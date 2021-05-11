@@ -1,0 +1,3 @@
+[submodule "external/nanovg"]
+	path = external/nanovg
+	url = https://github.com/memononen/nanovg

@@ -1,0 +1,9 @@
+[requires]
+glm/0.9.9.8
+nanosvg/20190405
+freetype/2.10.4
+glfw/3.3.4
+glew/2.2.0
+
+[generators]
+cmake
