@@ -18,5 +18,15 @@
     "path": "texture/tile/ocean_basecolor.png",
     "id": "texture/tile/ocean",
     "loader": "image"
+  },
+  {
+    "path": "icon/cursor.png",
+    "id": "icon/cursor",
+    "loader": "image"
+  },
+  {
+    "path": "icon/house.png",
+    "id": "icon/house",
+    "loader": "image"
   }
 ]

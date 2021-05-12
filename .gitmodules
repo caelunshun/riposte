@@ -1,3 +1,6 @@
 [submodule "external/nanovg"]
 	path = external/nanovg
 	url = https://github.com/memononen/nanovg
+[submodule "external/FastNoise2"]
+	path = external/FastNoise2
+	url = https://github.com/Auburn/FastNoise2

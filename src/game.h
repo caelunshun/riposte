@@ -8,6 +8,8 @@
 #include <vector>
 #include <glm/ext/vector_uint2.hpp>
 #include "tile.h"
+#include "cursor.h"
+#include "view.h"
 
 namespace rip {
     class Game {
@@ -15,7 +17,12 @@ namespace rip {
         uint32_t mapWidth;
         uint32_t mapHeight;
 
-    private:
+        Cursor cursor;
+        View view;
+
+        float dt;
+        float lastFrameTime;
+
         size_t getMapIndex(glm::uvec2 pos) const {
             return static_cast<size_t>(pos.x) + static_cast<size_t>(pos.y) * static_cast<size_t>(mapWidth);
         }
@@ -48,6 +55,34 @@ namespace rip {
         const Tile &getTile(glm::uvec2 pos) const {
             auto index = getMapIndex(pos);
             return theMap.at(index);
+        }
+
+        Cursor &getCursor() {
+            return cursor;
+        }
+
+        const Cursor &getCursor() const {
+            return cursor;
+        }
+
+        View &getView() {
+            return view;
+        }
+
+        const View &getView() const {
+            return view;
+        }
+
+        float getDeltaTime() const {
+            return dt;
+        }
+
+        void tick(GLFWwindow *window) {
+            dt = glfwGetTime() - lastFrameTime;
+            lastFrameTime = glfwGetTime();
+
+            cursor.tick(window);
+            view.tick(dt, cursor);
         }
     };
 }

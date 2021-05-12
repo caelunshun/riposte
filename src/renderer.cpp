@@ -10,7 +10,6 @@
 
 #include "renderer.h"
 
-#include <utility>
 #include <glm/vec2.hpp>
 
 namespace rip {
@@ -36,11 +35,11 @@ namespace rip {
     class TilePainter: public Painter {
         std::shared_ptr<Assets> assets;
 
-        void paintTile(NVGcontext  *vg, glm::uvec2 pos, glm::vec2 offset, const Tile &tile) {
+        void paintTile(NVGcontext  *vg, glm::vec2 offset, const Tile &tile) {
             auto imageID = "texture/tile/" + std::string(tile.getTerrainID());
             auto image = std::dynamic_pointer_cast<Image>(assets->get(imageID));
 
-            auto p = glm::vec2(pos * glm::uvec2(100)) + offset;
+            auto p = offset;
             auto paint = nvgImagePattern(vg, p.x, p.y, 100, 100, 0, image->id, 1);
             nvgBeginPath(vg);
             nvgRect(vg, p.x, p.y, 100, 100);
@@ -56,22 +55,48 @@ namespace rip {
         explicit TilePainter(std::shared_ptr<Assets> assets) : assets(std::move(assets)) {}
 
         void paint(NVGcontext *vg, Game &game) override {
-            for (int x = 0; x < 16; x++) {
-                for (int y = 0; y < 16; y++) {
-                    Terrain t;
-                    if (x % 2 == 0) t = Terrain::Grassland;
-                    else if (y % 2 == 0) t = Terrain::Desert;
-                    else if (x % 3 == 0) t = Terrain::Ocean;
-                    else t = Terrain::Plains;
-                    Tile tile(t);
+            for (int x = 0; x < game.getMapWidth(); x++) {
+                for (int y = 0; y < game.getMapHeight(); y++) {
+                    auto tile = game.getTile(glm::uvec2(x, y));
+                    auto offset = game.getView().getMapCenter() + glm::vec2(x * 100, y * 100);
 
-                    paintTile(vg, glm::uvec2(x, y), glm::vec2(0, 0), tile);
+                    // Simple frustum cull.
+                    if (offset.x < -100 || offset.y < -100
+                            || offset.x > game.getCursor().getWindowSize().x
+                            || offset.y > game.getCursor().getWindowSize().y) {
+                        continue;
+                    }
+
+                    paintTile(vg, offset, tile);
                 }
             }
         }
     };
 
-    void Renderer::init(std::shared_ptr<Assets> assets) {
+    /**
+ * Paints the custom cursor.
+ */
+    class CursorPainter : public Painter {
+        std::shared_ptr<Image> icon;
+
+    public:
+        explicit CursorPainter(std::shared_ptr<Assets> assets) {
+            icon = std::dynamic_pointer_cast<Image>(assets->get("icon/cursor"));
+        }
+
+        void paint(NVGcontext *vg, Game &game) override {
+            const auto size = 20;
+            auto pos = game.getCursor().getPos();
+            nvgBeginPath(vg);
+            nvgRect(vg, pos.x, pos.y, size, size);
+            auto paint = nvgImagePattern(vg, pos.x, pos.y, size, size, 0, icon->id, 1);
+            nvgFillPaint(vg, paint);
+            nvgFill(vg);
+        }
+    };
+
+    void Renderer::init(const std::shared_ptr<Assets>& assets) {
         painters.push_back(std::make_unique<TilePainter>(assets));
+        painters.push_back(std::make_unique<CursorPainter>(assets));
     }
 }

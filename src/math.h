@@ -5,11 +5,10 @@
 #ifndef RIPOSTE_MATH_H
 #define RIPOSTE_MATH_H
 
-#include <glm/vec3.hpp>
-#include <glm/vec2.hpp>
+#include <cmath>
 
 namespace rip {
-
+    double pi() { return std::atan(1)*4; }
 }
 
 #endif //RIPOSTE_MATH_H

@@ -1,5 +1,6 @@
 #include "assets.h"
 #include "renderer.h"
+#include "mapgen.h"
 
 static void error_callback(int error, const char* description)
 {
@@ -20,6 +21,8 @@ int main() {
     }
     glfwMakeContextCurrent(window);
 
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
     glewExperimental = true;
 
     if (glewInit() != GLEW_OK) {
@@ -36,10 +39,13 @@ int main() {
 
     renderer.init(assets);
 
-    rip::Game game(100, 100);
+    rip::Game game(64, 64);
+    rip::MapGenerator mapgen;
+    mapgen.generate(game);
 
     glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {
+        game.tick(window);
         renderer.paint(game);
     }
 

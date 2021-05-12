@@ -28,7 +28,7 @@ namespace rip {
     public:
         explicit Renderer(GLFWwindow *window);
 
-        void init(std::shared_ptr<Assets> assets);
+        void init(const std::shared_ptr<Assets>& assets);
 
         void paint(Game &game) {
             int width, height, fbWidth, fbHeight;
