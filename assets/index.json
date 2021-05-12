@@ -1,0 +1,22 @@
+[
+  {
+    "path": "texture/tile/desert_basecolor.png",
+    "id": "texture/tile/desert",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/plains_basecolor.png",
+    "id": "texture/tile/plains",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/grassland_basecolor.png",
+    "id": "texture/tile/grassland",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/ocean_basecolor.png",
+    "id": "texture/tile/ocean",
+    "loader": "image"
+  }
+]

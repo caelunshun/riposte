@@ -5,6 +5,8 @@
 #ifndef RIPOSTE_TILE_H
 #define RIPOSTE_TILE_H
 
+#include <string>
+
 namespace rip {
     /**
      * A type of terrain.
@@ -12,6 +14,8 @@ namespace rip {
     enum Terrain {
         Grassland,
         Desert,
+        Ocean,
+        Plains,
     };
 
     /**
@@ -22,6 +26,9 @@ namespace rip {
         Terrain terrain;
 
     public:
+        Tile(Terrain terrain) : terrain(terrain) {}
+        Tile() : terrain(Terrain::Grassland) {}
+
         Terrain getTerrain() const {
             return terrain;
         }
@@ -32,6 +39,19 @@ namespace rip {
 
         bool canSustainCity() const {
             return (terrain != Terrain::Desert);
+        }
+
+        const char *getTerrainID() const {
+            switch (terrain) {
+                case Grassland:
+                    return "grassland";
+                case Desert:
+                    return "desert";
+                case Plains:
+                    return "plains";
+                case Ocean:
+                    return "ocean";
+            }
         }
     };
 

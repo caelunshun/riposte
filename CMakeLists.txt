@@ -1,17 +1,20 @@
-cmake_minimum_required(VERSION 3.15)
+cmake_minimum_required(VERSION 3.14)
 project(riposte)
+
+set(CMAKE_C_COMPILER clang-11)
+set(CMAKE_CXX_COMPILER clang++-11)
 
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
 set(CMAKE_CXX_STANDARD 20)
 
-set(SOURCES src/main.cpp src/math.h src/tile.cpp src/tile.h src/game.cpp src/game.h src/renderer.cpp src/renderer.h)
 set(NANOVG_SOURCES external/nanovg/src/nanovg.c)
-
-add_library(nanovg ${NANOVG_SOURCES})
-target_compile_definitions(nanovg PRIVATE FONS_USE_FREETYPE)
-target_include_directories(nanovg PUBLIC external/nanovg/src)
+set(SOURCES ${NANOVG_SOURCES} src/main.cpp src/math.h src/tile.cpp src/tile.h src/game.cpp src/game.h src/renderer.cpp src/renderer.h src/assets.cpp src/assets.h)
 
 add_executable(riposte ${SOURCES})
-target_link_libraries(riposte ${CONAN_LIBS} nanovg)
+
+target_compile_definitions(riposte PRIVATE FONS_USE_FREETYPE)
+target_include_directories(riposte PRIVATE external/nanovg/src)
+
+target_link_libraries(riposte ${CONAN_LIBS})
