@@ -8,7 +8,7 @@
 #include <cmath>
 
 namespace rip {
-    double pi() { return std::atan(1)*4; }
+    constexpr double pi() { return 3.14159265358979323846264338327950288; }
 }
 
 #endif //RIPOSTE_MATH_H

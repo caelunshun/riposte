@@ -10,6 +10,7 @@
 #include "tile.h"
 #include "cursor.h"
 #include "view.h"
+#include "city.h"
 
 namespace rip {
     class Game {
@@ -17,11 +18,13 @@ namespace rip {
         uint32_t mapWidth;
         uint32_t mapHeight;
 
+        std::vector<City> cities;
+
         Cursor cursor;
         View view;
 
-        float dt;
-        float lastFrameTime;
+        float dt = 0;
+        float lastFrameTime = 0;
 
         size_t getMapIndex(glm::uvec2 pos) const {
             return static_cast<size_t>(pos.x) + static_cast<size_t>(pos.y) * static_cast<size_t>(mapWidth);
@@ -77,12 +80,37 @@ namespace rip {
             return dt;
         }
 
+        glm::vec2 getMapOrigin() const {
+            return getView().getMapCenter() - (getCursor().getWindowSize() / 2.0f);
+        }
+
         void tick(GLFWwindow *window) {
             dt = glfwGetTime() - lastFrameTime;
             lastFrameTime = glfwGetTime();
 
             cursor.tick(window);
             view.tick(dt, cursor);
+        }
+
+        const std::vector<City> &getCities() const {
+            return cities;
+        }
+
+        std::vector<City> &getCities() {
+            return cities;
+        }
+
+        void addCity(City city) {
+            cities.push_back(std::move(city));
+        }
+
+        City *getCityAtLocation(glm::uvec2 location) {
+            for (auto &city : cities) {
+                if (city.getPos() == location) {
+                    return &city;
+                }
+            }
+            return nullptr;
         }
     };
 }

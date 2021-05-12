@@ -20,6 +20,7 @@ int main() {
         return 1;
     }
     glfwMakeContextCurrent(window);
+    glfwSetTime(0);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 

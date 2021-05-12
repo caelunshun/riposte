@@ -97,6 +97,27 @@ namespace rip {
         }
     };
 
+    // CITY GENERATOR
+    void placeCities(rip::Game &game, Rng &rng) {
+        const auto numCities = 7;
+        int placed = 0;
+        while (placed < numCities) {
+            auto x = rng.u32(0, game.getMapWidth());
+            auto y = rng.u32(0, game.getMapHeight());
+            glm::uvec2 pos(x, y);
+
+            if (game.getTile(pos).getTerrain() == Terrain::Ocean) {
+                continue;
+            }
+
+            if (game.getCityAtLocation(pos) == nullptr) {
+                City city(pos, "Test");
+                game.addCity(std::move(city));
+                ++placed;
+            }
+        }
+    }
+
     // MAIN GENERATOR
 
     void MapGenerator::generate(rip::Game &game) {
@@ -140,5 +161,7 @@ namespace rip {
                 game.getTile(pos).setTerrain(t);
             }
         }
+
+        placeCities(game, rng);
     }
 }

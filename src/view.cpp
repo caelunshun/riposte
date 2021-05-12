@@ -66,7 +66,7 @@ namespace rip {
         }
 
         moveTime += dt;
-        mapCenter += (-centerVelocity * (1 / zoomFactor)) * dt;
+        mapCenter += (centerVelocity * (1 / zoomFactor)) * dt;
     }
 
     glm::vec2 View::getMapCenter() const {
