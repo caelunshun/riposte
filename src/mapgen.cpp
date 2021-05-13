@@ -120,7 +120,7 @@ namespace rip {
 
     // MAIN GENERATOR
 
-    void MapGenerator::generate(rip::Game &game) {
+    void buildTerrain(rip::Game &game, Rng &rng) {
         LandMap landMap(4, 4);
         const auto numContinents = 10;
         for (int continent = 0; continent < numContinents; continent++) {
@@ -161,7 +161,10 @@ namespace rip {
                 game.getTile(pos).setTerrain(t);
             }
         }
+    }
 
+    void MapGenerator::generate(rip::Game &game) {
+        buildTerrain(game, rng);
         placeCities(game, rng);
     }
 }

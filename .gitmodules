@@ -4,3 +4,6 @@
 [submodule "external/FastNoise2"]
 	path = external/FastNoise2
 	url = https://github.com/Auburn/FastNoise2
+[submodule "external/Rea"]
+	path = external/Rea
+	url = https://github.com/im95able/Rea

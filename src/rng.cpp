@@ -28,7 +28,7 @@ namespace rip {
         std::random_device dev;
         uint32_t a = dev();
         uint32_t b = dev();
-        state_ = (static_cast<uint64_t>(a) << 32) | static_cast<uint64_t>(a);
+        state_ = (static_cast<uint64_t>(a) << 32) | static_cast<uint64_t>(b);
     }
 
     void Rng::seed(uint64_t seed) {

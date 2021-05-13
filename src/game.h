@@ -7,10 +7,14 @@
 
 #include <vector>
 #include <glm/ext/vector_uint2.hpp>
+#include <rea.h>
+
 #include "tile.h"
 #include "cursor.h"
 #include "view.h"
 #include "city.h"
+#include "player.h"
+#include "registry.h"
 
 namespace rip {
     class Game {
@@ -18,10 +22,16 @@ namespace rip {
         uint32_t mapWidth;
         uint32_t mapHeight;
 
-        std::vector<City> cities;
+        rea::versioned_slot_map<City> cities;
+        rea::versioned_slot_map<Player> players;
+
+        // The human player.
+        PlayerId thePlayer;
 
         Cursor cursor;
         View view;
+
+        std::shared_ptr<Registry> registry;
 
         float dt = 0;
         float lastFrameTime = 0;
@@ -34,7 +44,10 @@ namespace rip {
         Game(uint32_t mapWidth, uint32_t mapHeight)
         : theMap(static_cast<size_t>(mapWidth) * mapHeight),
         mapWidth(mapWidth),
-        mapHeight(mapHeight) {}
+        mapHeight(mapHeight),
+        cursor() {
+
+        }
 
         uint32_t getMapWidth() const {
             return mapWidth;
@@ -92,16 +105,16 @@ namespace rip {
             view.tick(dt, cursor);
         }
 
-        const std::vector<City> &getCities() const {
+        const rea::versioned_slot_map<City> &getCities() const {
             return cities;
         }
 
-        std::vector<City> &getCities() {
+        rea::versioned_slot_map<City> &getCities() {
             return cities;
         }
 
-        void addCity(City city) {
-            cities.push_back(std::move(city));
+        CityId addCity(City city) {
+            return cities.insert(std::move(city)).second;
         }
 
         City *getCityAtLocation(glm::uvec2 location) {
@@ -111,6 +124,34 @@ namespace rip {
                 }
             }
             return nullptr;
+        }
+
+        City &getCity(CityId id) {
+            return cities.id_value(id);
+        }
+
+        const City &getCity(CityId id) const {
+            return cities.id_value(id);
+        }
+
+        Player &getPlayer(PlayerId id) {
+            return players.id_value(id);
+        }
+
+        PlayerId getThePlayerID() const {
+            return thePlayer;
+        }
+
+        Player &getThePlayer() {
+            return getPlayer(thePlayer);
+        }
+
+        void setThePlayerID(PlayerId id) {
+            thePlayer = id;
+        }
+
+        const Registry &getRegistry() const {
+            return *registry;
         }
     };
 }

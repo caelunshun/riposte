@@ -11,12 +11,13 @@ namespace rip {
     public:
         glm::uvec2 pos;
         std::string name;
+        PlayerId owner;
 
-        impl(glm::uvec2 pos, std::string name) : pos(pos), name(std::move(name)) {}
+        impl(glm::uvec2 pos, std::string name, PlayerId owner) : pos(pos), name(std::move(name)), owner(owner) {}
     };
 
-    City::City(glm::uvec2 pos, std::string name) {
-        _impl = std::make_unique<impl>(pos, std::move(name));
+    City::City(glm::uvec2 pos, std::string name, PlayerId owner) {
+        _impl = std::make_unique<impl>(pos, std::move(name), owner);
     }
 
     City::~City() = default;
@@ -29,6 +30,10 @@ namespace rip {
 
     const std::string &City::getName() const {
         return _impl->name;
+    }
+
+    PlayerId City::getOwner() const {
+        return _impl->owner;
     }
 
     void City::setName(std::string name) {

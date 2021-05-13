@@ -1,0 +1,18 @@
+{
+  "id": "rome",
+  "name": "Roman Empire",
+  "adjective": "Roman",
+  "color": [78, 0, 142],
+  "leader": "Julius Caesar",
+  "cities": [
+    "Rome",
+    "Ariminum",
+    "Belum",
+    "Placentia",
+    "Naisuss",
+    "Florentia",
+    "Abila",
+    "Aventicum",
+    "Aequum"
+  ]
+}

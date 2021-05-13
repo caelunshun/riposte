@@ -28,5 +28,15 @@
     "path": "icon/house.png",
     "id": "icon/house",
     "loader": "image"
+  },
+  {
+    "path": "civ/greece.json",
+    "id": "civ/greece",
+    "loader": "civ"
+  },
+  {
+    "path": "civ/rome.json",
+    "id": "civ/rome",
+    "loader": "civ"
   }
 ]

@@ -1,6 +1,7 @@
 #include "assets.h"
 #include "renderer.h"
 #include "mapgen.h"
+#include "registry.h"
 
 static void error_callback(int error, const char* description)
 {
@@ -22,7 +23,7 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetTime(0);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+   // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = true;
 
@@ -33,9 +34,11 @@ int main() {
     glGetError();
 
     rip::Renderer renderer(window);
+    auto registry = std::make_shared<rip::Registry>();
 
     auto assets = std::make_shared<rip::Assets>();
     assets->addLoader("image", std::make_unique<rip::ImageLoader>(renderer));
+    assets->addLoader("civ", std::make_unique<rip::CivLoader>(registry));
     assets->loadAssetsDir("assets");
 
     renderer.init(assets);
