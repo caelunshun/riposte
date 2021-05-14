@@ -44,10 +44,6 @@ namespace rip {
             for (auto &painter : painters) {
                 painter->paint(vg, game);
             }
-            nvgEndFrame(vg);
-
-            glfwSwapBuffers(window);
-            glfwPollEvents();
         }
 
         NVGcontext *getNvg() const {

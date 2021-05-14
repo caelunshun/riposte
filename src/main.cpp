@@ -2,6 +2,8 @@
 #include "renderer.h"
 #include "mapgen.h"
 #include "registry.h"
+#include "hud.h"
+#include "ui.h"
 
 static void error_callback(int error, const char* description)
 {
@@ -56,10 +58,24 @@ int main() {
     auto &capital = game.getCity(game.getThePlayer().getCities().at(0));
     game.getView().setMapCenter(glm::vec2(capital.getPos()) * glm::vec2(100, 100));
 
+    rip::Ui ui;
+    rip::Hud hud(renderer.getNvg(), ui.getNk());
+
     glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {
         game.tick(window);
         renderer.paint(game);
+
+        hud.update(game);
+
+        nvgEndFrame(renderer.getNvg());
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
+
+        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
+            hud.handleClick(game, game.getCursor().getPos());
+        }
     }
 
     return 0;

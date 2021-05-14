@@ -101,6 +101,16 @@ namespace rip {
             return getView().getMapCenter() - (getCursor().getWindowSize() / 2.0f);
         }
 
+        glm::vec2 getScreenOffset(glm::uvec2 tile) const {
+            return glm::vec2(tile) * 100.0f - getMapOrigin();
+        }
+
+        glm::uvec2 getPosFromScreenOffset(glm::vec2 offset) const {
+            auto translated = offset + getMapOrigin();
+            auto scaled = translated / 100.0f;
+            return glm::uvec2(static_cast<uint32_t>(floor(scaled.x)), static_cast<uint32_t>(floor(scaled.y)));
+        }
+
         void tick(GLFWwindow *window) {
             dt = glfwGetTime() - lastFrameTime;
             lastFrameTime = glfwGetTime();
@@ -182,6 +192,15 @@ namespace rip {
 
         Unit &getUnit(UnitId id) {
             return units.id_value(id);
+        }
+
+        Unit *getUnitAtPosition(glm::uvec2 location) {
+            for (auto &unit : units) {
+                if (unit.getPos() == location) {
+                    return &unit;
+                }
+            }
+            return nullptr;
         }
 
         rea::versioned_slot_map<Unit> &getUnits() {
