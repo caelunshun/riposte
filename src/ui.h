@@ -5,9 +5,14 @@
 #ifndef RIPOSTE_UI_H
 #define RIPOSTE_UI_H
 
-#include <nuklear.h>
+#include <memory>
+#include <GLFW/glfw3.h>
+
+struct nk_context;
 
 namespace rip {
+    void ui_mouse_callback(GLFWwindow *window, int button, int action, int mods);
+
     enum MouseButton {
         Right,
         Middle,
@@ -27,12 +32,19 @@ namespace rip {
     };
 
     class Ui {
-        nk_context *nk;
+        class impl;
+        std::unique_ptr<impl> _impl;
 
     public:
-        Ui() : nk(nullptr) {}
+        Ui(GLFWwindow *window);
 
-        nk_context *getNk() const { return nk; }
+        nk_context *getNk();
+
+        void begin();
+        void render();
+
+        ~Ui();
+        Ui(Ui &&other) = delete;
     };
 }
 

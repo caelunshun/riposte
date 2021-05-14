@@ -6,6 +6,7 @@
 #include "hud.h"
 #include "game.h"
 #include "ripmath.h"
+#include <nuklear.h>
 
 namespace rip {
     Hud::Hud(NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnit() {}
@@ -43,8 +44,35 @@ namespace rip {
         }
     }
 
+    void Hud::paintMainHud(Game &game) {
+        auto height = 100;
+        nk_begin(nk, "HUD",
+                 nk_rect(0, game.getCursor().getWindowSize().y - height, game.getCursor().getWindowSize().x, height),
+                 0);
+
+        nk_layout_row_begin(nk, NK_STATIC, 80, game.getNumPlayers() + 1);
+        int i = 0;
+        for (const auto &player : game.getPlayers()) {
+            nk_layout_row_push(nk, 100);
+            if (nk_group_begin(nk, std::to_string(i++).c_str(), 0)) {
+                nk_layout_row_dynamic(nk, 10, 1);
+                auto text = player.getUsername();
+                nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
+                text = "Cities: " + std::to_string(player.getCities().size());
+                nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
+                nk_group_end(nk);
+            }
+        }
+
+        nk_layout_row_push(nk, 100);
+        nk_button_label(nk, "Next Turn");
+
+        nk_end(nk);
+    }
+
     void Hud::update(Game &game) {
         paintSelectedUnit(game);
+        paintMainHud(game);
     }
 
     void Hud::handleClick(Game &game, MouseEvent event) {
@@ -57,7 +85,7 @@ namespace rip {
                 selectedUnit = std::make_optional<UnitId>(unit->getID());
             }
         } else if (selectedUnit.has_value()
-                && event.button == MouseButton::Right && event.action == MouseAction::Release) {
+                   && event.button == MouseButton::Right && event.action == MouseAction::Release) {
             auto &unit = game.getUnit(*selectedUnit);
             unit.moveTo(tilePos, game);
         }

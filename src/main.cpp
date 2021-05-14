@@ -10,6 +10,8 @@
 static std::deque<rip::MouseEvent> mouseEvents;
 
 static void mouse_callback(GLFWwindow *window, int button, int action, int mods) {
+    rip::ui_mouse_callback(window, button, action, mods);
+
     rip::MouseButton b;
     rip::MouseAction a;
 
@@ -96,7 +98,7 @@ int main() {
     auto &capital = game.getCity(game.getThePlayer().getCities().at(0));
     game.getView().setMapCenter(glm::vec2(capital.getPos()) * glm::vec2(100, 100));
 
-    rip::Ui ui;
+    rip::Ui ui(window);
     rip::Hud hud(renderer.getNvg(), ui.getNk());
 
     glfwSwapInterval(0);
@@ -104,9 +106,10 @@ int main() {
         game.tick(window);
         renderer.paint(game);
 
+        ui.begin();
         hud.update(game);
-
         nvgEndFrame(renderer.getNvg());
+        ui.render();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

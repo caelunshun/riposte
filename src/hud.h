@@ -24,6 +24,7 @@ namespace rip {
         std::optional<UnitId> selectedUnit;
 
         void paintSelectedUnit(Game &game);
+        void paintMainHud(Game &game);
 
     public:
         Hud(NVGcontext *vg, nk_context *nk);

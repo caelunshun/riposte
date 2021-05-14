@@ -7,3 +7,6 @@
 [submodule "external/Rea"]
 	path = external/Rea
 	url = https://github.com/im95able/Rea
+[submodule "external/Nuklear"]
+	path = external/Nuklear
+	url = https://github.com/Immediate-Mode-UI/Nuklear
