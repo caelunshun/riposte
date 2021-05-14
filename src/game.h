@@ -187,6 +187,10 @@ namespace rip {
         rea::versioned_slot_map<Unit> &getUnits() {
             return units;
         }
+
+        const rea::versioned_slot_map<Unit> &getUnits() const {
+            return units;
+        }
     };
 }
 

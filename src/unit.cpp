@@ -45,6 +45,10 @@ namespace rip {
     }
 
     bool Unit::canMove(glm::uvec2 target, const Game &game) const {
+        if (!game.containsTile(target)) {
+            return false;
+        }
+
         if (dist(target, pos) > movementLeft) {
             return false;
         }
@@ -62,5 +66,8 @@ namespace rip {
         auto d = dist(target, pos);
         movementLeft -= ceil(d);
         pos = target;
+
+        // Unit has moved; update visibility
+        game.getPlayer(owner).recomputeVisibility(game);
     }
 }

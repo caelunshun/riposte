@@ -226,7 +226,7 @@ namespace rip {
         }
 
         void paint(NVGcontext *vg, Game &game) override {
-            const auto size = 20;
+            const auto size = 25;
             auto pos = game.getCursor().getPos();
             nvgBeginPath(vg);
             nvgRect(vg, pos.x, pos.y, size, size);

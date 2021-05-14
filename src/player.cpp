@@ -82,12 +82,21 @@ namespace rip {
             }
         }
 
+        std::vector<glm::uvec2> sightPositions;
+
         for (const auto cityID : cities) {
             const auto &city = game.getCity(cityID);
+            sightPositions.push_back(city.getPos());
+        }
 
+        for (const auto &unit : game.getUnits()) {
+            sightPositions.push_back(unit.getPos());
+        }
+
+        for (const auto sightPos : sightPositions) {
             for (int dx = -2; dx <= 2; dx++) {
                 for (int dy = -2; dy <= 2; dy++) {
-                    auto p = glm::ivec2(city.getPos()) + glm::ivec2(dx, dy);
+                    auto p = glm::ivec2(sightPos) + glm::ivec2(dx, dy);
                     if (p.x < 0 || p.y < 0 || p.x >= game.getMapWidth() || p.y >= game.getMapHeight()) {
                         continue;
                     }
