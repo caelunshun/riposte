@@ -43,5 +43,25 @@
     "path": "font/Merriweather-Regular.ttf",
     "id": "font/merriweather/regular",
     "loader": "font"
+  },
+  {
+    "path": "unit/settler.json",
+    "id": "unit/settler",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/warrior.json",
+    "id": "unit/warrior",
+    "loader": "unit"
+  },
+  {
+    "path": "texture/unit/warrior.png",
+    "id": "texture/unit/warrior",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/settler.png",
+    "id": "texture/unit/settler",
+    "loader": "image"
   }
 ]

@@ -130,6 +130,8 @@ namespace rip {
 
                 if (game.getCityAtLocation(pos) == nullptr) {
                     player.createCity(pos, game);
+                    Unit settler(game.getRegistry().getUnits().at(0), pos, player.getID());
+                    game.addUnit(std::move(settler));
                     break;
                 }
             }

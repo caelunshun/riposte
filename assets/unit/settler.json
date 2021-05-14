@@ -1,0 +1,9 @@
+{
+  "id": "settler",
+  "name": "Settler",
+  "strength": 0,
+  "movement": 2,
+  "capabilities": [
+    "found_city"
+  ]
+}

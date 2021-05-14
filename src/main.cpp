@@ -40,6 +40,7 @@ int main() {
     assets->addLoader("image", std::make_unique<rip::ImageLoader>(renderer));
     assets->addLoader("font", std::make_unique<rip::FontLoader>(renderer));
     assets->addLoader("civ", std::make_unique<rip::CivLoader>(registry));
+    assets->addLoader("unit", std::make_unique<rip::UnitLoader>(registry));
     assets->loadAssetsDir("assets");
 
     renderer.init(assets);

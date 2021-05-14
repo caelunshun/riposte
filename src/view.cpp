@@ -3,7 +3,7 @@
 //
 
 #include "view.h"
-#include "math.h"
+#include "ripmath.h"
 
 #include <cmath>
 #include <algorithm>

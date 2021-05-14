@@ -174,6 +174,46 @@ namespace rip {
          }
      };
 
+     /**
+      * Paints units.
+      */
+      class UnitPainter : public Painter {
+          std::shared_ptr<Assets> assets;
+
+          void paintUnit(NVGcontext *vg, const Unit &unit, glm::vec2 offset) {
+              auto imageID = "texture/unit/" + unit.getKind().id;
+              auto image = std::dynamic_pointer_cast<Image>(assets->get(imageID));
+
+              int imageWidth, imageHeight;
+              nvgImageSize(vg, image->id, &imageWidth, &imageHeight);
+              float width = imageWidth * 0.1;
+              float height = imageHeight * 0.1;
+
+              auto posX = (100.0f - width) / 2 + offset.x;
+              auto posY = (100.0f - height) / 2 + offset.y;
+
+              nvgBeginPath(vg);
+              nvgRect(vg, posX, posY, width, height);
+              auto paint = nvgImagePattern(vg, posX, posY, width, height, 0, image->id, 1);
+              nvgFillPaint(vg, paint);
+              nvgFill(vg);
+          }
+
+      public:
+          explicit UnitPainter(std::shared_ptr<Assets> assets) : assets(std::move(assets)) {}
+
+          void paint(NVGcontext *vg, Game &game) override {
+            for (const auto &unit : game.getUnits()) {
+                auto offset = glm::vec2(unit.getPos()) * glm::vec2(100) - game.getMapOrigin();
+                if (!shouldPaintTile(offset, unit.getPos(), game)) {
+                    continue;
+                }
+
+                paintUnit(vg, unit, offset);
+            }
+          }
+      };
+
     /**
     * Paints the custom cursor.
     */
@@ -199,6 +239,7 @@ namespace rip {
     void Renderer::init(const std::shared_ptr<Assets>& assets) {
         painters.push_back(std::make_unique<TilePainter>(assets));
         painters.push_back(std::make_unique<CityPainter>(assets));
+        painters.push_back(std::make_unique<UnitPainter>(assets));
         painters.push_back(std::make_unique<CursorPainter>(assets));
     }
 }

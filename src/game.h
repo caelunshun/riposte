@@ -14,6 +14,7 @@
 #include "view.h"
 #include "city.h"
 #include "player.h"
+#include "unit.h"
 #include "registry.h"
 #include "ids.h"
 
@@ -25,6 +26,7 @@ namespace rip {
 
         rea::versioned_slot_map<City> cities;
         rea::versioned_slot_map<Player> players;
+        rea::versioned_slot_map<Unit> units;
 
         // The human player.
         PlayerId thePlayer;
@@ -166,6 +168,24 @@ namespace rip {
 
         const Registry &getRegistry() const {
             return *registry;
+        }
+
+        UnitId addUnit(Unit unit) {
+            auto id = units.insert(std::move(unit)).second;
+            units.id_value(id).setID(id);
+            return id;
+        }
+
+        const Unit &getUnit(UnitId id) const {
+            return units.id_value(id);
+        }
+
+        Unit &getUnit(UnitId id) {
+            return units.id_value(id);
+        }
+
+        rea::versioned_slot_map<Unit> &getUnits() {
+            return units;
         }
     };
 }

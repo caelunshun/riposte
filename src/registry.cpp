@@ -1,5 +1,5 @@
 //
-// Created by caelum on 5/12/21.
+// Created by Caelum van Ispelen on 5/12/21.
 //
 
 #include "registry.h"
@@ -12,7 +12,18 @@ namespace rip {
         return ptr;
     }
 
+    std::shared_ptr<Asset> UnitLoader::loadAsset(const std::string &data) {
+        auto unit = nlohmann::json::parse(data).get<UnitKind>();
+        auto ptr = std::make_shared<UnitKind>(std::move(unit));
+        registry->addUnit(ptr);
+        return ptr;
+    }
+
     const std::vector<std::shared_ptr<CivKind>> &Registry::getCivs() const {
         return civs;
+    }
+
+    const std::vector<std::shared_ptr<UnitKind>> &Registry::getUnits() const {
+        return units;
     }
 }

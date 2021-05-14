@@ -1,0 +1,7 @@
+{
+  "id": "warrior",
+  "name": "Warrior",
+  "strength": 2,
+  "movement": 1,
+  "capabilities": []
+}

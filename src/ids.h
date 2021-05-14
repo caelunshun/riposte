@@ -10,6 +10,7 @@
 namespace rip {
     typedef std::pair<unsigned long, unsigned long> PlayerId;
     typedef std::pair<unsigned long, unsigned long> CityId;
+    typedef std::pair<unsigned long, unsigned long> UnitId;
 }
 
 #endif //RIPOSTE_IDS_H
