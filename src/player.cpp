@@ -90,7 +90,9 @@ namespace rip {
         }
 
         for (const auto &unit : game.getUnits()) {
-            sightPositions.push_back(unit.getPos());
+            if (unit.getOwner() == id) {
+                sightPositions.push_back(unit.getPos());
+            }
         }
 
         for (const auto sightPos : sightPositions) {

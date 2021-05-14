@@ -44,25 +44,28 @@ namespace rip {
             moveDir |= DIR_UP;
         }
 
-        if (moveDir != oldMoveDir) {
-            moveTime = 0;
+        if (!(moveDir & DIR_RIGHT || moveDir & DIR_LEFT)) {
+            centerVelocity.x *= powf(0.02, dt);
+            moveTime.x = 0;
+        }
+        if (!(moveDir & DIR_DOWN || moveDir & DIR_UP)) {
+            centerVelocity.y *= powf(0.02, dt);
+            moveTime.y = 0;
         }
 
-        if (moveDir == 0) {
-            centerVelocity *= powf(0.02, dt);
-        }
+        float speedX = sampleVelocityCurve(moveTime.x);
+        float speedY = sampleVelocityCurve(moveTime.y);
 
-        float speed = sampleVelocityCurve(moveTime);
         if (moveDir & DIR_RIGHT) {
-            centerVelocity.x = speed;
+            centerVelocity.x = speedX;
         } else if (moveDir & DIR_LEFT) {
-            centerVelocity.x = -speed;
+            centerVelocity.x = -speedX;
         }
 
         if (moveDir & DIR_DOWN) {
-            centerVelocity.y = speed;
+            centerVelocity.y = speedY;
         } else if (moveDir & DIR_UP) {
-            centerVelocity.y = -speed;
+            centerVelocity.y = -speedY;
         }
 
         moveTime += dt;

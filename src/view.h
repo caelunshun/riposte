@@ -24,7 +24,7 @@ namespace rip {
          */
         float zoomFactor;
 
-        float moveTime = 0;
+        glm::vec2 moveTime = glm::vec2(0);
         uint32_t moveDir = 0;
 
         float zoomVelocity;
