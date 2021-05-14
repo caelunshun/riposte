@@ -41,7 +41,7 @@ namespace rip {
         // Capabilities (e.g. found city, do work)
         std::vector<std::string> capabilities;
 
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(UnitKind, id, name, strength, capabilities);
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(UnitKind, id, name, strength, movement, capabilities);
     };
 
     /**

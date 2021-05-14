@@ -10,6 +10,7 @@
 #include <optional>
 #include <glm/vec2.hpp>
 #include "ids.h"
+#include "ui.h"
 
 namespace rip {
     class Game;
@@ -30,7 +31,7 @@ namespace rip {
         // Renders the UI and handles input.
         void update(Game &game);
 
-        void handleClick(Game &game, glm::vec2 pos);
+        void handleClick(Game &game, MouseEvent event);
     };
 }
 

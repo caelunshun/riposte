@@ -5,6 +5,43 @@
 #include "hud.h"
 #include "ui.h"
 
+#include <deque>
+
+static std::deque<rip::MouseEvent> mouseEvents;
+
+static void mouse_callback(GLFWwindow *window, int button, int action, int mods) {
+    rip::MouseButton b;
+    rip::MouseAction a;
+
+    switch (button) {
+        case GLFW_MOUSE_BUTTON_LEFT:
+            b = rip::MouseButton::Left;
+            break;
+        case GLFW_MOUSE_BUTTON_MIDDLE:
+            b = rip::MouseButton::Middle;
+            break;
+        case GLFW_MOUSE_BUTTON_RIGHT:
+            b = rip::MouseButton::Right;
+            break;
+        default:
+            return;
+    }
+
+    switch (action) {
+        case GLFW_PRESS:
+            a = rip::MouseAction::Press;
+            break;
+        case GLFW_RELEASE:
+            a = rip::MouseAction::Release;
+            break;
+        default:
+            return;
+    }
+
+    rip::MouseEvent event(b, a);
+    mouseEvents.push_back(event);
+}
+
 static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
@@ -26,6 +63,7 @@ int main() {
     glfwSetTime(0);
 
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetMouseButtonCallback(window, mouse_callback);
 
     glewExperimental = true;
 
@@ -73,8 +111,10 @@ int main() {
         glfwSwapBuffers(window);
         glfwPollEvents();
 
-        if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) {
-            hud.handleClick(game, game.getCursor().getPos());
+        while (!mouseEvents.empty()) {
+            auto event = mouseEvents[0];
+            hud.handleClick(game, event);
+            mouseEvents.pop_front();
         }
     }
 

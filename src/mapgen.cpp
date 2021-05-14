@@ -108,7 +108,7 @@ namespace rip {
 
             Player player(civ->leader, civ, game.getMapWidth(), game.getMapHeight());
             auto playerID = game.addPlayer(std::move(player));
-            player.setID(playerID);
+            game.getPlayer(playerID).setID(playerID);
 
             if (game.getNumPlayers() == 1) {
                 game.setThePlayerID(playerID);

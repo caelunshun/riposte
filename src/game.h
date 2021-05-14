@@ -182,7 +182,8 @@ namespace rip {
 
         UnitId addUnit(Unit unit) {
             auto id = units.insert(std::move(unit)).second;
-            units.id_value(id).setID(id);
+            auto &u = getUnit(id);
+            u.setID(id);
             return id;
         }
 

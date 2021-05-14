@@ -13,7 +13,7 @@ namespace rip {
 
     Unit::Unit(std::shared_ptr<UnitKind> kind, glm::uvec2 pos, PlayerId owner) : kind(std::move(kind)), pos(pos), owner(owner) {
         health = 1;
-        resetMovement();
+        movementLeft = this->kind->movement;
     }
 
     void Unit::setID(UnitId id) {
@@ -45,6 +45,10 @@ namespace rip {
     }
 
     bool Unit::canMove(glm::uvec2 target, const Game &game) const {
+        if (target == pos) {
+            return false;
+        }
+
         if (!game.containsTile(target)) {
             return false;
         }
@@ -62,6 +66,9 @@ namespace rip {
 
     void Unit::moveTo(glm::uvec2 target, Game &game) {
         if (!canMove(target, game)) return;
+
+        moveTime = 0;
+        moveFrom = pos;
 
         auto d = dist(target, pos);
         movementLeft -= ceil(d);

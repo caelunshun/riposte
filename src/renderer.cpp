@@ -9,8 +9,9 @@
 #include <nanovg_gl.h>
 
 #include "renderer.h"
+#include "ripmath.h"
 
-#include <glm/vec2.hpp>
+#include <glm/glm.hpp>
 
 namespace rip {
     std::shared_ptr<Asset> ImageLoader::loadAsset(const std::string &data) {
@@ -180,6 +181,24 @@ namespace rip {
       class UnitPainter : public Painter {
           std::shared_ptr<Assets> assets;
 
+          glm::vec2 getInterpolatedUnitPos(glm::vec2 fromPos, glm::vec2 toPos, float time) {
+              float pos;
+              // integral of cosine velocity function
+              const auto end = 1;
+              const auto vel = 1000;
+              if (time <= end) {
+                  pos = vel * -cos(time * (end * 2 * pi())) + vel;
+              } else {
+                  pos = (vel * -cos(end * (end / 2 * pi())) + vel) + vel * (time - end);
+              }
+
+              auto dist = glm::distance(fromPos, toPos);
+              pos = std::clamp(pos, 0.0f, dist);
+
+              auto ray = glm::normalize(toPos - fromPos);
+              return fromPos + (ray * pos);
+          }
+
           void paintUnit(NVGcontext *vg, const Unit &unit, glm::vec2 offset) {
               auto imageID = "texture/unit/" + unit.getKind().id;
               auto image = std::dynamic_pointer_cast<Image>(assets->get(imageID));
@@ -203,10 +222,19 @@ namespace rip {
           explicit UnitPainter(std::shared_ptr<Assets> assets) : assets(std::move(assets)) {}
 
           void paint(NVGcontext *vg, Game &game) override {
-            for (const auto &unit : game.getUnits()) {
-                auto offset = glm::vec2(unit.getPos()) * glm::vec2(100) - game.getMapOrigin();
+            for (auto &unit : game.getUnits()) {
+                auto offset = game.getScreenOffset(unit.getPos());
                 if (!shouldPaintTile(offset, unit.getPos(), game)) {
                     continue;
+                }
+
+                if (unit.moveTime != -1) {
+                    auto newOffset = getInterpolatedUnitPos(game.getScreenOffset(unit.moveFrom), offset, unit.moveTime);
+                    unit.moveTime += game.getDeltaTime();
+                    if (glm::distance(offset, newOffset) <= 0.1) {
+                        unit.moveTime = -1;
+                    }
+                    offset = newOffset;
                 }
 
                 paintUnit(vg, unit, offset);

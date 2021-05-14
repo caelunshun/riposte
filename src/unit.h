@@ -34,6 +34,10 @@ namespace rip {
         void resetMovement();
 
     public:
+        // Used by the renderer to animate the unit's position between two tiles.
+        float moveTime = -1;
+        glm::uvec2 moveFrom = glm::uvec2(0);
+
         Unit(std::shared_ptr<UnitKind> kind, glm::uvec2 pos, PlayerId owner);
 
         void setID(UnitId id);

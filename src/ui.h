@@ -8,6 +8,24 @@
 #include <nuklear.h>
 
 namespace rip {
+    enum MouseButton {
+        Right,
+        Middle,
+        Left,
+    };
+
+    enum MouseAction {
+        Press,
+        Release,
+    };
+
+    struct MouseEvent {
+        MouseButton button;
+        MouseAction action;
+
+        MouseEvent(MouseButton button, MouseAction action) : button(button), action(action) {}
+    };
+
     class Ui {
         nk_context *nk;
 

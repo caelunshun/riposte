@@ -6,7 +6,9 @@
 
 namespace rip {
     double dist(glm::uvec2 a, glm::uvec2 b) {
-        return sqrt(pow(static_cast<double>(b.x - a.x), 2) + pow(static_cast<double>(b.y - a.y), 2));
+        glm::vec2 af(a);
+        glm::vec2 bf(b);
+        return sqrt(pow(af.x - bf.x, 2) + pow(af.y - bf.y, 2));
     }
 }
 
