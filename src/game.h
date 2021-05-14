@@ -15,6 +15,7 @@
 #include "city.h"
 #include "player.h"
 #include "registry.h"
+#include "ids.h"
 
 namespace rip {
     class Game {
@@ -41,10 +42,11 @@ namespace rip {
         }
 
     public:
-        Game(uint32_t mapWidth, uint32_t mapHeight)
+        Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry)
         : theMap(static_cast<size_t>(mapWidth) * mapHeight),
         mapWidth(mapWidth),
         mapHeight(mapHeight),
+        registry(registry),
         cursor() {
 
         }
@@ -146,8 +148,20 @@ namespace rip {
             return getPlayer(thePlayer);
         }
 
+        size_t getNumPlayers() const {
+            return players.size();
+        }
+
         void setThePlayerID(PlayerId id) {
             thePlayer = id;
+        }
+
+        PlayerId addPlayer(Player player) {
+            return players.insert(std::move(player)).second;
+        }
+
+        rea::versioned_slot_map<Player> &getPlayers() {
+            return players;
         }
 
         const Registry &getRegistry() const {

@@ -97,23 +97,41 @@ namespace rip {
         }
     };
 
-    // CITY GENERATOR
-    void placeCities(rip::Game &game, Rng &rng) {
-        const auto numCities = 7;
-        int placed = 0;
-        while (placed < numCities) {
-            auto x = rng.u32(0, game.getMapWidth());
-            auto y = rng.u32(0, game.getMapHeight());
-            glm::uvec2 pos(x, y);
+    const auto numPlayers = 7;
 
-            if (game.getTile(pos).getTerrain() == Terrain::Ocean) {
-                continue;
+    // CIVILIZATION GENERATOR
+    void seedPlayers(Game &game, Rng &rng) {
+        while (game.getNumPlayers() < numPlayers) {
+            const auto &civs = game.getRegistry().getCivs();
+            auto index = rng.u32(0, civs.size());
+            auto civ = civs[index];
+
+            Player player(civ->leader, civ, game.getMapWidth(), game.getMapHeight());
+            auto playerID = game.addPlayer(std::move(player));
+            player.setID(playerID);
+
+            if (game.getNumPlayers() == 1) {
+                game.setThePlayerID(playerID);
             }
+        }
+    }
 
-            if (game.getCityAtLocation(pos) == nullptr) {
-                City city(pos, "Test");
-                game.addCity(std::move(city));
-                ++placed;
+    // CITY GENERATOR
+    void placeCities(Game &game, Rng &rng) {
+        for (auto &player : game.getPlayers()) {
+            while(true) {
+                auto x = rng.u32(0, game.getMapWidth());
+                auto y = rng.u32(0, game.getMapHeight());
+                glm::uvec2 pos(x, y);
+
+                if (game.getTile(pos).getTerrain() == Terrain::Ocean) {
+                    continue;
+                }
+
+                if (game.getCityAtLocation(pos) == nullptr) {
+                    player.createCity(pos, game);
+                    break;
+                }
             }
         }
     }
@@ -165,6 +183,7 @@ namespace rip {
 
     void MapGenerator::generate(rip::Game &game) {
         buildTerrain(game, rng);
+        seedPlayers(game, rng);
         placeCities(game, rng);
     }
 }

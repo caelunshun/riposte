@@ -38,6 +38,8 @@ namespace rip {
         glm::vec2 getMapCenter() const;
 
         float getZoomFactor() const;
+
+        void setMapCenter(glm::vec2 pos);
     };
 }
 

@@ -16,7 +16,7 @@ add_subdirectory(external/FastNoise2)
 target_compile_definitions(riposte PRIVATE FONS_USE_FREETYPE)
 target_include_directories(riposte PRIVATE external/nanovg/src external/FastNoise2/include external/Rea/Rea)
 
-set(CMAKE_C_COMPILER "/usr/bin/clang-11")
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
+#set(CMAKE_C_COMPILER "/usr/bin/clang-11")
+#set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
 
 target_link_libraries(riposte ${CONAN_LIBS} FastNoise)

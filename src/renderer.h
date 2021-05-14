@@ -70,6 +70,20 @@ namespace rip {
 
         explicit Image(int id) : id(id) {}
     };
+
+    class FontLoader : public AssetLoader {
+        NVGcontext *vg;
+    public:
+        explicit FontLoader(const Renderer &renderer) : vg(renderer.getNvg()) {}
+        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+    };
+
+    class Font : public Asset {
+    public:
+        int id;
+
+        explicit Font(int id) : id(id) {}
+    };
 }
 
 #endif //RIPOSTE_RENDERER_H

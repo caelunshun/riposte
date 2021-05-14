@@ -23,7 +23,7 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetTime(0);
 
-   // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = true;
 
@@ -38,14 +38,22 @@ int main() {
 
     auto assets = std::make_shared<rip::Assets>();
     assets->addLoader("image", std::make_unique<rip::ImageLoader>(renderer));
+    assets->addLoader("font", std::make_unique<rip::FontLoader>(renderer));
     assets->addLoader("civ", std::make_unique<rip::CivLoader>(registry));
     assets->loadAssetsDir("assets");
 
     renderer.init(assets);
 
-    rip::Game game(64, 64);
+    rip::Game game(64, 64, registry);
     rip::MapGenerator mapgen;
     mapgen.generate(game);
+
+    for (auto &player : game.getPlayers()) {
+        player.recomputeVisibility(game);
+    }
+
+    auto &capital = game.getCity(game.getThePlayer().getCities().at(0));
+    game.getView().setMapCenter(glm::vec2(capital.getPos()) * glm::vec2(100, 100));
 
     glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {

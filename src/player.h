@@ -8,14 +8,12 @@
 #include <rea.h>
 #include <string>
 #include <vector>
+#include <glm/vec2.hpp>
 #include "registry.h"
+#include "ids.h"
 
 namespace rip {
     class Game;
-
-    class Player;
-
-    typedef rea::versioned_slot_map<Player>::id_type PlayerId;
 
     enum Visibility : uint8_t {
         // The tile is completely hidden (black).
@@ -35,7 +33,11 @@ namespace rip {
         uint32_t mapWidth, mapHeight;
 
      public:
-         VisibilityMap(uint32_t mapWidth, uint32_t mapHeight) : mapWidth(mapWidth), mapHeight(mapHeight) {}
+         VisibilityMap(uint32_t mapWidth, uint32_t mapHeight) : map(mapWidth * mapHeight), mapWidth(mapWidth), mapHeight(mapHeight) {
+             for (int i = 0; i < mapWidth * mapHeight; i++) {
+                 map[i] = Visibility::Hidden;
+             }
+         }
 
          Visibility operator[](glm::uvec2 pos) const {
              return map[pos.x + mapWidth * pos.y];
@@ -67,10 +69,10 @@ namespace rip {
          // The player's civilization.
          std::shared_ptr<CivKind> civ;
 
-         std::string getNextCityName();
+         std::string getNextCityName(const Game &game);
 
      public:
-         Player(std::string username, uint32_t mapWidth, uint32_t mapHeight);
+         Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight);
 
          void setID(PlayerId id);
 

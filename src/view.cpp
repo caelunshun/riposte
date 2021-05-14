@@ -76,4 +76,8 @@ namespace rip {
     float View::getZoomFactor() const {
         return zoomFactor;
     }
+
+    void View::setMapCenter(glm::vec2 pos) {
+        mapCenter = pos;
+    }
 }

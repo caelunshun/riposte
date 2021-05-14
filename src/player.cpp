@@ -2,11 +2,12 @@
 // Created by Caelum van Ispelen on 5/12/21.
 //
 
+#include <unordered_set>
 #include "player.h"
 #include "game.h"
 
 namespace rip {
-    Player::Player(std::string username, uint32_t mapWidth, uint32_t mapHeight) : username(std::move(username)), visibilityMap(mapWidth, mapHeight) {
+    Player::Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight) : username(std::move(username)), visibilityMap(mapWidth, mapHeight), civ(civ) {
 
     }
 
@@ -38,12 +39,32 @@ namespace rip {
         cities.erase(std::remove(cities.begin(), cities.end(), id), cities.end());
     }
 
-    std::string Player::getNextCityName() {
+    std::string Player::getNextCityName(const Game &game) {
+        std::unordered_set<std::string> usedNames;
+        for (const auto cityID : cities) {
+            const auto &city = game.getCity(cityID);
+            usedNames.emplace(city.getName());
+        }
 
+        int numNews = 0;
+        while (true) {
+            for (const auto &name : civ->cities) {
+                std::string prefix;
+                for (int i = 0; i < numNews; i++) {
+                    prefix += "New ";
+                }
+                auto prefixedName = prefix + name;
+                if (usedNames.find(prefixedName) == usedNames.end()) {
+                    return prefixedName;
+                }
+
+                ++numNews;
+            }
+        }
     }
 
     CityId Player::createCity(glm::uvec2 pos, Game &game) {
-        auto name = getNextCityName();
+        auto name = getNextCityName(game);
         City city(pos, std::move(name), id);
         auto cityID = game.addCity(std::move(city));
         registerCity(cityID);
@@ -66,7 +87,11 @@ namespace rip {
 
             for (int dx = -2; dx <= 2; dx++) {
                 for (int dy = -2; dy <= 2; dy++) {
-                    glm::uvec2 pos(glm::ivec2(city.getPos()) + glm::ivec2(dx, dy));
+                    auto p = glm::ivec2(city.getPos()) + glm::ivec2(dx, dy);
+                    if (p.x < 0 || p.y < 0 || p.x >= game.getMapWidth() || p.y >= game.getMapHeight()) {
+                        continue;
+                    }
+                    glm::uvec2 pos(p);
                     visibilityMap[pos] = Visibility::Visible;
                 }
             }

@@ -9,12 +9,9 @@
 #include <glm/vec2.hpp>
 #include <rea.h>
 #include "player.h"
+#include "ids.h"
 
 namespace rip {
-    class City;
-
-    typedef rea::versioned_slot_map<City>::id_type CityId;
-
     class City {
         class impl;
         std::unique_ptr<impl> _impl;

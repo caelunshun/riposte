@@ -39,6 +39,7 @@ namespace rip {
         const std::vector<std::shared_ptr<CivKind>> &getCivs() const;
 
         void addCiv(std::shared_ptr<CivKind> c) {
+
             civs.push_back(std::move(c));
         }
     };

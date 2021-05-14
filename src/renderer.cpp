@@ -19,6 +19,11 @@ namespace rip {
         return std::make_shared<Image>(id);
     }
 
+    std::shared_ptr<Asset> FontLoader::loadAsset(const std::string &data) {
+        auto id = nvgCreateFontMem(vg, "default", (unsigned char *) data.data(), data.size(), 0);
+        return std::make_shared<Font>(id);
+    }
+
     Renderer::Renderer(GLFWwindow *window) : window(window) {
         vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
     }
@@ -28,10 +33,19 @@ namespace rip {
     }
 
     // Simple 2D frustum cull.
-    bool shouldPaintTile(glm::vec2 offset, const Cursor &cursor) {
-        return !(offset.x < -100 || offset.y < -100
+    bool shouldPaintTile(glm::vec2 offset, glm::uvec2 pos, Game &game) {
+        auto &cursor = game.getCursor();
+        if (offset.x < -100 || offset.y < -100
         || offset.x > cursor.getWindowSize().x
-        || offset.y > cursor.getWindowSize().y);
+        || offset.y > cursor.getWindowSize().y) {
+            return false;
+        }
+
+        if (game.getThePlayer().getVisibilityMap()[pos] != Visibility::Visible) {
+            return false;
+        }
+
+        return true;
     }
 
     // PAINTERS
@@ -54,7 +68,7 @@ namespace rip {
             nvgFill(vg);
 
             // Tile border
-            nvgStrokeColor(vg, nvgRGBA(0, 87, 183, 200));
+            nvgStrokeColor(vg, nvgRGBA(0, 87, 183, 100));
             nvgStroke(vg);
         }
 
@@ -64,10 +78,11 @@ namespace rip {
         void paint(NVGcontext *vg, Game &game) override {
             for (int x = 0; x < game.getMapWidth(); x++) {
                 for (int y = 0; y < game.getMapHeight(); y++) {
-                    auto tile = game.getTile(glm::uvec2(x, y));
+                    glm::uvec2 pos(x, y);
+                    auto tile = game.getTile(pos);
                     auto offset = glm::vec2(x * 100, y * 100) - game.getMapOrigin();
 
-                    if (!shouldPaintTile(offset, game.getCursor())) {
+                    if (!shouldPaintTile(offset, pos, game)) {
                         continue;
                     }
 
@@ -83,7 +98,7 @@ namespace rip {
      class CityPainter : public Painter {
          std::shared_ptr<Image> houseIcon;
 
-         void paintCity(NVGcontext *vg, const City &city, glm::vec2 offset) {
+         void paintHouses(NVGcontext *vg, glm::vec2 offset) {
              const auto numHouses = 3;
              const auto aspectRatio = 1.0 / 1.424;
              const glm::vec2 housePositions[numHouses] = {
@@ -109,6 +124,39 @@ namespace rip {
              }
          }
 
+         void paintBubble(NVGcontext *vg, const City &city, glm::vec2 offset) {
+             // Rectangle
+             nvgBeginPath(vg);
+             nvgRoundedRect(vg, offset.x, offset.y + 10, 100, 20, 5);
+             auto paint = nvgLinearGradient(vg, offset.x, offset.y + 10, offset.x, offset.y + 20,
+                                            nvgRGBA(61, 61, 62, 180),
+                                            nvgRGBA(40, 40, 41, 180));
+             nvgFillPaint(vg, paint);
+             nvgFill(vg);
+
+             // Circle
+             nvgBeginPath(vg);
+             const auto radius = 10;
+             nvgCircle(vg, offset.x - 5 + radius, offset.y + 10 + radius, radius);
+             nvgFillColor(vg, nvgRGB(182, 207, 174));
+             nvgFill(vg);
+             nvgStrokeColor(vg, nvgRGB(0, 0, 0));
+             nvgStrokeWidth(vg, 1.5);
+             nvgStroke(vg);
+
+             // City name
+             nvgFontFace(vg, "default");
+             nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+             nvgFontSize(vg, 15);
+             nvgFillColor(vg, nvgRGB(255, 255, 255));
+             nvgText(vg, offset.x + 50, offset.y + 20, city.getName().c_str(), nullptr);
+         }
+
+         void paintCity(NVGcontext *vg, const City &city, glm::vec2 offset) {
+             paintHouses(vg, offset);
+             paintBubble(vg, city, offset);
+         }
+
      public:
          explicit CityPainter(std::shared_ptr<Assets> assets) {
              houseIcon = std::dynamic_pointer_cast<Image>(assets->get("icon/house"));
@@ -117,7 +165,7 @@ namespace rip {
          void paint(NVGcontext *vg, Game &game) override {
             for (const auto &city : game.getCities()) {
                 auto offset = glm::vec2(city.getPos()) * 100.0f - game.getMapOrigin();
-                if (!shouldPaintTile(offset, game.getCursor())) {
+                if (!shouldPaintTile(offset, city.getPos(), game)) {
                     continue;
                 }
 
