@@ -33,6 +33,8 @@ namespace rip {
         void update(Game &game);
 
         void handleClick(Game &game, MouseEvent event);
+
+        void updateSelectedUnit(Game &game);
     };
 }
 

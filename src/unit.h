@@ -55,6 +55,8 @@ namespace rip {
         // Attempts to move the unit to a target position.
         // Does nothing if canMove(target) is false.
         void moveTo(glm::uvec2 target, Game &game);
+
+        void onTurnEnd();
     };
 }
 

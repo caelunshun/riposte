@@ -11,7 +11,8 @@ namespace rip {
         movementLeft = kind->movement;
     }
 
-    Unit::Unit(std::shared_ptr<UnitKind> kind, glm::uvec2 pos, PlayerId owner) : kind(std::move(kind)), pos(pos), owner(owner) {
+    Unit::Unit(std::shared_ptr<UnitKind> kind, glm::uvec2 pos, PlayerId owner) : kind(std::move(kind)), pos(pos),
+                                                                                 owner(owner) {
         health = 1;
         movementLeft = this->kind->movement;
     }
@@ -77,4 +78,11 @@ namespace rip {
         // Unit has moved; update visibility
         game.getPlayer(owner).recomputeVisibility(game);
     }
+
+    void Unit::onTurnEnd() {
+        resetMovement();
+        const auto regen = 0.2;
+        health = std::clamp(health + regen, 0.0, 1.0);
+    }
+
 }

@@ -34,7 +34,7 @@ namespace rip {
     }
 
     // Simple 2D frustum cull.
-    bool shouldPaintTile(glm::vec2 offset, glm::uvec2 pos, Game &game) {
+    bool shouldPaintTile(glm::vec2 offset, glm::uvec2 pos, Game &game, bool allowFog) {
         auto &cursor = game.getCursor();
         if (offset.x < -100 || offset.y < -100
         || offset.x > cursor.getWindowSize().x
@@ -42,7 +42,8 @@ namespace rip {
             return false;
         }
 
-        if (game.getThePlayer().getVisibilityMap()[pos] != Visibility::Visible) {
+        auto vis = game.getThePlayer().getVisibilityMap()[pos];
+        if (vis == Visibility::Hidden || (vis == Visibility::Fogged && !allowFog)) {
             return false;
         }
 
@@ -83,7 +84,7 @@ namespace rip {
                     auto tile = game.getTile(pos);
                     auto offset = glm::vec2(x * 100, y * 100) - game.getMapOrigin();
 
-                    if (!shouldPaintTile(offset, pos, game)) {
+                    if (!shouldPaintTile(offset, pos, game, true)) {
                         continue;
                     }
 
@@ -166,7 +167,7 @@ namespace rip {
          void paint(NVGcontext *vg, Game &game) override {
             for (const auto &city : game.getCities()) {
                 auto offset = glm::vec2(city.getPos()) * 100.0f - game.getMapOrigin();
-                if (!shouldPaintTile(offset, city.getPos(), game)) {
+                if (!shouldPaintTile(offset, city.getPos(), game, true)) {
                     continue;
                 }
 
@@ -224,7 +225,7 @@ namespace rip {
           void paint(NVGcontext *vg, Game &game) override {
             for (auto &unit : game.getUnits()) {
                 auto offset = game.getScreenOffset(unit.getPos());
-                if (!shouldPaintTile(offset, unit.getPos(), game)) {
+                if (!shouldPaintTile(offset, unit.getPos(), game, false)) {
                     continue;
                 }
 
@@ -241,6 +242,33 @@ namespace rip {
             }
           }
       };
+
+      /**
+       * Paints a fog overlay over fogged regions.
+       */
+       class FogPainter : public Painter {
+       public:
+           void paint(NVGcontext *vg, Game &game) override {
+                for (int x = 0; x < game.getMapWidth(); x++) {
+                    for (int y = 0; y < game.getMapHeight(); y++) {
+                        glm::uvec2 pos(x, y);
+                        auto offset = game.getScreenOffset(pos);
+                        if (!shouldPaintTile(offset, pos, game, true)) {
+                            continue;
+                        }
+
+                        if (game.getThePlayer().getVisibilityMap()[pos] != Visibility::Fogged) {
+                            continue;
+                        }
+
+                        nvgBeginPath(vg);
+                        nvgRect(vg, offset.x, offset.y, 100, 100);
+                        nvgFillColor(vg, nvgRGBA(50, 50, 50, 150));
+                        nvgFill(vg);
+                    }
+                }
+           }
+       };
 
     /**
     * Paints the custom cursor.
@@ -265,9 +293,12 @@ namespace rip {
     };
 
     void Renderer::init(const std::shared_ptr<Assets>& assets) {
-        painters.push_back(std::make_unique<TilePainter>(assets));
-        painters.push_back(std::make_unique<CityPainter>(assets));
-        painters.push_back(std::make_unique<UnitPainter>(assets));
-        painters.push_back(std::make_unique<CursorPainter>(assets));
+        // Painting happens in the order painters are added here,
+        // allowing for layering.
+        gamePainters.push_back(std::make_unique<TilePainter>(assets));
+        gamePainters.push_back(std::make_unique<CityPainter>(assets));
+        gamePainters.push_back(std::make_unique<UnitPainter>(assets));
+        gamePainters.push_back(std::make_unique<FogPainter>());
+        overlayPainters.push_back(std::make_unique<CursorPainter>(assets));
     }
 }

@@ -104,12 +104,19 @@ int main() {
     glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {
         game.tick(window);
-        renderer.paint(game);
+
+        // Paint order: game, UI, overlays
+        renderer.begin(true);
+        renderer.paintGame(game);
+        renderer.end();
 
         ui.begin();
         hud.update(game);
-        nvgEndFrame(renderer.getNvg());
         ui.render();
+
+        renderer.begin(false);
+        renderer.paintOverlays(game);
+        renderer.end();
 
         glfwSwapBuffers(window);
         glfwPollEvents();

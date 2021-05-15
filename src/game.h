@@ -8,6 +8,7 @@
 #include <vector>
 #include <glm/ext/vector_uint2.hpp>
 #include <rea.h>
+#include <optional>
 
 #include "tile.h"
 #include "cursor.h"
@@ -39,6 +40,8 @@ namespace rip {
         float dt = 0;
         float lastFrameTime = 0;
 
+        int turn = 0;
+
         size_t getMapIndex(glm::uvec2 pos) const {
             return static_cast<size_t>(pos.x) + static_cast<size_t>(pos.y) * static_cast<size_t>(mapWidth);
         }
@@ -52,6 +55,13 @@ namespace rip {
         cursor() {
 
         }
+
+        // Advances to the next turn, updating all necessary game state.
+        void advanceTurn();
+
+        // Gets the next unit the player should be prompted to move on this turn.
+        // If this returns an empty, then the turn should end.
+        std::optional<UnitId> getNextUnitToMove() const;
 
         uint32_t getMapWidth() const {
             return mapWidth;
@@ -210,6 +220,10 @@ namespace rip {
 
         const rea::versioned_slot_map<Unit> &getUnits() const {
             return units;
+        }
+
+        int getTurn() const {
+            return turn;
         }
     };
 }

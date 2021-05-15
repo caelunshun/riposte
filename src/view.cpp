@@ -70,6 +70,14 @@ namespace rip {
 
         moveTime += dt;
         mapCenter += (centerVelocity * (1 / zoomFactor)) * dt;
+
+        if (centerAnimation.has_value()) {
+            mapCenter = centerAnimation->getCurrentPos();
+            centerAnimation->advance(dt);
+            if (centerAnimation->isComplete()) {
+                centerAnimation = std::optional<SmoothAnimation>();
+            }
+        }
     }
 
     glm::vec2 View::getMapCenter() const {
@@ -82,5 +90,9 @@ namespace rip {
 
     void View::setMapCenter(glm::vec2 pos) {
         mapCenter = pos;
+    }
+
+    void View::setCenterAnimation(SmoothAnimation animation) {
+        centerAnimation = std::make_optional<SmoothAnimation>(animation);
     }
 }

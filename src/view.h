@@ -6,7 +6,9 @@
 #define RIPOSTE_VIEW_H
 
 #include <glm/vec2.hpp>
+#include <optional>
 #include "cursor.h"
+#include "ripmath.h"
 
 namespace rip {
     /**
@@ -30,6 +32,9 @@ namespace rip {
         float zoomVelocity;
         glm::vec2 centerVelocity;
 
+        // Used to animate the view position when it is moved programatically.
+        std::optional<SmoothAnimation> centerAnimation;
+
     public:
         View() : mapCenter(500, 500), zoomFactor(1), zoomVelocity(0), centerVelocity(0, 0) {}
 
@@ -40,6 +45,8 @@ namespace rip {
         float getZoomFactor() const;
 
         void setMapCenter(glm::vec2 pos);
+
+        void setCenterAnimation(SmoothAnimation animation);
     };
 }
 

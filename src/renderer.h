@@ -23,25 +23,41 @@ namespace rip {
     class Renderer {
         NVGcontext *vg;
         GLFWwindow *window;
-        std::vector<std::unique_ptr<Painter>> painters;
+        std::vector<std::unique_ptr<Painter>> gamePainters;
+        std::vector<std::unique_ptr<Painter>> overlayPainters;
 
     public:
         explicit Renderer(GLFWwindow *window);
 
         void init(const std::shared_ptr<Assets>& assets);
 
-        void paint(Game &game) {
+        void begin(bool clear) {
             int width, height, fbWidth, fbHeight;
             glfwGetWindowSize(window, &width, &height);
             glfwGetFramebufferSize(window, &fbWidth, &fbHeight);
             auto scaleFactor = static_cast<float>(fbWidth) / width;
 
             glViewport(0, 0, fbWidth, fbHeight);
-            glClearColor(0, 0, 0, 0);
-            glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+            if (clear) {
+                glClearColor(0, 0, 0, 0);
+                glClear(GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+            }
 
             nvgBeginFrame(vg, width, height, scaleFactor);
-            for (auto &painter : painters) {
+        }
+
+        void end() {
+            nvgEndFrame(vg);
+        }
+
+        void paintGame(Game &game) {
+            for (auto &painter : gamePainters) {
+                painter->paint(vg, game);
+            }
+        }
+
+        void paintOverlays(Game &game) {
+            for (auto &painter : overlayPainters) {
                 painter->paint(vg, game);
             }
         }

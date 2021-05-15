@@ -50,22 +50,28 @@ namespace rip {
                  nk_rect(0, game.getCursor().getWindowSize().y - height, game.getCursor().getWindowSize().x, height),
                  0);
 
-        nk_layout_row_begin(nk, NK_STATIC, 80, game.getNumPlayers() + 1);
-        int i = 0;
-        for (const auto &player : game.getPlayers()) {
-            nk_layout_row_push(nk, 100);
-            if (nk_group_begin(nk, std::to_string(i++).c_str(), 0)) {
-                nk_layout_row_dynamic(nk, 10, 1);
-                auto text = player.getUsername();
-                nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
-                text = "Cities: " + std::to_string(player.getCities().size());
-                nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
-                nk_group_end(nk);
-            }
-        }
+        nk_layout_row_begin(nk, NK_STATIC, 80, 2);
+        nk_layout_row_push(nk, 100);
+
+        auto turnText = "Turn " + std::to_string(game.getTurn());
+        nk_label(nk, turnText.c_str(), NK_TEXT_ALIGN_CENTERED);
 
         nk_layout_row_push(nk, 100);
-        nk_button_label(nk, "Next Turn");
+
+        if (nk_button_label(nk, "Next Turn")) {
+            if (game.getNextUnitToMove().has_value()) {
+                // Need to move all units first.
+                /*auto center = game.getCursor().getWindowSize();
+                auto width = 200;
+                auto height = 100;
+                nk_popup_begin(nk, NK_POPUP_STATIC, "units must move", 0, nk_rect(center.x - width / 2, center.y - height / 2, width, height));
+                nk_label(nk, "Move all your units first.", NK_TEXT_ALIGN_CENTERED);
+                nk_popup_end(nk);*/
+            } else {
+                game.advanceTurn();
+                updateSelectedUnit(game);
+            }
+        }
 
         nk_end(nk);
     }
@@ -73,6 +79,14 @@ namespace rip {
     void Hud::update(Game &game) {
         paintSelectedUnit(game);
         paintMainHud(game);
+    }
+
+    void Hud::updateSelectedUnit(Game &game) {
+        selectedUnit = game.getNextUnitToMove();
+        if (selectedUnit.has_value()) {
+            SmoothAnimation animation(game.getView().getMapCenter(), glm::vec2(game.getUnit(*selectedUnit).getPos()) * 100.0f, 300.0f, 0.5f);
+            game.getView().setCenterAnimation(animation);
+        }
     }
 
     void Hud::handleClick(Game &game, MouseEvent event) {
@@ -88,6 +102,9 @@ namespace rip {
                    && event.button == MouseButton::Right && event.action == MouseAction::Release) {
             auto &unit = game.getUnit(*selectedUnit);
             unit.moveTo(tilePos, game);
+            if (unit.getMovementLeft() == 0) {
+                updateSelectedUnit(game);
+            }
         }
     }
 }
