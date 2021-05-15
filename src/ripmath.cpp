@@ -38,6 +38,10 @@ namespace rip {
     }
 
     glm::vec2 SmoothAnimation::getCurrentPos() const {
+        if (glm::distance(targetPos, fromPos) <= 0.1) {
+            return targetPos;
+        }
+
         auto pos = getPosInternal();
         pos = std::clamp(pos, 0.0f, glm::distance(fromPos, targetPos));
 
