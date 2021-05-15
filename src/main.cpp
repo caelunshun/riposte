@@ -108,10 +108,10 @@ int main() {
         // Paint order: game, UI, overlays
         renderer.begin(true);
         renderer.paintGame(game);
-        renderer.end();
 
         ui.begin();
         hud.update(game);
+        renderer.end();
         ui.render();
 
         renderer.begin(false);

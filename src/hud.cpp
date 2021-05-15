@@ -61,12 +61,8 @@ namespace rip {
         if (nk_button_label(nk, "Next Turn")) {
             if (game.getNextUnitToMove().has_value()) {
                 // Need to move all units first.
-                /*auto center = game.getCursor().getWindowSize();
-                auto width = 200;
-                auto height = 100;
-                nk_popup_begin(nk, NK_POPUP_STATIC, "units must move", 0, nk_rect(center.x - width / 2, center.y - height / 2, width, height));
-                nk_label(nk, "Move all your units first.", NK_TEXT_ALIGN_CENTERED);
-                nk_popup_end(nk);*/
+                pushMessage("Move all your units before advancing the turn!");
+                updateSelectedUnit(game);
             } else {
                 game.advanceTurn();
                 updateSelectedUnit(game);
@@ -76,9 +72,39 @@ namespace rip {
         nk_end(nk);
     }
 
+    void Hud::paintMessages(Game &game) {
+        auto width = 500;
+        auto posX = game.getCursor().getWindowSize().x / 2;
+        auto posY = 50.0f;
+
+        nvgFontSize(vg, 14);
+        nvgFontFace(vg, "default");
+        nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
+
+        for (const auto &message : messages) {
+            float alpha = 1;
+            float timeLeft =  message.disappearTime - glfwGetTime();
+            if (timeLeft < 1) {
+                alpha = std::clamp(timeLeft, 0.0f, 1.0f);
+            }
+            nvgFillColor(vg, nvgRGBA(255, 255, 255, static_cast<uint8_t>(alpha * 255.0f)));
+
+            float bounds[2];
+            nvgTextBounds(vg, posX, posY, message.text.c_str(), nullptr, bounds);
+            nvgText(vg, posX, posY, message.text.c_str(), nullptr);
+
+            posY += bounds[1];
+        }
+
+        if (!messages.empty() && messages[0].disappearTime <= glfwGetTime()) {
+            messages.pop_front();
+        }
+    }
+
     void Hud::update(Game &game) {
         paintSelectedUnit(game);
         paintMainHud(game);
+        paintMessages(game);
     }
 
     void Hud::updateSelectedUnit(Game &game) {
@@ -106,5 +132,9 @@ namespace rip {
                 updateSelectedUnit(game);
             }
         }
+    }
+
+    void Hud::pushMessage(std::string message) {
+        messages.emplace_back(std::move(message), glfwGetTime() + 7);
     }
 }

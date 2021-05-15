@@ -8,12 +8,20 @@
 #include <nuklear.h>
 #include <nanovg.h>
 #include <optional>
+#include <deque>
 #include <glm/vec2.hpp>
 #include "ids.h"
 #include "ui.h"
 
 namespace rip {
     class Game;
+
+    struct HudMessage {
+        std::string text;
+        float disappearTime;
+
+        HudMessage(std::string text, float disappearTime) : text(std::move(text)), disappearTime(disappearTime) {}
+    };
 
     // Renders the UI overlay during the game.
     // Also handles certain interactions.
@@ -23,8 +31,11 @@ namespace rip {
 
         std::optional<UnitId> selectedUnit;
 
+        std::deque<HudMessage> messages;
+
         void paintSelectedUnit(Game &game);
         void paintMainHud(Game &game);
+        void paintMessages(Game &game);
 
     public:
         Hud(NVGcontext *vg, nk_context *nk);
@@ -35,6 +46,8 @@ namespace rip {
         void handleClick(Game &game, MouseEvent event);
 
         void updateSelectedUnit(Game &game);
+
+        void pushMessage(std::string message);
     };
 }
 
