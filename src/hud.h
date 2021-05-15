@@ -36,6 +36,7 @@ namespace rip {
         void paintSelectedUnit(Game &game);
         void paintMainHud(Game &game);
         void paintMessages(Game &game);
+        void paintUnitUI(Game &game);
 
     public:
         Hud(NVGcontext *vg, nk_context *nk);

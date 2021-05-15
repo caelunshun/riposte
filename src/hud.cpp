@@ -7,6 +7,8 @@
 #include "game.h"
 #include "ripmath.h"
 #include <nuklear.h>
+#include <sstream>
+#include <iomanip>
 
 namespace rip {
     Hud::Hud(NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnit() {}
@@ -38,9 +40,51 @@ namespace rip {
                 nvgMoveTo(vg, center.x + radius * cos(arcEnd + 0.3), center.y + radius * sin(arcEnd + 0.3));
             }
 
-            nvgStrokeColor(vg, nvgRGBA(255, 255, 255, 200));
+            NVGcolor color;
+            if (unit.getMovementLeft() == 0) {
+                color = nvgRGBA(218, 41, 28, 200);
+            } else {
+                color = nvgRGBA(255, 255, 255, 200);
+            }
+
+            nvgStrokeColor(vg, color);
             nvgStrokeWidth(vg, 4);
             nvgStroke(vg);
+        }
+    }
+
+    void Hud::paintUnitUI(Game &game) {
+        if (selectedUnit.has_value()) {
+            auto &unit = game.getUnit(*selectedUnit);
+
+            nk_layout_row_push(nk, 200);
+            if (nk_group_begin(nk, "unit hud", 0)) {
+                nk_layout_row_dynamic(nk, 10, 1);
+
+                auto text = unit.getKind().name;
+                nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
+                std::stringstream strength;
+                strength << "Strength: " << std::fixed << std::setprecision(1) << unit.getCombatStrength();
+                nk_label(nk, strength.str().c_str(), NK_TEXT_ALIGN_LEFT);
+                text = "Movement: " + std::to_string(unit.getMovementLeft());
+                if (unit.getMovementLeft() != unit.getKind().movement) {
+                    text += " / " + std::to_string(unit.getKind().movement);
+                }
+                nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
+
+                nk_group_end(nk);
+            }
+
+            for (const auto &capability : unit.getKind().capabilities) {
+                if (capability == "found_city") {
+                    nk_layout_row_push(nk, 100);
+                    if (nk_button_label(nk, "Found City")) {
+                        game.getThePlayer().createCity(unit.getPos(), game);
+                        game.killUnit(*selectedUnit);
+                        pushMessage("Founded a city, consuming your Settler.");
+                    }
+                }
+            }
         }
     }
 
@@ -50,7 +94,7 @@ namespace rip {
                  nk_rect(0, game.getCursor().getWindowSize().y - height, game.getCursor().getWindowSize().x, height),
                  0);
 
-        nk_layout_row_begin(nk, NK_STATIC, 80, 2);
+        nk_layout_row_begin(nk, NK_STATIC, 80, 4);
         nk_layout_row_push(nk, 100);
 
         auto turnText = "Turn " + std::to_string(game.getTurn());
@@ -69,11 +113,12 @@ namespace rip {
             }
         }
 
+        paintUnitUI(game);
+
         nk_end(nk);
     }
 
     void Hud::paintMessages(Game &game) {
-        auto width = 500;
         auto posX = game.getCursor().getWindowSize().x / 2;
         auto posY = 50.0f;
 
@@ -102,6 +147,10 @@ namespace rip {
     }
 
     void Hud::update(Game &game) {
+        if (selectedUnit.has_value() && !game.getUnits().id_is_valid(*selectedUnit)) {
+            selectedUnit = std::optional<UnitId>();
+        }
+
         paintSelectedUnit(game);
         paintMainHud(game);
         paintMessages(game);
@@ -116,6 +165,11 @@ namespace rip {
     }
 
     void Hud::handleClick(Game &game, MouseEvent event) {
+        if (game.getCursor().getPos().y > game.getCursor().getWindowSize().y - 100) {
+            // Click in UI. Don't interfere with the HUD.
+            return;
+        }
+
         auto tilePos = game.getPosFromScreenOffset(game.getCursor().getPos());
         if (event.button == MouseButton::Left && event.action == MouseAction::Press) {
             auto unit = game.getUnitAtPosition(tilePos);

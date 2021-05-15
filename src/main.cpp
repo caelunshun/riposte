@@ -64,7 +64,7 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetTime(0);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+   // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetMouseButtonCallback(window, mouse_callback);
 
     glewExperimental = true;
@@ -95,8 +95,8 @@ int main() {
         player.recomputeVisibility(game);
     }
 
-    auto &capital = game.getCity(game.getThePlayer().getCities().at(0));
-    game.getView().setMapCenter(glm::vec2(capital.getPos()) * glm::vec2(100, 100));
+    auto startPos = game.getUnits().begin()->getPos();
+    game.getView().setMapCenter(glm::vec2(startPos) * glm::vec2(100, 100));
 
     rip::Ui ui(window);
     rip::Hud hud(renderer.getNvg(), ui.getNk());

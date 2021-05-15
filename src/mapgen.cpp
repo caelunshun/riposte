@@ -129,9 +129,12 @@ namespace rip {
                 }
 
                 if (game.getCityAtLocation(pos) == nullptr) {
-                    player.createCity(pos, game);
-                    Unit settler(game.getRegistry().getUnits().at(0), pos + glm::uvec2(1, 0), player.getID());
+                    Unit settler(game.getRegistry().getUnits().at(0), pos, player.getID());
                     game.addUnit(std::move(settler));
+
+                    Unit warrior(game.getRegistry().getUnits().at(1), pos + glm::uvec2(1, 0), player.getID());
+                    game.addUnit(std::move(warrior));
+
                     break;
                 }
             }

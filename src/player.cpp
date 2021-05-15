@@ -57,9 +57,8 @@ namespace rip {
                 if (usedNames.find(prefixedName) == usedNames.end()) {
                     return prefixedName;
                 }
-
-                ++numNews;
             }
+            ++numNews;
         }
     }
 

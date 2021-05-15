@@ -214,6 +214,10 @@ namespace rip {
             return nullptr;
         }
 
+        void killUnit(UnitId id) {
+            units.erase(id);
+        }
+
         rea::versioned_slot_map<Unit> &getUnits() {
             return units;
         }
