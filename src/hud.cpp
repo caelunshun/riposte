@@ -89,11 +89,11 @@ namespace rip {
             }
             nvgFillColor(vg, nvgRGBA(255, 255, 255, static_cast<uint8_t>(alpha * 255.0f)));
 
-            float bounds[2];
-            nvgTextBounds(vg, posX, posY, message.text.c_str(), nullptr, bounds);
+            float bounds[4];
+            nvgTextBounds(vg, 0, 0, message.text.c_str(), nullptr, bounds);
             nvgText(vg, posX, posY, message.text.c_str(), nullptr);
 
-            posY += bounds[1];
+            posY += bounds[3] + 14;
         }
 
         if (!messages.empty() && messages[0].disappearTime <= glfwGetTime()) {
@@ -110,7 +110,7 @@ namespace rip {
     void Hud::updateSelectedUnit(Game &game) {
         selectedUnit = game.getNextUnitToMove();
         if (selectedUnit.has_value()) {
-            SmoothAnimation animation(game.getView().getMapCenter(), glm::vec2(game.getUnit(*selectedUnit).getPos()) * 100.0f, 300.0f, 0.5f);
+            SmoothAnimation animation(game.getView().getMapCenter(), glm::vec2(game.getUnit(*selectedUnit).getPos()) * 100.0f, 2000.0f, 2.0f);
             game.getView().setCenterAnimation(animation);
         }
     }

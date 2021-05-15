@@ -22,7 +22,7 @@ namespace rip {
 
     float SmoothAnimation::getPosInternal() const {
         // The velocity function v(t) is ksin(a*pi*t), where k is the maximum velocity
-        // and a is acceleratioNTime.
+        // and a is accelerationTime.
         // After t>accelerationTime, the velocity is set to k.
         //
         // This function computes the definite integral of v(t) between 0 and the current time
