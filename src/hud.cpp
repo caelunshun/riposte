@@ -63,9 +63,13 @@ namespace rip {
 
                 auto text = unit.getKind().name;
                 nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
-                std::stringstream strength;
-                strength << "Strength: " << std::fixed << std::setprecision(1) << unit.getCombatStrength();
-                nk_label(nk, strength.str().c_str(), NK_TEXT_ALIGN_LEFT);
+
+                if (unit.getKind().strength != 0) {
+                    std::stringstream strength;
+                    strength << "Strength: " << std::fixed << std::setprecision(1) << unit.getCombatStrength();
+                    nk_label(nk, strength.str().c_str(), NK_TEXT_ALIGN_LEFT);
+                }
+
                 text = "Movement: " + std::to_string(unit.getMovementLeft());
                 if (unit.getMovementLeft() != unit.getKind().movement) {
                     text += " / " + std::to_string(unit.getKind().movement);
@@ -189,6 +193,6 @@ namespace rip {
     }
 
     void Hud::pushMessage(std::string message) {
-        messages.emplace_back(std::move(message), glfwGetTime() + 7);
+        messages.push_back(HudMessage(message, glfwGetTime() + 7));
     }
 }

@@ -20,7 +20,7 @@ namespace rip {
         std::string text;
         float disappearTime;
 
-        HudMessage(std::string text, float disappearTime) : text(std::move(text)), disappearTime(disappearTime) {}
+        HudMessage(std::string text, float disappearTime) : text(text), disappearTime(disappearTime) {}
     };
 
     // Renders the UI overlay during the game.
