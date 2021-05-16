@@ -33,10 +33,15 @@ namespace rip {
 
         std::deque<HudMessage> messages;
 
+        CityId lastCityBuildPrompt;
+
         void paintSelectedUnit(Game &game);
         void paintMainHud(Game &game);
         void paintMessages(Game &game);
         void paintUnitUI(Game &game);
+        void paintCityBuildPrompt(Game &game, CityId cityID);
+
+        std::optional<CityId> getCityBuildPrompt(const Game &game) const;
 
     public:
         Hud(NVGcontext *vg, nk_context *nk);
@@ -49,6 +54,8 @@ namespace rip {
         void updateSelectedUnit(Game &game);
 
         void pushMessage(std::string message);
+
+        bool hasFocus(const Game &game) const;
     };
 }
 

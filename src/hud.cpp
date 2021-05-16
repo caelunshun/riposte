@@ -83,9 +83,13 @@ namespace rip {
                 if (capability == "found_city") {
                     nk_layout_row_push(nk, 100);
                     if (nk_button_label(nk, "Found City")) {
-                        game.getThePlayer().createCity(unit.getPos(), game);
-                        game.killUnit(*selectedUnit);
-                        pushMessage("Founded a city, consuming your Settler.");
+                        if (game.getCityAtLocation(unit.getPos())) {
+                            pushMessage("You can only fit one city per tile.");
+                        } else {
+                            game.getThePlayer().createCity(unit.getPos(), game);
+                            game.killUnit(*selectedUnit);
+                            pushMessage("Founded a city, consuming your Settler.");
+                        }
                     }
                 }
             }
@@ -106,7 +110,7 @@ namespace rip {
 
         nk_layout_row_push(nk, 100);
 
-        if (nk_button_label(nk, "Next Turn")) {
+        if (nk_button_label(nk, "Next Turn") && !hasFocus(game)) {
             if (game.getNextUnitToMove().has_value()) {
                 // Need to move all units first.
                 pushMessage("Move all your units before advancing the turn!");
@@ -155,8 +159,21 @@ namespace rip {
             selectedUnit = std::optional<UnitId>();
         }
 
+        if (hasFocus(game)) {
+            selectedUnit = std::optional<UnitId>();
+        }
+
         paintSelectedUnit(game);
         paintMainHud(game);
+        auto cityID = getCityBuildPrompt(game);
+        if (cityID.has_value()) {
+            if (*cityID != lastCityBuildPrompt) {
+                lastCityBuildPrompt = *cityID;
+                const auto &city = game.getCity(*cityID);
+                game.getView().setCenterAnimation(SmoothAnimation(game.getView().getMapCenter(), glm::vec2(city.getPos()) * 100.0f, 2000.0f, 0.5f));
+            }
+            paintCityBuildPrompt(game, *cityID);
+        }
         paintMessages(game);
     }
 
@@ -171,6 +188,10 @@ namespace rip {
     void Hud::handleClick(Game &game, MouseEvent event) {
         if (game.getCursor().getPos().y > game.getCursor().getWindowSize().y - 100) {
             // Click in UI. Don't interfere with the HUD.
+            return;
+        }
+
+        if (hasFocus(game)) {
             return;
         }
 
@@ -193,6 +214,52 @@ namespace rip {
     }
 
     void Hud::pushMessage(std::string message) {
-        messages.push_back(HudMessage(message, glfwGetTime() + 7));
+        messages.emplace_back(message, glfwGetTime() + 7);
+    }
+
+    void Hud::paintCityBuildPrompt(Game &game, CityId cityID) {
+        auto &city = game.getCity(cityID);
+
+        auto size = game.getCursor().getWindowSize();
+        auto width = 300;
+        auto height = 400;
+        auto margin = 20;
+
+        nk_begin(nk, "city build prompt", nk_rect(size.x - width - margin, margin, width, height), 0);
+        nk_layout_row_dynamic(nk, 50, 1);
+
+        const auto &previousTask = city.getPreviousBuildTask();
+        std::string text;
+        if (previousTask.empty()) {
+            text = "What would you like to build in " + city.getName() + "?";
+        } else {
+            text = "You have built a " + city.getPreviousBuildTask() + " in " + city.getName() + ". What would you like to work on next?";
+        }
+        nk_label_colored_wrap(nk, text.c_str(), nk_rgb(255, 255, 255));
+
+        for (auto &task : city.getPossibleBuildTasks(game)) {
+            auto label = task->getName() + " ("
+                    + std::to_string(city.estimateTurnsForCompletion(*task, game))
+                    + ")";
+            if (nk_button_label(nk, label.c_str())) {
+                city.setBuildTask(std::move(task));
+                updateSelectedUnit(game);
+            }
+        }
+
+        nk_end(nk);
+    }
+
+    std::optional<CityId> Hud::getCityBuildPrompt(const Game &game) const {
+       for (const auto &city : game.getCities()) {
+           if (!city.hasBuildTask() && city.getOwner() == game.getThePlayerID()) {
+               return std::make_optional(city.getID());
+           }
+       }
+       return std::optional<CityId>();
+    }
+
+    bool Hud::hasFocus(const Game &game) const {
+        return getCityBuildPrompt(game).has_value();
     }
 }

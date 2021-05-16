@@ -40,8 +40,10 @@ namespace rip {
         int movement;
         // Capabilities (e.g. found city, do work)
         std::vector<std::string> capabilities;
+        // How many hammers it costs to build this unit.
+        int cost;
 
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(UnitKind, id, name, strength, movement, capabilities);
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(UnitKind, id, name, strength, movement, capabilities, cost);
     };
 
     /**

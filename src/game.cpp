@@ -10,6 +10,10 @@ namespace rip {
             unit.onTurnEnd();
         }
 
+        for (auto &city : cities) {
+            city.onTurnEnd(*this);
+        }
+
         ++turn;
     }
 

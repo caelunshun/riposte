@@ -37,7 +37,7 @@ namespace rip {
 
         nk_font_atlas *atlas;
         nk_glfw3_font_stash_begin(&*nkGlfw, &atlas);
-        nk_font *defaultFont = nk_font_atlas_add_from_file(atlas, "assets/font/Merriweather-Regular.ttf", 14, 0);
+        nk_font *defaultFont = nk_font_atlas_add_from_file(atlas, "assets/font/Merriweather-Regular.ttf", 18, 0);
         nk_glfw3_font_stash_end(&*nkGlfw);
         nk_style_set_font(nk, &defaultFont->handle);
         nk_style_load_all_cursors(nk, atlas->cursors);

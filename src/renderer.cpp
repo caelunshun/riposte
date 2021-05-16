@@ -21,7 +21,10 @@ namespace rip {
     }
 
     std::shared_ptr<Asset> FontLoader::loadAsset(const std::string &data) {
-        auto id = nvgCreateFontMem(vg, "default", (unsigned char *) data.data(), data.size(), 0);
+        // The data is now owned by NanoVG, so we have to make a copy to avoid use-after-free.
+        auto *dataCopy = (unsigned char *) malloc(data.size());
+        memcpy(dataCopy, data.data(), data.size());
+        auto id = nvgCreateFontMem(vg, "default", dataCopy, data.size(), 0);
         return std::make_shared<Font>(id);
     }
 

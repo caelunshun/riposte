@@ -5,6 +5,7 @@
 #include "hud.h"
 #include "ui.h"
 
+#include <iostream>
 #include <deque>
 
 static std::deque<rip::MouseEvent> mouseEvents;
@@ -101,9 +102,13 @@ int main() {
     rip::Ui ui(window);
     rip::Hud hud(renderer.getNvg(), ui.getNk());
 
+    auto vendor = glGetString(GL_VENDOR);
+    auto model = glGetString(GL_RENDERER);
+    std::cout << "Selected GPU: " << vendor << " " << model << std::endl;
+
     glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {
-        game.tick(window);
+        game.tick(window, hud.hasFocus(game));
 
         // Paint order: game, UI, overlays
         renderer.begin(true);

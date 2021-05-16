@@ -3,6 +3,7 @@
   "name": "Settler",
   "strength": 0,
   "movement": 2,
+  "cost": 40,
   "capabilities": [
     "found_city"
   ]

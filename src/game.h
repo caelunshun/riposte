@@ -121,12 +121,14 @@ namespace rip {
             return glm::uvec2(static_cast<uint32_t>(floor(scaled.x)), static_cast<uint32_t>(floor(scaled.y)));
         }
 
-        void tick(GLFWwindow *window) {
+        void tick(GLFWwindow *window, bool hudHasFocus) {
             dt = glfwGetTime() - lastFrameTime;
             lastFrameTime = glfwGetTime();
 
             cursor.tick(window);
-            view.tick(dt, cursor);
+            if (!hudHasFocus) {
+                view.tick(dt, cursor);
+            }
         }
 
         const rea::versioned_slot_map<City> &getCities() const {
@@ -138,7 +140,9 @@ namespace rip {
         }
 
         CityId addCity(City city) {
-            return cities.insert(std::move(city)).second;
+            auto id = cities.insert(std::move(city)).second;
+            getCity(id).setID(id);
+            return id;
         }
 
         City *getCityAtLocation(glm::uvec2 location) {
