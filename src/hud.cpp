@@ -279,7 +279,7 @@ namespace rip {
     }
 
     void Hud::pushMessage(std::string message) {
-        messages.emplace_back(message, glfwGetTime() + 7);
+        messages.emplace_front(message, glfwGetTime() + 7);
     }
 
     void Hud::paintCityBuildPrompt(Game &game, CityId cityID) {
