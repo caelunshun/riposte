@@ -1,4 +1,5 @@
 [requires]
+abseil/20210324.1
 freetype/2.10.4
 glfw/3.3.4
 glew/2.2.0

@@ -148,6 +148,8 @@ namespace rip {
                  auto progress = static_cast<double>(task->getProgress()) / task->getCost();
                  auto projectedProgress = static_cast<double>(task->getProgress() + city.computeYield(game).hammers) / task->getCost();
 
+                 projectedProgress = std::clamp(projectedProgress, 0.0, 1.0);
+
                  const auto offsetY = 20;
                  const auto height = bubbleHeight / 2;
 

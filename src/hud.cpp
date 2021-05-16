@@ -11,7 +11,24 @@
 #include <iomanip>
 
 namespace rip {
-    Hud::Hud(NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnit() {}
+    Hud::Hud(NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnit(), selectedUnitPath(std::vector<glm::uvec2>()) {}
+
+    void Hud::paintPath(Game &game, glm::uvec2 start, const Path &path) {
+        auto prev = start;
+        nvgBeginPath(vg);
+        for (const auto point : path.getPoints()) {
+            auto prevOffset = game.getScreenOffset(prev) + 50.0f;
+            auto currOffset = game.getScreenOffset(point) + 50.0f;
+            nvgMoveTo(vg, prevOffset.x, prevOffset.y);
+            nvgLineTo(vg, currOffset.x, currOffset.y);
+            prev = point;
+        }
+
+        nvgStrokeColor(vg, nvgRGBA(255, 255, 255, 180));
+        nvgStrokeWidth(vg, 5);
+        nvgLineCap(vg, NVG_ROUND);
+        nvgStroke(vg);
+    }
 
     void Hud::paintSelectedUnit(Game &game) {
         if (selectedUnit.has_value()) {
@@ -50,6 +67,19 @@ namespace rip {
             nvgStrokeColor(vg, color);
             nvgStrokeWidth(vg, 4);
             nvgStroke(vg);
+
+            if (selectedUnitPath.getNumPoints() != 0) {
+                paintPath(game, unit.getPos(), selectedUnitPath);
+            }
+
+            if (selectedUnitPathError.has_value()) {
+                auto offset = game.getScreenOffset(*selectedUnitPathError) + 50.0f;
+                nvgBeginPath(vg);
+                nvgCircle(vg, offset.x, offset.y, 50);
+                nvgStrokeColor(vg, nvgRGBA(218, 41, 28, 200));
+                nvgStrokeWidth(vg, 5);
+                nvgStroke(vg);
+            }
         }
     }
 
@@ -163,6 +193,13 @@ namespace rip {
             selectedUnit = std::optional<UnitId>();
         }
 
+        if (isSelectingPath && selectedUnit.has_value()) {
+            auto currentPos = game.getPosFromScreenOffset(game.getCursor().getPos());
+            if (selectedUnitPath.getNumPoints() == 0 || currentPos != selectedUnitPath.getDestination()) {
+                trySetSelectedPath(game, game.getUnit(*selectedUnit).getPos(), currentPos);
+            }
+        }
+
         paintSelectedUnit(game);
         paintMainHud(game);
         auto cityID = getCityBuildPrompt(game);
@@ -175,6 +212,19 @@ namespace rip {
             paintCityBuildPrompt(game, *cityID);
         }
         paintMessages(game);
+    }
+
+    void Hud::trySetSelectedPath(Game &game, glm::uvec2 from, glm::uvec2 to) {
+        auto path = computeShortestPath(game, from, to);
+        if (path.has_value()) {
+            selectedUnitPath = std::move(*path);
+            selectedUnitPathError = std::optional<glm::uvec2>();
+        } else {
+            selectedUnitPathError = std::make_optional(to);
+            selectedUnitPath = Path(std::vector<glm::uvec2>());
+        }
+
+        isSelectingPath = true;
     }
 
     void Hud::updateSelectedUnit(Game &game) {
@@ -204,11 +254,22 @@ namespace rip {
                 selectedUnit = std::make_optional<UnitId>(unit->getID());
             }
         } else if (selectedUnit.has_value()
-                   && event.button == MouseButton::Right && event.action == MouseAction::Release) {
+                   && event.button == MouseButton::Right && event.action == MouseAction::Press) {
+            const auto &unit = game.getUnit(*selectedUnit);
+            trySetSelectedPath(game, unit.getPos(), tilePos);
+        } else if (selectedUnit.has_value()
+            && event.button == MouseButton::Right && event.action == MouseAction::Release) {
             auto &unit = game.getUnit(*selectedUnit);
-            unit.moveTo(tilePos, game);
+            unit.setPath(std::move(selectedUnitPath));
+            unit.moveAlongCurrentPath(game);
+            selectedUnitPath = Path(std::vector<glm::uvec2>());
+            selectedUnitPathError = std::optional<glm::uvec2>();
+            isSelectingPath = false;
+
             if (unit.getMovementLeft() == 0) {
                 updateSelectedUnit(game);
+                selectedUnitPathError = std::optional<glm::uvec2>();
+                selectedUnitPath = Path(std::vector<glm::uvec2>());
             }
         }
     }

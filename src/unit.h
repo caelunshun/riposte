@@ -8,6 +8,7 @@
 #include <glm/vec2.hpp>
 #include "registry.h"
 #include "ids.h"
+#include "path.h"
 
 namespace rip {
     class Game;
@@ -30,6 +31,8 @@ namespace rip {
         // How many tiles the unit has left to move on this turn.
         // Resets to kind.movement at the start of every turn.
         int movementLeft;
+        // The path the unit is currently following.
+        std::optional<Path> currentPath;
 
         void resetMovement();
 
@@ -55,6 +58,11 @@ namespace rip {
         // Attempts to move the unit to a target position.
         // Does nothing if canMove(target) is false.
         void moveTo(glm::uvec2 target, Game &game);
+
+        bool hasPath() const;
+        const Path &getPath() const;
+        void setPath(Path path);
+        void moveAlongCurrentPath(Game &game);
 
         void onTurnEnd();
     };

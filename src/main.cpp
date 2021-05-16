@@ -65,7 +65,7 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetTime(0);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetMouseButtonCallback(window, mouse_callback);
 
     glewExperimental = true;

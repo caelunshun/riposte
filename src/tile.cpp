@@ -3,3 +3,9 @@
 //
 
 #include "tile.h"
+
+namespace rip {
+    int Tile::getMovementCost() const {
+        return 1;
+    }
+}

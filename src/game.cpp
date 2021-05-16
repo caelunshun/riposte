@@ -17,10 +17,14 @@ namespace rip {
         ++turn;
     }
 
-    std::optional<UnitId> Game::getNextUnitToMove() const {
-        for (const auto &unit : units) {
+    std::optional<UnitId> Game::getNextUnitToMove() {
+        for (auto &unit : units) {
             if (unit.getMovementLeft() != 0 && unit.getOwner() == thePlayer) {
-                return std::make_optional<UnitId>(unit.getID());
+                if (unit.hasPath()) {
+                    unit.moveAlongCurrentPath(*this);
+                } else {
+                    return std::make_optional<UnitId>(unit.getID());
+                }
             }
         }
 

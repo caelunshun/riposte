@@ -54,7 +54,7 @@ namespace rip {
             return false;
         }
 
-        if (dist(target, pos) > movementLeft) {
+        if (game.getTile(target).getMovementCost() > movementLeft) {
             return false;
         }
 
@@ -71,12 +71,37 @@ namespace rip {
         moveTime = 0;
         moveFrom = pos;
 
-        auto d = dist(target, pos);
-        movementLeft -= ceil(d);
+        movementLeft -= game.getTile(target).getMovementCost();
         pos = target;
 
         // Unit has moved; update visibility
         game.getPlayer(owner).recomputeVisibility(game);
+    }
+
+    bool Unit::hasPath() const {
+        return currentPath.has_value();
+    }
+
+    void Unit::setPath(Path path) {
+        currentPath = std::move(path);
+    }
+
+    void Unit::moveAlongCurrentPath(Game &game) {
+        if (currentPath.has_value()) {
+            while (currentPath->getNumPoints() > 0 && movementLeft != 0) {
+                auto point = currentPath->popNextPoint();
+                moveTo(*point, game);
+            }
+
+            if (currentPath->getNumPoints() == 0) {
+                // Path is over.
+                currentPath = std::optional<Path>();
+            }
+        }
+    }
+
+    const Path &Unit::getPath() const {
+        return *currentPath;
     }
 
     void Unit::onTurnEnd() {

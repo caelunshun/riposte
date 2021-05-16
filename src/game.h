@@ -61,7 +61,7 @@ namespace rip {
 
         // Gets the next unit the player should be prompted to move on this turn.
         // If this returns an empty, then the turn should end.
-        std::optional<UnitId> getNextUnitToMove() const;
+        std::optional<UnitId> getNextUnitToMove();
 
         uint32_t getMapWidth() const {
             return mapWidth;

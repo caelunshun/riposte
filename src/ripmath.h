@@ -7,11 +7,14 @@
 
 #include <cmath>
 #include <glm/vec2.hpp>
+#include <array>
 
 namespace rip {
     constexpr double pi() { return 3.14159265358979323846264338327950288; }
 
     double dist(glm::uvec2 a, glm::uvec2 b);
+
+    std::array<glm::uvec2, 8> getNeighbors(glm::uvec2 pos);
 
     // A smooth cosine interpolation between two points in 2D space.
     class SmoothAnimation {

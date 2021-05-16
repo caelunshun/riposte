@@ -16,6 +16,25 @@ namespace rip {
     SmoothAnimation::SmoothAnimation(glm::vec2 fromPos, glm::vec2 targetPos, float maxVel, float accelerateTime)
     : fromPos(fromPos), targetPos(targetPos), maxVel(maxVel), time(0), accelerateTime(accelerateTime) {}
 
+    std::array<glm::uvec2, 8> getNeighbors(glm::uvec2 pos) {
+        glm::ivec2 offsets[8] = {
+                {1,0},
+                {1,1},
+                {0,1},
+                {-1,1},
+                {-1,0},
+                {-1,-1},
+                {0,-1},
+                {1,-1},
+        };
+
+        std::array<glm::uvec2, 8> result;
+        for (int i = 0; i < result.size(); i++) {
+            result[i] = glm::uvec2(glm::ivec2(pos) + offsets[i]);
+        }
+        return result;
+    }
+
     static float evaluateAnimationIntegral(float maxVel, float t, float accelerateTime) {
         return maxVel / pi() * -cos((1.0f / accelerateTime) * pi() * t) + (maxVel / pi());
     }

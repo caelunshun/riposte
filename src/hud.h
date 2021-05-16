@@ -12,6 +12,7 @@
 #include <glm/vec2.hpp>
 #include "ids.h"
 #include "ui.h"
+#include "path.h"
 
 namespace rip {
     class Game;
@@ -30,6 +31,9 @@ namespace rip {
         nk_context *nk;
 
         std::optional<UnitId> selectedUnit;
+        Path selectedUnitPath;
+        std::optional<glm::uvec2> selectedUnitPathError;
+        bool isSelectingPath = false;
 
         std::deque<HudMessage> messages;
 
@@ -40,6 +44,9 @@ namespace rip {
         void paintMessages(Game &game);
         void paintUnitUI(Game &game);
         void paintCityBuildPrompt(Game &game, CityId cityID);
+        void paintPath(Game &game, glm::uvec2 start, const Path &path);
+
+        void trySetSelectedPath(Game &game, glm::uvec2 from, glm::uvec2 to);
 
         std::optional<CityId> getCityBuildPrompt(const Game &game) const;
 

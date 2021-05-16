@@ -53,6 +53,8 @@ namespace rip {
                     return "ocean";
             }
         }
+
+        int getMovementCost() const;
     };
 
 
