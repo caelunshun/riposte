@@ -110,7 +110,7 @@ namespace rip {
             game.addUnit(std::move(unit));
         }
 
-        const std::string &getName() override {
+        const std::string &getName() const override {
             return unitKind->name;
         }
     };
@@ -123,6 +123,14 @@ namespace rip {
         }
 
         return tasks;
+    }
+
+    const BuildTask *City::getBuildTask() const {
+        if (buildTask) {
+            return &*buildTask;
+        } else {
+            return nullptr;
+        }
     }
 }
 

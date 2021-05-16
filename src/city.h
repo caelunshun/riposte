@@ -47,7 +47,7 @@ namespace rip {
         // necessary changes (create a unit, add a building, etc.)
         virtual void onCompleted(Game &game, City &builder) = 0;
 
-        virtual const std::string &getName() = 0;
+        virtual const std::string &getName() const = 0;
     };
 
     class City {
@@ -78,6 +78,7 @@ namespace rip {
 
         bool hasBuildTask() const;
         void setBuildTask(std::unique_ptr<BuildTask> task);
+        const BuildTask *getBuildTask() const;
         int estimateTurnsForCompletion(const BuildTask &task, const Game &game) const;
 
         const std::string &getPreviousBuildTask() const;

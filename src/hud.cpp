@@ -179,7 +179,7 @@ namespace rip {
 
     void Hud::updateSelectedUnit(Game &game) {
         selectedUnit = game.getNextUnitToMove();
-        if (selectedUnit.has_value()) {
+        if (selectedUnit.has_value() && !hasFocus(game)) {
             SmoothAnimation animation(game.getView().getMapCenter(), glm::vec2(game.getUnit(*selectedUnit).getPos()) * 100.0f, 2000.0f, 2.0f);
             game.getView().setCenterAnimation(animation);
         }

@@ -129,17 +129,40 @@ namespace rip {
              }
          }
 
-         void paintBubble(NVGcontext *vg, const City &city, glm::vec2 offset) {
+         void paintBubble(NVGcontext *vg, const City &city, const Game &game, glm::vec2 offset) {
              // Rectangle
+             const auto width = 100;
+             const auto bubbleHeight = 20;
              nvgBeginPath(vg);
-             nvgRoundedRect(vg, offset.x, offset.y + 10, 100, 20, 5);
-             auto paint = nvgLinearGradient(vg, offset.x, offset.y + 10, offset.x, offset.y + 20,
+             nvgRoundedRect(vg, offset.x, offset.y + 10, width, bubbleHeight, 5);
+             auto paint = nvgLinearGradient(vg, offset.x, offset.y + 10, offset.x, offset.y + 30,
                                             nvgRGBA(61, 61, 62, 180),
                                             nvgRGBA(40, 40, 41, 180));
              nvgFillPaint(vg, paint);
              nvgFill(vg);
 
-             // Circle
+             const auto task = city.getBuildTask();
+
+             // Production progress bar
+             if (task) {
+                 auto progress = static_cast<double>(task->getProgress()) / task->getCost();
+                 auto projectedProgress = static_cast<double>(task->getProgress() + city.computeYield(game).hammers) / task->getCost();
+
+                 const auto offsetY = 20;
+                 const auto height = bubbleHeight / 2;
+
+                 nvgBeginPath(vg);
+                 nvgRect(vg, offset.x, offset.y + offsetY, width * progress, height);
+                 nvgFillColor(vg, nvgRGBA(72, 159, 223, 160));
+                 nvgFill(vg);
+
+                 nvgBeginPath(vg);
+                 nvgRect(vg, offset.x + width * progress, offset.y + offsetY, width * (projectedProgress - progress), height);
+                 nvgFillColor(vg, nvgRGBA(141, 200, 232, 160));
+                 nvgFill(vg);
+             }
+
+             // Left circle
              nvgBeginPath(vg);
              const auto radius = 10;
              nvgCircle(vg, offset.x - 5 + radius, offset.y + 10 + radius, radius);
@@ -149,6 +172,23 @@ namespace rip {
              nvgStrokeWidth(vg, 1.5);
              nvgStroke(vg);
 
+             // Right circle
+             nvgBeginPath(vg);
+             nvgCircle(vg, offset.x + width + 5 - radius, offset.y + 10 + radius, radius);
+             nvgFillColor(vg, nvgRGB(244, 195, 204));
+             nvgFill(vg);
+             nvgStrokeColor(vg, nvgRGB(0, 0, 0));
+             nvgStroke(vg);
+
+             // Right circle text (first character of current build task)
+             if (task) {
+                 auto text = task->getName().substr(0, 1);
+                 nvgFontSize(vg, 12);
+                 nvgFillColor(vg, nvgRGB(0, 0, 0));
+                 nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+                 nvgText(vg, offset.x + width + 5 - radius, offset.y + 10 + radius, text.c_str(), nullptr);
+             }
+
              // City name
              nvgFontFace(vg, "default");
              nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
@@ -157,9 +197,9 @@ namespace rip {
              nvgText(vg, offset.x + 50, offset.y + 20, city.getName().c_str(), nullptr);
          }
 
-         void paintCity(NVGcontext *vg, const City &city, glm::vec2 offset) {
+         void paintCity(NVGcontext *vg, const City &city, const Game &game, glm::vec2 offset) {
              paintHouses(vg, offset);
-             paintBubble(vg, city, offset);
+             paintBubble(vg, city, game, offset);
          }
 
      public:
@@ -174,7 +214,7 @@ namespace rip {
                     continue;
                 }
 
-                paintCity(vg, city, offset);
+                paintCity(vg, city, game, offset);
             }
          }
      };
