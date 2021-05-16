@@ -67,6 +67,10 @@ namespace rip {
         City city(pos, std::move(name), id);
         auto cityID = game.addCity(std::move(city));
         registerCity(cityID);
+
+        auto &tile = game.getTile(pos);
+        tile.setForested(false);
+
         return cityID;
     }
 

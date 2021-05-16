@@ -143,7 +143,7 @@ namespace rip {
         if (nk_button_label(nk, "Next Turn") && !hasFocus(game)) {
             if (game.getNextUnitToMove().has_value()) {
                 // Need to move all units first.
-                pushMessage("Move all your units before advancing the turn!");
+                pushMessage("Move all your units before ending the turn!");
                 updateSelectedUnit(game);
             } else {
                 game.advanceTurn();

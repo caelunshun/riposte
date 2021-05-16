@@ -6,6 +6,14 @@
 
 namespace rip {
     int Tile::getMovementCost() const {
-        return 1;
+        return (forested ? 2 : 1);
+    }
+
+    bool Tile::isForested() const {
+        return forested;
+    }
+
+    void Tile::setForested(bool forested) {
+        this->forested = forested;
     }
 }

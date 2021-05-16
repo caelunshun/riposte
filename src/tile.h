@@ -24,6 +24,7 @@ namespace rip {
     class Tile {
     private:
         Terrain terrain;
+        bool forested = false;
 
     public:
         Tile(Terrain terrain) : terrain(terrain) {}
@@ -36,6 +37,10 @@ namespace rip {
         void setTerrain(Terrain terrain) {
             this->terrain = terrain;
         }
+
+        bool isForested() const;
+
+        void setForested(bool forested);
 
         bool canSustainCity() const {
             return (terrain != Terrain::Desert);

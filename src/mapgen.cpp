@@ -176,15 +176,21 @@ namespace rip {
         auto simplex = FastNoise::New<FastNoise::Simplex>();
         auto noise = FastNoise::New<FastNoise::FractalFBm>();
         noise->SetSource(simplex);
+        auto treeNoise = FastNoise::New<FastNoise::FractalFBm>();
+        treeNoise->SetSource(simplex);
+
         std::vector<float> noiseOutput(game.getMapWidth() * game.getMapHeight());
         noise->GenUniformGrid2D(noiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 10.0f, rng.u32(0, 0xFFFFFFFF));
 
+        std::vector<float> treeNoiseOutput(game.getMapWidth() * game.getMapHeight());
+        treeNoise->GenUniformGrid2D(treeNoiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 5.0f, rng.u32(0, 0xFFFFFFFF));
+
         for (int x = 0; x < game.getMapWidth(); x++) {
             for (int y = 0; y < game.getMapHeight(); y++) {
+                auto noiseIndex = x + y * game.getMapWidth();
                 Terrain t;
                 glm::uvec2 pos(x, y);
                 if (landMap.isLand(pos)) {
-                    auto noiseIndex = x + y * game.getMapWidth();
                     auto choice = noiseOutput[noiseIndex];
                     if (choice < -0.1) {
                         t = Terrain::Grassland;
@@ -198,6 +204,12 @@ namespace rip {
                 }
 
                 game.getTile(pos).setTerrain(t);
+
+                if (t != Terrain::Ocean && t != Terrain::Desert) {
+                    if (treeNoiseOutput[noiseIndex] < 0.0) {
+                        game.getTile(pos).setForested(true);
+                    }
+                }
             }
         }
     }

@@ -54,7 +54,7 @@ namespace rip {
             return false;
         }
 
-        if (game.getTile(target).getMovementCost() > movementLeft) {
+        if (movementLeft == 0) {
             return false;
         }
 
@@ -72,6 +72,7 @@ namespace rip {
         moveFrom = pos;
 
         movementLeft -= game.getTile(target).getMovementCost();
+        if (movementLeft < 0) movementLeft = 0;
         pos = target;
 
         // Unit has moved; update visibility
