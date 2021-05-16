@@ -44,16 +44,22 @@ namespace rip {
         }
     };
 
+    // A goal to improve our economy.
+    struct EconomyGoal : public Goal {};
+
     class LongTermBrain {
         std::unique_ptr<Goal> goal;
+        PlayerId playerID;
 
     public:
-        LongTermBrain() {
+        LongTermBrain(PlayerId playerID) : playerID(playerID) {
             goal = std::make_unique<ExpandPeacefully>();
         }
 
         void update(Game &game) {
-
+            if (game.getPlayer(playerID).getCities().size() == 4) {
+                goal = std::make_unique<EconomyGoal>();
+            }
         }
 
         const Goal &getGoal() const {
@@ -154,8 +160,13 @@ namespace rip {
 
         std::unique_ptr<BuildTask> getBuildTask(Game &game, const Goal &goal) {
             const auto &registry = game.getRegistry();
-            auto &settler = registry.getUnits().at(0);
-            return std::make_unique<UnitBuildTask>(settler);
+            if (goal.requestsSettlerExpansion()) {
+                auto &settler = registry.getUnits().at(0);
+                return std::make_unique<UnitBuildTask>(settler);
+            } else {
+                auto &warrior = registry.getUnits().at(1);
+                return std::make_unique<UnitBuildTask>(warrior);
+            }
         }
 
         void setCityBuildTasks(Game &game, const Goal &goal) {
@@ -259,7 +270,8 @@ namespace rip {
         }
     };
 
-    AI::AI(PlayerId playerID) : playerID(playerID), longTermBrain(std::make_unique<LongTermBrain>()),
+    AI::AI(PlayerId playerID) : playerID(playerID),
+        longTermBrain(std::make_unique<LongTermBrain>(playerID)),
         shortTermBrain(std::make_unique<ShortTermBrain>(playerID)),
         tacticalBrain(std::make_unique<TacticalBrain>(playerID)) {
 

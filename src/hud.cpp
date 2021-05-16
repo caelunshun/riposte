@@ -85,11 +85,12 @@ namespace rip {
 
     void Hud::paintUnitUI(Game &game) {
         if (selectedUnit.has_value()) {
+            bool kill = false;
             auto &unit = game.getUnit(*selectedUnit);
 
-            nk_layout_row_push(nk, 200);
+            nk_layout_row_push(nk, 150);
             if (nk_group_begin(nk, "unit hud", 0)) {
-                nk_layout_row_dynamic(nk, 10, 1);
+                nk_layout_row_dynamic(nk, 30, 1);
 
                 auto text = unit.getKind().name;
                 nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
@@ -105,6 +106,10 @@ namespace rip {
                     text += " / " + std::to_string(unit.getKind().movement);
                 }
                 nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
+
+                if (nk_button_label(nk, "Kill")) {
+                    kill = true;
+                }
 
                 nk_group_end(nk);
             }
@@ -122,6 +127,11 @@ namespace rip {
                         }
                     }
                 }
+            }
+
+            if (kill) {
+                game.killUnit(*selectedUnit);
+                selectedUnit = std::optional<UnitId>();
             }
         }
     }
