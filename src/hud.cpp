@@ -252,6 +252,10 @@ namespace rip {
                 selectedUnit = std::optional<UnitId>();
             } else if (unit->getOwner() == game.getThePlayerID()) {
                 selectedUnit = std::make_optional<UnitId>(unit->getID());
+
+                if (unit->hasPath()) {
+                    selectedUnitPath = unit->getPath();
+                }
             }
         } else if (selectedUnit.has_value()
                    && event.button == MouseButton::Right && event.action == MouseAction::Press) {
