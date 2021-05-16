@@ -38,7 +38,7 @@ namespace rip {
     public:
         View() : mapCenter(500, 500), zoomFactor(1), zoomVelocity(0), centerVelocity(0, 0) {}
 
-        void tick(float dt, const Cursor &cursor);
+        void tick(float dt, const Cursor &cursor, bool hudHasFocus);
 
         glm::vec2 getMapCenter() const;
 

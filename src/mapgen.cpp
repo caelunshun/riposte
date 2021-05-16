@@ -4,6 +4,7 @@
 
 #include <bitset>
 #include <array>
+#include <glm/glm.hpp>
 #include <FastNoise/FastNoise.h>
 #include "mapgen.h"
 
@@ -118,11 +119,19 @@ namespace rip {
 
     // CITY GENERATOR
     void placeCities(Game &game, Rng &rng) {
+        std::vector<glm::uvec2> positions;
         for (auto &player : game.getPlayers()) {
             while(true) {
                 auto x = rng.u32(0, game.getMapWidth());
                 auto y = rng.u32(0, game.getMapHeight());
                 glm::uvec2 pos(x, y);
+
+                const auto minDistToOtherCities = 15;
+                for (auto otherPos : positions) {
+                    if (dist(pos, otherPos) < minDistToOtherCities) {
+                        continue;
+                    }
+                }
 
                 if (game.getTile(pos).getTerrain() == Terrain::Ocean) {
                     continue;
@@ -134,6 +143,8 @@ namespace rip {
 
                     Unit warrior(game.getRegistry().getUnits().at(1), pos + glm::uvec2(1, 0), player.getID());
                     game.addUnit(std::move(warrior));
+
+                    positions.push_back(pos);
 
                     break;
                 }

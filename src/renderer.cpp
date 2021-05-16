@@ -220,6 +220,11 @@ namespace rip {
               auto paint = nvgImagePattern(vg, posX, posY, width, height, 0, image->id, 1);
               nvgFillPaint(vg, paint);
               nvgFill(vg);
+
+              nvgFontSize(vg, 14);
+              nvgFillColor(vg, nvgRGB(0, 0, 0));
+              nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
+              nvgText(vg, posX + (width / 2), posY + height, unit.getKind().name.c_str(), nullptr);
           }
 
       public:

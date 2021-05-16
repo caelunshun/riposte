@@ -24,12 +24,23 @@ namespace rip {
         }
     }
 
-    void View::tick(float dt, const Cursor &cursor) {
+    void View::tick(float dt, const Cursor &cursor, bool hudHasFocus) {
+        if (centerAnimation.has_value()) {
+            mapCenter = centerAnimation->getCurrentPos();
+            centerAnimation->advance(dt);
+            if (centerAnimation->isComplete()) {
+                centerAnimation = std::optional<SmoothAnimation>();
+            }
+        }
+
+        if (hudHasFocus) {
+            return;
+        }
+
         const auto threshold = 2;
         const auto cPos = cursor.getPos();
         const auto wSize = cursor.getWindowSize();
 
-        const auto oldMoveDir = moveDir;
         moveDir = 0;
 
         if (fabs(cPos.x - wSize.x) <= threshold) {
@@ -70,14 +81,6 @@ namespace rip {
 
         moveTime += dt;
         mapCenter += (centerVelocity * (1 / zoomFactor)) * dt;
-
-        if (centerAnimation.has_value()) {
-            mapCenter = centerAnimation->getCurrentPos();
-            centerAnimation->advance(dt);
-            if (centerAnimation->isComplete()) {
-                centerAnimation = std::optional<SmoothAnimation>();
-            }
-        }
     }
 
     glm::vec2 View::getMapCenter() const {

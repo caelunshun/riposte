@@ -126,9 +126,7 @@ namespace rip {
             lastFrameTime = glfwGetTime();
 
             cursor.tick(window);
-            if (!hudHasFocus) {
-                view.tick(dt, cursor);
-            }
+            view.tick(dt, cursor, hudHasFocus);
         }
 
         const rea::versioned_slot_map<City> &getCities() const {
