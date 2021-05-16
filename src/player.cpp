@@ -31,6 +31,10 @@ namespace rip {
         return visibilityMap;
     }
 
+    const CivKind &Player::getCiv() const {
+        return *civ;
+    }
+
     void Player::registerCity(CityId id) {
         cities.push_back(id);
     }

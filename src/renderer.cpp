@@ -298,7 +298,7 @@ namespace rip {
             return fromPos + (ray * pos);
         }
 
-        void paintUnit(NVGcontext *vg, const Unit &unit, glm::vec2 offset) {
+        void paintUnit(NVGcontext *vg, Game &game, const Unit &unit, glm::vec2 offset) {
             auto imageID = "texture/unit/" + unit.getKind().id;
             auto image = std::dynamic_pointer_cast<Image>(assets->get(imageID));
 
@@ -310,12 +310,22 @@ namespace rip {
             auto posX = (100.0f - width) / 2 + offset.x;
             auto posY = (100.0f - height) / 2 + offset.y;
 
+            // Unit icon
             nvgBeginPath(vg);
             nvgRect(vg, posX, posY, width, height);
             auto paint = nvgImagePattern(vg, posX, posY, width, height, 0, image->id, 1);
             nvgFillPaint(vg, paint);
             nvgFill(vg);
 
+            // Colored rectangle to indicate nationality
+            const auto &owner = game.getPlayer(unit.getOwner());
+            const auto color = owner.getCiv().color;
+            nvgBeginPath(vg);
+            nvgRect(vg, posX + width - 10, posY + height / 2 - 15, 25, 30);
+            nvgFillColor(vg, nvgRGB(color[0], color[1], color[2]));
+            nvgFill(vg);
+
+            // Text (unit name)
             nvgFontSize(vg, 14);
             nvgFillColor(vg, nvgRGB(0, 0, 0));
             nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
@@ -341,7 +351,7 @@ namespace rip {
                     offset = newOffset;
                 }
 
-                paintUnit(vg, unit, offset);
+                paintUnit(vg, game, unit, offset);
             }
         }
     };

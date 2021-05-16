@@ -80,6 +80,7 @@ namespace rip {
          const std::string &getUsername() const;
          const std::vector<CityId> &getCities() const;
          const VisibilityMap &getVisibilityMap() const;
+         const CivKind &getCiv() const;
 
          void registerCity(CityId id);
          void removeCity(CityId);
