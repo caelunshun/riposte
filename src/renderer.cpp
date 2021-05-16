@@ -48,7 +48,8 @@ namespace rip {
         }
 
         auto vis = game.getThePlayer().getVisibilityMap()[pos];
-        if (vis == Visibility::Hidden || (vis == Visibility::Fogged && !allowFog)) {
+        if (!game.isCheatMode()
+            && vis == Visibility::Hidden || (vis == Visibility::Fogged && !allowFog)) {
             return false;
         }
 

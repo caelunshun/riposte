@@ -215,7 +215,11 @@ namespace rip {
     }
 
     void Hud::trySetSelectedPath(Game &game, glm::uvec2 from, glm::uvec2 to) {
-        auto path = computeShortestPath(game, from, to, game.getThePlayer().getVisibilityMap());
+        std::optional<VisibilityMap> visMap;
+        if (!game.isCheatMode()) {
+            visMap = game.getThePlayer().getVisibilityMap();
+        }
+        auto path = computeShortestPath(game, from, to, std::move(visMap));
         if (path.has_value()) {
             selectedUnitPath = std::move(*path);
             selectedUnitPathError = std::optional<glm::uvec2>();
@@ -326,5 +330,11 @@ namespace rip {
 
     bool Hud::hasFocus(const Game &game) const {
         return getCityBuildPrompt(game).has_value();
+    }
+
+    void Hud::handleKey(Game &game, int key) {
+        if (key == GLFW_KEY_L) {
+            game.toggleCheatMode();
+        }
     }
 }

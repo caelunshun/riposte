@@ -96,24 +96,17 @@ namespace rip {
         return previousBuildTask;
     }
 
-    // A BuildTask to build a unit.
-    class UnitBuildTask : public BuildTask {
-        std::shared_ptr<UnitKind> unitKind;
 
-    public:
-        UnitBuildTask(std::shared_ptr<UnitKind> unitKind) : BuildTask(unitKind->cost), unitKind(std::move(unitKind)) {}
+    UnitBuildTask::UnitBuildTask(std::shared_ptr<UnitKind> unitKind) : BuildTask(unitKind->cost), unitKind(std::move(unitKind)) {}
 
-        ~UnitBuildTask() override = default;
+    void UnitBuildTask::onCompleted(Game &game, City &builder) {
+        Unit unit(unitKind, builder.getPos(), builder.getOwner());
+        game.addUnit(std::move(unit));
+    }
 
-        void onCompleted(Game &game, City &builder) override {
-            Unit unit(unitKind, builder.getPos(), builder.getOwner());
-            game.addUnit(std::move(unit));
-        }
-
-        const std::string &getName() const override {
-            return unitKind->name;
-        }
-    };
+    const std::string &UnitBuildTask::getName() const {
+        return unitKind->name;
+    }
 
     std::vector<std::unique_ptr<BuildTask>> City::getPossibleBuildTasks(const Game &game) const {
         std::vector<std::unique_ptr<BuildTask>> tasks;

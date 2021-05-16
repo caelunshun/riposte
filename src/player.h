@@ -9,6 +9,7 @@
 #include <string>
 #include <vector>
 #include <glm/vec2.hpp>
+#include "ai.h"
 #include "registry.h"
 #include "ids.h"
 
@@ -69,12 +70,19 @@ namespace rip {
          // The player's civilization.
          std::shared_ptr<CivKind> civ;
 
+         std::optional<AI> ai;
+
          std::string getNextCityName(const Game &game);
 
      public:
          Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight);
 
+         Player(Player &&other) = default;
+         Player(const Player &other) = delete;
+
          void setID(PlayerId id);
+
+         void enableAI();
 
          PlayerId getID() const;
          const std::string &getUsername() const;
@@ -91,6 +99,8 @@ namespace rip {
          void recomputeVisibility(const Game &game);
 
          bool isDead() const;
+
+         void onTurnEnd(Game &game);
      };
 }
 

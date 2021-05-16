@@ -42,6 +42,8 @@ namespace rip {
 
         int turn = 0;
 
+        bool cheatMode = false;
+
         size_t getMapIndex(glm::uvec2 pos) const {
             return static_cast<size_t>(pos.x) + static_cast<size_t>(pos.y) * static_cast<size_t>(mapWidth);
         }
@@ -230,6 +232,14 @@ namespace rip {
 
         int getTurn() const {
             return turn;
+        }
+
+        void toggleCheatMode() {
+            cheatMode = !cheatMode;
+        }
+
+        bool isCheatMode() const {
+            return cheatMode;
         }
     };
 }

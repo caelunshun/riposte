@@ -9,6 +9,7 @@
 #include <glm/vec2.hpp>
 #include <rea.h>
 #include "player.h"
+#include "registry.h"
 #include "ids.h"
 
 namespace rip {
@@ -48,6 +49,20 @@ namespace rip {
         virtual void onCompleted(Game &game, City &builder) = 0;
 
         virtual const std::string &getName() const = 0;
+    };
+
+    // A build task to build a unit.
+    class UnitBuildTask : public BuildTask {
+        std::shared_ptr<UnitKind> unitKind;
+
+    public:
+        UnitBuildTask(std::shared_ptr<UnitKind> unitKind);
+
+        ~UnitBuildTask() override = default;
+
+        void onCompleted(Game &game, City &builder) override;
+
+        const std::string &getName() const override;
     };
 
     class City {

@@ -9,6 +9,7 @@
 #include <deque>
 
 static std::deque<rip::MouseEvent> mouseEvents;
+static std::deque<int> keyEvents;
 
 static void mouse_callback(GLFWwindow *window, int button, int action, int mods) {
     rip::ui_mouse_callback(window, button, action, mods);
@@ -45,6 +46,10 @@ static void mouse_callback(GLFWwindow *window, int button, int action, int mods)
     mouseEvents.push_back(event);
 }
 
+static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    keyEvents.push_back(key);
+}
+
 static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
@@ -65,8 +70,9 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetTime(0);
 
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    // glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     glfwSetMouseButtonCallback(window, mouse_callback);
+    glfwSetKeyCallback(window, key_callback);
 
     glewExperimental = true;
 
@@ -130,6 +136,11 @@ int main() {
             auto event = mouseEvents[0];
             hud.handleClick(game, event);
             mouseEvents.pop_front();
+        }
+        while (!keyEvents.empty()) {
+            auto event = keyEvents[0];
+            hud.handleKey(game, event);
+            keyEvents.pop_front();
         }
     }
 

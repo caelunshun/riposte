@@ -57,6 +57,7 @@ namespace rip {
         void update(Game &game);
 
         void handleClick(Game &game, MouseEvent event);
+        void handleKey(Game &game, int key);
 
         void updateSelectedUnit(Game &game);
 

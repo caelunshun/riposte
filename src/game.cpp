@@ -14,6 +14,10 @@ namespace rip {
             city.onTurnEnd(*this);
         }
 
+        for (auto &player : players) {
+            player.onTurnEnd(*this);
+        }
+
         ++turn;
     }
 

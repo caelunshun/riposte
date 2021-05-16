@@ -15,6 +15,10 @@ namespace rip {
         this->id = id;
     }
 
+    void Player::enableAI() {
+        ai = std::make_optional<AI>(id);
+    }
+
     PlayerId Player::getID() const {
         return id;
     }
@@ -118,5 +122,11 @@ namespace rip {
 
     bool Player::isDead() const {
         return cities.empty();
+    }
+
+    void Player::onTurnEnd(Game &game) {
+        if (ai.has_value()) {
+            ai->doTurn(game);
+        }
     }
 }
