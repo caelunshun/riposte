@@ -215,7 +215,7 @@ namespace rip {
     }
 
     void Hud::trySetSelectedPath(Game &game, glm::uvec2 from, glm::uvec2 to) {
-        auto path = computeShortestPath(game, from, to);
+        auto path = computeShortestPath(game, from, to, game.getThePlayer().getVisibilityMap());
         if (path.has_value()) {
             selectedUnitPath = std::move(*path);
             selectedUnitPathError = std::optional<glm::uvec2>();

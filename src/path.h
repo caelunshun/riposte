@@ -8,6 +8,7 @@
 #include <vector>
 #include <optional>
 #include <glm/vec2.hpp>
+#include "player.h"
 
 namespace rip {
     class Game;
@@ -30,7 +31,7 @@ namespace rip {
     };
 
     // Computes a shortest path between two points on the map.
-    std::optional<Path> computeShortestPath(const Game &game, glm::uvec2 source, glm::uvec2 target);
+    std::optional<Path> computeShortestPath(const Game &game, glm::uvec2 source, glm::uvec2 target, std::optional<VisibilityMap> visibilityMask);
 }
 
 #endif //RIPOSTE_PATH_H
