@@ -127,10 +127,15 @@ namespace rip {
                 glm::uvec2 pos(x, y);
 
                 const auto minDistToOtherCities = 15;
+                bool foundClose = false;
                 for (auto otherPos : positions) {
                     if (dist(pos, otherPos) < minDistToOtherCities) {
-                        continue;
+                        foundClose = true;
+                        break;
                     }
+                }
+                if (foundClose) {
+                    continue;
                 }
 
                 if (game.getTile(pos).getTerrain() == Terrain::Ocean) {
