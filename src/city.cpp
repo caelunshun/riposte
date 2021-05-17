@@ -117,10 +117,6 @@ namespace rip {
             }
         });
 
-        if (owner == game.getThePlayerID()) {
-            game.getScreenOffset(pos);
-        }
-
         // The city's own tile is always worked.
         entries.emplace(entries.begin(), game.getTile(pos).getYield(game, pos), pos);
 
@@ -212,7 +208,7 @@ namespace rip {
         auto consumedFood = population * 2;
         auto excessFood = yield.food - consumedFood;
 
-        auto neededFoodForGrowth = population * 4;
+        auto neededFoodForGrowth = 30 + 3 * population;
 
         storedFood += excessFood;
         if (storedFood < 0) {
