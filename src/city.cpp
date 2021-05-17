@@ -103,19 +103,23 @@ namespace rip {
 
         std::stable_sort(entries.begin(), entries.end(), [] (const BfcEntry &a, const BfcEntry &b) {
             if (a.yield.food < b.yield.food) {
-                return true;
+                return false;
             } else if (b.yield.food < a.yield.food) {
-                return false;
+                return true;
             } else if (a.yield.hammers < b.yield.hammers) {
-                return true;
+                return false;
             } else if (b.yield.hammers < a.yield.hammers) {
-                return false;
-            } else if (a.yield.commerce < b.yield.commerce) {
                 return true;
-            } else {
+            } else if (a.yield.commerce < b.yield.commerce) {
                 return false;
+            } else {
+                return true;
             }
         });
+
+        if (owner == game.getThePlayerID()) {
+            game.getScreenOffset(pos);
+        }
 
         // The city's own tile is always worked.
         entries.emplace(entries.begin(), game.getTile(pos).getYield(game, pos), pos);
