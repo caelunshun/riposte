@@ -110,7 +110,7 @@ namespace rip {
                 nk_group_end(nk);
             }
 
-            nk_layout_row_push(nk, 50);
+            nk_layout_row_push(nk, 100);
             if (nk_button_label(nk, "Kill")) {
                 kill = true;
             }
@@ -143,7 +143,7 @@ namespace rip {
                  nk_rect(0, game.getCursor().getWindowSize().y - height, game.getCursor().getWindowSize().x, height),
                  0);
 
-        nk_layout_row_begin(nk, NK_STATIC, 80, 4);
+        nk_layout_row_begin(nk, NK_STATIC, 80, 5);
         nk_layout_row_push(nk, 100);
 
         auto turnText = "Turn " + std::to_string(game.getTurn());
