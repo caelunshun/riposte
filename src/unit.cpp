@@ -5,8 +5,30 @@
 #include "unit.h"
 #include "game.h"
 #include "ripmath.h"
+#include <nuklear.h>
 
 namespace rip {
+     FoundCityCapability::FoundCityCapability(UnitId unitID) : Capability(unitID) {}
+
+     bool FoundCityCapability::foundCity(Game &game) {
+         const auto &unit = game.getUnit(unitID);
+         auto &player = game.getPlayer(unit.getOwner());
+         if (game.getCityAtLocation(unit.getPos())) {
+             return false;
+         } else {
+             player.createCity(unit.getPos(), game);
+             game.deferKillUnit(unitID);
+             return true;
+         }
+     }
+
+     void FoundCityCapability::paintMainUI(Game &game, nk_context *nk) {
+         nk_layout_row_push(nk, 100);
+         if (nk_button_label(nk, "Found City")) {
+             foundCity(game);
+         }
+     }
+
     void Unit::resetMovement() {
         movementLeft = kind->movement;
     }
@@ -19,6 +41,14 @@ namespace rip {
 
     void Unit::setID(UnitId id) {
         this->id = id;
+
+        for (const auto &capabilityName : kind->capabilities) {
+            if (capabilityName == "found_city") {
+                capabilities.push_back(std::make_unique<FoundCityCapability>(id));
+            } else {
+                throw std::string("missing capability: " + capabilityName);
+            }
+        }
     }
 
     const UnitKind &Unit::getKind() const {
@@ -111,4 +141,7 @@ namespace rip {
         health = std::clamp(health + regen, 0.0, 1.0);
     }
 
+    std::vector<std::unique_ptr<Capability>> &Unit::getCapabilities() {
+        return capabilities;
+    }
 }

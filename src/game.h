@@ -37,6 +37,8 @@ namespace rip {
 
         std::shared_ptr<Registry> registry;
 
+        std::vector<UnitId> unitKillQueue;
+
         float dt = 0;
         float lastFrameTime = 0;
 
@@ -132,6 +134,11 @@ namespace rip {
 
             cursor.tick(window);
             view.tick(dt, cursor, hudHasFocus);
+
+            for (const auto unitID : unitKillQueue) {
+                killUnit(unitID);
+            }
+            unitKillQueue.clear();
         }
 
         const rea::versioned_slot_map<City> &getCities() const {
@@ -260,6 +267,11 @@ namespace rip {
 
         void setTileWorked(glm::uvec2 pos, bool worked) {
             workedTiles[getMapIndex(pos)] = worked;
+        }
+
+        // Enqueues a unit to be killed as soon as possible.
+        void deferKillUnit(UnitId id) {
+            unitKillQueue.push_back(id);
         }
     };
 }

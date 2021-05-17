@@ -10,8 +10,37 @@
 #include "ids.h"
 #include "path.h"
 
+struct nk_context;
+
 namespace rip {
     class Game;
+
+    // An instantiated capability attached to a unit.
+    //
+    // This object is created when a unit is created whose kind has the needed
+    // capability.
+    class Capability {
+    protected:
+        UnitId unitID;
+
+        explicit Capability(UnitId unitID) : unitID(unitID) {}
+    public:
+        virtual void onTurnEnd(Game &game) {}
+
+        virtual void paintMainUI(Game &game, nk_context *nk) {}
+    };
+
+    // Capability attached to settlers.
+    class FoundCityCapability : public Capability {
+    public:
+        explicit FoundCityCapability(UnitId unitID);
+
+        void paintMainUI(Game &game, nk_context *nk) override;
+
+        // Founds a city. If successful, the unit is killed.
+        // Don't use it anymore.
+        bool foundCity(Game &game);
+    };
 
     /**
      * A unit on the map.
@@ -34,6 +63,9 @@ namespace rip {
         // The path the unit is currently following.
         std::optional<Path> currentPath;
 
+        // Capabilities attached to the unit.
+        std::vector<std::unique_ptr<Capability>> capabilities;
+
         void resetMovement();
 
     public:
@@ -51,6 +83,7 @@ namespace rip {
         PlayerId getOwner() const;
         double getCombatStrength() const;
         int getMovementLeft() const;
+        std::vector<std::unique_ptr<Capability>> &getCapabilities();
 
         // Determines whether the unit can move to the given target
         // this turn.
@@ -65,6 +98,22 @@ namespace rip {
         void moveAlongCurrentPath(Game &game);
 
         void onTurnEnd();
+
+        template<class T>
+        T *getCapability() {
+            for (auto &cap : capabilities) {
+                T *downcasted = dynamic_cast<T*>(&*cap);
+                if (downcasted) {
+                    return downcasted;
+                }
+            }
+            return nullptr;
+        }
+
+        template<class T>
+        bool hasCapability() {
+            return getCapability<T>() != nullptr;
+        }
     };
 }
 

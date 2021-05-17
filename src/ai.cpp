@@ -207,7 +207,8 @@ namespace rip {
         void moveScouts(Game &game) {
             Rng rng;
             for (auto &unit : game.getUnits()) {
-                if (unit.getOwner() == playerID && unit.getKind().id != "settler" && !unit.hasPath()) {
+                if (unit.getOwner() == playerID
+                    && !unit.hasCapability<FoundCityCapability>() && !unit.hasPath()) {
                     std::optional<Path> path;
                     while (!path.has_value()) {
                         glm::uvec2 target(rng.u32(unit.getPos().x - 10, unit.getPos().x + 10),
@@ -232,8 +233,7 @@ namespace rip {
                     if (settlersDeploying.contains(unit.getID())) {
                         continue;
                     }
-                    if (std::find(unit.getKind().capabilities.begin(), unit.getKind().capabilities.end(), "found_city")
-                        != unit.getKind().capabilities.end()) {
+                    if (unit.hasCapability<FoundCityCapability>()) {
                         auto path = computeShortestPath(game, unit.getPos(), asSettle->settleLocation, std::optional<VisibilityMap>());
                         if (path.has_value()) {
                             unit.setPath(std::move(*path));
@@ -256,9 +256,8 @@ namespace rip {
             std::vector<UnitId> toRemove;
             for (auto &pair : settlersDeploying) {
                 auto &unit = game.getUnit(pair.first);
-                if (unit.getPos() == pair.second && !game.getCityAtLocation(unit.getPos())) {
-                    game.getPlayer(playerID).createCity(unit.getPos(), game);
-                    game.killUnit(unit.getID());
+                if (unit.getPos() == pair.second) {
+                    unit.getCapability<FoundCityCapability>()->foundCity(game);
                     toRemove.push_back(unit.getID());
                     std::cout << "[ai] founded city" << std::endl;
                 }

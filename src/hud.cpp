@@ -115,19 +115,8 @@ namespace rip {
                 kill = true;
             }
 
-            for (const auto &capability : unit.getKind().capabilities) {
-                if (capability == "found_city") {
-                    nk_layout_row_push(nk, 100);
-                    if (nk_button_label(nk, "Found City")) {
-                        if (game.getCityAtLocation(unit.getPos())) {
-                            pushMessage("You can only fit one city per tile.");
-                        } else {
-                            game.getThePlayer().createCity(unit.getPos(), game);
-                            game.killUnit(*selectedUnit);
-                            pushMessage("Founded a city, consuming your Settler.");
-                        }
-                    }
-                }
+            for (const auto &capability : unit.getCapabilities()) {
+                capability->paintMainUI(game, nk);
             }
 
             if (kill) {
