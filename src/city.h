@@ -19,6 +19,10 @@ namespace rip {
         int food;
 
         Yield(int hammers, int commerce, int food);
+
+        Yield operator+(const Yield &other) const;
+
+        void operator+=(const Yield &other);
     };
 
     class City;
@@ -75,6 +79,13 @@ namespace rip {
         std::unique_ptr<BuildTask> buildTask;
         std::string previousBuildTask;
 
+        std::vector<glm::uvec2> workedTiles;
+
+        int population = 1;
+        int storedFood = 0;
+
+        void doGrowth(Game &game);
+
     public:
         City(glm::uvec2 pos, std::string name, PlayerId owner);
 
@@ -87,6 +98,7 @@ namespace rip {
 
         void setName(std::string name);
 
+        void updateWorkedTiles(Game &game);
         Yield computeYield(const Game &game) const;
 
         void onTurnEnd(Game &game);
@@ -99,6 +111,8 @@ namespace rip {
         const std::string &getPreviousBuildTask() const;
 
         std::vector<std::unique_ptr<BuildTask>> getPossibleBuildTasks(const Game &game) const;
+
+        int getPopulation() const;
     };
 }
 

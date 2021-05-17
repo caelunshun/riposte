@@ -44,6 +44,8 @@ namespace rip {
 
         bool cheatMode = false;
 
+        std::vector<bool> workedTiles;
+
         size_t getMapIndex(glm::uvec2 pos) const {
             return static_cast<size_t>(pos.x) + static_cast<size_t>(pos.y) * static_cast<size_t>(mapWidth);
         }
@@ -51,9 +53,10 @@ namespace rip {
     public:
         Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry)
         : theMap(static_cast<size_t>(mapWidth) * mapHeight),
+        workedTiles(static_cast<size_t>(mapWidth) * mapHeight),
         mapWidth(mapWidth),
         mapHeight(mapHeight),
-        registry(registry),
+        registry(std::move(registry)),
         cursor() {
 
         }
@@ -154,6 +157,15 @@ namespace rip {
             return nullptr;
         }
 
+        const City *getCityAtLocation(glm::uvec2 location) const {
+            for (auto &city : cities) {
+                if (city.getPos() == location) {
+                    return &city;
+                }
+            }
+            return nullptr;
+        }
+
         City &getCity(CityId id) {
             return cities.id_value(id);
         }
@@ -240,6 +252,14 @@ namespace rip {
 
         bool isCheatMode() const {
             return cheatMode;
+        }
+
+        bool isTileWorked(glm::uvec2 pos) const {
+            return workedTiles[getMapIndex(pos)];
+        }
+
+        void setTileWorked(glm::uvec2 pos, bool worked) {
+            workedTiles[getMapIndex(pos)] = worked;
         }
     };
 }

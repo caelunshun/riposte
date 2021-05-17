@@ -20,7 +20,7 @@ target_include_directories(riposte PRIVATE
         external/Rea/Rea
         external/Nuklear)
 
-set(CMAKE_C_COMPILER "/usr/bin/clang-11")
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
+#set(CMAKE_C_COMPILER "/usr/bin/clang-11")
+#set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
 
 target_link_libraries(riposte ${CONAN_LIBS} FastNoise)

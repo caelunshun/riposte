@@ -16,6 +16,8 @@ namespace rip {
 
     std::array<glm::uvec2, 8> getNeighbors(glm::uvec2 pos);
 
+    std::array<glm::uvec2, 20> getBigFatCross(glm::uvec2 center);
+
     // A smooth cosine interpolation between two points in 2D space.
     class SmoothAnimation {
         glm::vec2 fromPos;

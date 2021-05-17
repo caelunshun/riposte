@@ -49,7 +49,7 @@ namespace rip {
 
         auto vis = game.getThePlayer().getVisibilityMap()[pos];
         if (!game.isCheatMode()
-            && vis == Visibility::Hidden || (vis == Visibility::Fogged && !allowFog)) {
+            && (vis == Visibility::Hidden || (vis == Visibility::Fogged && !allowFog))) {
             return false;
         }
 
@@ -236,12 +236,16 @@ namespace rip {
             nvgStrokeColor(vg, nvgRGB(0, 0, 0));
             nvgStroke(vg);
 
+            // Left circle text (population)
+            auto population = city.getPopulation();
+            nvgFontSize(vg, 12);
+            nvgFillColor(vg, nvgRGB(0, 0, 0));
+            nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+            nvgText(vg, offset.x + - 5 + radius, offset.y + 10 + radius, std::to_string(population).c_str(), nullptr);
+
             // Right circle text (first character of current build task)
             if (task) {
                 auto text = task->getName().substr(0, 1);
-                nvgFontSize(vg, 12);
-                nvgFillColor(vg, nvgRGB(0, 0, 0));
-                nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
                 nvgText(vg, offset.x + width + 5 - radius, offset.y + 10 + radius, text.c_str(), nullptr);
             }
 

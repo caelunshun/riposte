@@ -11,6 +11,16 @@
 namespace rip {
     Yield::Yield(int hammers, int commerce, int food) : hammers(hammers), commerce(commerce), food(food) {}
 
+    Yield Yield::operator+(const Yield &other) const {
+        return Yield(hammers + other.hammers, commerce + other.commerce, food + other.food);
+    }
+
+    void Yield::operator+=(const Yield &other) {
+        hammers += other.hammers;
+        commerce += other.commerce;
+        food += other.food;
+    }
+
     BuildTask::BuildTask(int cost) : cost(cost) {}
 
     int BuildTask::getCost() const {
@@ -33,7 +43,9 @@ namespace rip {
         progress += hammers;
     }
 
-    City::City(glm::uvec2 pos, std::string name, PlayerId owner) : pos(pos), name(std::move(name)), owner(owner) {}
+    City::City(glm::uvec2 pos, std::string name, PlayerId owner) : pos(pos), name(std::move(name)), owner(owner) {
+
+    }
 
     void City::setID(CityId id) {
         this->id = id;
@@ -59,8 +71,67 @@ namespace rip {
         this->name = std::move(name);
     }
 
+    class BfcEntry {
+    public:
+        Yield yield;
+        glm::uvec2 pos;
+
+        BfcEntry(const Yield &yield, const glm::uvec2 &pos) : yield(yield), pos(pos) {}
+    };
+
+    void City::updateWorkedTiles(Game &game) {
+        // Clear worked tiles and recompute them.
+        for (const auto tile : workedTiles) {
+            game.setTileWorked(tile, false);
+        }
+        workedTiles.clear();
+
+        // Priorities:
+        // 1. Food
+        // 2. Production
+        // 3. Commerce
+        // Iterate over the BFC and optimize these.
+        std::vector<BfcEntry> entries;
+
+        for (const auto bfcPos : getBigFatCross(getPos())) {
+            if (!game.containsTile(bfcPos)) continue;
+            if (game.isTileWorked(bfcPos)) continue;
+            const auto &tile = game.getTile(bfcPos);
+            const auto yield = tile.getYield(game, bfcPos);
+            entries.emplace_back(yield, bfcPos);
+        }
+
+        std::stable_sort(entries.begin(), entries.end(), [] (const BfcEntry &a, const BfcEntry &b) {
+            if (a.yield.food < b.yield.food) {
+                return true;
+            } else if (b.yield.food < a.yield.food) {
+                return false;
+            } else if (a.yield.hammers < b.yield.hammers) {
+                return true;
+            } else if (b.yield.hammers < a.yield.hammers) {
+                return false;
+            } else if (a.yield.commerce < b.yield.commerce) {
+                return true;
+            } else {
+                return false;
+            }
+        });
+
+        // The city's own tile is always worked.
+        entries.emplace(entries.begin(), game.getTile(pos).getYield(game, pos), pos);
+
+        for (int i = 0; i < std::min(population + 1, (int) entries.size()); i++) {
+            workedTiles.push_back(entries[i].pos);
+            game.setTileWorked(entries[i].pos, true);
+        }
+    }
+
     Yield City::computeYield(const Game &game) const {
-        return Yield(10, 2, 2); // TODO
+        Yield yield(0, 0, 0);
+        for (const auto workedPos : workedTiles) {
+            yield += game.getTile(workedPos).getYield(game, workedPos);
+        }
+        return yield;
     }
 
     void City::onTurnEnd(Game &game) {
@@ -74,6 +145,8 @@ namespace rip {
                 buildTask = std::unique_ptr<BuildTask>();
             }
         }
+        updateWorkedTiles(game);
+        doGrowth(game);
     }
 
     bool City::hasBuildTask() const {
@@ -123,6 +196,27 @@ namespace rip {
             return &*buildTask;
         } else {
             return nullptr;
+        }
+    }
+
+    int City::getPopulation() const {
+        return population;
+    }
+
+    void City::doGrowth(Game &game) {
+        auto yield = computeYield(game);
+        auto consumedFood = population * 2;
+        auto excessFood = yield.food - consumedFood;
+
+        auto neededFoodForGrowth = population * 4;
+
+        storedFood += excessFood;
+        if (storedFood < 0) {
+            --population;
+            storedFood = 0;
+        } else if (storedFood >= neededFoodForGrowth) {
+            ++population;
+            storedFood -= neededFoodForGrowth;
         }
     }
 }

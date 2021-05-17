@@ -6,8 +6,13 @@
 #define RIPOSTE_TILE_H
 
 #include <string>
+#include <glm/vec2.hpp>
 
 namespace rip {
+    struct Yield;
+
+    class Game;
+
     /**
      * A type of terrain.
      */
@@ -60,6 +65,8 @@ namespace rip {
         }
 
         int getMovementCost() const;
+
+        Yield getYield(const Game &game, glm::uvec2 pos) const;
     };
 
 

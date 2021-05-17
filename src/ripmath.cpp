@@ -13,6 +13,27 @@ namespace rip {
         return sqrt(pow(af.x - bf.x, 2) + pow(af.y - bf.y, 2));
     }
 
+    std::array<glm::uvec2, 20> getBigFatCross(glm::uvec2 center) {
+        std::array<glm::uvec2, 20> result;
+
+        int i = 0;
+        for (int dx = -2; dx <= 2; dx++) {
+            for (int dy = -2; dy <= 2; dy++) {
+                if (abs(dx) == 2 && abs(dy) == 2) {
+                    continue;
+                }
+                if (dx == 0 && dy == 0) {
+                    continue;
+                }
+                auto pos = glm::uvec2(glm::ivec2(dx, dy) + glm::ivec2(center));
+                assert(i < 20);
+                result[i++] = pos;
+            }
+        }
+
+        return result;
+    }
+
     SmoothAnimation::SmoothAnimation(glm::vec2 fromPos, glm::vec2 targetPos, float maxVel, float accelerateTime)
     : fromPos(fromPos), targetPos(targetPos), maxVel(maxVel), time(0), accelerateTime(accelerateTime) {}
 
