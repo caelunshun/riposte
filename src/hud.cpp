@@ -90,7 +90,7 @@ namespace rip {
 
             nk_layout_row_push(nk, 150);
             if (nk_group_begin(nk, "unit hud", 0)) {
-                nk_layout_row_dynamic(nk, 30, 1);
+                nk_layout_row_dynamic(nk, 15, 1);
 
                 auto text = unit.getKind().name;
                 nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
@@ -107,11 +107,12 @@ namespace rip {
                 }
                 nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
 
-                if (nk_button_label(nk, "Kill")) {
-                    kill = true;
-                }
-
                 nk_group_end(nk);
+            }
+
+            nk_layout_row_push(nk, 50);
+            if (nk_button_label(nk, "Kill")) {
+                kill = true;
             }
 
             for (const auto &capability : unit.getKind().capabilities) {
