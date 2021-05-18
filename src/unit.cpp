@@ -5,6 +5,7 @@
 #include "unit.h"
 #include "game.h"
 #include "ripmath.h"
+#include "worker.h"
 #include <nuklear.h>
 
 namespace rip {
@@ -22,11 +23,13 @@ namespace rip {
          }
      }
 
-     void FoundCityCapability::paintMainUI(Game &game, nk_context *nk) {
+     UnitUIStatus FoundCityCapability::paintMainUI(Game &game, nk_context *nk) {
          nk_layout_row_push(nk, 100);
          if (nk_button_label(nk, "Found City")) {
              foundCity(game);
+             return UnitUIStatus::Deselect;
          }
+         return UnitUIStatus::None;
      }
 
     void Unit::resetMovement() {
@@ -45,6 +48,8 @@ namespace rip {
         for (const auto &capabilityName : kind->capabilities) {
             if (capabilityName == "found_city") {
                 capabilities.push_back(std::make_unique<FoundCityCapability>(id));
+            } else if (capabilityName == "do_work") {
+                capabilities.push_back(std::make_unique<WorkerCapability>(id));
             } else {
                 throw std::string("missing capability: " + capabilityName);
             }
@@ -107,6 +112,11 @@ namespace rip {
 
         // Unit has moved; update visibility
         game.getPlayer(owner).recomputeVisibility(game);
+
+        // Update capabilities
+        for (auto &capability : getCapabilities()) {
+            capability->onUnitMoved(game);
+        }
     }
 
     bool Unit::hasPath() const {
@@ -135,13 +145,21 @@ namespace rip {
         return *currentPath;
     }
 
-    void Unit::onTurnEnd() {
+    void Unit::onTurnEnd(Game &game) {
         resetMovement();
         const auto regen = 0.2;
         health = std::clamp(health + regen, 0.0, 1.0);
+
+        for (auto &capability : getCapabilities()) {
+            capability->onTurnEnd(game);
+        }
     }
 
     std::vector<std::unique_ptr<Capability>> &Unit::getCapabilities() {
         return capabilities;
+    }
+
+    void Unit::setMovementLeft(int movement) {
+        movementLeft = movement;
     }
 }

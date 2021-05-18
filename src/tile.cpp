@@ -89,7 +89,7 @@ namespace rip {
     }
 
     bool Mine::isCompatible(const Tile &tile) const {
-        return !tile.hasImprovement<Mine>();
+        return tile.getImprovements().empty();
     }
 
     Yield Mine::getYieldContribution(const Game &game) const {
@@ -100,8 +100,16 @@ namespace rip {
         paintImprovementIcon(vg, assets, offset, "icon/mine");
     }
 
+    std::string Mine::getName() const {
+        return "Mine";
+    }
+
+    int Mine::getNumBuildTurns() const {
+        return 5;
+    }
+
     bool Cottage::isCompatible(const Tile &tile) const {
-        return !tile.hasImprovement<Cottage>();
+        return tile.getImprovements().empty();
     }
 
     Yield Cottage::getYieldContribution(const Game &game) const {
@@ -110,5 +118,13 @@ namespace rip {
 
     void Cottage::paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) {
         paintImprovementIcon(vg, assets, offset, "icon/cottage");
+    }
+
+    std::string Cottage::getName() const {
+        return "Cottage";
+    }
+
+    int Cottage::getNumBuildTurns() const {
+        return 4;
     }
 }

@@ -15,6 +15,15 @@ struct nk_context;
 namespace rip {
     class Game;
 
+    // Value returned by Capability::paintMainUI which determines whether the unit
+    // should remain selected.
+    enum UnitUIStatus {
+        // Keep the unit selected.
+        None,
+        // Deselect the unit.
+        Deselect,
+    };
+
     // An instantiated capability attached to a unit.
     //
     // This object is created when a unit is created whose kind has the needed
@@ -27,7 +36,9 @@ namespace rip {
     public:
         virtual void onTurnEnd(Game &game) {}
 
-        virtual void paintMainUI(Game &game, nk_context *nk) {}
+        virtual void onUnitMoved(Game &game) {}
+
+        virtual UnitUIStatus paintMainUI(Game &game, nk_context *nk) {}
     };
 
     // Capability attached to settlers.
@@ -35,7 +46,7 @@ namespace rip {
     public:
         explicit FoundCityCapability(UnitId unitID);
 
-        void paintMainUI(Game &game, nk_context *nk) override;
+        UnitUIStatus paintMainUI(Game &game, nk_context *nk) override;
 
         // Founds a city. If successful, the unit is killed.
         // Don't use it anymore.
@@ -85,6 +96,8 @@ namespace rip {
         int getMovementLeft() const;
         std::vector<std::unique_ptr<Capability>> &getCapabilities();
 
+        void setMovementLeft(int movement);
+
         // Determines whether the unit can move to the given target
         // this turn.
         bool canMove(glm::uvec2 target, const Game &game) const;
@@ -97,7 +110,7 @@ namespace rip {
         void setPath(Path path);
         void moveAlongCurrentPath(Game &game);
 
-        void onTurnEnd();
+        void onTurnEnd(Game &game);
 
         template<class T>
         T *getCapability() {

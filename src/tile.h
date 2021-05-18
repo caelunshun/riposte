@@ -38,6 +38,10 @@ namespace rip {
         // `offset` is the upper-left-hand corner of the improvement's tile.
         virtual void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) = 0;
 
+        virtual int getNumBuildTurns() const = 0;
+
+        virtual std::string getName() const = 0;
+
         virtual ~Improvement() = default;
     };
 
@@ -49,6 +53,10 @@ namespace rip {
 
         Yield getYieldContribution(const Game &game) const override;
 
+        int getNumBuildTurns() const override;
+
+        std::string getName() const override;
+
         void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
     };
 
@@ -59,6 +67,10 @@ namespace rip {
         bool isCompatible(const Tile &tile) const override;
 
         Yield getYieldContribution(const Game &game) const override;
+
+        int getNumBuildTurns() const override;
+
+        std::string getName() const override;
 
         void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
     };

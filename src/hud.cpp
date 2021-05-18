@@ -116,7 +116,10 @@ namespace rip {
             }
 
             for (const auto &capability : unit.getCapabilities()) {
-                capability->paintMainUI(game, nk);
+                if (capability->paintMainUI(game, nk) == UnitUIStatus::Deselect) {
+                    selectedUnit = {};
+                    return;
+                }
             }
 
             if (kill) {
@@ -132,7 +135,7 @@ namespace rip {
                  nk_rect(0, game.getCursor().getWindowSize().y - height, game.getCursor().getWindowSize().x, height),
                  0);
 
-        nk_layout_row_begin(nk, NK_STATIC, 80, 5);
+        nk_layout_row_begin(nk, NK_STATIC, 80, 20);
         nk_layout_row_push(nk, 100);
 
         auto turnText = "Turn " + std::to_string(game.getTurn());
@@ -185,7 +188,8 @@ namespace rip {
     }
 
     void Hud::update(Game &game) {
-        if (selectedUnit.has_value() && !game.getUnits().id_is_valid(*selectedUnit)) {
+        if (selectedUnit.has_value() &&
+                !game.getUnits().id_is_valid(*selectedUnit)) {
             selectedUnit = std::optional<UnitId>();
         }
 

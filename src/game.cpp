@@ -7,7 +7,7 @@
 namespace rip {
     void Game::advanceTurn() {
         for (auto &unit : units) {
-            unit.onTurnEnd();
+            unit.onTurnEnd(*this);
         }
 
         for (auto &city : cities) {

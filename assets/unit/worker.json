@@ -4,5 +4,7 @@
   "strength": 0,
   "movement": 2,
   "cost": 30,
-  "capabilities": []
+  "capabilities": [
+    "do_work"
+  ]
 }
