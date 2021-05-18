@@ -1,0 +1,13 @@
+{
+  "id": "britain",
+  "name": "British Empire",
+  "adjective": "British",
+  "color": [0, 119, 207],
+  "leader": "Churchill",
+  "cities": [
+    "London",
+    "Norwich",
+    "Nottingham",
+    "Birmingham"
+  ]
+}

@@ -1,0 +1,13 @@
+{
+  "id": "egypt",
+  "name": "Egypt",
+  "adjective": "Egyptian",
+  "color": [248, 229, 154],
+  "leader": "Ramesses II",
+  "cities": [
+    "Cairo",
+    "Alexandria",
+    "Thebes",
+    "Giza"
+  ]
+}

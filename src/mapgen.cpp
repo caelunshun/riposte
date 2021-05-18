@@ -6,6 +6,7 @@
 #include <array>
 #include <glm/glm.hpp>
 #include <FastNoise/FastNoise.h>
+#include <absl/container/flat_hash_set.h>
 #include "mapgen.h"
 
 namespace rip {
@@ -102,10 +103,16 @@ namespace rip {
 
     // CIVILIZATION GENERATOR
     void seedPlayers(Game &game, Rng &rng) {
+        absl::flat_hash_set<std::string> usedCivIDs;
         while (game.getNumPlayers() < numPlayers) {
             const auto &civs = game.getRegistry().getCivs();
             auto index = rng.u32(0, civs.size());
             auto civ = civs[index];
+
+            if (usedCivIDs.contains(civ->id)) {
+                continue;
+            }
+            usedCivIDs.insert(civ->id);
 
             Player player(civ->leader, civ, game.getMapWidth(), game.getMapHeight());
             auto playerID = game.addPlayer(std::move(player));

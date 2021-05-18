@@ -1,0 +1,13 @@
+{
+  "id": "holy_rome",
+  "name": "Holy Roman Empire",
+  "adjective": "Holy Roman",
+  "color": [207, 127, 0],
+  "leader": "Charlemagne",
+  "cities": [
+    "Aachen",
+    "Prague",
+    "Vienna",
+    "Nuremberg"
+  ]
+}

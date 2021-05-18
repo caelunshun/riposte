@@ -40,8 +40,33 @@
     "loader": "civ"
   },
   {
-    "path": "civ/rome.json",
-    "id": "civ/rome",
+    "path": "civ/aztec.json",
+    "id": "civ/aztec",
+    "loader": "civ"
+  },
+  {
+    "path": "civ/britain.json",
+    "id": "civ/britain",
+    "loader": "civ"
+  },
+  {
+    "path": "civ/china.json",
+    "id": "civ/china",
+    "loader": "civ"
+  },
+  {
+    "path": "civ/egypt.json",
+    "id": "civ/egypt",
+    "loader": "civ"
+  },
+  {
+    "path": "civ/holy_rome.json",
+    "id": "civ/holy_rome",
+    "loader": "civ"
+  },
+  {
+    "path": "civ/india.json",
+    "id": "civ/india",
     "loader": "civ"
   },
   {

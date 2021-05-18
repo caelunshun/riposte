@@ -1,0 +1,13 @@
+{
+  "id": "china",
+  "name": "Chinese Empire",
+  "adjective": "Chinese",
+  "color": [106, 52, 96],
+  "leader": "Han Wudi",
+  "cities": [
+    "Beijing",
+    "Chang'an",
+    "Xi'an",
+    "Hangzhou"
+  ]
+}

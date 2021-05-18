@@ -1,0 +1,13 @@
+{
+  "id": "india",
+  "name": "Indian Empire",
+  "adjective": "Indian",
+  "color": [226, 119, 205],
+  "leader": "Ashoka the Great",
+  "cities": [
+    "Delhi",
+    "Mumbai",
+    "Chennai",
+    "Kolkata"
+  ]
+}

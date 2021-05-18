@@ -1,0 +1,13 @@
+{
+  "id": "aztec",
+  "name": "Aztec Empire",
+  "adjective": "Aztec",
+  "color": [167, 225, 99],
+  "leader": "",
+  "cities": [
+    "Tenochtitlan",
+    "Tetzcoco",
+    "Tlacopan",
+    "Colhuacan"
+  ]
+}
