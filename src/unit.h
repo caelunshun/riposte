@@ -38,7 +38,9 @@ namespace rip {
 
         virtual void onUnitMoved(Game &game) {}
 
-        virtual UnitUIStatus paintMainUI(Game &game, nk_context *nk) {}
+        virtual UnitUIStatus paintMainUI(Game &game, nk_context *nk) {
+            return UnitUIStatus::None;
+        }
     };
 
     // Capability attached to settlers.
