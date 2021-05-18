@@ -127,4 +127,24 @@ namespace rip {
     int Cottage::getNumBuildTurns() const {
         return 4;
     }
+
+    bool Farm::isCompatible(const Tile &tile) const {
+        return tile.getImprovements().empty();
+    }
+
+    Yield Farm::getYieldContribution(const Game &game) const {
+        return Yield(0, 0, 1);
+    }
+
+    int Farm::getNumBuildTurns() const {
+        return 5;
+    }
+
+    std::string Farm::getName() const {
+        return "Farm";
+    }
+
+    void Farm::paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) {
+        paintImprovementIcon(vg, assets, offset, "icon/farm");
+    }
 }

@@ -40,6 +40,8 @@ namespace rip {
         tasks.push_back(std::make_unique<BuildImprovementTask>(cottage.getNumBuildTurns(), unit.getPos(), std::make_unique<Cottage>(std::move(cottage))));
         Mine mine(unit.getPos());
         tasks.push_back(std::make_unique<BuildImprovementTask>(mine.getNumBuildTurns(), unit.getPos(), std::make_unique<Mine>(std::move(mine))));
+        Farm farm(unit.getPos());
+        tasks.push_back(std::make_unique<BuildImprovementTask>(farm.getNumBuildTurns(), unit.getPos(), std::make_unique<Farm>(std::move(farm))));
 
         // Remove incompatible improvement tasks.
         for (int i = static_cast<int>(tasks.size()) - 1; i >= 0; i--) {
@@ -64,7 +66,7 @@ namespace rip {
 
         if (currentTask.has_value()) {
             auto &task = **currentTask;
-            nk_layout_row_push(nk, 100);
+            nk_layout_row_push(nk, 150);
             auto text = task.getPresentParticiple() + " (" + std::to_string(task.getRemainingTurns()) + ")";
             nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
         }
@@ -95,7 +97,7 @@ namespace rip {
     }
 
     std::string BuildImprovementTask::getPresentParticiple() {
-        return "Building" + improvement->getName();
+        return "Building " + improvement->getName();
     }
 
     const Improvement &BuildImprovementTask::getImprovement() const {

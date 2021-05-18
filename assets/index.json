@@ -40,6 +40,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/farm.png",
+    "id": "icon/farm",
+    "loader": "image"
+  },
+  {
     "path": "icon/mine.png",
     "id": "icon/mine",
     "loader": "image"

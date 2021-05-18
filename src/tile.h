@@ -75,6 +75,21 @@ namespace rip {
         void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
     };
 
+    class Farm : public Improvement {
+    public:
+        explicit Farm(glm::uvec2 pos) : Improvement(pos) {}
+
+        bool isCompatible(const Tile &tile) const override;
+
+        Yield getYieldContribution(const Game &game) const override;
+
+        int getNumBuildTurns() const override;
+
+        std::string getName() const override;
+
+        void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
+    };
+
     /**
      * A type of terrain.
      */
