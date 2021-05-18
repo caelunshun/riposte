@@ -366,6 +366,74 @@ namespace rip {
         }
     };
 
+    // Paints the yield for tiles.
+    class YieldPainter : public Painter {
+        std::shared_ptr<Image> foodIcon;
+        std::shared_ptr<Image> hammerIcon;
+        std::shared_ptr<Image> coinIcon;
+
+        void paintTile(NVGcontext *vg, Game &game, Tile &tile, glm::uvec2 tilePos, glm::vec2 offset) {
+            auto yieldScale = 15;
+
+            if (game.isTileWorked(tilePos)) {
+                yieldScale = 25;
+            }
+
+            const auto yield = tile.getYield(game, tilePos);
+            std::vector<std::pair<int, float>> icons;
+            auto cursor = 0;
+            const auto spacing = 4;
+            const auto bigSpacing = 20;
+            for (int i = 0; i < yield.food; i++) {
+                icons.emplace_back(foodIcon->id, cursor);
+                cursor += spacing;
+            }
+            if (yield.hammers != 0) cursor += bigSpacing;
+            for (int i = 0; i < yield.hammers; i++) {
+                icons.emplace_back(hammerIcon->id, cursor);
+                cursor += spacing;
+            }
+            if (yield.commerce != 0) cursor += bigSpacing;
+            for (int i = 0; i < yield.commerce; i++) {
+                icons.emplace_back(coinIcon->id, cursor);
+                cursor += spacing;
+            }
+
+            float length = 0;
+            if (!icons.empty()) length = icons[icons.size() - 1].second + yieldScale;
+
+            for (const auto entry : icons) {
+                auto iconID = entry.first;
+                auto offsetX = entry.second + (50 - length / 2);
+                nvgBeginPath(vg);
+                nvgRect(vg, offset.x + offsetX, offset.y + 50 - yieldScale / 2, yieldScale, yieldScale);
+                auto paint = nvgImagePattern(vg, offset.x + offsetX, offset.y + 50 - yieldScale / 2,
+                                             yieldScale, yieldScale, 0, iconID, 1);
+                nvgFillPaint(vg, paint);
+                nvgFill(vg);
+            }
+        }
+
+    public:
+        explicit YieldPainter(std::shared_ptr<Assets> assets) {
+            coinIcon = std::dynamic_pointer_cast<Image>(assets->get("icon/coin"));
+            foodIcon = std::dynamic_pointer_cast<Image>(assets->get("icon/bread"));
+            hammerIcon = std::dynamic_pointer_cast<Image>(assets->get("icon/hammer"));
+        }
+
+        void paint(NVGcontext *vg, Game &game) override {
+            for (int x = 0; x < game.getMapWidth(); x++) {
+                for (int y = 0; y < game.getMapHeight(); y++) {
+                    glm::uvec2 tilePos(x, y);
+                    auto offset = game.getScreenOffset(tilePos);
+                    if (shouldPaintTile(offset, tilePos, game, true)) {
+                        paintTile(vg, game, game.getTile(tilePos), tilePos, offset);
+                    }
+                }
+            }
+        }
+    };
+
     /**
      * Paints a fog overlay over fogged regions.
      */
@@ -421,6 +489,7 @@ namespace rip {
         gamePainters.push_back(std::make_unique<TilePainter>(assets));
         gamePainters.push_back(std::make_unique<TreePainter>(assets));
         gamePainters.push_back(std::make_unique<CityPainter>(assets));
+        gamePainters.push_back(std::make_unique<YieldPainter>(assets));
         gamePainters.push_back(std::make_unique<UnitPainter>(assets));
         gamePainters.push_back(std::make_unique<FogPainter>());
         overlayPainters.push_back(std::make_unique<CursorPainter>(assets));

@@ -50,6 +50,21 @@
     "loader": "image"
   },
   {
+    "path": "icon/bread.png",
+    "id": "icon/bread",
+    "loader": "image"
+  },
+  {
+    "path": "icon/coin.png",
+    "id": "icon/coin",
+    "loader": "image"
+  },
+  {
+    "path": "icon/hammer.png",
+    "id": "icon/hammer",
+    "loader": "image"
+  },
+  {
     "path": "civ/greece.json",
     "id": "civ/greece",
     "loader": "civ"
