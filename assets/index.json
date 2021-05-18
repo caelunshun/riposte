@@ -35,6 +35,16 @@
     "loader": "image"
   },
   {
+    "path": "icon/cottage.png",
+    "id": "icon/cottage",
+    "loader": "image"
+  },
+  {
+    "path": "icon/mine.png",
+    "id": "icon/mine",
+    "loader": "image"
+  },
+  {
     "path": "civ/greece.json",
     "id": "civ/greece",
     "loader": "civ"
@@ -85,6 +95,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/worker.json",
+    "id": "unit/worker",
+    "loader": "unit"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"
@@ -92,6 +107,11 @@
   {
     "path": "texture/unit/settler.png",
     "id": "texture/unit/settler",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/worker.png",
+    "id": "texture/unit/worker",
     "loader": "image"
   }
 ]

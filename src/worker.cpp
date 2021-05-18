@@ -3,3 +3,7 @@
 //
 
 #include "worker.h"
+
+namespace rip {
+
+}

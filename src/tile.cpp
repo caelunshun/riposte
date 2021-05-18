@@ -2,6 +2,7 @@
 // Created by Caelum van Ispelen on 5/11/21.
 //
 
+#include "renderer.h"
 #include "tile.h"
 #include "city.h"
 #include "game.h"
@@ -49,6 +50,65 @@ namespace rip {
             yield.commerce += 1;
         }
 
+        for (const auto &improvement : getImprovements()) {
+            yield += improvement->getYieldContribution(game);
+        }
+
         return yield;
+    }
+
+    const std::vector<std::unique_ptr<Improvement>> &Tile::getImprovements() const {
+        return improvements;
+    }
+
+    bool Tile::addImprovement(std::unique_ptr<Improvement> improvement) {
+        if (improvement->isCompatible(*this)) {
+            improvements.push_back(std::move(improvement));
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    void Tile::clearImprovements() {
+        improvements.clear();
+    }
+
+    static void paintImprovementIcon(NVGcontext *vg, const Assets &assets, glm::vec2 offset, const std::string &assetID) {
+        const auto &image = std::dynamic_pointer_cast<Image>(assets.get(assetID));
+        nvgBeginPath(vg);
+        auto aspectRatio = 640.0f / 512;
+        auto width = 60.0f;
+        auto height = aspectRatio * width;
+        offset += 50.0f;
+        offset -= glm::vec2(width, height) / 2.0f;
+        nvgRect(vg, offset.x, offset.y, width, height);
+        auto paint = nvgImagePattern(vg, offset.x, offset.y, width, height, 0, image->id, 1);
+        nvgFillPaint(vg, paint);
+        nvgFill(vg);
+    }
+
+    bool Mine::isCompatible(const Tile &tile) const {
+        return !tile.hasImprovement<Mine>();
+    }
+
+    Yield Mine::getYieldContribution(const Game &game) const {
+        return Yield(2, 0, 0);
+    }
+
+    void Mine::paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) {
+        paintImprovementIcon(vg, assets, offset, "icon/mine");
+    }
+
+    bool Cottage::isCompatible(const Tile &tile) const {
+        return !tile.hasImprovement<Cottage>();
+    }
+
+    Yield Cottage::getYieldContribution(const Game &game) const {
+        return Yield(0, 1, 0);
+    }
+
+    void Cottage::paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) {
+        paintImprovementIcon(vg, assets, offset, "icon/cottage");
     }
 }

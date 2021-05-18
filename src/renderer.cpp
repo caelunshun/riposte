@@ -64,7 +64,7 @@ namespace rip {
     class TilePainter : public Painter {
         std::shared_ptr<Assets> assets;
 
-        void paintTile(NVGcontext *vg, Game &game, glm::vec2 offset, glm::uvec2 tilePos, const Tile &tile) {
+        void paintTile(NVGcontext *vg, Game &game, glm::vec2 offset, glm::uvec2 tilePos, Tile &tile) {
             auto imageID = "texture/tile/" + std::string(tile.getTerrainID());
             auto image = std::dynamic_pointer_cast<Image>(assets->get(imageID));
 
@@ -78,6 +78,11 @@ namespace rip {
             // Tile border
             nvgStrokeColor(vg, nvgRGBA(0, 87, 183, 100));
             nvgStroke(vg);
+
+            // Improvements
+            for (auto &improvement : tile.getImprovements()) {
+                improvement->paint(vg, *assets, offset);
+            }
         }
 
     public:
@@ -89,7 +94,7 @@ namespace rip {
             for (int x = 0; x < game.getMapWidth(); x++) {
                 for (int y = 0; y < game.getMapHeight(); y++) {
                     glm::uvec2 pos(x, y);
-                    auto tile = game.getTile(pos);
+                    auto &tile = game.getTile(pos);
                     auto offset = glm::vec2(x * 100, y * 100) - game.getMapOrigin();
 
                     if (!shouldPaintTile(offset, pos, game, true)) {

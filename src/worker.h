@@ -5,4 +5,8 @@
 #ifndef RIPOSTE_WORKER_H
 #define RIPOSTE_WORKER_H
 
+namespace rip {
+
+}
+
 #endif //RIPOSTE_WORKER_H
