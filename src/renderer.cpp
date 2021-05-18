@@ -382,7 +382,7 @@ namespace rip {
             const auto yield = tile.getYield(game, tilePos);
             std::vector<std::pair<int, float>> icons;
             auto cursor = 0;
-            const auto spacing = 4;
+            const auto spacing = 6;
             const auto bigSpacing = 20;
             for (int i = 0; i < yield.food; i++) {
                 icons.emplace_back(foodIcon->id, cursor);

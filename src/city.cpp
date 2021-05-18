@@ -215,9 +215,11 @@ namespace rip {
         storedFood += excessFood;
         if (storedFood < 0) {
             --population;
-            storedFood = 0;
+            updateWorkedTiles(game);
+            storedFood = (30 + 3 * (population - 1)) - 1;
         } else if (storedFood >= neededFoodForGrowth) {
             ++population;
+            updateWorkedTiles(game);
             storedFood -= neededFoodForGrowth;
         }
     }
