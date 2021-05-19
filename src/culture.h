@@ -8,6 +8,7 @@
 #include <absl/container/inlined_vector.h>
 #include <glm/vec2.hpp>
 #include <optional>
+#include <vector>
 #include "ids.h"
 #include "ripmath.h"
 
