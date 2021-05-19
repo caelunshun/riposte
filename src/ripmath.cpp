@@ -56,6 +56,15 @@ namespace rip {
         return result;
     }
 
+    std::array<glm::uvec2, 4> getSideNeighbors(glm::uvec2 pos) {
+        return {
+            pos + glm::uvec2(1, 0),
+            pos - glm::uvec2(1, 0),
+            pos + glm::uvec2(0, 1),
+            pos - glm::uvec2(0, 1),
+        };
+    }
+
     static float evaluateAnimationIntegral(float maxVel, float t, float accelerateTime) {
         return maxVel / pi() * -cos((1.0f / accelerateTime) * pi() * t) + (maxVel / pi());
     }

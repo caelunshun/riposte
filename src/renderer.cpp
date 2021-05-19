@@ -465,12 +465,62 @@ namespace rip {
     class CultureBorderPainter : public Painter {
         void paintTileCulture(NVGcontext *vg, Game &game, glm::uvec2 tilePos, glm::vec2 offset) {
             auto owner = game.getCultureMap().getTileOwner(tilePos);
+            const auto width = 3.0f;
+            nvgStrokeWidth(vg, width);
+            nvgLineCap(vg, NVG_SQUARE);
             if (owner.has_value()) {
-                nvgBeginPath(vg);
-                nvgRect(vg, offset.x, offset.y, 100, 100);
-                const auto &color = game.getPlayer(*owner).getCiv().color;
-                nvgFillColor(vg, nvgRGBA(color[0], color[1], color[2], 200));
-                nvgFill(vg);
+                // Draw borders only when the neighbor on that side has a different owner.
+                for (const auto neighborTilePos : getSideNeighbors(tilePos)) {
+                    if (!game.containsTile(neighborTilePos)) continue;
+                    auto neighborOwner = game.getCultureMap().getTileOwner(neighborTilePos);
+                    if (neighborOwner != owner) {
+                        // Draw a border along this edge.
+                        glm::vec2 edgeOffset;
+                        glm::vec2 edgeLength;
+                        glm::vec2 crossVector;
+
+                        auto diff = glm::ivec2(neighborTilePos) - glm::ivec2(tilePos);
+                        if (diff == glm::ivec2(1, 0)) {
+                            edgeOffset = glm::vec2(100 - width / 2, width / 2);
+                            edgeLength = glm::vec2(0, 100 - width);
+                            crossVector = glm::vec2(-1, 0);
+                        } else if (diff == glm::ivec2(-1, 0)) {
+                            edgeOffset = glm::vec2(width / 2,  width / 2);
+                            edgeLength = glm::vec2(0, 100 - width);
+                            crossVector = glm::vec2(1, 0);
+                        } else if (diff == glm::ivec2(0, 1)) {
+                            edgeOffset = glm::vec2(width / 2, 100 - width / 2);
+                            edgeLength = glm::vec2(100 - width, 0);
+                            crossVector = glm::vec2(0, -1);
+                        } else {
+                            edgeOffset = glm::vec2(width / 2, width / 2);
+                            edgeLength = glm::vec2(100 - width, 0);
+                            crossVector = glm::vec2(0, 1);
+                        }
+
+                        nvgBeginPath(vg);
+                        auto start = offset + edgeOffset;
+                        auto end = start + edgeLength;
+                        nvgMoveTo(vg, start.x, start.y);
+                        nvgLineTo(vg, end.x, end.y);
+                        const auto &color = game.getPlayer(*owner).getCiv().color;
+                        nvgStrokeColor(vg, nvgRGB(color[0], color[1], color[2]));
+                        nvgStroke(vg);
+
+                        // Gradient to indicate direction of border.
+                        nvgBeginPath(vg);
+                        auto gradientStart = start;
+                        auto gradientEnd = gradientStart + crossVector * 30.0f;
+                        nvgRect(vg, gradientStart.x, gradientStart.y,
+                                gradientEnd.x - gradientStart.x + edgeLength.x,
+                                gradientEnd.y - gradientStart.y + edgeLength.y);
+                        auto paint = nvgLinearGradient(vg, gradientStart.x, gradientStart.y, gradientEnd.x, gradientEnd.y,
+                                                       nvgRGBA(color[0], color[1], color[2], 128),
+                                                       nvgRGBA(color[0], color[1], color[2], 0));
+                        nvgFillPaint(vg, paint);
+                        nvgFill(vg);
+                    }
+                }
             }
         }
 

@@ -64,7 +64,7 @@ namespace rip {
             cultureTile.addCultureForPlayer(city.getOwner(), culturePerTurn);
 
             // Add 20 * (radius - distance) culture to the plot as well.
-            auto extraCulture = 20 * (level - static_cast<int>(dist(pos, city.getPos())));
+            auto extraCulture = 20 * (level - static_cast<int>(round(dist(pos, city.getPos()))));
             if (extraCulture > 0) {
                 cultureTile.addCultureForPlayer(city.getOwner(), extraCulture);
             }
@@ -84,7 +84,7 @@ namespace rip {
             owners[pos.x + pos.y * mapWidth] = currentOwner;
         }, [&] (Tile &tile, glm::uvec2 pos) {
             auto d = dist(pos, city.getPos());
-            return static_cast<int>(d) <= level;
+            return static_cast<int>(round(d)) <= level;
         });
     }
 
