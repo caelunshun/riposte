@@ -83,7 +83,8 @@ namespace rip {
             }
             owners[pos.x + pos.y * mapWidth] = currentOwner;
         }, [&] (Tile &tile, glm::uvec2 pos) {
-            return static_cast<int>(dist(pos, city.getPos())) <= level;
+            auto d = dist(pos, city.getPos());
+            return static_cast<int>(d) <= level;
         });
     }
 

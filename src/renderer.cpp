@@ -461,6 +461,35 @@ namespace rip {
         }
     };
 
+    // Paints cultural borders.
+    class CultureBorderPainter : public Painter {
+        void paintTileCulture(NVGcontext *vg, Game &game, glm::uvec2 tilePos, glm::vec2 offset) {
+            auto owner = game.getCultureMap().getTileOwner(tilePos);
+            if (owner.has_value()) {
+                nvgBeginPath(vg);
+                nvgRect(vg, offset.x, offset.y, 100, 100);
+                const auto &color = game.getPlayer(*owner).getCiv().color;
+                nvgFillColor(vg, nvgRGBA(color[0], color[1], color[2], 200));
+                nvgFill(vg);
+            }
+        }
+
+    public:
+        void paint(NVGcontext *vg, Game &game) override {
+            for (int x = 0; x < game.getMapWidth(); x++) {
+                for (int y = 0; y < game.getMapHeight(); y++) {
+                    glm::uvec2 tilePos(x, y);
+                    auto offset = game.getScreenOffset(tilePos);
+                    if (!shouldPaintTile(offset, tilePos, game, true)) {
+                        continue;
+                    }
+
+                    paintTileCulture(vg, game, tilePos, offset);
+                }
+            }
+        }
+    };
+
     /**
     * Paints the custom cursor.
     */
@@ -488,6 +517,7 @@ namespace rip {
         // allowing for layering.
         gamePainters.push_back(std::make_unique<TilePainter>(assets));
         gamePainters.push_back(std::make_unique<TreePainter>(assets));
+        gamePainters.push_back(std::make_unique<CultureBorderPainter>());
         gamePainters.push_back(std::make_unique<CityPainter>(assets));
         gamePainters.push_back(std::make_unique<YieldPainter>(assets));
         gamePainters.push_back(std::make_unique<UnitPainter>(assets));

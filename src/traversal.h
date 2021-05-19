@@ -41,7 +41,7 @@ namespace rip {
                 }
                 visited.insert(neighbor);
                 auto &neighborTile = game.getTile(neighbor);
-                if (shouldVisit(neighborTile, current)) {
+                if (shouldVisit(neighborTile, neighbor)) {
                     queue.push_back(neighbor);
                 }
             }

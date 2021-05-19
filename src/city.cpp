@@ -147,6 +147,8 @@ namespace rip {
         }
         updateWorkedTiles(game);
         doGrowth(game);
+
+        culture.addCultureForPlayer(owner, getCulturePerTurn());
     }
 
     bool City::hasBuildTask() const {
