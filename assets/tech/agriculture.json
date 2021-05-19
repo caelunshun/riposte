@@ -1,0 +1,6 @@
+{
+  "name": "Agriculture",
+  "cost": 40,
+
+  "unlocksImprovements": ["Farm"]
+}

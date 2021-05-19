@@ -1,0 +1,6 @@
+{
+  "name": "Pottery",
+  "cost": 60,
+
+  "unlocksImprovements": ["Cottage"]
+}

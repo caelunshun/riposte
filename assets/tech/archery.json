@@ -1,0 +1,5 @@
+{
+  "name": "Archery",
+  "cost": 80,
+  "prerequisites": ["Hunting"]
+}

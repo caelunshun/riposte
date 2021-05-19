@@ -1,0 +1,6 @@
+{
+  "name": "Mining",
+  "cost": 70,
+
+  "unlocksImprovements": ["Mine"]
+}
