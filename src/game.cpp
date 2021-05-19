@@ -18,6 +18,8 @@ namespace rip {
             player.onTurnEnd(*this);
         }
 
+        cultureMap.onTurnEnd(*this);
+
         ++turn;
     }
 

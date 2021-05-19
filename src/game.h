@@ -18,6 +18,7 @@
 #include "unit.h"
 #include "registry.h"
 #include "ids.h"
+#include "culture.h"
 
 namespace rip {
     class Game {
@@ -48,6 +49,8 @@ namespace rip {
 
         std::vector<bool> workedTiles;
 
+        CultureMap cultureMap;
+
         size_t getMapIndex(glm::uvec2 pos) const {
             return static_cast<size_t>(pos.x) + static_cast<size_t>(pos.y) * static_cast<size_t>(mapWidth);
         }
@@ -59,6 +62,7 @@ namespace rip {
         mapWidth(mapWidth),
         mapHeight(mapHeight),
         registry(std::move(registry)),
+        cultureMap(mapWidth, mapHeight),
         cursor() {
 
         }
@@ -152,6 +156,7 @@ namespace rip {
         CityId addCity(City city) {
             auto id = cities.insert(std::move(city)).second;
             getCity(id).setID(id);
+            getCity(id).onCreated(*this);
             return id;
         }
 
@@ -272,6 +277,14 @@ namespace rip {
         // Enqueues a unit to be killed as soon as possible.
         void deferKillUnit(UnitId id) {
             unitKillQueue.push_back(id);
+        }
+
+        CultureMap &getCultureMap() {
+            return cultureMap;
+        }
+
+        const CultureMap &getCultureMap() const {
+            return cultureMap;
         }
     };
 }

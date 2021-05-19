@@ -11,6 +11,7 @@
 #include "player.h"
 #include "registry.h"
 #include "ids.h"
+#include "culture.h"
 
 namespace rip {
     struct Yield {
@@ -55,6 +56,33 @@ namespace rip {
         virtual const std::string &getName() const = 0;
     };
 
+    struct CultureLevel {
+        int value;
+
+        explicit CultureLevel(int value) : value(value) {}
+
+        std::string getName() const {
+            switch (value) {
+                case 0:
+                    return "None";
+                case 1:
+                    return "Poor";
+                case 2:
+                    return "Fledgling";
+                case 3:
+                    return "Developing";
+                case 4:
+                    return "Refined";
+                case 5:
+                    return "Influential";
+                case 6:
+                    return "Legendary";
+                default:
+                    throw std::string("invalid culture level " + std::to_string(value));
+            }
+        }
+    };
+
     // A build task to build a unit.
     class UnitBuildTask : public BuildTask {
         std::shared_ptr<UnitKind> unitKind;
@@ -84,6 +112,11 @@ namespace rip {
         int population = 1;
         int storedFood = 0;
 
+        // Culture stored in the city for each
+        // player. Note that this is not the same as plot culture,
+        // which is stored in the CultureMap object.
+        Culture culture;
+
         void doGrowth(Game &game);
 
     public:
@@ -96,11 +129,16 @@ namespace rip {
         PlayerId getOwner() const;
         CityId getID() const;
 
+        const Culture &getCulture() const;
+        int getCulturePerTurn() const;
+        CultureLevel getCultureLevel() const;
+
         void setName(std::string name);
 
         void updateWorkedTiles(Game &game);
         Yield computeYield(const Game &game) const;
 
+        void onCreated(Game &game);
         void onTurnEnd(Game &game);
 
         bool hasBuildTask() const;

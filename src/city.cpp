@@ -43,8 +43,8 @@ namespace rip {
         progress += hammers;
     }
 
-    City::City(glm::uvec2 pos, std::string name, PlayerId owner) : pos(pos), name(std::move(name)), owner(owner) {
-
+    City::City(glm::uvec2 pos, std::string name, PlayerId owner) : pos(pos), name(std::move(name)), owner(owner), culture() {
+        culture.addCultureForPlayer(owner, 1);
     }
 
     void City::setID(CityId id) {
@@ -218,6 +218,35 @@ namespace rip {
             ++population;
             storedFood -= neededFoodForGrowth;
         }
+    }
+
+    const Culture &City::getCulture() const {
+        return culture;
+    }
+
+    int City::getCulturePerTurn() const {
+        return population; // TODO?
+    }
+
+    CultureLevel City::getCultureLevel() const {
+        const auto culture = getCulture().getCultureForPlayer(owner);
+        if (culture < 10) {
+            return CultureLevel(1);
+        } else if (culture < 100) {
+            return CultureLevel(2);
+        } else if (culture < 500) {
+            return CultureLevel(3);
+        } else if (culture < 5000) {
+            return CultureLevel(4);
+        } else if (culture < 50000) {
+            return CultureLevel(5);
+        } else {
+            return CultureLevel(6);
+        }
+    }
+
+    void City::onCreated(Game &game) {
+        game.getCultureMap().onCityCreated(game, getID());
     }
 }
 
