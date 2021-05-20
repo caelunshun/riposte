@@ -45,7 +45,17 @@ namespace rip {
         // Techs that need to be unlocked before building this unit.
         std::vector<std::string> techs;
 
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(UnitKind, id, name, strength, movement, capabilities, cost, techs);
+        friend void from_json(const nlohmann::json &nlohmann_json_j, UnitKind &nlohmann_json_t) {
+            nlohmann_json_j.at("id").get_to(nlohmann_json_t.id);
+            nlohmann_json_j.at("name").get_to(nlohmann_json_t.name);
+            nlohmann_json_j.at("strength").get_to(nlohmann_json_t.strength);
+            nlohmann_json_j.at("movement").get_to(nlohmann_json_t.movement);
+            if (nlohmann_json_j.contains("capabilities")) {
+                nlohmann_json_j.at("capabilities").get_to(nlohmann_json_t.capabilities);
+            }
+            nlohmann_json_j.at("cost").get_to(nlohmann_json_t.cost);
+            nlohmann_json_j.at("techs").get_to(nlohmann_json_t.techs);
+        }
     };
 
     /**

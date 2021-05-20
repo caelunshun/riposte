@@ -1,0 +1,12 @@
+{
+  "id": "rice",
+  "name": "Rice",
+  "revealedBy": "Agriculture",
+  "yieldBonus": {
+    "food": 1
+  },
+  "improvement": "Farm",
+  "improvedBonus": {
+    "food": 1
+  }
+}

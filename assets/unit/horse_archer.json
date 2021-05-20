@@ -1,0 +1,9 @@
+{
+  "id": "horse_archer",
+  "name": "Horse Archer",
+  "strength": 6,
+  "movement": 2,
+  "cost": 50,
+  "techs": ["Horseback Riding"],
+  "resources": ["Horse"]
+}

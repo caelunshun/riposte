@@ -1,0 +1,9 @@
+{
+  "id": "axeman",
+  "name": "Axeman",
+  "strength": 5,
+  "movement": 1,
+  "cost": 35,
+  "techs": ["Bronze Working"],
+  "resources": ["Copper"]
+}

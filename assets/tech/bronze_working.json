@@ -1,0 +1,5 @@
+{
+  "name": "Bronze Working",
+  "cost": 100,
+  "prerequisites": ["Mining"]
+}

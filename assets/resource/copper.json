@@ -1,0 +1,12 @@
+{
+  "id": "copper",
+  "name": "Copper",
+  "revealedBy": "Bronze Working",
+  "yieldBonus": {
+    "hammers": 1
+  },
+  "improvement": "Mine",
+  "improvedBonus": {
+    "hammers": 3
+  }
+}

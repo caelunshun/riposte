@@ -1,0 +1,13 @@
+{
+  "id": "horse",
+  "name": "Horse",
+  "reavealedBy": "Animal Husbandry",
+  "yieldBonus": {
+    "hammers": 1
+  },
+  "improvement": "Pasture",
+  "improvedBonus": {
+    "hammers": 1,
+    "commerce": 1
+  }
+}

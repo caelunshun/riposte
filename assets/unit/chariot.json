@@ -1,0 +1,9 @@
+{
+  "id": "chariot",
+  "name": "Chariot",
+  "strength": 4,
+  "movement": 2,
+  "cost": 40,
+  "techs": ["Animal Husbandry"],
+  "resources": ["Horse"]
+}
