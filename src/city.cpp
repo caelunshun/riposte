@@ -96,6 +96,7 @@ namespace rip {
         for (const auto bfcPos : getBigFatCross(getPos())) {
             if (!game.containsTile(bfcPos)) continue;
             if (game.isTileWorked(bfcPos)) continue;
+            if (game.getCultureMap().getTileOwner(bfcPos) != getOwner()) continue;
             const auto &tile = game.getTile(bfcPos);
             const auto yield = tile.getYield(game, bfcPos);
             entries.emplace_back(yield, bfcPos);
