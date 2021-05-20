@@ -4,5 +4,6 @@
   "strength": 2,
   "movement": 1,
   "cost": 20,
+  "techs": [],
   "capabilities": []
 }

@@ -31,6 +31,19 @@ namespace rip {
         void loadAssetsDir(const std::string &dir);
 
         std::shared_ptr<Asset> get(const std::string &id) const;
+
+        template<class T>
+        std::vector<std::shared_ptr<T>> getAll() const {
+            std::vector<std::shared_ptr<T>> results;
+            for (const auto &entry : assets) {
+                const auto &asset = entry.second;
+                auto assetDowncasted = std::dynamic_pointer_cast<T>(asset);
+                if (assetDowncasted) {
+                    results.push_back(std::move(assetDowncasted));
+                }
+            }
+            return results;
+        }
     };
 }
 

@@ -4,6 +4,7 @@
   "strength": 0,
   "movement": 2,
   "cost": 30,
+  "techs": [],
   "capabilities": [
     "do_work"
   ]

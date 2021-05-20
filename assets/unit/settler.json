@@ -4,6 +4,7 @@
   "strength": 0,
   "movement": 2,
   "cost": 40,
+  "techs": [],
   "capabilities": [
     "found_city"
   ]

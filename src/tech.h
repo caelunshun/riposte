@@ -8,12 +8,13 @@
 #include <string>
 #include <vector>
 #include <memory>
-#include <nlohmann/json.hpp>
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 #include "registry.h"
 
 namespace rip {
+    struct JSONTech;
+
     struct Tech {
         // Tech name to be displayed in the UI.
         std::string name;
@@ -30,6 +31,8 @@ namespace rip {
         std::vector<std::shared_ptr<Tech>> prerequisites;
         std::vector<std::shared_ptr<Tech>> leadsTo;
 
+        Tech(const std::string &name, int cost, const std::vector<std::string> &unlocksImprovements);
+
         int estimateResearchTurns(int beakersPerTurn) const;
     };
 
@@ -38,6 +41,8 @@ namespace rip {
         absl::flat_hash_map<std::string, std::shared_ptr<Tech>> techs;
 
     public:
+        TechTree(const Assets &assets, const Registry &registry);
+
         Tech &getTech(const std::string &name);
 
         const absl::flat_hash_map<std::string, std::shared_ptr<Tech>> &getTechs() const;
@@ -58,6 +63,8 @@ namespace rip {
 
         void unlockTech(std::shared_ptr<Tech> tech);
 
+        bool arePrerequisitesMet(const Tech &tech) const;
+
         bool isTechUnlocked(const std::string &name) const;
 
         bool isUnitUnlocked(const UnitKind &kind) const;
@@ -65,6 +72,10 @@ namespace rip {
         bool isImprovementUnlocked(const std::string &name) const;
     };
 
+    class TechLoader : public AssetLoader {
+    public:
+        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+    };
 }
 
 #endif //RIPOSTE_TECH_H
