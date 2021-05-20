@@ -133,5 +133,30 @@
     "path": "texture/unit/worker.png",
     "id": "texture/unit/worker",
     "loader": "image"
+  },
+  {
+    "path": "tech/agriculture.json",
+    "id": "tech/agriculture",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/archery.json",
+    "id": "tech/archery",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/hunting.json",
+    "id": "tech/hunting",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/mining.json",
+    "id": "tech/mining",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/pottery.json",
+    "id": "tech/pottery",
+    "loader": "tech"
   }
 ]

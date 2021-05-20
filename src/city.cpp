@@ -183,11 +183,19 @@ namespace rip {
         return unitKind->name;
     }
 
+    bool UnitBuildTask::canBuild(const Game &game, const City &builder) {
+        return game.getPlayer(builder.getID()).getTechs().isUnitUnlocked(*unitKind);
+    }
+
     std::vector<std::unique_ptr<BuildTask>> City::getPossibleBuildTasks(const Game &game) const {
         std::vector<std::unique_ptr<BuildTask>> tasks;
 
         for (const auto &unitKind : game.getRegistry().getUnits()) {
-            tasks.push_back(std::make_unique<UnitBuildTask>(unitKind));
+            auto task = std::make_unique<UnitBuildTask>(unitKind);
+            if (!task->canBuild(game, *this)) {
+                continue;
+            }
+            tasks.push_back(std::move(task));
         }
 
         return tasks;

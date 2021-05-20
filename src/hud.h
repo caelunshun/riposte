@@ -46,6 +46,11 @@ namespace rip {
         void paintCityBuildPrompt(Game &game, CityId cityID);
         void paintPath(Game &game, glm::uvec2 start, const Path &path);
 
+        void paintResearchBar(Game &game);
+
+        bool shouldShowTechPrompt(const Game &game) const;
+        void paintTechPrompt(Game &game);
+
         void trySetSelectedPath(Game &game, glm::uvec2 from, glm::uvec2 to);
 
         std::optional<CityId> getCityBuildPrompt(const Game &game) const;

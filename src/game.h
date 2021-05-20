@@ -210,6 +210,14 @@ namespace rip {
             return players.insert(std::move(player)).second;
         }
 
+        const Player &getThePlayer() const {
+            return players.id_value(thePlayer);
+        }
+
+        const Player &getPlayer(PlayerId id) const {
+            return players.id_value(id);
+        }
+
         rea::versioned_slot_map<Player> &getPlayers() {
             return players;
         }

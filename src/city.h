@@ -49,6 +49,8 @@ namespace rip {
 
         void spendHammers(int hammers);
 
+        virtual bool canBuild(const Game &game, const City &builder) = 0;
+
         // Should be invoked when the task completes to spawn any
         // necessary changes (create a unit, add a building, etc.)
         virtual void onCompleted(Game &game, City &builder) = 0;
@@ -93,6 +95,8 @@ namespace rip {
         ~UnitBuildTask() override = default;
 
         void onCompleted(Game &game, City &builder) override;
+
+        bool canBuild(const Game &game, const City &builder) override;
 
         const std::string &getName() const override;
     };

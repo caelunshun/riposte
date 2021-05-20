@@ -90,6 +90,7 @@ int main() {
     assets->addLoader("font", std::make_unique<rip::FontLoader>(renderer));
     assets->addLoader("civ", std::make_unique<rip::CivLoader>(registry));
     assets->addLoader("unit", std::make_unique<rip::UnitLoader>(registry));
+    assets->addLoader("tech", std::make_unique<rip::TechLoader>());
     assets->loadAssetsDir("assets");
 
     auto techTree = std::make_shared<rip::TechTree>(*assets, *registry);

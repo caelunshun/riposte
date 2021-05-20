@@ -63,6 +63,7 @@ namespace rip {
          ResearchingTech(std::shared_ptr<Tech> tech);
 
          bool isFinished() const;
+         int estimateCompletionTurns(int beakersPerTurn) const;
      };
 
     /**

@@ -1,0 +1,9 @@
+{
+  "id": "archer",
+  "name": "Archer",
+  "strength": 3,
+  "movement": 1,
+  "cost": 40,
+  "techs": ["Archery"],
+  "capabilities": []
+}

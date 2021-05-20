@@ -1,0 +1,9 @@
+{
+  "id": "scout",
+  "name": "Scout",
+  "strength": 1,
+  "movement": 2,
+  "cost": 30,
+  "techs": ["Hunting"],
+  "capabilities": []
+}

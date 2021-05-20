@@ -187,6 +187,46 @@ namespace rip {
         }
     }
 
+    void Hud::paintResearchBar(Game &game) {
+        const auto &research = game.getThePlayer().getResearchingTech();
+        float progress = 0;
+        if (research.has_value()) {
+            progress = static_cast<float>(research->beakersAccumulated) / research->tech->cost;
+        }
+        progress = std::clamp(progress, 0.0f, 1.0f);
+
+        glm::vec2 size(400, 30);
+        glm::vec2 progressSize(size.x * progress, size.y);
+        glm::vec2 offset(game.getCursor().getWindowSize().x / 2 - size.x / 2, 1);
+        auto end = offset + size;
+
+        nvgBeginPath(vg);
+        nvgRect(vg, offset.x, offset.y, size.x, size.y);
+        nvgFillColor(vg, nvgRGBA(100, 100, 100, 150));
+        nvgFill(vg);
+        nvgStrokeColor(vg, nvgRGB(0, 0, 0));
+        nvgStrokeWidth(vg, 1);
+        nvgStroke(vg);
+
+        nvgBeginPath(vg);
+        nvgRect(vg, offset.x, offset.y, progressSize.x, progressSize.y);
+        nvgFillColor(vg, nvgRGB(108, 198, 74));
+        nvgFill(vg);
+
+        std::string text = "Research: ";
+        if (research.has_value()) {
+            text += research->tech->name + " (" +
+                    std::to_string(research->estimateCompletionTurns(game.getThePlayer().getBeakerRevenue()))
+                    + ")";
+        } else {
+            text += "None";
+        }
+        nvgFontSize(vg, 15);
+        nvgFillColor(vg, nvgRGB(255, 255, 255));
+        nvgTextAlign(vg, NVG_ALIGN_MIDDLE | NVG_ALIGN_CENTER);
+        nvgText(vg, offset.x + size.x / 2, offset.y + size.y / 2, text.c_str(), nullptr);
+    }
+
     void Hud::update(Game &game) {
         if (selectedUnit.has_value() &&
                 !game.getUnits().id_is_valid(*selectedUnit)) {
@@ -215,6 +255,8 @@ namespace rip {
             }
             paintCityBuildPrompt(game, *cityID);
         }
+        paintResearchBar(game);
+        paintTechPrompt(game);
         paintMessages(game);
     }
 
@@ -333,12 +375,43 @@ namespace rip {
     }
 
     bool Hud::hasFocus(const Game &game) const {
-        return getCityBuildPrompt(game).has_value();
+        return getCityBuildPrompt(game).has_value() || shouldShowTechPrompt(game);
     }
 
     void Hud::handleKey(Game &game, int key) {
         if (key == GLFW_KEY_L) {
             game.toggleCheatMode();
         }
+    }
+
+    bool Hud::shouldShowTechPrompt(const Game &game) const {
+        return game.getTurn() != 0 && !game.getThePlayer().getResearchingTech().has_value();
+    }
+
+    void Hud::paintTechPrompt(Game &game) {
+        if (!shouldShowTechPrompt(game)) return;
+
+        const auto windowSize = game.getCursor().getWindowSize();
+        glm::vec2 size(600, 400);
+        auto bounds = nk_rect(
+                windowSize.x / 2 - size.x / 2,
+                windowSize.y / 2 - size.y / 2,
+                size.x,
+                size.y);
+        nk_begin(nk, "research prompt", bounds, 0);
+        nk_layout_row_dynamic(nk, 60, 1);
+
+        nk_label_colored_wrap(nk, "What would you like to research next?", nk_rgb(255, 255, 255));
+
+        auto beakers = game.getThePlayer().getBeakerRevenue();
+        for (const auto &tech : game.getThePlayer().getTechs().getPossibleResearches()) {
+            auto turnEstimate = (tech->cost + beakers - 1) / beakers;
+            auto text = tech->name + " (" + std::to_string(turnEstimate) + ")";
+            if (nk_button_label(nk, text.c_str())) {
+                game.getThePlayer().setResearchingTech(tech);
+            }
+        }
+
+        nk_end(nk);
     }
 }

@@ -192,4 +192,8 @@ namespace rip {
     }
 
     ResearchingTech::ResearchingTech(std::shared_ptr<Tech> tech) : tech(std::move(tech)) {}
+
+    int ResearchingTech::estimateCompletionTurns(int beakersPerTurn) const {
+        return (tech->cost - beakersAccumulated + beakersPerTurn - 1) / beakersPerTurn;
+    }
 }
