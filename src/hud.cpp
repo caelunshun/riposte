@@ -392,10 +392,10 @@ namespace rip {
         if (!shouldShowTechPrompt(game)) return;
 
         const auto windowSize = game.getCursor().getWindowSize();
-        glm::vec2 size(600, 400);
+        glm::vec2 size(600, 350);
         auto bounds = nk_rect(
                 windowSize.x / 2 - size.x / 2,
-                windowSize.y / 2 - size.y / 2,
+                50,
                 size.x,
                 size.y);
         nk_begin(nk, "research prompt", bounds, 0);
@@ -405,6 +405,31 @@ namespace rip {
 
         auto beakers = game.getThePlayer().getBeakerRevenue();
         for (const auto &tech : game.getThePlayer().getTechs().getPossibleResearches()) {
+            if (nk_widget_is_hovered(nk)) {
+                // Show tooltip.
+                if (nk_tooltip_begin(nk, 300)) {
+                    nk_layout_row_begin(nk, NK_STATIC, 100, 2);
+                    nk_layout_row_push(nk, 30);
+                    nk_spacing(nk, 1);
+
+                    nk_layout_row_push(nk, 270);
+                    if (nk_group_begin(nk, "tech info", 0)) {
+                        nk_layout_row_dynamic(nk, 20, 1);
+                        nk_label(nk, ("Cost: " + std::to_string(tech->cost)).c_str(), NK_TEXT_ALIGN_LEFT);
+
+                        for (const auto &unit : tech->unlocksUnits) {
+                            nk_label(nk, ("* Can train a " + unit->name).c_str(), NK_TEXT_ALIGN_LEFT);
+                        }
+                        for (const auto &improvement : tech->unlocksImprovements) {
+                            nk_label(nk, ("* Can build a " + improvement).c_str(), NK_TEXT_ALIGN_LEFT);
+                        }
+                        nk_group_end(nk);
+                    }
+
+                    nk_tooltip_end(nk);
+                }
+            }
+
             auto turnEstimate = (tech->cost + beakers - 1) / beakers;
             auto text = tech->name + " (" + std::to_string(turnEstimate) + ")";
             if (nk_button_label(nk, text.c_str())) {
