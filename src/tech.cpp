@@ -25,6 +25,7 @@ namespace rip {
     };
 
     int Tech::estimateResearchTurns(int beakersPerTurn) const {
+        if (beakersPerTurn == 0) return cost + 1;
         return (cost + beakersPerTurn - 1) / beakersPerTurn;
     }
 

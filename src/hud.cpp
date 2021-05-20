@@ -430,7 +430,10 @@ namespace rip {
                 }
             }
 
-            auto turnEstimate = (tech->cost + beakers - 1) / beakers;
+            int turnEstimate = tech->cost + 1;
+            if (beakers != 0) {
+                turnEstimate = (tech->cost + beakers - 1) / beakers;
+            }
             auto text = tech->name + " (" + std::to_string(turnEstimate) + ")";
             if (nk_button_label(nk, text.c_str())) {
                 game.getThePlayer().setResearchingTech(tech);

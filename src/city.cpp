@@ -185,7 +185,7 @@ namespace rip {
     }
 
     bool UnitBuildTask::canBuild(const Game &game, const City &builder) {
-        return game.getPlayer(builder.getID()).getTechs().isUnitUnlocked(*unitKind);
+        return game.getPlayer(builder.getOwner()).getTechs().isUnitUnlocked(*unitKind);
     }
 
     std::vector<std::unique_ptr<BuildTask>> City::getPossibleBuildTasks(const Game &game) const {
