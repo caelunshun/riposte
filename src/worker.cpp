@@ -48,7 +48,10 @@ namespace rip {
             auto &task = tasks[i];
             auto downcasted = dynamic_cast<BuildImprovementTask*>(&*task);
             if (downcasted) {
-                if (!downcasted->getImprovement().isCompatible(game.getTile(unit.getPos()))) {
+                if (
+                        !game.getPlayer(unit.getOwner()).getTechs().isImprovementUnlocked(downcasted->getImprovement().getName())
+                        || !downcasted->getImprovement().isCompatible(game.getTile(unit.getPos()))
+                        ) {
                     tasks.erase(tasks.begin() + i);
                 }
             }

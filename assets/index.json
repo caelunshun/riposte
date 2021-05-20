@@ -120,6 +120,16 @@
     "loader": "unit"
   },
   {
+    "path": "unit/archer.json",
+    "id": "unit/archer",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/scout.json",
+    "id": "unit/scout",
+    "loader": "unit"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"
@@ -132,6 +142,16 @@
   {
     "path": "texture/unit/worker.png",
     "id": "texture/unit/worker",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/archer.png",
+    "id": "texture/unit/archer",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/scout.png",
+    "id": "texture/unit/scout",
     "loader": "image"
   },
   {
