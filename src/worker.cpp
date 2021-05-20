@@ -36,6 +36,11 @@ namespace rip {
 
         const auto &unit = game.getUnit(unitID);
 
+        if (game.getCultureMap().getTileOwner(unit.getPos()) != unit.getOwner()) {
+            // You can only build on your own land....
+            return tasks;
+        }
+
         Cottage cottage(unit.getPos());
         tasks.push_back(std::make_unique<BuildImprovementTask>(cottage.getNumBuildTurns(), unit.getPos(), std::make_unique<Cottage>(std::move(cottage))));
         Mine mine(unit.getPos());
