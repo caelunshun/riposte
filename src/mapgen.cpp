@@ -102,7 +102,7 @@ namespace rip {
     const auto numPlayers = 7;
 
     // CIVILIZATION GENERATOR
-    void seedPlayers(Game &game, Rng &rng) {
+    void seedPlayers(Game &game, const std::shared_ptr<TechTree> &techTree, Rng &rng) {
         absl::flat_hash_set<std::string> usedCivIDs;
         while (game.getNumPlayers() < numPlayers) {
             const auto &civs = game.getRegistry().getCivs();
@@ -114,7 +114,7 @@ namespace rip {
             }
             usedCivIDs.insert(civ->id);
 
-            Player player(civ->leader, civ, game.getMapWidth(), game.getMapHeight());
+            Player player(civ->leader, civ, game.getMapWidth(), game.getMapHeight(), techTree);
             auto playerID = game.addPlayer(std::move(player));
 
             auto &p = game.getPlayer(playerID);
@@ -225,9 +225,9 @@ namespace rip {
         }
     }
 
-    void MapGenerator::generate(rip::Game &game) {
+    void MapGenerator::generate(rip::Game &game, const std::shared_ptr<TechTree> &techTree) {
         buildTerrain(game, rng);
-        seedPlayers(game, rng);
+        seedPlayers(game, techTree, rng);
         placeCities(game, rng);
     }
 }

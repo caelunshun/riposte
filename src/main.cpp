@@ -92,11 +92,13 @@ int main() {
     assets->addLoader("unit", std::make_unique<rip::UnitLoader>(registry));
     assets->loadAssetsDir("assets");
 
+    auto techTree = std::make_shared<rip::TechTree>(*assets, *registry);
+
     renderer.init(assets);
 
     rip::Game game(64, 64, registry);
     rip::MapGenerator mapgen;
-    mapgen.generate(game);
+    mapgen.generate(game, techTree);
 
     for (auto &player : game.getPlayers()) {
         player.recomputeVisibility(game);

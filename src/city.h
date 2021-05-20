@@ -138,6 +138,8 @@ namespace rip {
         void updateWorkedTiles(Game &game);
         Yield computeYield(const Game &game) const;
 
+        int getGoldProduced(Game &game) const;
+
         void onCreated(Game &game);
         void onTurnEnd(Game &game);
 

@@ -7,7 +7,9 @@
 #include "game.h"
 
 namespace rip {
-    Player::Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight) : username(std::move(username)), visibilityMap(mapWidth, mapHeight), civ(civ) {
+    Player::Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree)
+        : username(std::move(username)), visibilityMap(mapWidth, mapHeight), civ(civ),
+        techs(techTree) {
 
     }
 
@@ -127,8 +129,67 @@ namespace rip {
     }
 
     void Player::onTurnEnd(Game &game) {
+        recomputeRevenue(game);
+        doEconomyTurn(game);
         if (ai.has_value()) {
             ai->doTurn(game);
         }
     }
+
+    const PlayerTechs &Player::getTechs() const {
+        return techs;
+    }
+
+    void Player::recomputeRevenue(Game &game) {
+        baseRevenue = 0;
+        for (const auto cityID : cities) {
+            auto &city = game.getCity(cityID);
+            baseRevenue += city.getGoldProduced(game);
+        }
+    }
+
+    int Player::getBaseRevenue() const {
+        return baseRevenue;
+    }
+
+    int Player::getGoldRevenue() const {
+        return 0;
+    }
+
+    int Player::getBeakerRevenue() const {
+        return getBaseRevenue();
+    }
+
+    int Player::getGold() const {
+        return gold;
+    }
+
+    void Player::doEconomyTurn(Game &game) {
+        if (researchingTech.has_value()) {
+            researchingTech->beakersAccumulated += getBeakerRevenue();
+            updateResearch(game);
+        }
+        gold += getGoldRevenue();
+    }
+
+    void Player::updateResearch(Game &game) {
+        if (researchingTech.has_value() && researchingTech->isFinished()) {
+            techs.unlockTech(researchingTech->tech);
+            researchingTech = {};
+        }
+    }
+
+    const std::optional<ResearchingTech> &Player::getResearchingTech() const {
+        return researchingTech;
+    }
+
+    void Player::setResearchingTech(const std::shared_ptr<Tech> &tech) {
+        researchingTech = std::make_optional(tech);
+    }
+
+    bool ResearchingTech::isFinished() const {
+        return beakersAccumulated >= tech->cost;
+    }
+
+    ResearchingTech::ResearchingTech(std::shared_ptr<Tech> tech) : tech(std::move(tech)) {}
 }

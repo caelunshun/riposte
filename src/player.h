@@ -12,6 +12,7 @@
 #include "ai.h"
 #include "registry.h"
 #include "ids.h"
+#include "tech.h"
 
 namespace rip {
     class Game;
@@ -55,6 +56,15 @@ namespace rip {
          }
      };
 
+     struct ResearchingTech {
+         std::shared_ptr<Tech> tech;
+         int beakersAccumulated = 0;
+
+         ResearchingTech(std::shared_ptr<Tech> tech);
+
+         bool isFinished() const;
+     };
+
     /**
      * A player is an instantiation of a civilization within a game.
      */
@@ -72,10 +82,20 @@ namespace rip {
 
          std::optional<AI> ai;
 
+         PlayerTechs techs;
+         std::optional<ResearchingTech> researchingTech;
+
+         int baseRevenue = 0;
+         int gold = 0;
+
          std::string getNextCityName(const Game &game);
 
+         void recomputeRevenue(Game &game);
+         void updateResearch(Game &game);
+         void doEconomyTurn(Game &game);
+
      public:
-         Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight);
+         Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree);
 
          Player(Player &&other) = default;
          Player(const Player &other) = delete;
@@ -101,6 +121,16 @@ namespace rip {
          bool isDead() const;
 
          void onTurnEnd(Game &game);
+
+         const PlayerTechs &getTechs() const;
+
+         int getBaseRevenue() const;
+         int getGoldRevenue() const;
+         int getBeakerRevenue() const;
+         int getGold() const;
+
+         const std::optional<ResearchingTech> &getResearchingTech() const;
+         void setResearchingTech(const std::shared_ptr<Tech> &tech);
      };
 }
 

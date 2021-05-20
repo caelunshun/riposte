@@ -252,5 +252,9 @@ namespace rip {
     void City::onCreated(Game &game) {
         game.getCultureMap().onCityCreated(game, getID());
     }
+
+    int City::getGoldProduced(Game &game) const {
+        return computeYield(game).commerce;
+    }
 }
 

@@ -12,7 +12,7 @@ namespace rip {
     class MapGenerator {
         Rng rng;
     public:
-        void generate(Game &game);
+        void generate(Game &game, const std::shared_ptr<TechTree> &techTree);
     };
 }
 
