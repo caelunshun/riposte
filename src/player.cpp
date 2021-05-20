@@ -83,13 +83,15 @@ namespace rip {
         auto &tile = game.getTile(pos);
         tile.setForested(false);
 
+        recomputeVisibility(game);
+
         return cityID;
     }
 
     void Player::recomputeVisibility(const Game &game) {
         // Change Visible => Fogged
         for (int x = 0; x < game.getMapWidth(); x++) {
-            for (int y = 0; y < game.getMapWidth(); y++) {
+            for (int y = 0; y < game.getMapHeight(); y++) {
                 glm::uvec2 pos(x, y);
                 if (visibilityMap[pos] == Visibility::Visible) {
                     visibilityMap[pos] = Visibility::Fogged;
@@ -99,11 +101,17 @@ namespace rip {
 
         std::vector<glm::uvec2> sightPositions;
 
-        for (const auto cityID : cities) {
-            const auto &city = game.getCity(cityID);
-            sightPositions.push_back(city.getPos());
+        // Cultural borders
+        for (int x = 0; x < game.getMapWidth(); x++) {
+            for (int y = 0; y < game.getMapHeight(); y++) {
+                glm::uvec2 pos(x, y);
+                if (game.getCultureMap().getTileOwner(pos) == id) {
+                    sightPositions.push_back(pos);
+                }
+            }
         }
 
+        // Units
         for (const auto &unit : game.getUnits()) {
             if (unit.getOwner() == id) {
                 sightPositions.push_back(unit.getPos());
