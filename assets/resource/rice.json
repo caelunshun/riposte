@@ -3,11 +3,11 @@
   "name": "Rice",
   "revealedBy": "Agriculture",
   "yieldBonus": {
-    "food": 1
+    "food": 0
   },
   "improvement": "Farm",
   "improvedBonus": {
-    "food": 1
+    "food": 2
   },
-  "scarcity": 4
+  "scarcity": 6
 }

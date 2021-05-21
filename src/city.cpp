@@ -86,7 +86,7 @@ namespace rip {
             if (game.isTileWorked(bfcPos)) continue;
             if (game.getCultureMap().getTileOwner(bfcPos) != std::make_optional<PlayerId>(getOwner())) continue;
             const auto &tile = game.getTile(bfcPos);
-            const auto yield = tile.getYield(game, bfcPos);
+            const auto yield = tile.getYield(game, bfcPos, owner);
             entries.emplace_back(yield, bfcPos);
         }
 
@@ -107,7 +107,7 @@ namespace rip {
         });
 
         // The city's own tile is always worked.
-        entries.emplace(entries.begin(), game.getTile(pos).getYield(game, pos), pos);
+        entries.emplace(entries.begin(), game.getTile(pos).getYield(game, pos, owner), pos);
 
         for (int i = 0; i < std::min(population + 1, (int) entries.size()); i++) {
             workedTiles.push_back(entries[i].pos);
@@ -118,7 +118,7 @@ namespace rip {
     Yield City::computeYield(const Game &game) const {
         Yield yield(0, 0, 0);
         for (const auto workedPos : workedTiles) {
-            yield += game.getTile(workedPos).getYield(game, workedPos);
+            yield += game.getTile(workedPos).getYield(game, workedPos, owner);
         }
         return yield;
     }

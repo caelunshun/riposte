@@ -426,6 +426,12 @@ namespace rip {
                         for (const auto &leadsTo : tech->leadsTo) {
                             nk_label(nk, ("* Leads to " + leadsTo->name).c_str(), NK_TEXT_ALIGN_LEFT);
                         }
+                        for (const auto &entry : game.getRegistry().getResources()) {
+                            const auto &resource = entry.second;
+                            if (resource->revealedBy == tech->name) {
+                                nk_label(nk, ("* Reveals " + resource->name).c_str(), NK_TEXT_ALIGN_LEFT);
+                            }
+                        }
                         nk_group_end(nk);
                     }
 

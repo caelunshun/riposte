@@ -20,7 +20,16 @@ namespace rip {
         this->forested = forested;
     }
 
-    Yield Tile::getYield(const Game &game, glm::uvec2 pos) const {
+    bool Tile::hasImprovement(const std::string &name) const {
+        for (const auto &improvement : improvements) {
+            if (improvement->getName() == name) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    Yield Tile::getYield(const Game &game, glm::uvec2 pos, PlayerId playerID) const {
         Yield yield(0, 0, 0);
 
         switch (terrain) {
@@ -52,6 +61,19 @@ namespace rip {
 
         for (const auto &improvement : getImprovements()) {
             yield += improvement->getYieldContribution(game);
+        }
+
+        // Resource.
+        if (resource.has_value()) {
+            const auto &theResource = **resource;
+            const auto &player = game.getPlayer(playerID);
+            if (player.getTechs().isTechUnlocked(theResource.revealedBy)) {
+                yield += theResource.yieldBonus;
+
+                if (hasImprovement(theResource.improvement)) {
+                    yield += theResource.improvedBonus;
+                }
+            }
         }
 
         return yield;

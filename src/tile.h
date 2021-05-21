@@ -11,6 +11,7 @@
 #include <glm/vec2.hpp>
 #include "assets.h"
 #include "registry.h"
+#include "ids.h"
 
 struct NVGcontext;
 
@@ -148,12 +149,12 @@ namespace rip {
 
         int getMovementCost() const;
 
-        Yield getYield(const Game &game, glm::uvec2 pos) const;
+        Yield getYield(const Game &game, glm::uvec2 pos, PlayerId player) const;
 
         const std::vector<std::unique_ptr<Improvement>> &getImprovements() const;
 
         bool addImprovement(std::unique_ptr<Improvement> improvement);
-
+        bool hasImprovement(const std::string &name) const;
         void clearImprovements();
 
         template<class T>

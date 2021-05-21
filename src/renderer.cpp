@@ -379,7 +379,7 @@ namespace rip {
                 yieldScale = 25;
             }
 
-            const auto yield = tile.getYield(game, tilePos);
+            const auto yield = tile.getYield(game, tilePos, game.getThePlayerID());
             std::vector<std::pair<int, float>> icons;
             auto cursor = 0;
             const auto spacing = 6;
@@ -559,6 +559,10 @@ namespace rip {
                     const auto &tile = game.getTile(tilePos);
                     if (!tile.hasResource()) continue;
                     const auto &resource = *tile.getResource();
+                    if (!game.getThePlayer().getTechs().isTechUnlocked(resource->revealedBy)) {
+                        continue;
+                    }
+
                     auto resourceID = "texture/resource/" + resource->id;
                     const auto image = std::dynamic_pointer_cast<Image>(assets->get(resourceID))->id;
 
