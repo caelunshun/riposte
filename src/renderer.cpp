@@ -540,6 +540,38 @@ namespace rip {
         }
     };
 
+    // Paints tile resources.
+    class ResourcePainter : public Painter {
+        std::shared_ptr<Assets> assets;
+
+    public:
+        explicit ResourcePainter(std::shared_ptr<Assets> assets) : assets(std::move(assets)) {}
+
+        void paint(NVGcontext *vg, Game &game) override {
+            for (int x = 0; x < game.getMapWidth(); x++) {
+                for (int y = 0; y < game.getMapHeight(); y++) {
+                    glm::uvec2 tilePos(x, y);
+                    auto offset = game.getScreenOffset(tilePos);
+                    if (!shouldPaintTile(offset, tilePos, game, true)) {
+                        continue;
+                    }
+
+                    const auto &tile = game.getTile(tilePos);
+                    if (!tile.hasResource()) continue;
+                    const auto &resource = *tile.getResource();
+                    auto resourceID = "texture/resource/" + resource->id;
+                    const auto image = std::dynamic_pointer_cast<Image>(assets->get(resourceID))->id;
+
+                    nvgBeginPath(vg);
+                    nvgRect(vg, offset.x, offset.y, 100, 100);
+                    auto paint = nvgImagePattern(vg, offset.x, offset.y, 100, 100, 0, image, 1);
+                    nvgFillPaint(vg, paint);
+                    nvgFill(vg);
+                }
+            }
+        }
+    };
+
     /**
     * Paints the custom cursor.
     */
@@ -566,6 +598,7 @@ namespace rip {
         // Painting happens in the order painters are added here,
         // allowing for layering.
         gamePainters.push_back(std::make_unique<TilePainter>(assets));
+        gamePainters.push_back(std::make_unique<ResourcePainter>(assets));
         gamePainters.push_back(std::make_unique<TreePainter>(assets));
         gamePainters.push_back(std::make_unique<CultureBorderPainter>());
         gamePainters.push_back(std::make_unique<CityPainter>(assets));

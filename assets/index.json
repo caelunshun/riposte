@@ -208,5 +208,20 @@
     "path": "resource/rice.json",
     "id": "resource/rice",
     "loader": "resource"
+  },
+  {
+    "path": "texture/resource/rice.png",
+    "id": "texture/resource/rice",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/horse.png",
+    "id": "texture/resource/horse",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/copper.png",
+    "id": "texture/resource/copper",
+    "loader": "image"
   }
 ]
