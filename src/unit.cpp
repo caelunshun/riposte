@@ -76,7 +76,7 @@ namespace rip {
         return health * kind->strength;
     }
 
-    int Unit::getMovementLeft() const {
+    float Unit::getMovementLeft() const {
         return movementLeft;
     }
 
@@ -107,7 +107,7 @@ namespace rip {
         moveFrom = pos;
 
         movementLeft -= game.getTile(target).getMovementCost();
-        if (movementLeft < 0) movementLeft = 0;
+        if (movementLeft <= 0.1) movementLeft = 0;
         pos = target;
 
         // Unit has moved; update visibility

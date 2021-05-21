@@ -72,7 +72,7 @@ namespace rip {
         double health;
         // How many tiles the unit has left to move on this turn.
         // Resets to kind.movement at the start of every turn.
-        int movementLeft;
+        float movementLeft;
         // The path the unit is currently following.
         std::optional<Path> currentPath;
 
@@ -95,7 +95,7 @@ namespace rip {
         UnitId getID() const;
         PlayerId getOwner() const;
         double getCombatStrength() const;
-        int getMovementLeft() const;
+        float getMovementLeft() const;
         std::vector<std::unique_ptr<Capability>> &getCapabilities();
 
         void setMovementLeft(int movement);

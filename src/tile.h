@@ -92,6 +92,21 @@ namespace rip {
         void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
     };
 
+    class Road : public Improvement {
+    public:
+        explicit Road(glm::uvec2 pos) : Improvement(pos) {}
+
+        bool isCompatible(const Tile &tile) const override;
+
+        Yield getYieldContribution(const Game &game) const override;
+
+        int getNumBuildTurns() const override;
+
+        std::string getName() const override;
+
+        void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
+    };
+
     /**
      * A type of terrain.
      */
@@ -147,7 +162,7 @@ namespace rip {
             }
         }
 
-        int getMovementCost() const;
+        float getMovementCost() const;
 
         Yield getYield(const Game &game, glm::uvec2 pos, PlayerId player) const;
 

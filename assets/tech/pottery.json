@@ -1,6 +1,7 @@
 {
   "name": "Pottery",
   "cost": 60,
+  "prerequisites": ["The Wheel"],
 
   "unlocksImprovements": ["Cottage"]
 }

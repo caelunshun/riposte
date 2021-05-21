@@ -195,6 +195,11 @@
     "loader": "tech"
   },
   {
+    "path": "tech/the_wheel.json",
+    "id": "tech/the_wheel",
+    "loader": "tech"
+  },
+  {
     "path": "resource/copper.json",
     "id": "resource/copper",
     "loader": "resource"

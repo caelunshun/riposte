@@ -8,8 +8,14 @@
 #include "game.h"
 
 namespace rip {
-    int Tile::getMovementCost() const {
-        return (forested ? 2 : 1);
+    float Tile::getMovementCost() const {
+        float cost = forested ? 2 : 1;
+
+        if (hasImprovement<Road>()) {
+            cost /= 3;
+        }
+
+        return cost;
     }
 
     bool Tile::isForested() const {
@@ -168,5 +174,27 @@ namespace rip {
 
     void Farm::paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) {
         paintImprovementIcon(vg, assets, offset, "icon/farm");
+    }
+
+    bool Road::isCompatible(const Tile &tile) const {
+        return tile.getTerrain() != Terrain::Ocean && !tile.hasImprovement("Road");
+    }
+
+    Yield Road::getYieldContribution(const Game &game) const {
+        return Yield();
+    }
+
+    int Road::getNumBuildTurns() const {
+        return 2;
+    }
+
+    std::string Road::getName() const {
+        return "Road";
+    }
+
+    void Road::paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) {
+        nvgFontSize(vg, 20);
+        nvgTextAlign(vg, NVG_ALIGN_MIDDLE | NVG_ALIGN_CENTER);
+        nvgText(vg, offset.x + 50, offset.y + 50, "Road", nullptr);
     }
 }
