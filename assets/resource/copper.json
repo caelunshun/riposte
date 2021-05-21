@@ -8,5 +8,6 @@
   "improvement": "Mine",
   "improvedBonus": {
     "hammers": 3
-  }
+  },
+  "scarcity": 2.5
 }

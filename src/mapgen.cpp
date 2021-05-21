@@ -168,9 +168,30 @@ namespace rip {
         }
     }
 
+    void placeResources(Game &game, Rng &rng) {
+        const auto numTiles = game.getMapWidth() * game.getMapHeight();
+        for (const auto &entry : game.getRegistry().getResources()) {
+            const auto &resource = entry.second;
+            const auto minPlacements = resource->scarcity * (static_cast<float>(numTiles) / 1000);
+
+            int placed = 0;
+            while (placed < minPlacements) {
+                glm::uvec2 pos(rng.u32(0, game.getMapWidth()), rng.u32(0, game.getMapHeight()));
+                auto &tile = game.getTile(pos);
+
+                if (tile.hasResource() || tile.getTerrain() == Terrain::Ocean) {
+                    continue;
+                }
+
+                tile.setResource(resource);
+                ++placed;
+            }
+        }
+    }
+
     // MAIN GENERATOR
 
-    void buildTerrain(rip::Game &game, Rng &rng) {
+    void buildTerrain(Game &game, Rng &rng) {
         LandMap landMap(4, 4);
         const auto numContinents = 10;
         for (int continent = 0; continent < numContinents; continent++) {
@@ -229,5 +250,6 @@ namespace rip {
         buildTerrain(game, rng);
         seedPlayers(game, techTree, rng);
         placeCities(game, rng);
+        placeResources(game, rng);
     }
 }

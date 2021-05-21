@@ -9,5 +9,6 @@
   "improvedBonus": {
     "hammers": 1,
     "commerce": 1
-  }
+  },
+  "scarcity": 1.2
 }

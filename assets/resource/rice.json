@@ -8,5 +8,6 @@
   "improvement": "Farm",
   "improvedBonus": {
     "food": 1
-  }
+  },
+  "scarcity": 4
 }

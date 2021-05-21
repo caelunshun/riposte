@@ -33,4 +33,8 @@ namespace rip {
         registry->addResource(ptr);
         return ptr;
     }
+
+    const absl::flat_hash_map<std::string, std::shared_ptr<Resource>> &Registry::getResources() const {
+        return resources;
+    }
 }

@@ -10,6 +10,7 @@
 #include <memory>
 #include <glm/vec2.hpp>
 #include "assets.h"
+#include "registry.h"
 
 struct NVGcontext;
 
@@ -108,6 +109,7 @@ namespace rip {
         Terrain terrain;
         bool forested = false;
         std::vector<std::unique_ptr<Improvement>> improvements;
+        std::optional<std::shared_ptr<Resource>> resource;
 
     public:
         Tile(Terrain terrain) : terrain(terrain) {}
@@ -162,6 +164,18 @@ namespace rip {
                 }
             }
             return false;
+        }
+
+        const std::optional<std::shared_ptr<Resource>> &getResource() const {
+            return resource;
+        }
+
+        bool hasResource() const {
+            return resource.has_value();
+        }
+
+        void setResource(std::shared_ptr<Resource> resource) {
+            this->resource = std::move(resource);
         }
     };
 

@@ -76,6 +76,10 @@ namespace rip {
         // Added on top of yieldBonus.
         Yield improvedBonus;
 
+        // Determines how frequently the resource is generated.
+        // Units are in resources/1000 tiles.
+        float scarcity;
+
         friend void from_json(const nlohmann::json &nlohmann_json_j, Resource &nlohmann_json_t) {
             nlohmann_json_j.at("id").get_to(nlohmann_json_t.id);
             nlohmann_json_j.at("name").get_to(nlohmann_json_t.name);
@@ -83,6 +87,7 @@ namespace rip {
             nlohmann_json_j.at("yieldBonus").get_to(nlohmann_json_t.yieldBonus);
             nlohmann_json_j.at("improvement").get_to(nlohmann_json_t.improvement);
             nlohmann_json_j.at("improvedBonus").get_to(nlohmann_json_t.improvedBonus);
+            nlohmann_json_j.at("scarcity").get_to(nlohmann_json_t.scarcity);
         }
     };
 
@@ -114,6 +119,8 @@ namespace rip {
         }
 
         const std::vector<std::shared_ptr<UnitKind>> &getUnits() const;
+
+        const absl::flat_hash_map<std::string, std::shared_ptr<Resource>> &getResources() const;
     };
 
     class CivLoader : public AssetLoader {
