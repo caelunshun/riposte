@@ -1,7 +1,7 @@
 {
   "id": "horse",
   "name": "Horse",
-  "reavealedBy": "Animal Husbandry",
+  "revealedBy": "Animal Husbandry",
   "yieldBonus": {
     "hammers": 1
   },

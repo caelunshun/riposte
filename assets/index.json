@@ -178,5 +178,35 @@
     "path": "tech/pottery.json",
     "id": "tech/pottery",
     "loader": "tech"
+  },
+  {
+    "path": "tech/animal_husbandry.json",
+    "id": "tech/animal_husbandry",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/bronze_working.json",
+    "id": "tech/bronze_working",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/horseback_riding.json",
+    "id": "tech/horseback_riding",
+    "loader": "tech"
+  },
+  {
+    "path": "resource/copper.json",
+    "id": "resource/copper",
+    "loader": "resource"
+  },
+  {
+    "path": "resource/horse.json",
+    "id": "resource/horse",
+    "loader": "resource"
+  },
+  {
+    "path": "resource/rice.json",
+    "id": "resource/rice",
+    "loader": "resource"
   }
 ]

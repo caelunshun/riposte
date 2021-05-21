@@ -12,20 +12,9 @@
 #include "registry.h"
 #include "ids.h"
 #include "culture.h"
+#include "yield.h"
 
 namespace rip {
-    struct Yield {
-        int hammers;
-        int commerce;
-        int food;
-
-        Yield(int hammers, int commerce, int food);
-
-        Yield operator+(const Yield &other) const;
-
-        void operator+=(const Yield &other);
-    };
-
     class City;
 
     // Something a city is producing right now: a unit, a building,

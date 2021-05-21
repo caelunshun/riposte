@@ -8,8 +8,10 @@
 #include <string>
 #include <vector>
 #include <array>
+#include <absl/container/flat_hash_map.h>
 #include <nlohmann/json.hpp>
 #include "assets.h"
+#include "yield.h"
 
 namespace rip {
     struct CivKind : public Asset {
@@ -58,12 +60,39 @@ namespace rip {
         }
     };
 
+    struct Resource : public Asset {
+        std::string id;
+        std::string name;
+
+        // Tech (name) required to reveal the resource
+        std::string revealedBy;
+
+        // Bonus added to tiles with this resource (when revealed)
+        Yield yieldBonus;
+
+        // Improvement required to harvest resource
+        std::string improvement;
+        // Extra yield when the resource is improved.
+        // Added on top of yieldBonus.
+        Yield improvedBonus;
+
+        friend void from_json(const nlohmann::json &nlohmann_json_j, Resource &nlohmann_json_t) {
+            nlohmann_json_j.at("id").get_to(nlohmann_json_t.id);
+            nlohmann_json_j.at("name").get_to(nlohmann_json_t.name);
+            nlohmann_json_j.at("revealedBy").get_to(nlohmann_json_t.revealedBy);
+            nlohmann_json_j.at("yieldBonus").get_to(nlohmann_json_t.yieldBonus);
+            nlohmann_json_j.at("improvement").get_to(nlohmann_json_t.improvement);
+            nlohmann_json_j.at("improvedBonus").get_to(nlohmann_json_t.improvedBonus);
+        }
+    };
+
     /**
      * A registry of civilization, unit, etc. __kinds__.
      */
     class Registry {
         std::vector<std::shared_ptr<CivKind>> civs;
         std::vector<std::shared_ptr<UnitKind>> units;
+        absl::flat_hash_map<std::string, std::shared_ptr<Resource>> resources;
 
     public:
         const std::vector<std::shared_ptr<CivKind>> &getCivs() const;
@@ -74,6 +103,14 @@ namespace rip {
 
         void addUnit(std::shared_ptr<UnitKind> u) {
             units.push_back(std::move(u));
+        }
+
+        void addResource(std::shared_ptr<Resource> r) {
+            resources.emplace(r->name, std::move(r));
+        }
+
+        const std::shared_ptr<Resource> &getResource(const std::string &name) const {
+            return resources.at(name);
         }
 
         const std::vector<std::shared_ptr<UnitKind>> &getUnits() const;
@@ -93,6 +130,15 @@ namespace rip {
 
     public:
         UnitLoader(std::shared_ptr<Registry> registry) : registry(std::move(registry)) {}
+
+        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+    };
+
+    class ResourceLoader : public AssetLoader {
+        std::shared_ptr<Registry> registry;
+
+    public:
+        ResourceLoader(std::shared_ptr<Registry> registry) : registry(std::move(registry)) {}
 
         std::shared_ptr<Asset> loadAsset(const std::string &data) override;
     };

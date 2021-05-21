@@ -26,4 +26,11 @@ namespace rip {
     const std::vector<std::shared_ptr<UnitKind>> &Registry::getUnits() const {
         return units;
     }
+
+    std::shared_ptr<Asset> ResourceLoader::loadAsset(const std::string &data) {
+        auto resource = nlohmann::json::parse(data).get<Resource>();
+        auto ptr = std::make_shared<Resource>(std::move(resource));
+        registry->addResource(ptr);
+        return ptr;
+    }
 }

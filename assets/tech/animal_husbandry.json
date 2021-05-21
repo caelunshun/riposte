@@ -1,7 +1,7 @@
 {
   "name": "Animal Husbandry",
   "cost": 80,
-  "prerequisites": "Agriculture",
+  "prerequisites": ["Agriculture"],
 
   "unlocksImprovements": ["Pasture"]
 }

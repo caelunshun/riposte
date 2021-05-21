@@ -423,6 +423,9 @@ namespace rip {
                         for (const auto &improvement : tech->unlocksImprovements) {
                             nk_label(nk, ("* Can build a " + improvement).c_str(), NK_TEXT_ALIGN_LEFT);
                         }
+                        for (const auto &leadsTo : tech->leadsTo) {
+                            nk_label(nk, ("* Leads to " + leadsTo->name).c_str(), NK_TEXT_ALIGN_LEFT);
+                        }
                         nk_group_end(nk);
                     }
 
