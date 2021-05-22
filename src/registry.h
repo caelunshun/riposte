@@ -46,6 +46,8 @@ namespace rip {
         int cost;
         // Techs that need to be unlocked before building this unit.
         std::vector<std::string> techs;
+        // Resources required to build the unit.
+        std::vector<std::string> resources;
 
         friend void from_json(const nlohmann::json &nlohmann_json_j, UnitKind &nlohmann_json_t) {
             nlohmann_json_j.at("id").get_to(nlohmann_json_t.id);
@@ -57,6 +59,9 @@ namespace rip {
             }
             nlohmann_json_j.at("cost").get_to(nlohmann_json_t.cost);
             nlohmann_json_j.at("techs").get_to(nlohmann_json_t.techs);
+            if (nlohmann_json_j.contains("resources")) {
+                nlohmann_json_j.at("resources").get_to(nlohmann_json_t.resources);
+            }
         }
     };
 

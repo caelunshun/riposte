@@ -130,6 +130,21 @@
     "loader": "unit"
   },
   {
+    "path": "unit/axeman.json",
+    "id": "unit/axeman",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/chariot.json",
+    "id": "unit/chariot",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/horse_archer.json",
+    "id": "unit/horse_archer",
+    "loader": "unit"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"
@@ -152,6 +167,21 @@
   {
     "path": "texture/unit/scout.png",
     "id": "texture/unit/scout",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/axeman.png",
+    "id": "texture/unit/axeman",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/chariot.png",
+    "id": "texture/unit/chariot",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/horse_archer.png",
+    "id": "texture/unit/horse_archer",
     "loader": "image"
   },
   {
