@@ -8,6 +8,7 @@
 #include <memory>
 #include <glm/vec2.hpp>
 #include <rea.h>
+#include <absl/container/flat_hash_set.h>
 #include "player.h"
 #include "registry.h"
 #include "ids.h"
@@ -110,6 +111,9 @@ namespace rip {
         // which is stored in the CultureMap object.
         Culture culture;
 
+        // Resources accessible to this city.
+        absl::flat_hash_set<std::shared_ptr<Resource>, ResourceHash> resources;
+
         void doGrowth(Game &game);
 
     public:
@@ -146,6 +150,10 @@ namespace rip {
         std::vector<std::unique_ptr<BuildTask>> getPossibleBuildTasks(const Game &game) const;
 
         int getPopulation() const;
+
+        bool hasResource(const std::shared_ptr<Resource> &resource) const;
+        void addResource(std::shared_ptr<Resource> resource);
+        void clearResources();
     };
 }
 

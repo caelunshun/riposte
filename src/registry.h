@@ -91,6 +91,18 @@ namespace rip {
         }
     };
 
+    struct ResourceHash {
+        size_t operator()(const std::shared_ptr<Resource> &resource)const
+        {
+            return std::hash<std::string>()(resource->name);
+        }
+
+        bool operator()(const std::shared_ptr<Resource> &a, const std::shared_ptr<Resource> &b)const
+        {
+            return a->name == b->name;
+        }
+    };
+
     /**
      * A registry of civilization, unit, etc. __kinds__.
      */

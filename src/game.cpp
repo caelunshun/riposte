@@ -10,6 +10,8 @@ namespace rip {
             unit.onTurnEnd(*this);
         }
 
+        tradeRoutes.updateResources(*this);
+
         for (auto &city : cities) {
             city.onTurnEnd(*this);
         }

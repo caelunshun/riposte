@@ -97,6 +97,10 @@ namespace rip {
     }
 
     void BuildImprovementTask::onFinished(Game &game) {
+        if (improvement->getName() == "Road") {
+            game.getTradeRoutes().onRoadBuilt(game, pos);
+        }
+
         auto &tile = game.getTile(pos);
         tile.addImprovement(std::move(improvement));
         tile.setForested(false);

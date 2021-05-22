@@ -19,6 +19,7 @@
 #include "registry.h"
 #include "ids.h"
 #include "culture.h"
+#include "trade.h"
 
 namespace rip {
     class Game {
@@ -50,6 +51,8 @@ namespace rip {
         std::vector<bool> workedTiles;
 
         CultureMap cultureMap;
+
+        TradeRoutes tradeRoutes;
 
         size_t getMapIndex(glm::uvec2 pos) const {
             return static_cast<size_t>(pos.x) + static_cast<size_t>(pos.y) * static_cast<size_t>(mapWidth);
@@ -293,6 +296,14 @@ namespace rip {
 
         const CultureMap &getCultureMap() const {
             return cultureMap;
+        }
+
+        TradeRoutes &getTradeRoutes() {
+            return tradeRoutes;
+        }
+
+        const TradeRoutes &getTradeRoutes() const {
+            return tradeRoutes;
         }
     };
 }

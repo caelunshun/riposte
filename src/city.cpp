@@ -7,6 +7,7 @@
 #include "game.h"
 #include <string>
 #include <utility>
+#include <iostream>
 
 namespace rip {
     BuildTask::BuildTask(int cost) : cost(cost) {}
@@ -248,10 +249,24 @@ namespace rip {
 
     void City::onCreated(Game &game) {
         game.getCultureMap().onCityCreated(game, getID());
+        game.getTradeRoutes().onCityCreated(game, *this);
     }
 
     int City::getGoldProduced(Game &game) const {
         return computeYield(game).commerce;
+    }
+
+    bool City::hasResource(const std::shared_ptr<Resource> &resource) const {
+        return resources.contains(resource);
+    }
+
+    void City::addResource(std::shared_ptr<Resource> resource) {
+        std::cout << "city got " << resource->name << std::endl;
+        resources.insert(std::move(resource));
+    }
+
+    void City::clearResources() {
+        resources.clear();
     }
 }
 
