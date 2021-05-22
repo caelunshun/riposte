@@ -92,6 +92,21 @@ namespace rip {
         void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
     };
 
+    class Pasture : public Improvement {
+    public:
+        explicit Pasture(glm::uvec2 pos) : Improvement(pos) {}
+
+        bool isCompatible(const Tile &tile) const override;
+
+        Yield getYieldContribution(const Game &game) const override;
+
+        int getNumBuildTurns() const override;
+
+        std::string getName() const override;
+
+        void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
+    };
+
     class Road : public Improvement {
     public:
         explicit Road(glm::uvec2 pos) : Improvement(pos) {}
@@ -192,6 +207,23 @@ namespace rip {
 
         void setResource(std::shared_ptr<Resource> resource) {
             this->resource = std::move(resource);
+        }
+
+        bool hasNonRoadImprovements() const {
+            for (const auto &improvement : improvements) {
+                if (improvement->getName() != "Road") {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        bool hasImproveableResource(const std::string &improvement) const {
+            if (resource.has_value()) {
+                return (*resource)->improvement == improvement;
+            } else {
+                return false;
+            }
         }
     };
 

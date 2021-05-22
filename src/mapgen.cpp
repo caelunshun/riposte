@@ -179,7 +179,7 @@ namespace rip {
                 glm::uvec2 pos(rng.u32(0, game.getMapWidth()), rng.u32(0, game.getMapHeight()));
                 auto &tile = game.getTile(pos);
 
-                if (tile.hasResource() || tile.getTerrain() == Terrain::Ocean) {
+                if (tile.hasResource() || tile.getTerrain() == Terrain::Ocean || tile.getTerrain() == Terrain::Desert) {
                     continue;
                 }
 

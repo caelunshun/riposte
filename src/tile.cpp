@@ -117,7 +117,7 @@ namespace rip {
     }
 
     bool Mine::isCompatible(const Tile &tile) const {
-        return tile.getImprovements().empty() && tile.getTerrain() != Terrain::Desert;
+        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert;
     }
 
     Yield Mine::getYieldContribution(const Game &game) const {
@@ -137,7 +137,7 @@ namespace rip {
     }
 
     bool Cottage::isCompatible(const Tile &tile) const {
-        return tile.getImprovements().empty() && tile.getTerrain() != Terrain::Desert;
+        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert;
     }
 
     Yield Cottage::getYieldContribution(const Game &game) const {
@@ -157,7 +157,7 @@ namespace rip {
     }
 
     bool Farm::isCompatible(const Tile &tile) const {
-        return tile.getImprovements().empty() && tile.getTerrain() != Terrain::Desert;
+        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert;
     }
 
     Yield Farm::getYieldContribution(const Game &game) const {
@@ -196,5 +196,25 @@ namespace rip {
         nvgFontSize(vg, 20);
         nvgTextAlign(vg, NVG_ALIGN_MIDDLE | NVG_ALIGN_CENTER);
         nvgText(vg, offset.x + 50, offset.y + 50, "Road", nullptr);
+    }
+
+    bool Pasture::isCompatible(const Tile &tile) const {
+        return !tile.hasNonRoadImprovements() && tile.hasImproveableResource(getName());
+    }
+
+    Yield Pasture::getYieldContribution(const Game &game) const {
+        return Yield();
+    }
+
+    int Pasture::getNumBuildTurns() const {
+        return 5;
+    }
+
+    std::string Pasture::getName() const {
+        return "Pasture";
+    }
+
+    void Pasture::paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) {
+        paintImprovementIcon(vg, assets, offset, "icon/pasture");
     }
 }

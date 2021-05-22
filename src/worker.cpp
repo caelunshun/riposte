@@ -47,6 +47,8 @@ namespace rip {
         tasks.push_back(std::make_unique<BuildImprovementTask>(mine.getNumBuildTurns(), unit.getPos(), std::make_unique<Mine>(std::move(mine))));
         Farm farm(unit.getPos());
         tasks.push_back(std::make_unique<BuildImprovementTask>(farm.getNumBuildTurns(), unit.getPos(), std::make_unique<Farm>(std::move(farm))));
+        Pasture pasture(unit.getPos());
+        tasks.push_back(std::make_unique<BuildImprovementTask>(pasture.getNumBuildTurns(), unit.getPos(), std::make_unique<Pasture>(std::move(pasture))));
         Road road(unit.getPos());
         tasks.push_back(std::make_unique<BuildImprovementTask>(road.getNumBuildTurns(), unit.getPos(), std::make_unique<Road>(std::move(road))));
 

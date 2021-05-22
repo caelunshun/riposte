@@ -50,6 +50,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/pasture.png",
+    "id": "icon/pasture",
+    "loader": "image"
+  },
+  {
     "path": "icon/bread.png",
     "id": "icon/bread",
     "loader": "image"
