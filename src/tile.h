@@ -38,7 +38,7 @@ namespace rip {
         // Draws the improvement.
         //
         // `offset` is the upper-left-hand corner of the improvement's tile.
-        virtual void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) = 0;
+        virtual void paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) = 0;
 
         virtual int getNumBuildTurns() const = 0;
 
@@ -59,7 +59,7 @@ namespace rip {
 
         std::string getName() const override;
 
-        void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
+        void paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) override;
     };
 
     class Cottage : public Improvement {
@@ -74,7 +74,7 @@ namespace rip {
 
         std::string getName() const override;
 
-        void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
+        void paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) override;
     };
 
     class Farm : public Improvement {
@@ -89,7 +89,7 @@ namespace rip {
 
         std::string getName() const override;
 
-        void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
+        void paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) override;
     };
 
     class Pasture : public Improvement {
@@ -104,7 +104,7 @@ namespace rip {
 
         std::string getName() const override;
 
-        void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
+        void paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) override;
     };
 
     class Road : public Improvement {
@@ -119,7 +119,7 @@ namespace rip {
 
         std::string getName() const override;
 
-        void paint(NVGcontext *vg, const Assets &assets, glm::vec2 offset) override;
+        void paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) override;
     };
 
     /**

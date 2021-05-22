@@ -76,12 +76,13 @@ namespace rip {
             nvgFill(vg);
 
             // Tile border
+            nvgStrokeWidth(vg, 1);
             nvgStrokeColor(vg, nvgRGBA(0, 87, 183, 100));
             nvgStroke(vg);
 
             // Improvements
             for (auto &improvement : tile.getImprovements()) {
-                improvement->paint(vg, *assets, offset);
+                improvement->paint(game, tilePos, vg, *assets);
             }
         }
 
