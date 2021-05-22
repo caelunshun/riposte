@@ -36,11 +36,6 @@ namespace rip {
 
         const auto &unit = game.getUnit(unitID);
 
-        if (game.getCultureMap().getTileOwner(unit.getPos()) != unit.getOwner()) {
-            // You can only build on your own land....
-            return tasks;
-        }
-
         Cottage cottage(unit.getPos());
         tasks.push_back(std::make_unique<BuildImprovementTask>(cottage.getNumBuildTurns(), unit.getPos(), std::make_unique<Cottage>(std::move(cottage))));
         Mine mine(unit.getPos());
@@ -60,6 +55,7 @@ namespace rip {
                 if (
                         !game.getPlayer(unit.getOwner()).getTechs().isImprovementUnlocked(downcasted->getImprovement().getName())
                         || !downcasted->getImprovement().isCompatible(game.getTile(unit.getPos()))
+                        || (downcasted->getImprovement().getName() != "Road" && game.getCultureMap().getTileOwner(unit.getPos()) != unit.getOwner())
                         ) {
                     tasks.erase(tasks.begin() + i);
                 }
