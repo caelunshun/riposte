@@ -184,6 +184,24 @@ namespace rip {
             expenses += city.getMaintanenceCost(game);
         }
 
+        // Unit upkeep. Each unit costs 1 GPT.
+        // Units outside of our borders contribute an additional
+        // 1/2 GPT each.
+        // We get a handicap of 10 free units.
+        const int handicap = 10;
+        int unitExpensesDoubled = -handicap * 2;
+        for (const auto &unit : game.getUnits()) {
+            if (unit.getOwner() != id) continue;
+
+            unitExpensesDoubled += 2;
+            if (game.getCultureMap().getTileOwner(unit.getPos()) != id) {
+                unitExpensesDoubled += 1;
+            }
+        }
+        if (unitExpensesDoubled > 0) {
+            expenses += unitExpensesDoubled / 2;
+        }
+
         // Apply inflation. Inflation is computed as
         // a percent of all other expenses, where
         // that percent increases linearily starting at turn 100.
