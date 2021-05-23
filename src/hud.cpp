@@ -496,15 +496,15 @@ namespace rip {
         nk_layout_row_end(nk);
 
         nk_layout_row_begin(nk, NK_STATIC, 50, 1);
-        nk_layout_row_push(nk, 250);
+        nk_layout_row_push(nk, 280);
         if (nk_group_begin(nk, "researchSlider", 0)) {
-            nk_layout_row_begin(nk, NK_STATIC, 20, 4);
+            nk_layout_row_begin(nk, NK_STATIC, 20, 5);
 
             nk_layout_row_push(nk, 30);
             auto beaker = nk_image_id(beakerIcon->id);
             nk_image(nk, beaker);
 
-            nk_layout_row_push(nk, 50);
+            nk_layout_row_push(nk, 40);
             auto percentText = std::to_string(player.getSciencePercent()) + "%";
             nk_label(nk, percentText.c_str(), NK_TEXT_ALIGN_LEFT);
 
@@ -516,6 +516,11 @@ namespace rip {
             if (nk_button_label(nk, "-")) {
                 player.setSciencePercent(player.getSciencePercent() - 10, game);
             }
+
+            nk_layout_row_push(nk, 80);
+            auto beakersText = "(" + std::to_string(player.getBeakerRevenue()) + " / turn)";
+            nk_label(nk, beakersText.c_str(), NK_TEXT_ALIGN_LEFT);
+
             nk_group_end(nk);
         }
 
