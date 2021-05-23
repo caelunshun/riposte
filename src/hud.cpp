@@ -461,7 +461,7 @@ namespace rip {
         glm::vec2 size(300, 150);
         nk_begin(nk, "topLeft", nk_rect(0, 0, size.x, size.y), 0);
 
-        nk_layout_row_begin(nk, NK_STATIC, 20, 2);
+        nk_layout_row_begin(nk, NK_STATIC, 20, 3);
 
         // Gold
         nk_layout_row_push(nk, 20);
@@ -469,9 +469,22 @@ namespace rip {
         nk_image(nk, image);
 
         auto &player = game.getThePlayer();
-        const auto text = std::to_string(player.getGold());
-        nk_layout_row_push(nk, 50);
+        const auto text = ": " + std::to_string(player.getGold());
+        nk_layout_row_push(nk, 40);
         nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
+
+        const auto netGold = player.getNetGold();
+        nk_color netTextColor;
+        std::string netText;
+        if (netGold < 0) {
+            netText = "(-" + std::to_string(abs(netGold)) + " / turn)";
+            netTextColor = nk_rgb(231, 60, 62);
+        } else {
+            netText = "(+" + std::to_string(netGold) + " / turn)";
+            netTextColor = nk_rgb(68, 194, 113);
+        }
+        nk_layout_row_push(nk, 100);
+        nk_label_colored(nk, netText.c_str(), NK_TEXT_ALIGN_LEFT, netTextColor);
 
         nk_layout_row_push(nk, 100);
         nk_label_colored(nk, ("Expenses: " + std::to_string(player.getExpenses())).c_str(), NK_TEXT_ALIGN_LEFT, nk_rgb(231, 60, 62));
@@ -495,11 +508,11 @@ namespace rip {
             auto percentText = std::to_string(player.getSciencePercent()) + "%";
             nk_label(nk, percentText.c_str(), NK_TEXT_ALIGN_LEFT);
 
-            nk_layout_row_push(nk, 50);
+            nk_layout_row_push(nk, 30);
             if (nk_button_label(nk, "+")) {
                 player.setSciencePercent(player.getSciencePercent() + 10, game);
             }
-            nk_layout_row_push(nk, 50);
+            nk_layout_row_push(nk, 30);
             if (nk_button_label(nk, "-")) {
                 player.setSciencePercent(player.getSciencePercent() - 10, game);
             }
