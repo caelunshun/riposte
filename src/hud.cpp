@@ -457,10 +457,10 @@ namespace rip {
     }
 
     void Hud::paintTopLeftHud(Game &game) {
-        glm::vec2 size(200, 100);
+        glm::vec2 size(300, 100);
         nk_begin(nk, "topLeft", nk_rect(0, 0, size.x, size.y), 0);
 
-        nk_layout_row_begin(nk, NK_STATIC, 20, 100);
+        nk_layout_row_begin(nk, NK_STATIC, 20, 2);
 
         // Gold
         nk_layout_row_push(nk, 20);
@@ -471,6 +471,12 @@ namespace rip {
         const auto text = std::to_string(player.getGold());
         nk_layout_row_push(nk, 50);
         nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
+
+        nk_layout_row_push(nk, 100);
+        nk_label_colored(nk, ("Expenses: " + std::to_string(player.getExpenses())).c_str(), NK_TEXT_ALIGN_LEFT, nk_rgb(231, 60, 62));
+
+        nk_layout_row_push(nk, 100);
+        nk_label_colored(nk, ("Revenue: " + std::to_string(player.getBaseRevenue())).c_str(), NK_TEXT_ALIGN_LEFT, nk_rgb(68, 194, 113));
 
         nk_end(nk);
     }

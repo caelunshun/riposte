@@ -92,8 +92,14 @@ namespace rip {
         tile.setForested(false);
 
         recomputeVisibility(game);
+        recomputeRevenue(game);
+        recomputeExpenses(game);
 
         return cityID;
+    }
+
+    CityId Player::getCapital() const {
+        return capital;
     }
 
     void Player::recomputeVisibility(const Game &game) {
@@ -146,6 +152,7 @@ namespace rip {
 
     void Player::onTurnEnd(Game &game) {
         recomputeRevenue(game);
+        recomputeExpenses(game);
         doEconomyTurn(game);
         if (ai.has_value()) {
             ai->doTurn(game);
@@ -164,12 +171,28 @@ namespace rip {
         }
     }
 
+    void Player::recomputeExpenses(Game &game) {
+        expenses = 0;
+        for (const auto cityID : cities) {
+            const auto &city = game.getCity(cityID);
+            expenses += city.getMaintanenceCost(game);
+        }
+    }
+
     int Player::getBaseRevenue() const {
         return baseRevenue;
     }
 
     int Player::getGoldRevenue() const {
         return 0;
+    }
+
+    int Player::getNetGold() const {
+        return getGoldRevenue() - getExpenses();
+    }
+
+    int Player::getExpenses() const {
+        return expenses;
     }
 
     int Player::getBeakerRevenue() const {
@@ -185,7 +208,7 @@ namespace rip {
             researchingTech->beakersAccumulated += getBeakerRevenue();
             updateResearch(game);
         }
-        gold += getGoldRevenue();
+        gold += getNetGold();
     }
 
     void Player::updateResearch(Game &game) {

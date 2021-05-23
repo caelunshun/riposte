@@ -290,7 +290,13 @@ namespace rip {
     }
 
     int City::getMaintanenceCost(const Game &game) const {
-        return 0;
+        const auto &capitalCity = game.getCity(game.getPlayer(owner).getCapital());
+        float baseDistanceCost = dist(pos, capitalCity.getPos()) * 0.25;
+        int distanceFromPalaceCost = static_cast<int>((7 + population) * (baseDistanceCost / 8));
+
+        int numberOfCitiesCost = static_cast<int>(0.6 + 0.033 * population * game.getPlayer(owner).getCities().size() / 2);
+
+        return distanceFromPalaceCost + numberOfCitiesCost;
     }
 }
 

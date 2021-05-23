@@ -87,6 +87,7 @@ namespace rip {
          std::optional<ResearchingTech> researchingTech;
 
          int baseRevenue = 0;
+         int expenses = 0;
          int gold = 0;
 
          CityId capital;
@@ -94,6 +95,7 @@ namespace rip {
          std::string getNextCityName(const Game &game);
 
          void recomputeRevenue(Game &game);
+         void recomputeExpenses(Game &game);
          void updateResearch(Game &game);
          void doEconomyTurn(Game &game);
 
@@ -113,6 +115,7 @@ namespace rip {
          const std::vector<CityId> &getCities() const;
          const VisibilityMap &getVisibilityMap() const;
          const CivKind &getCiv() const;
+         CityId getCapital() const;
 
          void registerCity(CityId id);
          void removeCity(CityId);
@@ -130,6 +133,8 @@ namespace rip {
 
          int getBaseRevenue() const;
          int getGoldRevenue() const;
+         int getExpenses() const;
+         int getNetGold() const;
          int getBeakerRevenue() const;
          int getGold() const;
 
