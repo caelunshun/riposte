@@ -20,6 +20,7 @@
 #include "ids.h"
 #include "culture.h"
 #include "trade.h"
+#include "era.h"
 
 namespace rip {
     class Game {
@@ -305,6 +306,8 @@ namespace rip {
         const TradeRoutes &getTradeRoutes() const {
             return tradeRoutes;
         }
+
+        Era getEra() const;
     };
 }
 

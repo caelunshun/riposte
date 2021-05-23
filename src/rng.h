@@ -83,6 +83,54 @@ namespace rip {
 
         uint64_t gen_mod_u64(uint64_t n);
     };
+
+    // Picks random values from an array in a way that implements the gambler's
+    // fallacy. That is, values are less likely to be chosen twice in a row...
+    template<class T>
+    class FairPicker {
+        Rng rng;
+        std::vector<T> options;
+        std::vector<float> weights;
+
+        void updateWeightsForChoice(int choiceIndex) {
+            // Increase all other weights. Decrease this weight.
+            weights[choiceIndex] = 0;
+            for (int i = 0; i < weights.size(); i++) {
+                if (i != choiceIndex) {
+                    weights[i] += 1;
+                }
+            }
+        }
+
+    public:
+        FairPicker() = default;
+
+        explicit FairPicker(Rng rng) : rng(rng) {}
+
+        void addChoice(T choice) {
+            options.push_back(std::move(choice));
+            weights.push_back(1);
+        }
+
+        T pickNext() {
+            float weightSum = 0;
+            for (const auto weight : weights) weightSum += weight;
+
+            float choice = rng.f32() * weightSum;
+
+            assert(options.size() == weights.size());
+            float cursor = 0;
+            for (int i = 0; i < options.size(); i++) {
+                if (choice < cursor + weights[i]) {
+                    updateWeightsForChoice(i);
+                    return options[i];
+                }
+                cursor += weights[i];
+            }
+
+            throw std::string("zero options");
+        }
+    };
 }
 
 #endif //RIPOSTE_RNG_H

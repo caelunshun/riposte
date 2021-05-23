@@ -38,4 +38,22 @@ namespace rip {
 
         return std::optional<UnitId>();
     }
+
+    Era Game::getEra() const {
+        if (turn < 50) {
+            return Era::Ancient;
+        } else if (turn < 150) {
+            return Era::Classical;
+        } else if (turn < 250) {
+            return Era::Medieval;
+        } else if (turn < 300) {
+            return Era::Renaissance;
+        } else if (turn < 400) {
+            return Era::Industrial;
+        } else if (turn < 450) {
+            return Era::Modern;
+        } else {
+            return Era::Future;
+        }
+    }
 }

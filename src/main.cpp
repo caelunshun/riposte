@@ -4,6 +4,7 @@
 #include "registry.h"
 #include "hud.h"
 #include "ui.h"
+#include "audio.h"
 
 #include <iostream>
 #include <deque>
@@ -85,6 +86,8 @@ int main() {
     rip::Renderer renderer(window);
     auto registry = std::make_shared<rip::Registry>();
 
+    auto audio = std::make_shared<rip::AudioManager>();
+
     auto assets = std::make_shared<rip::Assets>();
     assets->addLoader("image", std::make_unique<rip::ImageLoader>(renderer));
     assets->addLoader("font", std::make_unique<rip::FontLoader>(renderer));
@@ -92,7 +95,10 @@ int main() {
     assets->addLoader("unit", std::make_unique<rip::UnitLoader>(registry));
     assets->addLoader("resource", std::make_unique<rip::ResourceLoader>(registry));
     assets->addLoader("tech", std::make_unique<rip::TechLoader>());
+    assets->addLoader("sound", std::make_unique<rip::AudioLoader>(audio));
     assets->loadAssetsDir("assets");
+
+    audio->addSounds(*assets);
 
     auto techTree = std::make_shared<rip::TechTree>(*assets, *registry);
 
@@ -119,6 +125,7 @@ int main() {
     glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {
         game.tick(window, hud.hasFocus(game));
+        audio->update(game);
 
         // Paint order: game, UI, overlays
         renderer.begin(true);

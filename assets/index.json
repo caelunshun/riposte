@@ -263,5 +263,80 @@
     "path": "texture/resource/copper.png",
     "id": "texture/resource/copper",
     "loader": "image"
+  },
+  {
+    "path": "music/ancient/tribal1.ogg",
+    "id": "music/ancient/tribal1",
+    "loader": "sound"
+  },
+  {
+    "path": "music/ancient/tribal2.ogg",
+    "id": "music/ancient/tribal2",
+    "loader": "sound"
+  },
+  {
+    "path": "music/classical/chinese1.ogg",
+    "id": "music/classical/chinese1",
+    "loader": "sound"
+  },
+  {
+    "path": "music/classical/chinese2.ogg",
+    "id": "music/classical/chinese2",
+    "loader": "sound"
+  },
+  {
+    "path": "music/medieval/christian1.ogg",
+    "id": "music/medieval/christian1",
+    "loader": "sound"
+  },
+  {
+    "path": "music/medieval/christian2.ogg",
+    "id": "music/medieval/christian2",
+    "loader": "sound"
+  },
+  {
+    "path": "music/renaissance/brandenburg1.ogg",
+    "id": "music/renaissance/brandenburg1",
+    "loader": "sound"
+  },
+  {
+    "path": "music/renaissance/brandenburg2.ogg",
+    "id": "music/renaissance/brandenburg2",
+    "loader": "sound"
+  },
+  {
+    "path": "music/renaissance/brandenburg3.ogg",
+    "id": "music/renaissance/brandenburg3",
+    "loader": "sound"
+  },
+  {
+    "path": "music/industrial/beethoven1.ogg",
+    "id": "music/industrial/beethoven1",
+    "loader": "sound"
+  },
+  {
+    "path": "music/industrial/romantic1.ogg",
+    "id": "music/industrial/romantic1",
+    "loader": "sound"
+  },
+  {
+    "path": "music/modern/grand_pianola1.ogg",
+    "id": "music/modern/grand_pianola1",
+    "loader": "sound"
+  },
+  {
+    "path": "music/modern/the_people_are_the_heroes_now.ogg",
+    "id": "music/modern/the_people_are_the_heroes_now",
+    "loader": "sound"
+  },
+  {
+    "path": "music/future/shattered.ogg",
+    "id": "music/future/shattered",
+    "loader": "sound"
+  },
+  {
+    "path": "music/future/victory_and_death.ogg",
+    "id": "music/future/victory_and_death",
+    "loader": "sound"
   }
 ]

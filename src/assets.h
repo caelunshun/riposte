@@ -45,6 +45,19 @@ namespace rip {
             }
             return results;
         }
+
+        template<class T>
+        std::vector<std::pair<std::string, std::shared_ptr<T>>> getAllWithIDs() const {
+            std::vector<std::pair<std::string, std::shared_ptr<T>>> results;
+            for (const auto &entry : assets) {
+                const auto &asset = entry.second;
+                auto assetDowncasted = std::dynamic_pointer_cast<T>(asset);
+                if (assetDowncasted) {
+                    results.push_back({entry.first, std::move(assetDowncasted)});
+                }
+            }
+            return results;
+        }
     };
 }
 

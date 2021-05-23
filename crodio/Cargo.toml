@@ -1,0 +1,11 @@
+[package]
+name = "crodio"
+version = "0.1.0"
+authors = ["caelunshun <caelunshun@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+rodio = { version = "0.14", default-features = false, features = [ "vorbis", "flac", "wav" ] }
