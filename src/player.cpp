@@ -169,6 +169,11 @@ namespace rip {
             auto &city = game.getCity(cityID);
             baseRevenue += city.getGoldProduced(game);
         }
+
+        // Split base revenue into gold and beaker revenue
+        // based on beakerPercent.
+        beakerRevenue = static_cast<int>(baseRevenue * (sciencePercent / 100.0));
+        goldRevenue = baseRevenue - beakerRevenue;
     }
 
     void Player::recomputeExpenses(Game &game) {
@@ -184,7 +189,11 @@ namespace rip {
     }
 
     int Player::getGoldRevenue() const {
-        return 0;
+        return goldRevenue;
+    }
+
+    int Player::getBeakerRevenue() const {
+        return beakerRevenue;
     }
 
     int Player::getNetGold() const {
@@ -193,10 +202,6 @@ namespace rip {
 
     int Player::getExpenses() const {
         return expenses;
-    }
-
-    int Player::getBeakerRevenue() const {
-        return getBaseRevenue();
     }
 
     int Player::getGold() const {
@@ -208,6 +213,14 @@ namespace rip {
             researchingTech->beakersAccumulated += getBeakerRevenue();
             updateResearch(game);
         }
+
+        // Lower beaker percent if needed.
+        while (gold + getNetGold() < 0 && sciencePercent >= 10) {
+            sciencePercent -= 10;
+            recomputeRevenue(game);
+            // TODO: what happens after sciencePercent==0 and gold==0?
+        }
+
         gold += getNetGold();
     }
 
@@ -235,5 +248,19 @@ namespace rip {
     int ResearchingTech::estimateCompletionTurns(int beakersPerTurn) const {
         if (beakersPerTurn == 0) return tech->cost + 1;
         return (tech->cost - beakersAccumulated + beakersPerTurn - 1) / beakersPerTurn;
+    }
+
+    int Player::getSciencePercent() const {
+        return sciencePercent;
+    }
+
+    void Player::setSciencePercent(int percent, Game &game) {
+        sciencePercent = percent;
+        if (sciencePercent > 100) {
+            sciencePercent = 100;
+        } else if (sciencePercent < 0) {
+            sciencePercent = 0;
+        }
+        recomputeRevenue(game);
     }
 }

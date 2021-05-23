@@ -14,6 +14,7 @@
 namespace rip {
     Hud::Hud(const Assets &assets, NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnit(), selectedUnitPath(std::vector<glm::uvec2>()) {
         goldIcon = std::dynamic_pointer_cast<Image>(assets.get("icon/gold"));
+        beakerIcon = std::dynamic_pointer_cast<Image>(assets.get("icon/beaker"));
     }
 
     void Hud::paintPath(Game &game, glm::uvec2 start, const Path &path) {
@@ -457,7 +458,7 @@ namespace rip {
     }
 
     void Hud::paintTopLeftHud(Game &game) {
-        glm::vec2 size(300, 100);
+        glm::vec2 size(300, 150);
         nk_begin(nk, "topLeft", nk_rect(0, 0, size.x, size.y), 0);
 
         nk_layout_row_begin(nk, NK_STATIC, 20, 2);
@@ -467,7 +468,7 @@ namespace rip {
         auto image = nk_image_id(goldIcon->id);
         nk_image(nk, image);
 
-        const auto &player = game.getThePlayer();
+        auto &player = game.getThePlayer();
         const auto text = std::to_string(player.getGold());
         nk_layout_row_push(nk, 50);
         nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
@@ -477,6 +478,33 @@ namespace rip {
 
         nk_layout_row_push(nk, 100);
         nk_label_colored(nk, ("Revenue: " + std::to_string(player.getBaseRevenue())).c_str(), NK_TEXT_ALIGN_LEFT, nk_rgb(68, 194, 113));
+
+        // Research slider
+        nk_layout_row_end(nk);
+
+        nk_layout_row_begin(nk, NK_STATIC, 50, 1);
+        nk_layout_row_push(nk, 250);
+        if (nk_group_begin(nk, "researchSlider", 0)) {
+            nk_layout_row_begin(nk, NK_STATIC, 20, 4);
+
+            nk_layout_row_push(nk, 30);
+            auto beaker = nk_image_id(beakerIcon->id);
+            nk_image(nk, beaker);
+
+            nk_layout_row_push(nk, 50);
+            auto percentText = std::to_string(player.getSciencePercent()) + "%";
+            nk_label(nk, percentText.c_str(), NK_TEXT_ALIGN_LEFT);
+
+            nk_layout_row_push(nk, 50);
+            if (nk_button_label(nk, "+")) {
+                player.setSciencePercent(player.getSciencePercent() + 10, game);
+            }
+            nk_layout_row_push(nk, 50);
+            if (nk_button_label(nk, "-")) {
+                player.setSciencePercent(player.getSciencePercent() - 10, game);
+            }
+            nk_group_end(nk);
+        }
 
         nk_end(nk);
     }

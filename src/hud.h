@@ -41,6 +41,7 @@ namespace rip {
         CityId lastCityBuildPrompt;
 
         std::shared_ptr<Image> goldIcon;
+        std::shared_ptr<Image> beakerIcon;
 
         void paintSelectedUnit(Game &game);
         void paintMainHud(Game &game);

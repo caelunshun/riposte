@@ -75,6 +75,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/beaker.png",
+    "id": "icon/beaker",
+    "loader": "image"
+  },
+  {
     "path": "civ/greece.json",
     "id": "civ/greece",
     "loader": "civ"

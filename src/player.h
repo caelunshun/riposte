@@ -87,8 +87,13 @@ namespace rip {
          std::optional<ResearchingTech> researchingTech;
 
          int baseRevenue = 0;
+         int beakerRevenue = 0;
+         int goldRevenue = 0;
          int expenses = 0;
          int gold = 0;
+
+         // Determines how much of the base revenue is converted to beakers.
+         int sciencePercent = 100;
 
          CityId capital;
 
@@ -133,13 +138,17 @@ namespace rip {
 
          int getBaseRevenue() const;
          int getGoldRevenue() const;
+         int getBeakerRevenue() const;
          int getExpenses() const;
          int getNetGold() const;
-         int getBeakerRevenue() const;
+
          int getGold() const;
 
          const std::optional<ResearchingTech> &getResearchingTech() const;
          void setResearchingTech(const std::shared_ptr<Tech> &tech);
+
+         int getSciencePercent() const;
+         void setSciencePercent(int percent, Game &game);
      };
 }
 
