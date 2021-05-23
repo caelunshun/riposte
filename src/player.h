@@ -89,6 +89,8 @@ namespace rip {
          int baseRevenue = 0;
          int gold = 0;
 
+         CityId capital;
+
          std::string getNextCityName(const Game &game);
 
          void recomputeRevenue(Game &game);
@@ -102,6 +104,7 @@ namespace rip {
          Player(const Player &other) = delete;
 
          void setID(PlayerId id);
+         void setCapital(CityId capital);
 
          void enableAI();
 

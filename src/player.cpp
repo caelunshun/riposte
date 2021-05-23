@@ -17,6 +17,10 @@ namespace rip {
         this->id = id;
     }
 
+    void Player::setCapital(CityId capital) {
+        this->capital = capital;
+    }
+
     void Player::enableAI() {
         ai = std::make_optional<AI>(id);
     }
@@ -77,6 +81,10 @@ namespace rip {
         City city(pos, std::move(name), id);
         auto cityID = game.addCity(std::move(city));
         registerCity(cityID);
+
+        if (cities.size() == 1) {
+            game.getCity(cityID).setCapital(game, true);
+        }
 
         game.getCity(cityID).updateWorkedTiles(game);
 

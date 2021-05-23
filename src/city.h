@@ -114,17 +114,21 @@ namespace rip {
         // Resources accessible to this city.
         absl::flat_hash_set<std::shared_ptr<Resource>, ResourceHash> resources;
 
+        bool capital = false;
+
         void doGrowth(Game &game);
 
     public:
         City(glm::uvec2 pos, std::string name, PlayerId owner);
 
         void setID(CityId id);
+        void setCapital(Game &game, bool isCapital);
 
         glm::uvec2 getPos() const;
         const std::string &getName() const;
         PlayerId getOwner() const;
         CityId getID() const;
+        bool isCapital() const;
 
         const Culture &getCulture() const;
         int getCulturePerTurn() const;
@@ -154,6 +158,8 @@ namespace rip {
         bool hasResource(const std::shared_ptr<Resource> &resource) const;
         void addResource(std::shared_ptr<Resource> resource);
         void clearResources();
+
+        int getMaintanenceCost(const Game &game) const;
     };
 }
 

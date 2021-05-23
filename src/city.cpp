@@ -56,6 +56,10 @@ namespace rip {
         return id;
     }
 
+    bool City::isCapital() const {
+        return capital;
+    }
+
     void City::setName(std::string name) {
         this->name = std::move(name);
     }
@@ -276,6 +280,17 @@ namespace rip {
 
     void City::clearResources() {
         resources.clear();
+    }
+
+    void City::setCapital(Game &game, bool isCapital) {
+        this->capital = isCapital;
+        if (isCapital) {
+            game.getPlayer(owner).setCapital(id);
+        }
+    }
+
+    int City::getMaintanenceCost(const Game &game) const {
+        return 0;
     }
 }
 
