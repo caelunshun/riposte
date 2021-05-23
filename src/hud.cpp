@@ -3,6 +3,7 @@
 //
 
 #include <iostream>
+#include "renderer.h"
 #include "hud.h"
 #include "game.h"
 #include "ripmath.h"
@@ -11,7 +12,9 @@
 #include <iomanip>
 
 namespace rip {
-    Hud::Hud(NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnit(), selectedUnitPath(std::vector<glm::uvec2>()) {}
+    Hud::Hud(const Assets &assets, NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnit(), selectedUnitPath(std::vector<glm::uvec2>()) {
+        goldIcon = std::dynamic_pointer_cast<Image>(assets.get("icon/gold"));
+    }
 
     void Hud::paintPath(Game &game, glm::uvec2 start, const Path &path) {
         auto prev = start;
@@ -258,6 +261,7 @@ namespace rip {
         paintResearchBar(game);
         paintTechPrompt(game);
         paintMessages(game);
+        paintTopLeftHud(game);
     }
 
     void Hud::trySetSelectedPath(Game &game, glm::uvec2 from, glm::uvec2 to) {
@@ -448,6 +452,25 @@ namespace rip {
                 game.getThePlayer().setResearchingTech(tech);
             }
         }
+
+        nk_end(nk);
+    }
+
+    void Hud::paintTopLeftHud(Game &game) {
+        glm::vec2 size(200, 100);
+        nk_begin(nk, "topLeft", nk_rect(0, 0, size.x, size.y), 0);
+
+        nk_layout_row_begin(nk, NK_STATIC, 20, 100);
+
+        // Gold
+        nk_layout_row_push(nk, 20);
+        auto image = nk_image_id(goldIcon->id);
+        nk_image(nk, image);
+
+        const auto &player = game.getThePlayer();
+        const auto text = std::to_string(player.getGold());
+        nk_layout_row_push(nk, 50);
+        nk_label(nk, text.c_str(), NK_TEXT_ALIGN_LEFT);
 
         nk_end(nk);
     }

@@ -116,7 +116,7 @@ int main() {
     game.getView().setMapCenter(glm::vec2(startPos) * glm::vec2(100, 100));
 
     rip::Ui ui(window);
-    rip::Hud hud(renderer.getNvg(), ui.getNk());
+    rip::Hud hud(*assets, renderer.getNvg(), ui.getNk());
 
     auto vendor = glGetString(GL_VENDOR);
     auto model = glGetString(GL_RENDERER);

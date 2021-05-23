@@ -15,6 +15,7 @@
 #include "path.h"
 
 namespace rip {
+    class Image;
     class Game;
 
     struct HudMessage {
@@ -39,6 +40,8 @@ namespace rip {
 
         CityId lastCityBuildPrompt;
 
+        std::shared_ptr<Image> goldIcon;
+
         void paintSelectedUnit(Game &game);
         void paintMainHud(Game &game);
         void paintMessages(Game &game);
@@ -55,8 +58,10 @@ namespace rip {
 
         std::optional<CityId> getCityBuildPrompt(const Game &game) const;
 
+        void paintTopLeftHud(Game &game);
+
     public:
-        Hud(NVGcontext *vg, nk_context *nk);
+        Hud(const Assets &assets, NVGcontext *vg, nk_context *nk);
 
         // Renders the UI and handles input.
         void update(Game &game);
