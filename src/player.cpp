@@ -177,11 +177,19 @@ namespace rip {
     }
 
     void Player::recomputeExpenses(Game &game) {
+        // City maintanence expenses
         expenses = 0;
         for (const auto cityID : cities) {
             const auto &city = game.getCity(cityID);
             expenses += city.getMaintanenceCost(game);
         }
+
+        // Apply inflation. Inflation is computed as
+        // a percent of all other expenses, where
+        // that percent increases linearily starting at turn 100.
+        double inflationPercent = game.getTurn() < 100 ? 0 : (game.getTurn() - 100.0) * 1.0 / 400.0;
+        int inflation = static_cast<int>(expenses * inflationPercent);
+        expenses += inflation;
     }
 
     int Player::getBaseRevenue() const {
