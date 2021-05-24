@@ -125,6 +125,11 @@
     "loader": "civ"
   },
   {
+    "path": "civ/korea.json",
+    "id": "civ/korea",
+    "loader": "civ"
+  },
+  {
     "path": "font/Merriweather-Regular.ttf",
     "id": "font/merriweather/regular",
     "loader": "font"

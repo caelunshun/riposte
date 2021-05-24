@@ -2,7 +2,7 @@
   "id": "japan",
   "name": "Japanese Empire",
   "adjective": "Japanese",
-  "color": [78, 0, 142],
+  "color": [235, 51, 0],
   "leader": "Jimmu",
   "cities": [
     "Tokyo",
