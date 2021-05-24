@@ -7,6 +7,10 @@
 #include "ripmath.h"
 #include "city.h"
 #include "rng.h"
+#include "tile.h"
+#include "unit.h"
+#include "path.h"
+#include "player.h"
 #include <glm/glm.hpp>
 #include <deque>
 #include <iostream>

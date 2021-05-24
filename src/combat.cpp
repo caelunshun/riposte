@@ -5,6 +5,7 @@
 #include <cassert>
 #include "combat.h"
 #include "game.h"
+#include "unit.h"
 
 namespace rip {
     const float roundTime = 0.5;

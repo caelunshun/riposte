@@ -9,6 +9,8 @@
 #include "rng.h"
 
 namespace rip {
+    class TechTree;
+
     class MapGenerator {
         Rng rng;
     public:

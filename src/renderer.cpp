@@ -12,6 +12,10 @@
 #include "renderer.h"
 #include "ripmath.h"
 #include "rng.h"
+#include "player.h"
+#include "tile.h"
+#include "city.h"
+#include "unit.h"
 
 #include <glm/glm.hpp>
 

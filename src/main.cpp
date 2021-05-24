@@ -5,6 +5,8 @@
 #include "hud.h"
 #include "ui.h"
 #include "audio.h"
+#include "unit.h"
+#include "player.h"
 
 #include <iostream>
 #include <deque>

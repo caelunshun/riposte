@@ -4,6 +4,7 @@
 
 #include "path.h"
 #include "game.h"
+#include "tile.h"
 #include <queue>
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>

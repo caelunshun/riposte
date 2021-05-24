@@ -4,6 +4,9 @@
 
 #include "worker.h"
 #include "game.h"
+#include "tile.h"
+#include "trade.h"
+#include "culture.h"
 #include <nuklear.h>
 
 namespace rip {

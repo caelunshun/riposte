@@ -6,6 +6,8 @@
 #include "renderer.h"
 #include "hud.h"
 #include "game.h"
+#include "unit.h"
+#include "city.h"
 #include "ripmath.h"
 #include <nuklear.h>
 #include <sstream>

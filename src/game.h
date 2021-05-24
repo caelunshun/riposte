@@ -5,71 +5,39 @@
 #ifndef RIPOSTE_GAME_H
 #define RIPOSTE_GAME_H
 
-#include <vector>
-#include <glm/ext/vector_uint2.hpp>
+#include <memory>
+#include <glm/vec2.hpp>
 #include <rea.h>
-#include <optional>
+#include <GLFW/glfw3.h>
 
-#include "tile.h"
-#include "cursor.h"
-#include "view.h"
-#include "city.h"
-#include "player.h"
-#include "unit.h"
-#include "registry.h"
-#include "ids.h"
-#include "culture.h"
-#include "trade.h"
+// Avoid including headers that change frequently here,
+// or changing those headers will cause a recompilation of almost all source
+// files.
 #include "era.h"
+#include "ids.h"
+#include "view.h"
+#include "cursor.h"
 
 namespace rip {
+    class Registry;
+    class Unit;
+    class Player;
+    class City;
+    class Tile;
+    class CultureMap;
+    class TradeRoutes;
+
     class Game {
-        std::vector<Tile> theMap;
-        uint32_t mapWidth;
-        uint32_t mapHeight;
-
-        rea::versioned_slot_map<City> cities;
-        rea::versioned_slot_map<Player> players;
-        rea::versioned_slot_map<Unit> units;
-
-        // The human player.
-        PlayerId thePlayer;
-
-        Cursor cursor;
-        View view;
-
-        std::shared_ptr<Registry> registry;
-
-        std::vector<UnitId> unitKillQueue;
-
-        float dt = 0;
-        float lastFrameTime = 0;
-
-        int turn = 0;
-
-        bool cheatMode = false;
-
-        std::vector<bool> workedTiles;
-
-        CultureMap cultureMap;
-
-        TradeRoutes tradeRoutes;
-
-        size_t getMapIndex(glm::uvec2 pos) const {
-            return static_cast<size_t>(pos.x) + static_cast<size_t>(pos.y) * static_cast<size_t>(mapWidth);
-        }
+        class _impl;
+        std::unique_ptr<_impl> impl;
 
     public:
-        Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry)
-        : theMap(static_cast<size_t>(mapWidth) * mapHeight),
-        workedTiles(static_cast<size_t>(mapWidth) * mapHeight),
-        mapWidth(mapWidth),
-        mapHeight(mapHeight),
-        registry(std::move(registry)),
-        cultureMap(mapWidth, mapHeight),
-        cursor() {
+        Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry);
 
-        }
+        ~Game();
+
+        Game(Game &&other);
+        Game(const Game &other) = delete;
 
         // Advances to the next turn, updating all necessary game state.
         void advanceTurn();
@@ -78,234 +46,69 @@ namespace rip {
         // If this returns an empty, then the turn should end.
         std::optional<UnitId> getNextUnitToMove();
 
-        uint32_t getMapWidth() const {
-            return mapWidth;
-        }
+        uint32_t getMapWidth() const;
+        uint32_t getMapHeight() const;
+        bool containsTile(glm::uvec2 pos) const;
+        Tile &getTile(glm::uvec2 pos);
+        const Tile &getTile(glm::uvec2 pos) const;
 
-        uint32_t getMapHeight() const {
-            return mapHeight;
-        }
+        Cursor &getCursor();
+        const Cursor &getCursor() const;
 
-        bool containsTile(glm::uvec2 pos) const {
-            return (pos.x < mapWidth && pos.y < mapHeight);
-        }
+        View &getView();
+        const View &getView() const;
 
-        Tile &getTile(glm::uvec2 pos) {
-            assert(pos.x < mapWidth);
-            assert(pos.y < mapHeight);
-            auto index = getMapIndex(pos);
-            return theMap.at(index);
-        }
+        float getDeltaTime() const;
 
-        const Tile &getTile(glm::uvec2 pos) const {
-            auto index = getMapIndex(pos);
-            return theMap.at(index);
-        }
+        glm::vec2 getMapOrigin() const;
+        glm::vec2 getScreenOffset(glm::uvec2 tile) const;
+        glm::uvec2 getPosFromScreenOffset(glm::vec2 offset) const;
 
-        Cursor &getCursor() {
-            return cursor;
-        }
+        void tick(GLFWwindow *window, bool hudHasFocus);
 
-        const Cursor &getCursor() const {
-            return cursor;
-        }
+        const rea::versioned_slot_map<City> &getCities() const;
+        rea::versioned_slot_map<City> &getCities();
+        CityId addCity(City city);
+        City *getCityAtLocation(glm::uvec2 location);
+        const City *getCityAtLocation(glm::uvec2 location) const;
+        City &getCity(CityId id);
+        const City &getCity(CityId id) const;
 
-        View &getView() {
-            return view;
-        }
+        Player &getPlayer(PlayerId id);
+        const Player &getPlayer(PlayerId id) const;
+        Player &getThePlayer();
+        const Player &getThePlayer() const;
+        PlayerId getThePlayerID() const;
+        size_t getNumPlayers() const;
+        void setThePlayerID(PlayerId id);
+        PlayerId addPlayer(Player player);
+        rea::versioned_slot_map<Player> &getPlayers();
 
-        const View &getView() const {
-            return view;
-        }
+        const Registry &getRegistry() const;
 
-        float getDeltaTime() const {
-            return dt;
-        }
-
-        glm::vec2 getMapOrigin() const {
-            return getView().getMapCenter() - (getCursor().getWindowSize() / 2.0f);
-        }
-
-        glm::vec2 getScreenOffset(glm::uvec2 tile) const {
-            return glm::vec2(tile) * 100.0f - getMapOrigin();
-        }
-
-        glm::uvec2 getPosFromScreenOffset(glm::vec2 offset) const {
-            auto translated = offset + getMapOrigin();
-            auto scaled = translated / 100.0f;
-            return glm::uvec2(static_cast<uint32_t>(floor(scaled.x)), static_cast<uint32_t>(floor(scaled.y)));
-        }
-
-        void tick(GLFWwindow *window, bool hudHasFocus) {
-            dt = glfwGetTime() - lastFrameTime;
-            lastFrameTime = glfwGetTime();
-
-            cursor.tick(window);
-            view.tick(dt, cursor, hudHasFocus);
-
-            for (const auto unitID : unitKillQueue) {
-                killUnit(unitID);
-            }
-            unitKillQueue.clear();
-        }
-
-        const rea::versioned_slot_map<City> &getCities() const {
-            return cities;
-        }
-
-        rea::versioned_slot_map<City> &getCities() {
-            return cities;
-        }
-
-        CityId addCity(City city) {
-            auto id = cities.insert(std::move(city)).second;
-            getCity(id).setID(id);
-            getCity(id).onCreated(*this);
-            return id;
-        }
-
-        City *getCityAtLocation(glm::uvec2 location) {
-            for (auto &city : cities) {
-                if (city.getPos() == location) {
-                    return &city;
-                }
-            }
-            return nullptr;
-        }
-
-        const City *getCityAtLocation(glm::uvec2 location) const {
-            for (auto &city : cities) {
-                if (city.getPos() == location) {
-                    return &city;
-                }
-            }
-            return nullptr;
-        }
-
-        City &getCity(CityId id) {
-            return cities.id_value(id);
-        }
-
-        const City &getCity(CityId id) const {
-            return cities.id_value(id);
-        }
-
-        Player &getPlayer(PlayerId id) {
-            return players.id_value(id);
-        }
-
-        PlayerId getThePlayerID() const {
-            return thePlayer;
-        }
-
-        Player &getThePlayer() {
-            return getPlayer(thePlayer);
-        }
-
-        size_t getNumPlayers() const {
-            return players.size();
-        }
-
-        void setThePlayerID(PlayerId id) {
-            thePlayer = id;
-        }
-
-        PlayerId addPlayer(Player player) {
-            return players.insert(std::move(player)).second;
-        }
-
-        const Player &getThePlayer() const {
-            return players.id_value(thePlayer);
-        }
-
-        const Player &getPlayer(PlayerId id) const {
-            return players.id_value(id);
-        }
-
-        rea::versioned_slot_map<Player> &getPlayers() {
-            return players;
-        }
-
-        const Registry &getRegistry() const {
-            return *registry;
-        }
-
-        UnitId addUnit(Unit unit) {
-            auto id = units.insert(std::move(unit)).second;
-            auto &u = getUnit(id);
-            u.setID(id);
-            return id;
-        }
-
-        const Unit &getUnit(UnitId id) const {
-            return units.id_value(id);
-        }
-
-        Unit &getUnit(UnitId id) {
-            return units.id_value(id);
-        }
-
-        Unit *getUnitAtPosition(glm::uvec2 location) {
-            for (auto &unit : units) {
-                if (unit.getPos() == location) {
-                    return &unit;
-                }
-            }
-            return nullptr;
-        }
-
-        void killUnit(UnitId id) {
-            units.erase(id);
-        }
-
-        rea::versioned_slot_map<Unit> &getUnits() {
-            return units;
-        }
-
-        const rea::versioned_slot_map<Unit> &getUnits() const {
-            return units;
-        }
-
-        int getTurn() const {
-            return turn;
-        }
-
-        void toggleCheatMode() {
-            cheatMode = !cheatMode;
-        }
-
-        bool isCheatMode() const {
-            return cheatMode;
-        }
-
-        bool isTileWorked(glm::uvec2 pos) const {
-            return workedTiles[getMapIndex(pos)];
-        }
-
-        void setTileWorked(glm::uvec2 pos, bool worked) {
-            workedTiles[getMapIndex(pos)] = worked;
-        }
-
+        UnitId addUnit(Unit unit);
+        const Unit &getUnit(UnitId id) const;
+        Unit &getUnit(UnitId id);
+        Unit *getUnitAtPosition(glm::uvec2 location);
+        void killUnit(UnitId id);
         // Enqueues a unit to be killed as soon as possible.
-        void deferKillUnit(UnitId id) {
-            unitKillQueue.push_back(id);
-        }
+        void deferKillUnit(UnitId id);
+        rea::versioned_slot_map<Unit> &getUnits();
+        const rea::versioned_slot_map<Unit> &getUnits() const;
 
-        CultureMap &getCultureMap() {
-            return cultureMap;
-        }
+        int getTurn() const;
 
-        const CultureMap &getCultureMap() const {
-            return cultureMap;
-        }
+        void toggleCheatMode();
+        bool isCheatMode() const;
 
-        TradeRoutes &getTradeRoutes() {
-            return tradeRoutes;
-        }
+        bool isTileWorked(glm::uvec2 pos) const;
+        void setTileWorked(glm::uvec2 pos, bool worked);
 
-        const TradeRoutes &getTradeRoutes() const {
-            return tradeRoutes;
-        }
+        CultureMap &getCultureMap();
+        const CultureMap &getCultureMap() const;
+
+        TradeRoutes &getTradeRoutes();
+        const TradeRoutes &getTradeRoutes() const;
 
         Era getEra() const;
     };

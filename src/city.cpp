@@ -5,6 +5,8 @@
 #include "city.h"
 #include "unit.h"
 #include "game.h"
+#include "tile.h"
+#include "trade.h"
 #include <string>
 #include <utility>
 #include <iostream>

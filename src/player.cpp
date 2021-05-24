@@ -5,6 +5,9 @@
 #include <unordered_set>
 #include "player.h"
 #include "game.h"
+#include "city.h"
+#include "tile.h"
+#include "unit.h"
 
 namespace rip {
     Player::Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree)

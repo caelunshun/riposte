@@ -8,6 +8,9 @@
 #include <FastNoise/FastNoise.h>
 #include <absl/container/flat_hash_set.h>
 #include "mapgen.h"
+#include "tech.h"
+#include "unit.h"
+#include "tile.h"
 
 namespace rip {
     // CONTINENT GENERATION

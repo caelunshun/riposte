@@ -5,6 +5,7 @@
 #include "unit.h"
 #include "game.h"
 #include "ripmath.h"
+#include "tile.h"
 #include "worker.h"
 #include <nuklear.h>
 

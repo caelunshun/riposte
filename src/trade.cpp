@@ -6,6 +6,7 @@
 #include "trade.h"
 #include "game.h"
 #include "city.h"
+#include "tile.h"
 
 namespace rip {
     void TradeRoute::mount(TradeRouteId id) {
