@@ -1,0 +1,18 @@
+{
+  "id": "japan",
+  "name": "Japanese Empire",
+  "adjective": "Japanese",
+  "color": [78, 0, 142],
+  "leader": "Jimmu",
+  "cities": [
+    "Tokyo",
+    "Kyoto",
+    "Hiroshima",
+    "Nagasaki",
+    "Osaka",
+    "Yokohama",
+    "Kobe",
+    "Sapporo",
+    "Fukuoka"
+  ]
+}

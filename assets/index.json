@@ -115,6 +115,16 @@
     "loader": "civ"
   },
   {
+  "path": "civ/america.json",
+  "id": "civ/america",
+  "loader": "civ"
+},
+  {
+    "path": "civ/japan.json",
+    "id": "civ/japan",
+    "loader": "civ"
+  },
+  {
     "path": "font/Merriweather-Regular.ttf",
     "id": "font/merriweather/regular",
     "loader": "font"
