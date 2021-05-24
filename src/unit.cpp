@@ -162,4 +162,23 @@ namespace rip {
     void Unit::setMovementLeft(int movement) {
         movementLeft = movement;
     }
+
+    double Unit::getHealth() const {
+        return health;
+    }
+
+    void Unit::setHealth(double health) {
+        this->health = health;
+        if (health < 0) {
+            this-> health = 0;
+        }
+    }
+
+    bool Unit::canFight() const {
+        return kind->strength > 0;
+    }
+
+    bool Unit::shouldDie() const {
+        return health <= 0;
+    }
 }

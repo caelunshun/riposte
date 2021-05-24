@@ -96,7 +96,12 @@ namespace rip {
         PlayerId getOwner() const;
         double getCombatStrength() const;
         float getMovementLeft() const;
+        double getHealth() const;
+        void setHealth(double health);
         std::vector<std::unique_ptr<Capability>> &getCapabilities();
+
+        bool canFight() const;
+        bool shouldDie() const;
 
         void setMovementLeft(int movement);
 
