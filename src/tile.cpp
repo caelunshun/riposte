@@ -209,29 +209,9 @@ namespace rip {
             if (!game.containsTile(neighborPos)) continue;
             const auto &neighbor = game.getTile(neighborPos);
             const auto diff = glm::ivec2(neighborPos) - glm::ivec2(pos);
-            const auto mask = glm::ivec2(std::abs(diff.x), std::abs(diff.y));
-            const auto maskInvert = glm::ivec2(mask.x == 1 ? 0 : 1, mask.y == 1 ? 0 : 1);
             const auto edgeCenter = center + glm::vec2(diff * 50);
-            if (neighbor.hasImprovement<Road>()) {
-                Rng neighborRng(makeSeed(neighborPos));
-                // Ensure that each edge uses the same RNG seed.
-                // Determine based on coordinates modulo 2.
-                Rng *rngToUse;
-
-                int diffIndex;
-                if (mask.x == 1) diffIndex = 0;
-                else diffIndex = 1;
-
-                if (pos[diffIndex] % 2 == 0) {
-                    rngToUse = &rng;
-                } else {
-                    rngToUse = &neighborRng;
-                }
-
-                entryPoints[numEntryPoints++] = glm::vec2(
-                        edgeCenter.x + maskInvert.x * rngToUse->f32() * 50.0f,
-                        edgeCenter.y + maskInvert.y * rngToUse->f32() * 50.0f
-                        );
+            if (neighbor.hasImprovement<Road>() || game.getCityAtLocation(neighborPos)) {
+                entryPoints[numEntryPoints++] = edgeCenter;
             }
         }
 
@@ -245,11 +225,9 @@ namespace rip {
                 second = center;
             }
 
-            auto control = center + (glm::vec2(rng.f32(), rng.f32()) - 0.5f) * 25.0f;
-
             nvgBeginPath(vg);
             nvgMoveTo(vg, first.x, first.y);
-            nvgQuadTo(vg, control.x, control.y, second.x, second.y);
+            nvgLineTo(vg, second.x, second.y);
 
             nvgLineCap(vg, NVG_ROUND);
             nvgStrokeWidth(vg, 5);
