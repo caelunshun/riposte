@@ -3,7 +3,7 @@
   "name": "Aztec Empire",
   "adjective": "Aztec",
   "color": [167, 225, 99],
-  "leader": "",
+  "leader": "Montezuma",
   "cities": [
     "Tenochtitlan",
     "Tetzcoco",

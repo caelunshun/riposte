@@ -263,6 +263,7 @@ namespace rip {
         paintTechPrompt(game);
         paintMessages(game);
         paintTopLeftHud(game);
+        paintScoreHud(game);
     }
 
     void Hud::trySetSelectedPath(Game &game, glm::uvec2 from, glm::uvec2 to) {
@@ -525,5 +526,46 @@ namespace rip {
         }
 
         nk_end(nk);
+    }
+
+    void Hud::paintScoreHud(Game &game) {
+        auto windowSize = game.getCursor().getWindowSize();
+        glm::vec2 size(200, 200);
+        auto pos = windowSize - size - glm::vec2(0, 100);
+
+        nvgBeginPath(vg);
+        nvgRect(vg, pos.x, pos.y, size.x, size.y);
+        nvgFillColor(vg, nvgRGBA(0x2b, 0x2b, 0x2b, 255));
+        nvgFill(vg);
+
+        // Sort players by score.
+        std::vector<const Player*> players(game.getPlayers().size());
+        int i = 0;
+        for (const auto &player : game.getPlayers()) {
+            players[i++] = &player;
+        }
+        std::sort(players.begin(), players.end(), [] (const Player *a, const Player *b) {
+            return a->getScore() > b->getScore();
+        });
+
+        // Draw players.
+        nvgFontSize(vg, 15);
+        nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
+        float textCursor = pos.y + 5;
+        for (const auto *player : players) {
+            const auto &leaderName = player->getCiv().leader;
+            const auto score = player->getScore();
+            const auto color = player->getCiv().color;
+
+            nvgFillColor(vg, nvgRGB(255, 255, 255));
+            nvgText(vg, pos.x, textCursor, std::to_string(score).c_str(), nullptr);
+            float _bounds[4];
+            float advance = nvgTextBounds(vg, pos.x, textCursor, std::to_string(score).c_str(), nullptr, _bounds);
+            nvgFillColor(vg, nvgRGB(color[0], color[1], color[2]));
+            nvgText(vg, pos.x + advance, textCursor, (" " + leaderName).c_str(), nullptr);
+
+            textCursor += 30;
+        }
+        nvgReset(vg);
     }
 }

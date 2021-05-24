@@ -94,6 +94,7 @@ namespace rip {
         recomputeVisibility(game);
         recomputeRevenue(game);
         recomputeExpenses(game);
+        recomputeScore(game);
 
         return cityID;
     }
@@ -157,6 +158,7 @@ namespace rip {
         if (ai.has_value()) {
             ai->doTurn(game);
         }
+        recomputeScore(game);
     }
 
     const PlayerTechs &Player::getTechs() const {
@@ -288,5 +290,25 @@ namespace rip {
             sciencePercent = 0;
         }
         recomputeRevenue(game);
+    }
+
+    int Player::getTotalPopulation(const Game &game) {
+        int sum = 0;
+        for (const auto cityID : cities) sum += game.getCity(cityID).getPopulation();
+        return sum;
+    }
+
+    void Player::recomputeScore(Game &game) {
+        score = 0;
+
+        // population
+        score += static_cast<int>(5000.0 * (getTotalPopulation(game) / 400.0));
+
+        // techs
+        score += static_cast<int>(2000.0 * (getTechs().getUnlockedTechs().size() / 200.0));
+    }
+
+    int Player::getScore() const {
+        return score;
     }
 }

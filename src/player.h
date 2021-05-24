@@ -92,6 +92,8 @@ namespace rip {
          int expenses = 0;
          int gold = 0;
 
+         int score = 0;
+
          // Determines how much of the base revenue is converted to beakers.
          int sciencePercent = 100;
 
@@ -103,6 +105,10 @@ namespace rip {
          void recomputeExpenses(Game &game);
          void updateResearch(Game &game);
          void doEconomyTurn(Game &game);
+
+         void recomputeScore(Game &game);
+
+         int getTotalPopulation(const Game &game);
 
      public:
          Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree);
@@ -149,6 +155,8 @@ namespace rip {
 
          int getSciencePercent() const;
          void setSciencePercent(int percent, Game &game);
+
+         int getScore() const;
      };
 }
 

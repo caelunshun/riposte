@@ -52,6 +52,8 @@ namespace rip {
 
         void paintResearchBar(Game &game);
 
+        void paintScoreHud(Game &game);
+
         bool shouldShowTechPrompt(const Game &game) const;
         void paintTechPrompt(Game &game);
 
