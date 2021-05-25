@@ -75,6 +75,7 @@ namespace rip {
         float movementLeft;
         // The path the unit is currently following.
         std::optional<Path> currentPath;
+        bool inCombat = false;
 
         // Capabilities attached to the unit.
         std::vector<std::unique_ptr<Capability>> capabilities;
@@ -116,6 +117,9 @@ namespace rip {
         const Path &getPath() const;
         void setPath(Path path);
         void moveAlongCurrentPath(Game &game);
+
+        bool isInCombat() const;
+        void setInCombat(bool inCombat);
 
         void onTurnEnd(Game &game);
 

@@ -313,6 +313,24 @@ namespace rip {
             return fromPos + (ray * pos);
         }
 
+        void paintHealthBar(NVGcontext *vg, Game &game, const Unit &unit, glm::vec2 offset) {
+            glm::vec2 size(60, 10);
+            glm::vec2 pos(offset.x + 50 - size.x / 2, offset.y + 25);
+
+            nvgBeginPath(vg);
+            nvgRect(vg, pos.x, pos.y, size.x, size.y);
+            nvgFillColor(vg, nvgRGBA(100, 100, 100, 150));
+            nvgFill(vg);
+            nvgStrokeWidth(vg, 1);
+            nvgStrokeColor(vg, nvgRGB(0, 0, 0));
+
+            auto progress = unit.getHealth();
+            nvgBeginPath(vg);
+            nvgRect(vg, pos.x, pos.y, progress * size.x, size.y);
+            nvgFillColor(vg, nvgRGB(108, 198, 74));
+            nvgFill(vg);
+        }
+
         void paintUnit(NVGcontext *vg, Game &game, const Unit &unit, glm::vec2 offset) {
             auto imageID = "texture/unit/" + unit.getKind().id;
             auto image = std::dynamic_pointer_cast<Image>(assets->get(imageID));
@@ -345,6 +363,10 @@ namespace rip {
             nvgFillColor(vg, nvgRGB(0, 0, 0));
             nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_TOP);
             nvgText(vg, posX + (width / 2), posY + height, unit.getKind().name.c_str(), nullptr);
+
+            if (unit.isInCombat()) {
+                paintHealthBar(vg, game, unit, offset);
+            }
         }
 
     public:

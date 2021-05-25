@@ -18,13 +18,7 @@ namespace rip {
         return nextRound * roundTime;
     }
 
-    void Combat::advance(Game &game, float dt) {
-        time += dt;
-
-        if (getNextRoundTime() > time) return;
-
-        if (finished) return;
-
+    void Combat::doRound(Game &game) {
         auto &attacker = game.getUnit(attackerID);
         auto &defender = game.getUnit(defenderID);
 
@@ -33,8 +27,8 @@ namespace rip {
 
         double r = a / d;
 
-        double attackerDamage = 20.0 * (3 * r + 1) / (3 + r) / 100.0;
-        double defenderDamage = 20.0 * (3 + r) / (3 * r + 1) / 100.0;
+        double attackerDamage = 20.0 * (3 * r + 1) / (3 + r) / 100.0 / a;
+        double defenderDamage = 20.0 * (3 + r) / (3 * r + 1) / 100.0 / d;
 
         bool attackerWon = rng.chance(r / (1 + r));
         if (attackerWon) {
@@ -48,24 +42,51 @@ namespace rip {
         ++nextRound;
     }
 
+    void Combat::advance(Game &game, float dt) {
+        time += dt;
+
+        if (getNextRoundTime() > time) return;
+
+        if (finished) return;
+
+        doRound(game);
+    }
+
     bool Combat::isFinished() const {
         return finished;
     }
 
     void Combat::finish(Game &game) {
-        assert(isFinished());
+        while (!isFinished()) {
+            doRound(game);
+        }
 
         auto &attacker = game.getUnit(attackerID);
         auto &defender = game.getUnit(defenderID);
 
+        attacker.setInCombat(false);
+        defender.setInCombat(false);
+
+        UnitId unitToMove;
+        glm::uvec2 movePos;
         if (attacker.shouldDie()) {
             game.deferKillUnit(attackerID);
+            unitToMove = defenderID;
+            movePos = attacker.getPos();
         } else if (defender.shouldDie()) {
             game.deferKillUnit(defenderID);
+            unitToMove = attackerID;
+            movePos = defender.getPos();
         }
+
+        game.getUnit(unitToMove).moveTo(movePos, game);
     }
 
-    void Combat::paintUnits(NVGcontext *vg, const Game &game) const {
+    UnitId Combat::getAttacker() {
+        return attackerID;
+    }
 
+    UnitId Combat::getDefender() {
+        return defenderID;
     }
 }

@@ -7,6 +7,7 @@
 #include "ripmath.h"
 #include "tile.h"
 #include "worker.h"
+#include "combat.h"
 #include <nuklear.h>
 
 namespace rip {
@@ -104,6 +105,15 @@ namespace rip {
     void Unit::moveTo(glm::uvec2 target, Game &game) {
         if (!canMove(target, game)) return;
 
+        Unit *enemy = game.getUnitAtPosition(target);
+        if (enemy && !enemy->shouldDie()) {
+            Combat combat(getID(), enemy->getID());
+            game.addCombat(combat);
+            enemy->setInCombat(true);
+            this->setInCombat(true);
+            return;
+        }
+
         moveTime = 0;
         moveFrom = pos;
 
@@ -147,9 +157,12 @@ namespace rip {
     }
 
     void Unit::onTurnEnd(Game &game) {
+        if (movementLeft > 0) {
+            const auto regen = 0.2;
+            health = std::clamp(health + regen, 0.0, 1.0);
+        }
+
         resetMovement();
-        const auto regen = 0.2;
-        health = std::clamp(health + regen, 0.0, 1.0);
 
         for (auto &capability : getCapabilities()) {
             capability->onTurnEnd(game);
@@ -180,6 +193,14 @@ namespace rip {
     }
 
     bool Unit::shouldDie() const {
-        return health <= 0;
+        return health < 0.1;
+    }
+
+    bool Unit::isInCombat() const {
+        return inCombat;
+    }
+
+    void Unit::setInCombat(bool inCombat) {
+        this->inCombat = inCombat;
     }
 }

@@ -10,6 +10,7 @@
 #include "trade.h"
 #include "registry.h"
 #include "tile.h"
+#include "combat.h"
 
 namespace rip {
     struct Game::_impl {
@@ -44,6 +45,8 @@ namespace rip {
 
         TradeRoutes tradeRoutes;
 
+        std::vector<Combat> ongoingCombats;
+
         _impl(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry)
         : theMap(static_cast<size_t>(mapWidth) * mapHeight),
         workedTiles(static_cast<size_t>(mapWidth) * mapHeight),
@@ -70,6 +73,11 @@ namespace rip {
         }
 
         impl->cultureMap.onTurnEnd(*this);
+
+        for (auto &combat : impl->ongoingCombats) {
+            combat.finish(*this);
+        }
+        impl->ongoingCombats.clear();
 
         ++(impl->turn);
     }
@@ -158,6 +166,21 @@ namespace rip {
             killUnit(unitID);
         }
         impl->unitKillQueue.clear();
+
+        for (int i = impl->ongoingCombats.size() - 1; i >= 0; i--) {
+            auto &combat = impl->ongoingCombats[i];
+
+            if (!getUnits().id_is_valid(combat.getAttacker()) || !getUnits().id_is_valid(combat.getDefender())) {
+                impl->ongoingCombats.erase(impl->ongoingCombats.begin() + i);
+                continue;
+            }
+
+            combat.advance(*this, getDeltaTime());
+            if (combat.isFinished()) {
+                combat.finish(*this);
+                impl->ongoingCombats.erase(impl->ongoingCombats.begin() + i);
+            }
+        }
     }
 
     const rea::versioned_slot_map<City> &Game::getCities() const {
@@ -334,6 +357,10 @@ namespace rip {
         } else {
             return Era::Future;
         }
+    }
+
+    void Game::addCombat(Combat &combat) {
+        impl->ongoingCombats.push_back(combat);
     }
 
     Game::~Game() = default;

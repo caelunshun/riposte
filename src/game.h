@@ -26,6 +26,7 @@ namespace rip {
     class Tile;
     class CultureMap;
     class TradeRoutes;
+    class Combat;
 
     class Game {
         class _impl;
@@ -109,6 +110,8 @@ namespace rip {
 
         TradeRoutes &getTradeRoutes();
         const TradeRoutes &getTradeRoutes() const;
+
+        void addCombat(Combat &combat);
 
         Era getEra() const;
     };

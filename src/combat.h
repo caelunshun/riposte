@@ -8,8 +8,6 @@
 #include "rng.h"
 #include "ids.h"
 
-struct NVGcontext;
-
 namespace rip {
     class Game;
 
@@ -24,6 +22,8 @@ namespace rip {
 
         float getNextRoundTime() const;
 
+        void doRound(Game &game);
+
     public:
         Combat(UnitId attacker, UnitId defender);
 
@@ -36,8 +36,8 @@ namespace rip {
         // Finishes combat by killing the loser (if needed).
         void finish(Game &game);
 
-        // Paints both units in the combat event.
-        void paintUnits(NVGcontext *vg, const Game &game) const;
+        UnitId getAttacker();
+        UnitId getDefender();
     };
 }
 
