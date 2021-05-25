@@ -157,6 +157,8 @@ namespace rip {
          void setSciencePercent(int percent, Game &game);
 
          int getScore() const;
+
+         bool isAtWarWith(PlayerId player) const;
      };
 }
 

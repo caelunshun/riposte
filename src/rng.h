@@ -8,6 +8,7 @@
 #include <cstdint>
 #include <iterator>
 #include <array>
+#include <string>
 #include <vector>
 
 namespace rip {

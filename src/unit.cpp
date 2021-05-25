@@ -102,11 +102,18 @@ namespace rip {
         return true;
     }
 
+    bool Unit::wouldAttack(const Game &game, const Unit &other) const {
+         return true;
+        return !other.shouldDie()
+            && owner != other.getOwner()
+            && game.getPlayer(owner).isAtWarWith(other.getOwner());
+    }
+
     void Unit::moveTo(glm::uvec2 target, Game &game) {
         if (!canMove(target, game)) return;
 
         Unit *enemy = game.getUnitAtPosition(target);
-        if (enemy && !enemy->shouldDie()) {
+        if (enemy && wouldAttack(game, *enemy)) {
             Combat combat(getID(), enemy->getID(), game);
             game.addCombat(combat);
             enemy->setInCombat(true);

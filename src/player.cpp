@@ -314,4 +314,8 @@ namespace rip {
     int Player::getScore() const {
         return score;
     }
+
+    bool Player::isAtWarWith(PlayerId player) const {
+        return player != getID();
+    }
 }

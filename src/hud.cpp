@@ -19,7 +19,7 @@ namespace rip {
         beakerIcon = std::dynamic_pointer_cast<Image>(assets.get("icon/beaker"));
     }
 
-    void Hud::paintPath(Game &game, glm::uvec2 start, const Path &path) {
+    void Hud::paintPath(Game &game, const Unit &unit, glm::uvec2 start, const Path &path) {
         auto prev = start;
         nvgBeginPath(vg);
         for (const auto point : path.getPoints()) {
@@ -30,7 +30,14 @@ namespace rip {
             prev = point;
         }
 
-        nvgStrokeColor(vg, nvgRGBA(255, 255, 255, 180));
+        NVGcolor color;
+        Unit *targetUnit = game.getUnitAtPosition(path.getDestination());
+        if (targetUnit && unit.wouldAttack(game, *targetUnit)) {
+            color = nvgRGBA(225, 82, 62, 180);
+        } else {
+            color = nvgRGBA(255, 255, 255, 180);
+        }
+        nvgStrokeColor(vg, color);
         nvgStrokeWidth(vg, 5);
         nvgLineCap(vg, NVG_ROUND);
         nvgStroke(vg);
@@ -75,7 +82,7 @@ namespace rip {
             nvgStroke(vg);
 
             if (selectedUnitPath.getNumPoints() != 0) {
-                paintPath(game, unit.getPos(), selectedUnitPath);
+                paintPath(game, unit, unit.getPos(), selectedUnitPath);
             }
 
             if (selectedUnitPathError.has_value()) {

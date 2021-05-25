@@ -48,7 +48,7 @@ namespace rip {
         void paintMessages(Game &game);
         void paintUnitUI(Game &game);
         void paintCityBuildPrompt(Game &game, CityId cityID);
-        void paintPath(Game &game, glm::uvec2 start, const Path &path);
+        void paintPath(Game &game, const Unit &unit, glm::uvec2 start, const Path &path);
 
         void paintResearchBar(Game &game);
 

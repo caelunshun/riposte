@@ -113,6 +113,9 @@ namespace rip {
         // Does nothing if canMove(target) is false.
         void moveTo(glm::uvec2 target, Game &game);
 
+        // Determines whether this unit will attack another unit.
+        bool wouldAttack(const Game &game, const Unit &other) const;
+
         bool hasPath() const;
         const Path &getPath() const;
         void setPath(Path path);
