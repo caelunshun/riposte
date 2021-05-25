@@ -8,10 +8,12 @@
 #include "unit.h"
 
 namespace rip {
-    const float roundTime = 0.5;
+    const float roundTime = 0.4;
 
-    Combat::Combat(UnitId attacker, UnitId defender) : attackerID(attacker), defenderID(defender) {
+    Combat::Combat(UnitId attacker, UnitId defender, const Game &game) : attackerID(attacker), defenderID(defender) {
         assert(attacker != defender);
+        startingAttackerStrength = game.getUnit(attacker).getCombatStrength();
+        startingDefenderStrength = game.getUnit(defender).getCombatStrength();
     }
 
     float Combat::getNextRoundTime() const {
@@ -22,19 +24,18 @@ namespace rip {
         auto &attacker = game.getUnit(attackerID);
         auto &defender = game.getUnit(defenderID);
 
-        double a = attacker.getCombatStrength();
-        double d = defender.getCombatStrength();
+        double r = startingAttackerStrength / startingDefenderStrength;
 
-        double r = a / d;
-
-        double attackerDamage = 20.0 * (3 * r + 1) / (3 + r) / 100.0 / a;
-        double defenderDamage = 20.0 * (3 + r) / (3 * r + 1) / 100.0 / d;
+        double attackerDamage = 20.0 * (3 * r + 1) / (3 + r) / 100.0;
+        double defenderDamage = 20.0 * (3 + r) / (3 * r + 1) / 100.0;
 
         bool attackerWon = rng.chance(r / (1 + r));
         if (attackerWon) {
-            defender.setHealth(defender.getHealth() - attackerDamage);
+            auto newHealth = defender.getHealth() - attackerDamage;
+            defender.setHealth(newHealth);
         } else {
-            attacker.setHealth(attacker.getHealth() - defenderDamage);
+            auto newHealth = attacker.getHealth() - defenderDamage;
+            attacker.setHealth(newHealth);
         }
 
         if (attacker.shouldDie() || defender.shouldDie()) finished = true;
@@ -67,19 +68,12 @@ namespace rip {
         attacker.setInCombat(false);
         defender.setInCombat(false);
 
-        UnitId unitToMove;
-        glm::uvec2 movePos;
         if (attacker.shouldDie()) {
             game.deferKillUnit(attackerID);
-            unitToMove = defenderID;
-            movePos = attacker.getPos();
         } else if (defender.shouldDie()) {
             game.deferKillUnit(defenderID);
-            unitToMove = attackerID;
-            movePos = defender.getPos();
+            attacker.moveTo(defender.getPos(), game);
         }
-
-        game.getUnit(unitToMove).moveTo(movePos, game);
     }
 
     UnitId Combat::getAttacker() {

@@ -20,12 +20,15 @@ namespace rip {
         int nextRound = 0;
         Rng rng;
 
+        double startingAttackerStrength;
+        double startingDefenderStrength;
+
         float getNextRoundTime() const;
 
         void doRound(Game &game);
 
     public:
-        Combat(UnitId attacker, UnitId defender);
+        Combat(UnitId attacker, UnitId defender, const Game &game);
 
         // Advances combat by the given time.
         void advance(Game &game, float dt);

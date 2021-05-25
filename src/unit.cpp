@@ -107,7 +107,7 @@ namespace rip {
 
         Unit *enemy = game.getUnitAtPosition(target);
         if (enemy && !enemy->shouldDie()) {
-            Combat combat(getID(), enemy->getID());
+            Combat combat(getID(), enemy->getID(), game);
             game.addCombat(combat);
             enemy->setInCombat(true);
             this->setInCombat(true);

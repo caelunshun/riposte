@@ -289,7 +289,9 @@ namespace rip {
     }
 
     void Game::killUnit(UnitId id) {
-        impl->units.erase(id);
+        if (impl->units.id_is_valid(id)) {
+            impl->units.erase(id);
+        }
     }
 
     void Game::deferKillUnit(UnitId id) {
