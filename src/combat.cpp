@@ -36,8 +36,12 @@ namespace rip {
         double attackerDamage = 20.0 * (3 * r + 1) / (3 + r) / 100.0;
         double defenderDamage = 20.0 * (3 + r) / (3 * r + 1) / 100.0;
 
-        attacker.setHealth(attacker.getHealth() - defenderDamage);
-        defender.setHealth(defender.getHealth() - attackerDamage);
+        bool attackerWon = rng.chance(r / (1 + r));
+        if (attackerWon) {
+            defender.setHealth(defender.getHealth() - attackerDamage);
+        } else {
+            attacker.setHealth(attacker.getHealth() - defenderDamage);
+        }
 
         if (attacker.shouldDie() || defender.shouldDie()) finished = true;
 

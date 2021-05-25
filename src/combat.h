@@ -5,6 +5,7 @@
 #ifndef RIPOSTE_COMBAT_H
 #define RIPOSTE_COMBAT_H
 
+#include "rng.h"
 #include "ids.h"
 
 struct NVGcontext;
@@ -19,6 +20,7 @@ namespace rip {
         UnitId defenderID;
         float time = 0;
         int nextRound = 0;
+        Rng rng;
 
         float getNextRoundTime() const;
 
