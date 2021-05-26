@@ -103,8 +103,9 @@ namespace rip {
     }
 
     bool Unit::wouldAttack(const Game &game, const Unit &other) const {
-         return true;
-        return !other.shouldDie()
+        return
+            canFight()
+            && !other.shouldDie()
             && owner != other.getOwner()
             && game.getPlayer(owner).isAtWarWith(other.getOwner());
     }

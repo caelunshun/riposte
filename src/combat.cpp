@@ -14,6 +14,10 @@ namespace rip {
         assert(attacker != defender);
         startingAttackerStrength = game.getUnit(attacker).getCombatStrength();
         startingDefenderStrength = game.getUnit(defender).getCombatStrength();
+
+        if (startingDefenderStrength == 0 || startingAttackerStrength == 0) {
+            finished = true;
+        }
     }
 
     float Combat::getNextRoundTime() const {
@@ -68,9 +72,9 @@ namespace rip {
         attacker.setInCombat(false);
         defender.setInCombat(false);
 
-        if (attacker.shouldDie()) {
+        if (attacker.shouldDie() || attacker.getCombatStrength() == 0) {
             game.deferKillUnit(attackerID);
-        } else if (defender.shouldDie()) {
+        } else if (defender.shouldDie() || defender.getCombatStrength() == 0) {
             game.deferKillUnit(defenderID);
             attacker.moveTo(defender.getPos(), game);
         }
