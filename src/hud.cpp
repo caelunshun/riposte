@@ -9,17 +9,18 @@
 #include "unit.h"
 #include "city.h"
 #include "ripmath.h"
+#include "stack.h"
 #include <nuklear.h>
 #include <sstream>
 #include <iomanip>
 
 namespace rip {
-    Hud::Hud(const Assets &assets, NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnit(), selectedUnitPath(std::vector<glm::uvec2>()) {
+    Hud::Hud(const Assets &assets, NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnitPath(std::vector<glm::uvec2>()) {
         goldIcon = std::dynamic_pointer_cast<Image>(assets.get("icon/gold"));
         beakerIcon = std::dynamic_pointer_cast<Image>(assets.get("icon/beaker"));
     }
 
-    void Hud::paintPath(Game &game, const Unit &unit, glm::uvec2 start, const Path &path) {
+    void Hud::paintPath(Game &game, const Stack &stack, glm::uvec2 start, const Path &path) {
         auto prev = start;
         nvgBeginPath(vg);
         for (const auto point : path.getPoints()) {
@@ -31,8 +32,14 @@ namespace rip {
         }
 
         NVGcolor color;
-        Unit *targetUnit = game.getUnitAtPosition(path.getDestination());
-        if (targetUnit && unit.wouldAttack(game, *targetUnit)) {
+        bool wouldAttack = false;
+        for (const auto unitID : selectedUnits) {
+            if (game.getUnit(unitID).wouldAttackPos(game, path.getDestination())) {
+                wouldAttack = true;
+                break;
+            }
+        }
+        if (wouldAttack) {
             color = nvgRGBA(225, 82, 62, 180);
         } else {
             color = nvgRGBA(255, 255, 255, 180);
@@ -44,15 +51,11 @@ namespace rip {
     }
 
     void Hud::paintSelectedUnit(Game &game) {
-        if (selectedUnit.has_value()) {
-            auto unitID = *selectedUnit;
-            if (!game.getUnits().id_is_valid(unitID)) {
-                selectedUnit = std::optional<UnitId>();
-                return;
-            }
+        if (selectedStack.has_value()) {
+            auto stackID = *selectedStack;
 
-            auto &unit = game.getUnit(unitID);
-            auto offset = game.getScreenOffset(unit.getPos());
+            const auto &stack = game.getStack(stackID);
+            auto offset = game.getScreenOffset(stack.getPos());
 
             nvgBeginPath(vg);
 
@@ -71,7 +74,14 @@ namespace rip {
             }
 
             NVGcolor color;
-            if (unit.getMovementLeft() == 0) {
+            bool movementLeft = true;
+            for (const auto unitID : selectedUnits) {
+                if (game.getUnit(unitID).getMovementLeft() <= 0.1) {
+                    movementLeft = false;
+                    break;
+                }
+            }
+            if (!movementLeft) {
                 color = nvgRGBA(218, 41, 28, 200);
             } else {
                 color = nvgRGBA(255, 255, 255, 200);
@@ -82,7 +92,7 @@ namespace rip {
             nvgStroke(vg);
 
             if (selectedUnitPath.getNumPoints() != 0) {
-                paintPath(game, unit, unit.getPos(), selectedUnitPath);
+                paintPath(game, stack, stack.getPos(), selectedUnitPath);
             }
 
             if (selectedUnitPathError.has_value()) {
@@ -97,7 +107,7 @@ namespace rip {
     }
 
     void Hud::paintUnitUI(Game &game) {
-        if (selectedUnit.has_value()) {
+        /*if (selectedUnit.has_value()) {
             bool kill = false;
             auto &unit = game.getUnit(*selectedUnit);
 
@@ -139,7 +149,7 @@ namespace rip {
                 game.killUnit(*selectedUnit);
                 selectedUnit = std::optional<UnitId>();
             }
-        }
+        }*/
     }
 
     void Hud::paintMainHud(Game &game) {
@@ -241,19 +251,19 @@ namespace rip {
     }
 
     void Hud::update(Game &game) {
-        if (selectedUnit.has_value() &&
-                !game.getUnits().id_is_valid(*selectedUnit)) {
-            selectedUnit = std::optional<UnitId>();
+        if (selectedStack.has_value() &&
+                !game.getStacks().id_is_valid(*selectedStack)) {
+            selectedStack = {};
         }
 
         if (hasFocus(game)) {
-            selectedUnit = std::optional<UnitId>();
+            selectedStack = {};
         }
 
-        if (isSelectingPath && selectedUnit.has_value()) {
+        if (isSelectingPath && selectedStack.has_value()) {
             auto currentPos = game.getPosFromScreenOffset(game.getCursor().getPos());
             if (selectedUnitPath.getNumPoints() == 0 || currentPos != selectedUnitPath.getDestination()) {
-                trySetSelectedPath(game, game.getUnit(*selectedUnit).getPos(), currentPos);
+                trySetSelectedPath(game, game.getStack(*selectedStack).getPos(), currentPos);
             }
         }
 
@@ -293,9 +303,14 @@ namespace rip {
     }
 
     void Hud::updateSelectedUnit(Game &game) {
-        selectedUnit = game.getNextUnitToMove();
-        if (selectedUnit.has_value() && !hasFocus(game)) {
-            SmoothAnimation animation(game.getView().getMapCenter(), glm::vec2(game.getUnit(*selectedUnit).getPos()) * 100.0f, 2000.0f, 2.0f);
+        auto unit = game.getNextUnitToMove();
+        if (unit.has_value()) {
+            selectedUnits.clear();
+            selectedStack = game.getUnit(*unit).getStack(game);
+            selectedUnits.push_back(*unit);
+        }
+        if (selectedStack.has_value() && !hasFocus(game)) {
+            SmoothAnimation animation(game.getView().getMapCenter(), glm::vec2(game.getStack(*selectedStack).getPos()) * 100.0f, 2000.0f, 2.0f);
             game.getView().setCenterAnimation(animation);
         }
     }
@@ -312,34 +327,40 @@ namespace rip {
 
         auto tilePos = game.getPosFromScreenOffset(game.getCursor().getPos());
         if (event.button == MouseButton::Left && event.action == MouseAction::Press) {
-            auto unit = game.getUnitAtPosition(tilePos);
-            if (unit == nullptr) {
-                selectedUnit = std::optional<UnitId>();
-            } else if (unit->getOwner() == game.getThePlayerID()) {
-                selectedUnit = std::make_optional<UnitId>(unit->getID());
+            auto stackID = game.getStackByKey(game.getThePlayerID(), tilePos);
+            selectedUnits.clear();
+            selectedStack = stackID;
+            if (selectedStack.has_value()) {
+                selectedUnits.push_back(game.getStack(*selectedStack).getBestUnit(game));
+            }
+        } else if (selectedStack.has_value()
+                   && event.button == MouseButton::Right && event.action == MouseAction::Press) {
+            const auto &stack = game.getStack(*selectedStack);
+            trySetSelectedPath(game, stack.getPos(), tilePos);
+        } else if (selectedStack.has_value()
+            && event.button == MouseButton::Right && event.action == MouseAction::Release) {
 
-                if (unit->hasPath()) {
-                    selectedUnitPath = unit->getPath();
+            bool shouldFinishPath = false;
+            for (const auto unitID : selectedUnits) {
+                auto &unit = game.getUnit(unitID);
+                unit.setPath(selectedUnitPath);
+                unit.moveAlongCurrentPath(game);
+
+                if (unit.getMovementLeft() == 0) {
+                    shouldFinishPath = true;
                 }
             }
-        } else if (selectedUnit.has_value()
-                   && event.button == MouseButton::Right && event.action == MouseAction::Press) {
-            const auto &unit = game.getUnit(*selectedUnit);
-            trySetSelectedPath(game, unit.getPos(), tilePos);
-        } else if (selectedUnit.has_value()
-            && event.button == MouseButton::Right && event.action == MouseAction::Release) {
-            auto &unit = game.getUnit(*selectedUnit);
-            unit.setPath(std::move(selectedUnitPath));
-            unit.moveAlongCurrentPath(game);
-            selectedUnitPath = Path(std::vector<glm::uvec2>());
-            selectedUnitPathError = std::optional<glm::uvec2>();
-            isSelectingPath = false;
 
-            if (unit.getMovementLeft() == 0) {
+            if (shouldFinishPath) {
+                selectedStack = {};
                 updateSelectedUnit(game);
                 selectedUnitPathError = std::optional<glm::uvec2>();
                 selectedUnitPath = Path(std::vector<glm::uvec2>());
             }
+
+            selectedUnitPath = Path(std::vector<glm::uvec2>());
+            selectedUnitPathError = std::optional<glm::uvec2>();
+            isSelectingPath = false;
         }
     }
 

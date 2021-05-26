@@ -125,6 +125,7 @@ namespace rip {
         const std::vector<StackId> &getStacksAtPos(glm::uvec2 pos) const;
         const Stack &getStack(StackId id) const;
         Stack &getStack(StackId id);
+        rea::versioned_slot_map<Stack> &getStacks();
     };
 }
 

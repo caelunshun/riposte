@@ -17,6 +17,7 @@
 namespace rip {
     class Image;
     class Game;
+    class Stack;
 
     struct HudMessage {
         std::string text;
@@ -31,7 +32,9 @@ namespace rip {
         NVGcontext *vg;
         nk_context *nk;
 
-        std::optional<UnitId> selectedUnit;
+        std::optional<StackId> selectedStack;
+        std::vector<UnitId> selectedUnits;
+
         Path selectedUnitPath;
         std::optional<glm::uvec2> selectedUnitPathError;
         bool isSelectingPath = false;
@@ -48,7 +51,7 @@ namespace rip {
         void paintMessages(Game &game);
         void paintUnitUI(Game &game);
         void paintCityBuildPrompt(Game &game, CityId cityID);
-        void paintPath(Game &game, const Unit &unit, glm::uvec2 start, const Path &path);
+        void paintPath(Game &game, const Stack &stack, glm::uvec2 start, const Path &path);
 
         void paintResearchBar(Game &game);
 

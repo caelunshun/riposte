@@ -6,8 +6,8 @@
 #define RIPOSTE_STACK_H
 
 #include "ids.h"
-#include <absl/container/inlined_vector.h>
 #include <glm/vec2.hpp>
+#include <vector>
 
 namespace rip {
     class Game;
@@ -17,7 +17,7 @@ namespace rip {
     // All units in a stack have the same owner.
     class Stack {
         PlayerId owner;
-        absl::InlinedVector<UnitId, 2> units;
+        std::vector<UnitId> units;
         glm::uvec2 pos;
 
     public:
@@ -26,7 +26,7 @@ namespace rip {
         void addUnit(UnitId unit);
         void removeUnit(UnitId unit);
         bool containsUnit(UnitId unit) const;
-        const absl::InlinedVector<UnitId, 2> &getUnits() const;
+        const std::vector<UnitId> &getUnits() const;
 
         // Gets the unit with the highest combat strength.
         UnitId getBestUnit(const Game &game) const;

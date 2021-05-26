@@ -100,6 +100,7 @@ namespace rip {
         double getHealth() const;
         void setHealth(double health);
         std::vector<std::unique_ptr<Capability>> &getCapabilities();
+        StackId getStack(const Game &game) const;
 
         bool canFight() const;
         bool shouldDie() const;
@@ -115,6 +116,7 @@ namespace rip {
 
         // Determines whether this unit will attack another unit.
         bool wouldAttack(const Game &game, const Unit &other) const;
+        std::optional<UnitId> wouldAttackPos(const Game &game, glm::uvec2 target) const;
 
         bool hasPath() const;
         const Path &getPath() const;

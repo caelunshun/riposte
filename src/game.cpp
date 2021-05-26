@@ -367,11 +367,16 @@ namespace rip {
         const auto &unit = getUnit(unitID);
 
         if (oldPos.has_value()) {
-            auto &oldStack = getStack(*getStackByKey(unit.getOwner(), *oldPos));
+            auto oldStackID = *getStackByKey(unit.getOwner(), *oldPos);
+            auto &oldStack = getStack(oldStackID);
             oldStack.removeUnit(unitID);
+
+            if (oldStack.getUnits().empty()) {
+                deleteStack(oldStackID);
+            }
         }
 
-        auto newStack = getStack(createStack(unit.getOwner(), newPos));
+        auto &newStack = getStack(createStack(unit.getOwner(), newPos));
         newStack.addUnit(unitID);
     }
 
@@ -381,7 +386,12 @@ namespace rip {
             return *existing;
         }
 
-        return impl->stacks.insert(Stack(owner, pos)).second;
+        auto id = impl->stacks.insert(Stack(owner, pos)).second;
+        if (!impl->stacksByPos.contains(pos)) {
+            impl->stacksByPos[pos] = {};
+        }
+        impl->stacksByPos[pos].push_back(id);
+        return id;
     }
 
     void Game::deleteStack(StackId id) {
@@ -400,6 +410,7 @@ namespace rip {
         const auto &inPos = getStacksAtPos(pos);
         for (const auto id : inPos) {
             if (getStack(id).getOwner() == owner) {
+                assert(impl->stacks.id_is_valid(id));
                 return id;
             }
         }
@@ -424,6 +435,10 @@ namespace rip {
     Stack &Game::getStack(StackId id) {
         assert(impl->stacks.id_is_valid(id));
         return impl->stacks.id_value(id);
+    }
+
+    rea::versioned_slot_map<Stack> &Game::getStacks() {
+        return impl->stacks;
     }
 
     Game::~Game() = default;

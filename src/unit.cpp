@@ -112,24 +112,32 @@ namespace rip {
             && game.getPlayer(owner).isAtWarWith(other.getOwner());
     }
 
+    std::optional<UnitId> Unit::wouldAttackPos(const Game &game, glm::uvec2 target) const {
+        for (const auto stackID : game.getStacksAtPos(target)) {
+            const auto &stack = game.getStack(stackID);
+            for (const auto otherUnitID : stack.getUnits()) {
+                auto &otherUnit = game.getUnit(otherUnitID);
+                if (wouldAttack(game, otherUnit)) {
+                    return otherUnitID;
+                }
+            }
+        }
+        return {};
+    }
+
     void Unit::moveTo(glm::uvec2 target, Game &game) {
         if (!canMove(target, game)) return;
 
         auto oldPos = pos;
 
         // Check for attacks.
-        for (const auto stackID : game.getStacksAtPos(target)) {
-            const auto &stack = game.getStack(stackID);
-            for (const auto otherUnitID : stack.getUnits()) {
-                auto &otherUnit = game.getUnit(otherUnitID);
-                if (wouldAttack(game, otherUnit)) {
-                    Combat combat(getID(), otherUnit.getID(), game);
-                    game.addCombat(combat);
-                    otherUnit.setInCombat(true);
-                    this->setInCombat(true);
-                    return;
-                }
-            }
+        auto otherUnit = wouldAttackPos(game, target);
+        if (otherUnit.has_value()) {
+            Combat combat(getID(), *otherUnit, game);
+            game.addCombat(combat);
+            game.getUnit(*otherUnit).setInCombat(true);
+            this->setInCombat(true);
+            return;
         }
 
         moveTime = 0;
@@ -222,5 +230,9 @@ namespace rip {
 
     void Unit::setInCombat(bool inCombat) {
         this->inCombat = inCombat;
+    }
+
+    StackId Unit::getStack(const Game &game) const {
+        return *game.getStackByKey(owner, pos);
     }
 }

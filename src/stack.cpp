@@ -27,7 +27,7 @@ namespace rip {
         return std::find(units.begin(), units.end(), unit) != units.end();
     }
 
-    const absl::InlinedVector<UnitId, 2> &Stack::getUnits() const {
+    const std::vector<UnitId> &Stack::getUnits() const {
         return units;
     }
 
@@ -36,7 +36,7 @@ namespace rip {
         double bestStrength;
         for (const auto unitID : getUnits()) {
             const auto &unit = game.getUnit(unitID);
-            if (!best.has_value() && unit.getCombatStrength() > bestStrength) {
+            if (!best.has_value() || unit.getCombatStrength() > bestStrength) {
                 best = unitID;
                 bestStrength = unit.getCombatStrength();
             }
