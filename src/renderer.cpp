@@ -263,7 +263,7 @@ namespace rip {
             // City name
             nvgFontFace(vg, "default");
             nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
-            nvgFontSize(vg, 15);
+            nvgFontSize(vg, 10);
             nvgFillColor(vg, nvgRGB(255, 255, 255));
             nvgText(vg, offset.x + 50, offset.y + 20, city.getName().c_str(), nullptr);
         }
