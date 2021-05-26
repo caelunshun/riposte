@@ -31,6 +31,7 @@ namespace rip {
     class Hud {
         NVGcontext *vg;
         nk_context *nk;
+        GLFWwindow *window;
         std::shared_ptr<Assets> assets;
 
         std::optional<glm::vec2> clickPos;
@@ -74,7 +75,7 @@ namespace rip {
         bool wasRectClicked(glm::vec2 pos, glm::vec2 size) const;
 
     public:
-        Hud(std::shared_ptr<Assets> assets, NVGcontext *vg, nk_context *nk);
+        Hud(std::shared_ptr<Assets> assets, NVGcontext *vg, nk_context *nk, GLFWwindow *window);
 
         // Renders the UI and handles input.
         void update(Game &game);

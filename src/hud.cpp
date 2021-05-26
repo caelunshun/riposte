@@ -15,7 +15,7 @@
 #include <iomanip>
 
 namespace rip {
-    Hud::Hud(std::shared_ptr<Assets> assets, NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnitPath(std::vector<glm::uvec2>()), assets(assets) {
+    Hud::Hud(std::shared_ptr<Assets> assets, NVGcontext *vg, nk_context *nk, GLFWwindow *window) : vg(vg), nk(nk), selectedUnitPath(std::vector<glm::uvec2>()), assets(assets), window(window) {
         goldIcon = std::dynamic_pointer_cast<Image>(assets->get("icon/gold"));
         beakerIcon = std::dynamic_pointer_cast<Image>(assets->get("icon/beaker"));
     }
@@ -661,9 +661,14 @@ namespace rip {
             // Check for click - if so, toggle selection on this unit.
             if (wasRectClicked(pos, glm::vec2(iconWidth))) {
                 auto it = std::find(selectedUnits.begin(), selectedUnits.end(), unitID);
-                if (it != selectedUnits.end()) {
-                    selectedUnits.erase(it);
+                if (glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
+                    if (it != selectedUnits.end()) {
+                        selectedUnits.erase(it);
+                    } else {
+                        selectedUnits.push_back(unitID);
+                    }
                 } else {
+                    selectedUnits.clear();
                     selectedUnits.push_back(unitID);
                 }
             }
