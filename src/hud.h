@@ -33,6 +33,8 @@ namespace rip {
         nk_context *nk;
         std::shared_ptr<Assets> assets;
 
+        std::optional<glm::vec2> clickPos;
+
         std::optional<StackId> selectedStack;
         std::vector<UnitId> selectedUnits;
 
@@ -68,6 +70,8 @@ namespace rip {
         std::optional<CityId> getCityBuildPrompt(const Game &game) const;
 
         void paintTopLeftHud(Game &game);
+
+        bool wasRectClicked(glm::vec2 pos, glm::vec2 size) const;
 
     public:
         Hud(std::shared_ptr<Assets> assets, NVGcontext *vg, nk_context *nk);

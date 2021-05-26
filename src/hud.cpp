@@ -284,6 +284,8 @@ namespace rip {
         paintTopLeftHud(game);
         paintScoreHud(game);
         paintStackSelectionBar(game);
+
+        clickPos = {};
     }
 
     void Hud::trySetSelectedPath(Game &game, glm::uvec2 from, glm::uvec2 to) {
@@ -317,7 +319,11 @@ namespace rip {
     }
 
     void Hud::handleClick(Game &game, MouseEvent event) {
-        if (game.getCursor().getPos().y > game.getCursor().getWindowSize().y - 100) {
+        if (event.button == MouseButton::Left && event.action == MouseAction::Press) {
+            clickPos = game.getCursor().getPos();
+        }
+
+        if (game.getCursor().getPos().y > game.getCursor().getWindowSize().y - 150) {
             // Click in UI. Don't interfere with the HUD.
             return;
         }
@@ -623,7 +629,13 @@ namespace rip {
             nvgFillPaint(vg, paint);
             nvgFill(vg);
 
-            nvgStrokeColor(vg, nvgRGB(0, 0, 0));
+            NVGcolor borderColor;
+            if (std::find(selectedUnits.begin(), selectedUnits.end(), unitID) != selectedUnits.end()) {
+                borderColor = nvgRGB(255, 205, 0);
+            } else {
+                borderColor = nvgRGB(0, 0, 0);
+            }
+            nvgStrokeColor(vg, borderColor);
             nvgStrokeWidth(vg, 1);
             nvgStroke(vg);
 
@@ -646,7 +658,23 @@ namespace rip {
             nvgStrokeWidth(vg, 0.8);
             nvgStroke(vg);
 
+            // Check for click - if so, toggle selection on this unit.
+            if (wasRectClicked(pos, glm::vec2(iconWidth))) {
+                auto it = std::find(selectedUnits.begin(), selectedUnits.end(), unitID);
+                if (it != selectedUnits.end()) {
+                    selectedUnits.erase(it);
+                } else {
+                    selectedUnits.push_back(unitID);
+                }
+            }
+
             pos.x += iconWidth + padding;
         }
+    }
+
+    bool Hud::wasRectClicked(glm::vec2 pos, glm::vec2 size) const {
+        return clickPos.has_value()
+            && (clickPos->x >= pos.x && clickPos->y >= pos.y)
+            && (clickPos->x <= pos.x + size.x && clickPos->y <= pos.y + size.y);
     }
 }
