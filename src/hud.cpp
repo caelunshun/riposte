@@ -107,9 +107,10 @@ namespace rip {
     }
 
     void Hud::paintUnitUI(Game &game) {
-        /*if (selectedUnit.has_value()) {
+        if (selectedStack.has_value() && selectedUnits.size() == 1) {
+            auto selectedUnitID = selectedUnits[0];
             bool kill = false;
-            auto &unit = game.getUnit(*selectedUnit);
+            auto &unit = game.getUnit(selectedUnitID);
 
             nk_layout_row_push(nk, 150);
             if (nk_group_begin(nk, "unit hud", 0)) {
@@ -140,16 +141,19 @@ namespace rip {
 
             for (const auto &capability : unit.getCapabilities()) {
                 if (capability->paintMainUI(game, nk) == UnitUIStatus::Deselect) {
-                    selectedUnit = {};
+                    selectedStack = {};
                     return;
                 }
             }
 
             if (kill) {
-                game.killUnit(*selectedUnit);
-                selectedUnit = std::optional<UnitId>();
+                game.killUnit(selectedUnitID);
+                selectedStack = {};
             }
-        }*/
+        } else if (selectedStack.has_value() && selectedUnits.size() != 1) {
+            nk_layout_row_push(nk, 150);
+            nk_label_wrap(nk, (std::to_string(selectedUnits.size()) + " units").c_str());
+        }
     }
 
     void Hud::paintMainHud(Game &game) {
@@ -254,6 +258,10 @@ namespace rip {
         if (selectedStack.has_value() &&
                 !game.getStacks().id_is_valid(*selectedStack)) {
             selectedStack = {};
+        }
+
+        if (!selectedStack.has_value()) {
+            selectedUnits.clear();
         }
 
         if (hasFocus(game)) {

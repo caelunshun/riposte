@@ -288,6 +288,8 @@ namespace rip {
 
     void Game::killUnit(UnitId id) {
         if (impl->units.id_is_valid(id)) {
+            auto &stack = getStack(getUnit(id).getStack(*this));
+            stack.removeUnit(id);
             impl->units.erase(id);
         }
     }
