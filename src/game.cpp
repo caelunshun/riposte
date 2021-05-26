@@ -90,7 +90,7 @@ namespace rip {
 
     std::optional<UnitId> Game::getNextUnitToMove() {
         for (auto &unit : impl->units) {
-            if (unit.getMovementLeft() != 0 && unit.getOwner() == impl->thePlayer) {
+            if (unit.getMovementLeft() != 0 && unit.getOwner() == impl->thePlayer && !unit.isFortified()) {
                 if (unit.hasPath()) {
                     unit.moveAlongCurrentPath(*this);
                 } else {
@@ -288,8 +288,12 @@ namespace rip {
 
     void Game::killUnit(UnitId id) {
         if (impl->units.id_is_valid(id)) {
-            auto &stack = getStack(getUnit(id).getStack(*this));
+            auto stackID = getUnit(id).getStack(*this);
+            auto &stack = getStack(stackID);
             stack.removeUnit(id);
+            if (stack.getUnits().empty()) {
+                deleteStack(stackID);
+            }
             impl->units.erase(id);
         }
     }

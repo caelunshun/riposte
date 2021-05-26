@@ -106,7 +106,46 @@ namespace rip {
         }
     }
 
+    void Hud::paintGenericUnitUI(Game &game) {
+        if (!selectedStack.has_value() || selectedUnits.empty()) return;
+
+        nk_layout_row_push(nk, 100);
+        if (nk_button_label(nk, "Fortify")) {
+            for (const auto unitID : selectedUnits) {
+                game.getUnit(unitID).fortify();
+            }
+            selectedStack = {};
+            updateSelectedUnit(game);
+        }
+        bool needsHealing = false;
+        for (const auto unitID : selectedUnits) {
+            if (game.getUnit(unitID).getHealth() != 1) {
+                needsHealing = true;
+                break;
+            }
+        }
+        if (needsHealing) {
+            nk_layout_row_push(nk, 100);
+            if (nk_button_label(nk, "Heal")) {
+                for (const auto unitID : selectedUnits) {
+                    game.getUnit(unitID).fortifyUntilHealed();
+                }
+                selectedStack = {};
+                updateSelectedUnit(game);
+            }
+        }
+        nk_layout_row_push(nk, 100);
+        if (nk_button_label(nk, "Skip")) {
+            for (const auto unitID : selectedUnits) {
+                game.getUnit(unitID).skipTurn();
+            }
+            selectedStack = {};
+            updateSelectedUnit(game);
+        }
+    }
+
     void Hud::paintUnitUI(Game &game) {
+        paintGenericUnitUI(game);
         if (selectedStack.has_value() && selectedUnits.size() == 1) {
             auto selectedUnitID = selectedUnits[0];
             bool kill = false;
@@ -264,6 +303,12 @@ namespace rip {
             selectedUnits.clear();
         }
 
+        for (const auto unitID : selectedUnits) {
+            if (!game.getUnits().id_is_valid(unitID)) {
+                selectedUnits.clear();
+            }
+        }
+
         if (hasFocus(game)) {
             selectedStack = {};
         }
@@ -360,6 +405,7 @@ namespace rip {
                 auto &unit = game.getUnit(unitID);
                 unit.setPath(selectedUnitPath);
                 unit.moveAlongCurrentPath(game);
+                selectedStack = unit.getStack(game);
 
                 if (unit.getMovementLeft() == 0) {
                     shouldFinishPath = true;
@@ -653,7 +699,9 @@ namespace rip {
             nvgCircle(vg, circlePos.x, circlePos.y, circleRadius);
 
             NVGcolor circleColor;
-            if (unit.getMovementLeft() <= 0.1) {
+            if (unit.isFortified()) {
+                circleColor = nvgRGB(180, 180, 180);
+            } else if (unit.getMovementLeft() <= 0.1) {
                 circleColor = nvgRGB(231, 60, 62);
             } else if (unit.getMovementLeft() == unit.getKind().movement) {
                 circleColor = nvgRGB(68, 194, 113);

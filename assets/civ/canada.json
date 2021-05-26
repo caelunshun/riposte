@@ -1,11 +1,15 @@
 {
-  "id": "korea",
-  "name": "Korean Empire",
-  "adjective": "Korean",
-  "color": [190, 198, 192],
+  "id": "canada",
+  "name": "Canadian Empire",
+  "adjective": "Canadian",
+  "color": [
+    253,
+    218,
+    37
+  ],
   "leader": "Yi Sun-sin",
   "cities": [
-    "Seoul",
+    "Ottowa",
     "Peongchang",
     "Busan",
     "Incheon",

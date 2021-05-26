@@ -80,6 +80,10 @@ namespace rip {
         // Capabilities attached to the unit.
         std::vector<std::unique_ptr<Capability>> capabilities;
 
+        bool fortified = false;
+        bool skippingTurn = false;
+        bool fortifiedUntilHeal = false;
+
         void resetMovement();
 
     public:
@@ -127,6 +131,11 @@ namespace rip {
         void setInCombat(bool inCombat);
 
         void onTurnEnd(Game &game);
+
+        void fortify();
+        bool isFortified() const;
+        void fortifyUntilHealed();
+        void skipTurn();
 
         template<class T>
         T *getCapability() {

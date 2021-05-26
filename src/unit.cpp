@@ -150,6 +150,10 @@ namespace rip {
         // Unit has moved; update visibility
         game.getPlayer(owner).recomputeVisibility(game);
 
+        fortified = false;
+        skippingTurn = false;
+        fortifiedUntilHeal = false;
+
         game.onUnitMoved(id, oldPos, target);
 
         // Update capabilities
@@ -195,6 +199,11 @@ namespace rip {
         for (auto &capability : getCapabilities()) {
             capability->onTurnEnd(game);
         }
+
+        skippingTurn = false;
+        if (health == 1.0) {
+            fortifiedUntilHeal = false;
+        }
     }
 
     std::vector<std::unique_ptr<Capability>> &Unit::getCapabilities() {
@@ -234,5 +243,21 @@ namespace rip {
 
     StackId Unit::getStack(const Game &game) const {
         return *game.getStackByKey(owner, pos);
+    }
+
+    void Unit::fortify() {
+        fortified = true;
+    }
+
+    bool Unit::isFortified() const {
+        return fortified || fortifiedUntilHeal || skippingTurn;
+    }
+
+    void Unit::fortifyUntilHealed() {
+        fortifiedUntilHeal = true;
+    }
+
+    void Unit::skipTurn() {
+        skippingTurn = true;
     }
 }

@@ -53,6 +53,7 @@ namespace rip {
         void paintSelectedUnit(Game &game);
         void paintMainHud(Game &game);
         void paintMessages(Game &game);
+        void paintGenericUnitUI(Game &game);
         void paintUnitUI(Game &game);
         void paintCityBuildPrompt(Game &game, CityId cityID);
         void paintPath(Game &game, const Stack &stack, glm::uvec2 start, const Path &path);
