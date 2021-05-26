@@ -164,7 +164,7 @@ namespace rip {
                     nk_label(nk, strength.str().c_str(), NK_TEXT_ALIGN_LEFT);
                 }
 
-                text = "Movement: " + std::to_string(unit.getMovementLeft());
+                text = "Movement: " + std::to_string(static_cast<int>(unit.getMovementLeft()));
                 if (unit.getMovementLeft() != unit.getKind().movement) {
                     text += " / " + std::to_string(unit.getKind().movement);
                 }

@@ -160,6 +160,8 @@ namespace rip {
         for (auto &capability : getCapabilities()) {
             capability->onUnitMoved(game);
         }
+
+        inCombat = false;
     }
 
     bool Unit::hasPath() const {
