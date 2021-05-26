@@ -15,6 +15,7 @@
 #include "player.h"
 #include "tile.h"
 #include "city.h"
+#include "stack.h"
 #include "unit.h"
 
 #include <glm/glm.hpp>
@@ -373,12 +374,13 @@ namespace rip {
         explicit UnitPainter(std::shared_ptr<Assets> assets) : assets(std::move(assets)) {}
 
         void paint(NVGcontext *vg, Game &game) override {
-            for (auto &unit : game.getUnits()) {
-                auto offset = game.getScreenOffset(unit.getPos());
-                if (!shouldPaintTile(offset, unit.getPos(), game, false)) {
+            for (auto &stack : game.getStacks()) {
+                auto offset = game.getScreenOffset(stack.getPos());
+                if (!shouldPaintTile(offset, stack.getPos(), game, false)) {
                     continue;
                 }
 
+                auto &unit = game.getUnit(stack.getBestUnit(game));
                 if (unit.moveTime != -1) {
                     auto newOffset = getInterpolatedUnitPos(game.getScreenOffset(unit.moveFrom), offset, unit.moveTime);
                     unit.moveTime += game.getDeltaTime();
