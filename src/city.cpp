@@ -300,5 +300,17 @@ namespace rip {
 
         return distanceFromPalaceCost + numberOfCitiesCost;
     }
+
+    void City::transferControlTo(Game &game, PlayerId newOwnerID) {
+        game.getCultureMap().onCityDestroyed(game, id);
+        auto &oldOwner = game.getPlayer(owner);
+        oldOwner.removeCity(id);
+        auto &newOwner = game.getPlayer(newOwnerID);
+        newOwner.registerCity(id);
+        if (population > 1) --population;
+        buildTask = {};
+        owner = newOwnerID;
+        game.getCultureMap().onCityCreated(game, id);
+    }
 }
 

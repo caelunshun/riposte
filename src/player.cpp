@@ -54,6 +54,12 @@ namespace rip {
 
     void Player::removeCity(CityId id) {
         cities.erase(std::remove(cities.begin(), cities.end(), id), cities.end());
+        if (capital == id) {
+            capital = {};
+            if (!cities.empty()) {
+                capital = cities[0];
+            }
+        }
     }
 
     std::string Player::getNextCityName(const Game &game) {

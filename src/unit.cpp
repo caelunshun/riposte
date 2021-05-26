@@ -9,6 +9,7 @@
 #include "worker.h"
 #include "combat.h"
 #include "stack.h"
+#include "city.h"
 #include <nuklear.h>
 
 namespace rip {
@@ -138,6 +139,14 @@ namespace rip {
             game.getUnit(*otherUnit).setInCombat(true);
             this->setInCombat(true);
             return;
+        }
+
+        // Check for city captures.
+        auto *city = game.getCityAtLocation(target);
+        if (city) {
+            if (game.getPlayer(city->getOwner()).isAtWarWith(getOwner())) {
+                city->transferControlTo(game, getOwner());
+            }
         }
 
         moveTime = 0;

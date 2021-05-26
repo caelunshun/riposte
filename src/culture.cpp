@@ -76,9 +76,11 @@ namespace rip {
 
             // Update the tile owner.
             auto currentOwner = getTileOwner(pos);
-            for (const auto &value : cultureTile.getValues()) {
-                if (!currentOwner || value.amount > cultureTile.getCultureForPlayer(*currentOwner)) {
-                    currentOwner = value.owner;
+            for (const auto touchingCityID : touchingCities) {
+                const auto &touchingCity = game.getCity(touchingCityID);
+                if (!currentOwner.has_value() || cultureTile.getCultureForPlayer(touchingCity.getOwner())
+                    > cultureTile.getCultureForPlayer(*currentOwner)) {
+                    currentOwner = touchingCity.getOwner();
                 }
             }
             owners[pos.x + pos.y * mapWidth] = currentOwner;
@@ -98,8 +100,25 @@ namespace rip {
         updateForCity(game, city);
     }
 
-    void CultureMap::onCityDestroyed(Game &game, CityId city) {
-        throw std::string("unimplemented");
+    void CultureMap::onCityDestroyed(Game &game, CityId cityID) {
+        const auto &city = game.getCity(cityID);
+        const auto level = 6;
+
+        breadthFirstSearch(game, city.getPos(), [&] (Tile &tile, glm::uvec2 tilePos) {
+            auto &touchingCities = owningCities[tilePos.x + tilePos.y * mapWidth];
+            auto it = std::find(touchingCities.begin(), touchingCities.end(), cityID);
+            if (it != touchingCities.end()) {
+                touchingCities.erase(it);
+            }
+
+            auto &owner = owners[tilePos.x + tilePos.y * mapWidth];
+            if (owner == city.getOwner()) {
+                owner = {};
+            }
+        }, [&] (Tile &tile, glm::uvec2 tilePos) {
+            auto d = dist(tilePos, city.getPos());
+            return static_cast<int>(round(d)) <= level;
+        });
     }
 
     std::optional<PlayerId> CultureMap::getTileOwner(glm::uvec2 pos) const {

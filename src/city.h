@@ -160,6 +160,8 @@ namespace rip {
         void clearResources();
 
         int getMaintanenceCost(const Game &game) const;
+
+        void transferControlTo(Game &game, PlayerId newOwner);
     };
 }
 
