@@ -7,7 +7,7 @@ conan_basic_setup()
 set(CMAKE_CXX_STANDARD 20)
 
 set(NANOVG_SOURCES external/nanovg/src/nanovg.c)
-set(SOURCES ${NANOVG_SOURCES} src/main.cpp src/ripmath.h src/tile.cpp src/tile.h src/game.cpp src/game.h src/renderer.cpp src/renderer.h src/assets.cpp src/assets.h src/view.cpp src/view.h src/cursor.cpp src/cursor.h src/mapgen.cpp src/mapgen.h src/rng.cpp src/rng.h src/city.cpp src/city.h src/player.cpp src/player.h src/registry.cpp src/registry.h src/unit.cpp src/unit.h src/ripmath.cpp src/hud.cpp src/hud.h src/ui.cpp src/ui.h src/path.cpp src/path.h src/ai.cpp src/ai.h src/worker.cpp src/traversal.h src/culture.cpp src/culture.h src/tech.cpp src/yield.cpp src/yield.h src/trade.cpp src/trade.h src/audio.cpp src/audio.h src/era.cpp src/era.h src/combat.cpp src/combat.h)
+set(SOURCES ${NANOVG_SOURCES} src/main.cpp src/ripmath.h src/tile.cpp src/tile.h src/game.cpp src/game.h src/renderer.cpp src/renderer.h src/assets.cpp src/assets.h src/view.cpp src/view.h src/cursor.cpp src/cursor.h src/mapgen.cpp src/mapgen.h src/rng.cpp src/rng.h src/city.cpp src/city.h src/player.cpp src/player.h src/registry.cpp src/registry.h src/unit.cpp src/unit.h src/ripmath.cpp src/hud.cpp src/hud.h src/ui.cpp src/ui.h src/path.cpp src/path.h src/ai.cpp src/ai.h src/worker.cpp src/traversal.h src/culture.cpp src/culture.h src/tech.cpp src/yield.cpp src/yield.h src/trade.cpp src/trade.h src/audio.cpp src/audio.h src/era.cpp src/era.h src/combat.cpp src/combat.h src/stack.cpp src/stack.h)
 
 add_executable(riposte ${SOURCES})
 
