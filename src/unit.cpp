@@ -8,6 +8,7 @@
 #include "tile.h"
 #include "worker.h"
 #include "combat.h"
+#include "stack.h"
 #include <nuklear.h>
 
 namespace rip {
@@ -105,6 +106,7 @@ namespace rip {
     bool Unit::wouldAttack(const Game &game, const Unit &other) const {
         return
             canFight()
+            && other.getID() != id
             && !other.shouldDie()
             && owner != other.getOwner()
             && game.getPlayer(owner).isAtWarWith(other.getOwner());
@@ -113,13 +115,21 @@ namespace rip {
     void Unit::moveTo(glm::uvec2 target, Game &game) {
         if (!canMove(target, game)) return;
 
-        Unit *enemy = game.getUnitAtPosition(target);
-        if (enemy && wouldAttack(game, *enemy)) {
-            Combat combat(getID(), enemy->getID(), game);
-            game.addCombat(combat);
-            enemy->setInCombat(true);
-            this->setInCombat(true);
-            return;
+        auto oldPos = pos;
+
+        // Check for attacks.
+        for (const auto stackID : game.getStacksAtPos(target)) {
+            const auto &stack = game.getStack(stackID);
+            for (const auto otherUnitID : stack.getUnits()) {
+                auto &otherUnit = game.getUnit(otherUnitID);
+                if (wouldAttack(game, otherUnit)) {
+                    Combat combat(getID(), otherUnit.getID(), game);
+                    game.addCombat(combat);
+                    otherUnit.setInCombat(true);
+                    this->setInCombat(true);
+                    return;
+                }
+            }
         }
 
         moveTime = 0;
@@ -131,6 +141,8 @@ namespace rip {
 
         // Unit has moved; update visibility
         game.getPlayer(owner).recomputeVisibility(game);
+
+        game.onUnitMoved(id, oldPos, target);
 
         // Update capabilities
         for (auto &capability : getCapabilities()) {

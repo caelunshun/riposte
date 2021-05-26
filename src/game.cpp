@@ -11,6 +11,9 @@
 #include "registry.h"
 #include "tile.h"
 #include "combat.h"
+#include "stack.h"
+
+#include <absl/container/flat_hash_map.h>
 
 namespace rip {
     struct Game::_impl {
@@ -21,6 +24,9 @@ namespace rip {
         rea::versioned_slot_map<City> cities;
         rea::versioned_slot_map<Player> players;
         rea::versioned_slot_map<Unit> units;
+        rea::versioned_slot_map<Stack> stacks;
+
+        absl::flat_hash_map<glm::uvec2, std::vector<StackId>, PosHash> stacksByPos;
 
         // The human player.
         PlayerId thePlayer;
@@ -268,6 +274,7 @@ namespace rip {
         auto id = impl->units.insert(std::move(unit)).second;
         auto &u = getUnit(id);
         u.setID(id);
+        onUnitMoved(id, {}, u.getPos());
         return id;
     }
 
@@ -277,15 +284,6 @@ namespace rip {
 
     Unit &Game::getUnit(UnitId id) {
         return getUnits().id_value(id);
-    }
-
-    Unit *Game::getUnitAtPosition(glm::uvec2 location) {
-        for (auto &unit : getUnits()) {
-            if (unit.getPos() == location) {
-                return &unit;
-            }
-        }
-        return nullptr;
     }
 
     void Game::killUnit(UnitId id) {
@@ -363,6 +361,69 @@ namespace rip {
 
     void Game::addCombat(Combat &combat) {
         impl->ongoingCombats.push_back(combat);
+    }
+
+    void Game::onUnitMoved(UnitId unitID, std::optional<glm::uvec2> oldPos, glm::uvec2 newPos) {
+        const auto &unit = getUnit(unitID);
+
+        if (oldPos.has_value()) {
+            auto &oldStack = getStack(*getStackByKey(unit.getOwner(), *oldPos));
+            oldStack.removeUnit(unitID);
+        }
+
+        auto newStack = getStack(createStack(unit.getOwner(), newPos));
+        newStack.addUnit(unitID);
+    }
+
+    StackId Game::createStack(PlayerId owner, glm::uvec2 pos) {
+        const auto existing = getStackByKey(owner, pos);
+        if (existing.has_value()) {
+            return *existing;
+        }
+
+        return impl->stacks.insert(Stack(owner, pos)).second;
+    }
+
+    void Game::deleteStack(StackId id) {
+        // Remove the stack from the stacksByPos index.
+        auto &stack = getStack(id);
+        auto &inPos = impl->stacksByPos[stack.getPos()];
+        inPos.erase(std::find(inPos.begin(), inPos.end(), id));
+        if (inPos.empty()) {
+            impl->stacksByPos.erase(stack.getPos());
+        }
+
+        impl->stacks.erase(id);
+    }
+
+    std::optional<StackId> Game::getStackByKey(PlayerId owner, glm::uvec2 pos) const {
+        const auto &inPos = getStacksAtPos(pos);
+        for (const auto id : inPos) {
+            if (getStack(id).getOwner() == owner) {
+                return id;
+            }
+        }
+        return {};
+    }
+
+    static auto emptyStackVec = std::vector<StackId>();
+
+    const std::vector<StackId> &Game::getStacksAtPos(glm::uvec2 pos) const {
+        if (impl->stacksByPos.contains(pos)) {
+            return impl->stacksByPos[pos];
+        } else {
+            return emptyStackVec;
+        }
+    }
+
+    const Stack &Game::getStack(StackId id) const {
+        assert(impl->stacks.id_is_valid(id));
+        return impl->stacks.id_value(id);
+    }
+
+    Stack &Game::getStack(StackId id) {
+        assert(impl->stacks.id_is_valid(id));
+        return impl->stacks.id_value(id);
     }
 
     Game::~Game() = default;

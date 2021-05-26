@@ -45,7 +45,11 @@ namespace rip {
         return *best;
     }
 
-    void Stack::update(const Game &game) {
+    glm::uvec2 Stack::getPos() const {
+        return pos;
+    }
 
+    PlayerId Stack::getOwner() const {
+        return owner;
     }
 }

@@ -11,6 +11,7 @@ namespace rip {
     typedef std::pair<unsigned long, unsigned long> PlayerId;
     typedef std::pair<unsigned long, unsigned long> CityId;
     typedef std::pair<unsigned long, unsigned long> UnitId;
+    typedef std::pair<unsigned long, unsigned long> StackId;
     typedef std::pair<unsigned long, unsigned long> TradeRouteId;
 }
 

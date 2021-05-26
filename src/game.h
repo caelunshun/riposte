@@ -27,6 +27,7 @@ namespace rip {
     class CultureMap;
     class TradeRoutes;
     class Combat;
+    class Stack;
 
     class Game {
         class _impl;
@@ -90,7 +91,6 @@ namespace rip {
         UnitId addUnit(Unit unit);
         const Unit &getUnit(UnitId id) const;
         Unit &getUnit(UnitId id);
-        Unit *getUnitAtPosition(glm::uvec2 location);
         void killUnit(UnitId id);
         // Enqueues a unit to be killed as soon as possible.
         void deferKillUnit(UnitId id);
@@ -114,6 +114,17 @@ namespace rip {
         void addCombat(Combat &combat);
 
         Era getEra() const;
+
+        void onUnitMoved(UnitId unitID, std::optional<glm::uvec2> oldPos, glm::uvec2 newPos);
+
+        // Creates a new stack. If a stack with the same owner and position exists,
+        // does nothing and returns the existing stack.
+        StackId createStack(PlayerId owner, glm::uvec2 pos);
+        void deleteStack(StackId id);
+        std::optional<StackId> getStackByKey(PlayerId owner, glm::uvec2 pos) const;
+        const std::vector<StackId> &getStacksAtPos(glm::uvec2 pos) const;
+        const Stack &getStack(StackId id) const;
+        Stack &getStack(StackId id);
     };
 }
 

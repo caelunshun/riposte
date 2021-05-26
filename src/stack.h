@@ -31,8 +31,8 @@ namespace rip {
         // Gets the unit with the highest combat strength.
         UnitId getBestUnit(const Game &game) const;
 
-        // Ensures that the stack is up to date.
-        void update(const Game &game);
+        glm::uvec2 getPos() const;
+        PlayerId getOwner() const;
     };
 }
 
