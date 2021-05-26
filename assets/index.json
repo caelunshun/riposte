@@ -215,6 +215,46 @@
     "loader": "image"
   },
   {
+    "path": "icon/unit_head/warrior.png",
+    "id": "icon/unit_head/warrior",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/settler.png",
+    "id": "icon/unit_head/settler",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/worker.png",
+    "id": "icon/unit_head/worker",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/archer.png",
+    "id": "icon/unit_head/archer",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/scout.png",
+    "id": "icon/unit_head/scout",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/axeman.png",
+    "id": "icon/unit_head/axeman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/chariot.png",
+    "id": "icon/unit_head/chariot",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/horse_archer.png",
+    "id": "icon/unit_head/horse_archer",
+    "loader": "image"
+  },
+  {
     "path": "tech/agriculture.json",
     "id": "tech/agriculture",
     "loader": "tech"
