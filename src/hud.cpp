@@ -15,9 +15,9 @@
 #include <iomanip>
 
 namespace rip {
-    Hud::Hud(const Assets &assets, NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnitPath(std::vector<glm::uvec2>()) {
-        goldIcon = std::dynamic_pointer_cast<Image>(assets.get("icon/gold"));
-        beakerIcon = std::dynamic_pointer_cast<Image>(assets.get("icon/beaker"));
+    Hud::Hud(std::shared_ptr<Assets> assets, NVGcontext *vg, nk_context *nk) : vg(vg), nk(nk), selectedUnitPath(std::vector<glm::uvec2>()), assets(assets) {
+        goldIcon = std::dynamic_pointer_cast<Image>(assets->get("icon/gold"));
+        beakerIcon = std::dynamic_pointer_cast<Image>(assets->get("icon/beaker"));
     }
 
     void Hud::paintPath(Game &game, const Stack &stack, glm::uvec2 start, const Path &path) {
@@ -283,6 +283,7 @@ namespace rip {
         paintMessages(game);
         paintTopLeftHud(game);
         paintScoreHud(game);
+        paintStackSelectionBar(game);
     }
 
     void Hud::trySetSelectedPath(Game &game, glm::uvec2 from, glm::uvec2 to) {
@@ -597,5 +598,55 @@ namespace rip {
             textCursor += 30;
         }
         nvgReset(vg);
+    }
+
+    void Hud::paintStackSelectionBar(Game &game) {
+        if (!selectedStack.has_value()) return;
+        const auto &stack = game.getStack(*selectedStack);
+
+        // Paint icon for each unit in the stack.
+        glm::vec2 pos(200, game.getCursor().getWindowSize().y - 140);
+        for (const auto unitID : stack.getUnits()) {
+            const auto &unit = game.getUnit(unitID);
+            const auto iconWidth = 35;
+            const auto padding = 7;
+
+            nvgBeginPath(vg);
+            nvgRect(vg, pos.x, pos.y, iconWidth, iconWidth);
+
+            nvgFillColor(vg, nvgRGB(80, 80, 80));
+            nvgFill(vg);
+
+            auto iconID = "icon/unit_head/" + unit.getKind().id;
+            const auto icon = std::dynamic_pointer_cast<Image>(assets->get(iconID));
+            const auto paint = nvgImagePattern(vg, pos.x, pos.y, iconWidth, iconWidth, 0, icon->id, 1);
+            nvgFillPaint(vg, paint);
+            nvgFill(vg);
+
+            nvgStrokeColor(vg, nvgRGB(0, 0, 0));
+            nvgStrokeWidth(vg, 1);
+            nvgStroke(vg);
+
+            const float circleRadius = 5;
+            const glm::vec2 circlePos(pos.x + iconWidth - circleRadius / 2, pos.y + circleRadius / 2);
+            nvgBeginPath(vg);
+            nvgCircle(vg, circlePos.x, circlePos.y, circleRadius);
+
+            NVGcolor circleColor;
+            if (unit.getMovementLeft() <= 0.1) {
+                circleColor = nvgRGB(231, 60, 62);
+            } else if (unit.getMovementLeft() == unit.getKind().movement) {
+                circleColor = nvgRGB(68, 194, 113);
+            } else {
+                circleColor = nvgRGB(254, 221, 0);
+            }
+            nvgFillColor(vg, circleColor);
+            nvgFill(vg);
+            nvgStrokeColor(vg, nvgRGB(0, 0, 0));
+            nvgStrokeWidth(vg, 0.8);
+            nvgStroke(vg);
+
+            pos.x += iconWidth + padding;
+        }
     }
 }

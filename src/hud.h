@@ -31,6 +31,7 @@ namespace rip {
     class Hud {
         NVGcontext *vg;
         nk_context *nk;
+        std::shared_ptr<Assets> assets;
 
         std::optional<StackId> selectedStack;
         std::vector<UnitId> selectedUnits;
@@ -53,6 +54,8 @@ namespace rip {
         void paintCityBuildPrompt(Game &game, CityId cityID);
         void paintPath(Game &game, const Stack &stack, glm::uvec2 start, const Path &path);
 
+        void paintStackSelectionBar(Game &game);
+
         void paintResearchBar(Game &game);
 
         void paintScoreHud(Game &game);
@@ -67,7 +70,7 @@ namespace rip {
         void paintTopLeftHud(Game &game);
 
     public:
-        Hud(const Assets &assets, NVGcontext *vg, nk_context *nk);
+        Hud(std::shared_ptr<Assets> assets, NVGcontext *vg, nk_context *nk);
 
         // Renders the UI and handles input.
         void update(Game &game);
