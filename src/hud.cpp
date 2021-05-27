@@ -515,10 +515,10 @@ namespace rip {
                         nk_label(nk, ("Cost: " + std::to_string(tech->cost)).c_str(), NK_TEXT_ALIGN_LEFT);
 
                         for (const auto &unit : tech->unlocksUnits) {
-                            nk_label(nk, ("* Can train a " + unit->name).c_str(), NK_TEXT_ALIGN_LEFT);
+                            nk_label(nk, ("* Can train " + std::string(article(unit->name)) + " " + unit->name).c_str(), NK_TEXT_ALIGN_LEFT);
                         }
                         for (const auto &improvement : tech->unlocksImprovements) {
-                            nk_label(nk, ("* Can build a " + improvement).c_str(), NK_TEXT_ALIGN_LEFT);
+                            nk_label(nk, ("* Can build " + std::string(article(improvement)) + " " + improvement).c_str(), NK_TEXT_ALIGN_LEFT);
                         }
                         for (const auto &leadsTo : tech->leadsTo) {
                             nk_label(nk, ("* Leads to " + leadsTo->name).c_str(), NK_TEXT_ALIGN_LEFT);
