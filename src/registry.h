@@ -96,6 +96,8 @@ namespace rip {
         std::vector<std::string> resources;
         // Specialized combat bonuses.
         std::vector<CombatBonus> combatBonuses;
+        // Category of the unit - melee, mounted, gunpowder, etc.
+        std::string category;
 
         friend void from_json(const nlohmann::json &nlohmann_json_j, UnitKind &nlohmann_json_t) {
             nlohmann_json_j.at("id").get_to(nlohmann_json_t.id);
@@ -114,6 +116,8 @@ namespace rip {
             if (nlohmann_json_j.contains("combatBonuses")) {
                 nlohmann_json_j.at("combatBonuses").get_to(nlohmann_json_t.combatBonuses);
             }
+
+            nlohmann_json_j.at("category").get_to(nlohmann_json_t.category);
         }
     };
 

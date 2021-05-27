@@ -10,6 +10,7 @@
 
 namespace rip {
     class Game;
+    class Unit;
 
     // An ongoing combat event.
     class Combat {
@@ -26,6 +27,9 @@ namespace rip {
         float getNextRoundTime() const;
 
         void doRound(Game &game);
+
+        // Gets a unit's strength with all bonuses applied.
+        double getUnitStrength(const Game &game, const Unit &unit, const Unit &opponent);
 
     public:
         Combat(UnitId attacker, UnitId defender, const Game &game);

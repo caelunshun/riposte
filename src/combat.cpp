@@ -11,14 +11,44 @@
 namespace rip {
     const float roundTime = 0.4;
 
-    Combat::Combat(UnitId attacker, UnitId defender, const Game &game) : attackerID(attacker), defenderID(defender) {
-        assert(attacker != defender);
-        startingAttackerStrength = game.getUnit(attacker).getCombatStrength();
-        startingDefenderStrength = game.getUnit(defender).getCombatStrength();
+    Combat::Combat(UnitId attackerID, UnitId defenderID, const Game &game) : attackerID(attackerID), defenderID(defenderID) {
+        assert(attackerID != defenderID);
+        const auto &attacker = game.getUnit(attackerID);
+        const auto &defender = game.getUnit(defenderID);
+        startingAttackerStrength = getUnitStrength(game, attacker, defender);
+        startingDefenderStrength = getUnitStrength(game, defender, attacker);
 
         if (startingDefenderStrength == 0 || startingAttackerStrength == 0) {
             finished = true;
         }
+    }
+
+    double Combat::getUnitStrength(const Game &game, const Unit &unit, const Unit &opponent) {
+        double baseStrength = unit.getCombatStrength();
+
+        bool defending = unit.getID() == defenderID;
+        bool attacking = unit.getID() == attackerID;
+        assert(defending || attacking);
+
+        // Apply a percent bonus to the base strength,
+        // based on the unit's combatBonuses.
+        int percentBonus = 0;
+        for (const CombatBonus &bonus : unit.getKind().combatBonuses) {
+            if ((defending && bonus.onlyOnAttack) || (attacking && bonus.onlyOnDefense)) {
+                continue;
+            }
+            if (game.getCityAtLocation(unit.getPos())) {
+                percentBonus += bonus.whenInCityBonus;
+            }
+            if (opponent.getKind().id == bonus.unit) {
+                percentBonus += bonus.againstUnitBonus;
+            }
+            if (opponent.getKind().category == bonus.unitCategory) {
+                percentBonus += bonus.againstUnitCategoryBonus;
+            }
+        }
+
+        return baseStrength + (percentBonus / 100.0) * baseStrength;
     }
 
     float Combat::getNextRoundTime() const {
