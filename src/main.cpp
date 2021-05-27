@@ -6,6 +6,7 @@
 #include "ui.h"
 #include "audio.h"
 #include "unit.h"
+#include "event.h"
 #include "player.h"
 
 #include <iostream>
@@ -100,7 +101,7 @@ int main() {
     assets->addLoader("sound", std::make_unique<rip::AudioLoader>(audio));
     assets->loadAssetsDir("assets");
 
-    audio->addSounds(*assets);
+    audio->addSounds(assets);
 
     auto techTree = std::make_shared<rip::TechTree>(*assets, *registry);
 
@@ -155,6 +156,21 @@ int main() {
             hud.handleKey(game, event);
             keyEvents.pop_front();
         }
+
+        // Handle and clear events.
+        auto &events = game.getEvents();
+        for (auto &event : events) {
+            auto sound = event->getAudioID(game.getEra());
+            if (sound.has_value()) {
+                audio->playSound(*sound);
+            }
+
+            auto message = event->getMessage();
+            if (message.has_value()) {
+                hud.pushMessage(std::move(message->text));
+            }
+        }
+        events.clear();
     }
 
     return 0;

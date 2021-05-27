@@ -403,5 +403,20 @@
     "path": "music/future/victory_and_death.ogg",
     "id": "music/future/victory_and_death",
     "loader": "sound"
+  },
+  {
+    "path": "sound/event/city_capture.wav",
+    "id": "sound/event/city_capture",
+    "loader": "sound"
+  },
+  {
+    "path": "sound/event/combat_defeat.wav",
+    "id": "sound/event/combat_defeat",
+    "loader": "sound"
+  },
+  {
+    "path": "sound/event/combat_victory.wav",
+    "id": "sound/event/combat_victory",
+    "loader": "sound"
   }
 ]

@@ -20,9 +20,10 @@ namespace rip {
         rodio = rodio_new();
     }
 
-    void AudioManager::addSounds(const Assets &assets) {
+    void AudioManager::addSounds(std::shared_ptr<Assets> assets) {
+        this->assets = assets;
         std::regex eraRegex("music/(.+)/(.+)");
-        for (const auto &entry : assets.getAllWithIDs<SoundAsset>()) {
+        for (const auto &entry : assets->getAllWithIDs<SoundAsset>()) {
             auto &id = entry.first;
             auto &sound = entry.second;
 
@@ -49,6 +50,11 @@ namespace rip {
             currentMusic = rodio_start_sound(rodio, sound->handle);
             currentMusicEra = currentEra;
         }
+    }
+
+    void AudioManager::playSound(const std::string &id) {
+        auto sound = std::dynamic_pointer_cast<SoundAsset>(assets->get(id));
+        rodio_start_sound(rodio, sound->handle);
     }
 
     void AudioManager::update(const Game &game) {

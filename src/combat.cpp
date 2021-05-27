@@ -6,6 +6,7 @@
 #include "combat.h"
 #include "game.h"
 #include "unit.h"
+#include "event.h"
 
 namespace rip {
     const float roundTime = 0.4;
@@ -72,11 +73,28 @@ namespace rip {
         attacker.setInCombat(false);
         defender.setInCombat(false);
 
+        UnitId winner;
+
         if (attacker.shouldDie() || attacker.getCombatStrength() == 0) {
             game.deferKillUnit(attackerID);
+            winner = defenderID;
         } else if (defender.shouldDie() || defender.getCombatStrength() == 0) {
             game.deferKillUnit(defenderID);
             attacker.moveTo(defender.getPos(), game);
+            winner = attackerID;
+        }
+
+        if (attackerID == game.getThePlayerID() || defenderID == game.getThePlayerID()) {
+            UnitId enemy;
+            UnitId ours;
+            if (attackerID == game.getThePlayerID()) { enemy = defenderID; ours = attackerID; }
+            else { enemy = attackerID; ours = defenderID; }
+            game.addEvent(std::make_unique<CombatEvent>(
+                        winner == game.getThePlayerID(),
+                        game.getPlayer(game.getUnit(enemy).getOwner()).getCiv().adjective,
+                        game.getUnit(ours).getKind().name,
+                        game.getUnit(enemy).getKind().name
+                    ));
         }
     }
 

@@ -22,6 +22,7 @@ namespace rip {
     };
 
     class AudioManager {
+        std::shared_ptr<Assets> assets;
         std::optional<InstanceHandle*> currentMusic;
         Era currentMusicEra = Era::Ancient;
 
@@ -34,7 +35,9 @@ namespace rip {
 
         AudioManager();
 
-        void addSounds(const Assets &assets);
+        void addSounds(std::shared_ptr<Assets> assets);
+
+        void playSound(const std::string &id);
 
         void update(const Game &game);
     };

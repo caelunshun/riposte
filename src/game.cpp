@@ -12,6 +12,7 @@
 #include "tile.h"
 #include "combat.h"
 #include "stack.h"
+#include "event.h"
 
 #include <absl/container/flat_hash_map.h>
 
@@ -52,6 +53,8 @@ namespace rip {
         TradeRoutes tradeRoutes;
 
         std::vector<Combat> ongoingCombats;
+
+        std::vector<std::unique_ptr<Event>> events;
 
         _impl(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry)
         : theMap(static_cast<size_t>(mapWidth) * mapHeight),
@@ -445,6 +448,14 @@ namespace rip {
 
     rea::versioned_slot_map<Stack> &Game::getStacks() {
         return impl->stacks;
+    }
+
+    void Game::addEvent(std::unique_ptr<Event> event) {
+        getEvents().push_back(std::move(event));
+    }
+
+    std::vector<std::unique_ptr<Event>> &Game::getEvents() {
+        return impl->events;
     }
 
     Game::~Game() = default;

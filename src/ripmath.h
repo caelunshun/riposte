@@ -51,6 +51,9 @@ namespace rip {
 
         float getPosInternal() const;
     };
+
+    // Returns "a" or "an" depending on the proceeding noun or adjective.
+    const char *article(const std::string &noun);
 }
 
 #endif //RIPOSTE_RIPMATH_H

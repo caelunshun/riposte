@@ -7,6 +7,7 @@
 #include "game.h"
 #include "tile.h"
 #include "trade.h"
+#include "event.h"
 #include <string>
 #include <utility>
 #include <iostream>
@@ -311,6 +312,11 @@ namespace rip {
         buildTask = {};
         owner = newOwnerID;
         game.getCultureMap().onCityCreated(game, id);
+
+        game.addEvent(std::make_unique<CityCapturedEvent>(
+                name,
+                newOwner.getCiv().name
+                ));
     }
 }
 

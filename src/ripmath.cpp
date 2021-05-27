@@ -105,5 +105,18 @@ namespace rip {
     bool SmoothAnimation::isComplete() {
         return getPosInternal() >= glm::distance(fromPos, targetPos);
     }
+
+    const char *article(const std::string &noun) {
+        if (noun.empty()) {
+            return "a";
+        }
+
+        char c = noun[0];
+        if (c == 'a' || c == 'o' || c == 'u' || c == 'e' || c == 'i') {
+            return "an";
+        } else {
+            return "a";
+        }
+    }
 }
 

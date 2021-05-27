@@ -28,6 +28,7 @@ namespace rip {
     class TradeRoutes;
     class Combat;
     class Stack;
+    class Event;
 
     class Game {
         class _impl;
@@ -126,6 +127,9 @@ namespace rip {
         const Stack &getStack(StackId id) const;
         Stack &getStack(StackId id);
         rea::versioned_slot_map<Stack> &getStacks();
+
+        void addEvent(std::unique_ptr<Event> event);
+        std::vector<std::unique_ptr<Event>> &getEvents();
     };
 }
 
