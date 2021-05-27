@@ -12,7 +12,7 @@
 namespace rip {
     typedef std::array<uint8_t, 3> Color;
 
-    static const Color colorBad = {231, 60, 62};
+    static const Color colorBad = {193, 0, 22};
     static const Color colorGood = {68, 194, 113};
 
     struct Message {

@@ -22,8 +22,9 @@ namespace rip {
     struct HudMessage {
         std::string text;
         float disappearTime;
+        std::array<uint8_t, 3> color;
 
-        HudMessage(std::string text, float disappearTime) : text(text), disappearTime(disappearTime) {}
+        HudMessage(std::string text, float disappearTime, std::array<uint8_t, 3> color) : text(text), disappearTime(disappearTime), color(color) {}
     };
 
     // Renders the UI overlay during the game.
@@ -86,7 +87,7 @@ namespace rip {
 
         void updateSelectedUnit(Game &game);
 
-        void pushMessage(std::string message);
+        void pushMessage(std::string message, std::array<uint8_t, 3> color);
 
         bool hasFocus(const Game &game) const;
     };

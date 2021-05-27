@@ -212,7 +212,7 @@ namespace rip {
         if (nk_button_label(nk, "Next Turn") && !hasFocus(game)) {
             if (game.getNextUnitToMove().has_value()) {
                 // Need to move all units first.
-                pushMessage("Move all your units before ending the turn!");
+                pushMessage("Move all your units before ending the turn!", {255,255,255});
                 updateSelectedUnit(game);
             } else {
                 game.advanceTurn();
@@ -233,19 +233,51 @@ namespace rip {
         nvgFontFace(vg, "default");
         nvgTextAlign(vg, NVG_ALIGN_CENTER | NVG_ALIGN_BASELINE);
 
+        const auto spacing = 20;
+
+        // Background pane.
+        // First we have to find the text bounds.
+        glm::vec2 pos(posX, posY);
+        glm::vec2 end = pos;
+        auto posYTemp = posY;
+        for (const auto &message : messages) {
+            float bounds[4];
+            nvgTextBounds(vg, posX, posYTemp, message.text.c_str(), nullptr, bounds);
+
+            if (pos.x > bounds[0]) {
+                pos.x = bounds[0];
+            }
+            if (pos.y > bounds[1]) {
+                pos.y = bounds[1];
+            }
+            if (end.x < bounds[2]) {
+                end.x = bounds[2];
+            }
+            if (end.y < bounds[3]) {
+                end.y = bounds[3];
+            }
+
+            posYTemp += spacing;
+        }
+
+        const auto padding = 5;
+        nvgBeginPath(vg);
+        nvgRect(vg, pos.x - padding, pos.y - padding, end.x - pos.x + padding, end.y - pos.y + padding);
+        nvgFillColor(vg, nvgRGBA(0, 0, 0, 150));
+        nvgFill(vg);
+
         for (const auto &message : messages) {
             float alpha = 1;
             float timeLeft =  message.disappearTime - glfwGetTime();
             if (timeLeft < 1) {
                 alpha = std::clamp(timeLeft, 0.0f, 1.0f);
             }
-            nvgFillColor(vg, nvgRGBA(255, 255, 255, static_cast<uint8_t>(alpha * 255.0f)));
+            auto color = message.color;
+            nvgFillColor(vg, nvgRGBA(color[0], color[1], color[2], static_cast<uint8_t>(alpha * 255.0f)));
 
-            float bounds[4];
-            nvgTextBounds(vg, 0, 0, message.text.c_str(), nullptr, bounds);
             nvgText(vg, posX, posY, message.text.c_str(), nullptr);
 
-            posY += bounds[3] + 14;
+            posY += spacing;
         }
 
         if (!messages.empty() && messages[0].disappearTime <= glfwGetTime()) {
@@ -425,8 +457,8 @@ namespace rip {
         }
     }
 
-    void Hud::pushMessage(std::string message) {
-        messages.emplace_front(message, glfwGetTime() + 7);
+    void Hud::pushMessage(std::string message, std::array<uint8_t, 3> color) {
+        messages.emplace_front(message, glfwGetTime() + 7, color);
     }
 
     void Hud::paintCityBuildPrompt(Game &game, CityId cityID) {

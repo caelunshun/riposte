@@ -167,7 +167,7 @@ int main() {
 
             auto message = event->getMessage();
             if (message.has_value()) {
-                hud.pushMessage(std::move(message->text));
+                hud.pushMessage(std::move(message->text), message->color);
             }
         }
         events.clear();
