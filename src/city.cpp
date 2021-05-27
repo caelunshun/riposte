@@ -317,6 +317,9 @@ namespace rip {
                 name,
                 newOwner.getCiv().name
                 ));
+
+        newOwner.recomputeScore(game);
+        oldOwner.recomputeScore(game);
     }
 }
 

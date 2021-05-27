@@ -106,8 +106,6 @@ namespace rip {
          void updateResearch(Game &game);
          void doEconomyTurn(Game &game);
 
-         void recomputeScore(Game &game);
-
          int getTotalPopulation(const Game &game);
 
      public:
@@ -157,6 +155,7 @@ namespace rip {
          void setSciencePercent(int percent, Game &game);
 
          int getScore() const;
+         void recomputeScore(Game &game);
 
          bool isAtWarWith(PlayerId player) const;
      };
