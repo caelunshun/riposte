@@ -5,5 +5,14 @@
   "movement": 2,
   "cost": 40,
   "techs": ["Animal Husbandry"],
-  "resources": ["Horse"]
+  "resources": ["Horse"],
+  "category": "mounted",
+  "combatBonuses": [
+    {
+      "type": "againstUnit",
+      "unit": "axeman",
+      "onlyOnAttack": true,
+      "bonusPercent": 100
+    }
+  ]
 }

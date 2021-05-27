@@ -4,5 +4,12 @@
   "strength": 3,
   "movement": 1,
   "cost": 40,
-  "techs": ["Archery"]
+  "techs": ["Archery"],
+  "category": "archery",
+  "combatBonuses": [
+    {
+      "type": "whenInCity",
+      "bonusPercent": 50
+    }
+  ]
 }

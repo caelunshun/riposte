@@ -31,6 +31,52 @@ namespace rip {
         NLOHMANN_DEFINE_TYPE_INTRUSIVE(CivKind, id, name, adjective, color, leader, cities);
     };
 
+    class ParseException : public std::exception {
+        std::string message;
+
+    public:
+        ParseException(std::string message) : message(std::move(message)) {}
+
+        const char *what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT override {
+            return message.c_str();
+        }
+    };
+
+    struct CombatBonus {
+        int whenInCityBonus = 0;
+        int againstUnitCategoryBonus = 0;
+        int againstUnitBonus = 0;
+        bool onlyOnAttack = false;
+        bool onlyOnDefense = false;
+        std::string unit;
+        std::string unitCategory;
+
+        friend void from_json(const nlohmann::json &json, CombatBonus &bonus) {
+            auto type = json.at("type").get<std::string>();
+            int *targetBonus = nullptr;
+            if (type == "whenInCity") {
+                targetBonus = &bonus.whenInCityBonus;
+            } else if (type == "againstUnit") {
+                targetBonus = &bonus.againstUnitBonus;
+                bonus.unit = json.at("unit").get<std::string>();
+            } else if (type == "againstUnitCategory") {
+                targetBonus = &bonus.againstUnitCategoryBonus;
+                bonus.unitCategory = json.at("category").get<std::string>();
+            } else {
+                throw ParseException("unrecognized combat bonus '" + type + "'");
+            }
+
+            *targetBonus = json.at("bonusPercent").get<int>();
+
+            if (json.contains("onlyOnAttack")) {
+                bonus.onlyOnAttack = json["onlyOnAttack"].get<bool>();
+            }
+            if (json.contains("onlyOnDefense")) {
+                bonus.onlyOnDefense = json["onlyOnDefense"].get<bool>();
+            }
+        }
+    };
+
     struct UnitKind : public Asset {
         // Unique string ID
         std::string id;
@@ -48,6 +94,8 @@ namespace rip {
         std::vector<std::string> techs;
         // Resources required to build the unit.
         std::vector<std::string> resources;
+        // Specialized combat bonuses.
+        std::vector<CombatBonus> combatBonuses;
 
         friend void from_json(const nlohmann::json &nlohmann_json_j, UnitKind &nlohmann_json_t) {
             nlohmann_json_j.at("id").get_to(nlohmann_json_t.id);
@@ -61,6 +109,10 @@ namespace rip {
             nlohmann_json_j.at("techs").get_to(nlohmann_json_t.techs);
             if (nlohmann_json_j.contains("resources")) {
                 nlohmann_json_j.at("resources").get_to(nlohmann_json_t.resources);
+            }
+
+            if (nlohmann_json_j.contains("combatBonuses")) {
+                nlohmann_json_j.at("combatBonuses").get_to(nlohmann_json_t.combatBonuses);
             }
         }
     };

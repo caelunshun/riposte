@@ -310,6 +310,7 @@ namespace rip {
         newOwner.registerCity(id);
         if (population > 1) --population;
         buildTask = {};
+        previousBuildTask = "";
         owner = newOwnerID;
         game.getCultureMap().onCityCreated(game, id);
 

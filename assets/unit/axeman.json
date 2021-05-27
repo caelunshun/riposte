@@ -5,5 +5,13 @@
   "movement": 1,
   "cost": 35,
   "techs": ["Bronze Working"],
-  "resources": ["Copper"]
+  "resources": ["Copper"],
+  "category": "melee",
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "category": "melee",
+      "bonusPercent": 50
+    }
+  ]
 }
