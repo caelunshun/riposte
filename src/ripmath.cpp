@@ -111,7 +111,7 @@ namespace rip {
             return "a";
         }
 
-        char c = noun[0];
+        char c = tolower(noun[0]);
         if (c == 'a' || c == 'o' || c == 'u' || c == 'e' || c == 'i') {
             return "an";
         } else {
