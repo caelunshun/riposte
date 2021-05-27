@@ -5,6 +5,7 @@
 #include "ripmath.h"
 #include <glm/glm.hpp>
 #include <algorithm>
+#include <string>
 
 namespace rip {
     double dist(glm::uvec2 a, glm::uvec2 b) {

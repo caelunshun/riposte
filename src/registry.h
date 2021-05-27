@@ -37,7 +37,7 @@ namespace rip {
     public:
         ParseException(std::string message) : message(std::move(message)) {}
 
-        const char *what() const _GLIBCXX_TXN_SAFE_DYN _GLIBCXX_USE_NOEXCEPT override {
+        const char *what() const noexcept override {
             return message.c_str();
         }
     };
