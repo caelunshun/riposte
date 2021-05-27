@@ -1,0 +1,17 @@
+{
+  "id": "spearman",
+  "name": "Spearman",
+  "strength": 4,
+  "movement": 1,
+  "cost": 35,
+  "techs": ["Bronze Working"],
+  "resources": ["Copper"],
+  "category": "melee",
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "category": "mounted",
+      "bonusPercent": 100
+    }
+  ]
+}
