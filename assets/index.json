@@ -175,6 +175,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/spearman.json",
+    "id": "unit/spearman",
+    "loader": "unit"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"
@@ -207,6 +212,11 @@
   {
     "path": "texture/unit/chariot.png",
     "id": "texture/unit/chariot",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/spearman.png",
+    "id": "texture/unit/spearman",
     "loader": "image"
   },
   {
@@ -255,6 +265,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/unit_head/spearman.png",
+    "id": "icon/unit_head/spearman",
+    "loader": "image"
+  },
+  {
     "path": "tech/agriculture.json",
     "id": "tech/agriculture",
     "loader": "tech"
@@ -297,6 +312,21 @@
   {
     "path": "tech/the_wheel.json",
     "id": "tech/the_wheel",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/alphabet.json",
+    "id": "tech/alphabet",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/iron_working.json",
+    "id": "tech/iron_working",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/writing.json",
+    "id": "tech/writing",
     "loader": "tech"
   },
   {
