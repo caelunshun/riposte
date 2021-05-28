@@ -125,9 +125,9 @@ namespace rip {
 
             if (game.getNumPlayers() == 1) {
                 game.setThePlayerID(playerID);
-            } //else { // DEBUG - AI
+            } else { // DEBUG - AI
                 p.enableAI();
-            // }
+            }
         }
     }
 
