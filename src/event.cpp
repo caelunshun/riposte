@@ -40,7 +40,7 @@ namespace rip {
 
     std::optional<Message> CityCapturedEvent::getMessage() {
         return Message(
-                captured + " has been captured by " + capturedByName + "!",
+                captured + " has been captured by the " + capturedByName + "!",
                 colorBad
                 );
     }
