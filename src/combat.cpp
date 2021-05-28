@@ -120,7 +120,7 @@ namespace rip {
             if (attacker.getOwner() == game.getThePlayerID()) { enemy = defenderID; ours = attackerID; }
             else { enemy = attackerID; ours = defenderID; }
             game.addEvent(std::make_unique<CombatEvent>(
-                        winner == game.getThePlayerID(),
+                        game.getUnit(winner).getOwner() == game.getThePlayerID(),
                         game.getPlayer(game.getUnit(enemy).getOwner()).getCiv().adjective,
                         game.getUnit(ours).getKind().name,
                         game.getUnit(enemy).getKind().name
