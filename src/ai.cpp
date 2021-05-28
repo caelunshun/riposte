@@ -31,6 +31,8 @@ namespace rip {
 
         virtual ~UnitAI() = default;
 
+        virtual void onDeath(Game &game, AIimpl &ai, Player &player) {}
+
         virtual void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) = 0;
 
         UnitId getUnitID() const {
@@ -69,6 +71,8 @@ namespace rip {
         PlayerId playerID;
         Rng rng;
 
+        absl::flat_hash_set<glm::uvec2, PosHash> claimedWorkerTiles;
+
         explicit AIimpl(PlayerId playerId) : playerID(playerId) {}
 
         std::unique_ptr<UnitAI> makeUnitAI(Unit &unit);
@@ -89,6 +93,7 @@ namespace rip {
                 }
             }
 
+            auto &player = game.getPlayer(playerID);
             if (!unitAIs.empty()) {
                 for (int i = unitAIs.size() - 1; i >= 0; i--) {
                     auto &unitAI = unitAIs.at(i);
@@ -96,6 +101,7 @@ namespace rip {
 
                     if (!game.getUnits().id_is_valid(unitID)) {
                         // Unit died - delete its AI.
+                        unitAI->onDeath(game, *this, player);
                         unitAIs.erase(unitAIs.begin() + i);
                         unitAISet.erase(unitID);
                         continue;
@@ -103,7 +109,6 @@ namespace rip {
 
                     auto &unit = game.getUnit(unitID);
                     unit.moveAlongCurrentPath(game);
-                    auto &player = game.getPlayer(playerID);
                     unitAI->doTurn(game, *this, player, unit);
                 }
             }
@@ -199,6 +204,10 @@ namespace rip {
             return distFactor + resourceFactor + suitabilityFactor;
         }
 
+        void onDeath(Game &game, AIimpl &ai, Player &player) override {
+            ai.claimedWorkerTiles.erase(targetPos);
+        }
+
         void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) override {
             auto &workCap = *unit.getCapability<WorkerCapability>();
 
@@ -206,6 +215,7 @@ namespace rip {
                 ai.log("worker started building " + targetTask->getImprovement().getName());
                 workCap.setTask(std::make_unique<BuildImprovementTask>(std::move(*targetTask)));
                 targetTask = {};
+                targetPos = {};
             }
 
             if (workCap.getTask() != nullptr) return;
@@ -218,6 +228,8 @@ namespace rip {
                 const auto &city = game.getCity(cityID);
                 for (const auto tilePos : getBigFatCross(city.getPos())) {
                     if (!game.containsTile(tilePos)) continue;
+                    if (ai.claimedWorkerTiles.contains(tilePos)) continue;
+
                     const auto &tile = game.getTile(tilePos);
                     for (auto &improvement : tile.getPossibleImprovements(game, tilePos)) {
                         if (!player.getTechs().isImprovementUnlocked(improvement->getName())) continue;
@@ -238,6 +250,7 @@ namespace rip {
                 auto path = computeShortestPath(game, unit.getPos(), bestTask->getPos(), {});
                 if (path.has_value()) {
                     ai.log("worker chose to build " + bestTask->getImprovement().getName());
+                    ai.claimedWorkerTiles.insert(bestTask->getPos());
 
                     targetPos = bestTask->getPos();
                     targetTask = std::move(bestTask);
