@@ -153,17 +153,16 @@ namespace rip {
             std::cout << "[ai-" << playerName << "] " << message << std::endl;
         }
 
-        // Gets the closest city (that we own) to the given position.
+        // Gets the closest city (owned by anyone) to the given position.
         std::pair<double, CityId> getDistanceToNearestCity(const Game &game, glm::uvec2 pos) {
             double bestDist = 1000000;
             CityId bestCity;
 
-            for (const auto cityID : getCities()) {
-                const auto &city = game.getCity(cityID);
+            for (const auto &city : game.getCities()) {
                 const auto d = dist(pos, city.getPos());
                 if (d < bestDist) {
                     bestDist = d;
-                    bestCity = cityID;
+                    bestCity = city.getID();
                 }
             }
 
@@ -402,7 +401,7 @@ namespace rip {
 
         void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) override {
             // Stay in the city if it needs protection.
-            const auto minCityUnits = 1;
+            const auto minCityUnits = 6;
             auto *city = game.getCityAtLocation(unit.getPos());
             if (city && city->getOwner() == ai.playerID) {
                 auto stackID = game.getStackByKey(ai.playerID, unit.getPos());
@@ -445,10 +444,10 @@ namespace rip {
         if (city.getBuildTask()) return;
 
         std::shared_ptr<UnitKind> unitToBuild;
-        if (buildIndex % 5 < 2) {
+        if ((buildIndex + 3) % 5 < 2) {
             // warrior
             unitToBuild = game.getRegistry().getUnits().at(1);
-        } else if (buildIndex % 5 < 4) {
+        } else if ((buildIndex + 3) % 5 < 4) {
             // worker
             unitToBuild = game.getRegistry().getUnits().at(2);
         } else {

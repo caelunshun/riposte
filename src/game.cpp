@@ -56,6 +56,8 @@ namespace rip {
 
         std::vector<std::unique_ptr<Event>> events;
 
+        bool inTurnEnd = false;
+
         _impl(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry)
         : theMap(static_cast<size_t>(mapWidth) * mapHeight),
         workedTiles(static_cast<size_t>(mapWidth) * mapHeight),
@@ -67,6 +69,7 @@ namespace rip {
     };
 
     void Game::advanceTurn() {
+        impl->inTurnEnd = true;
         for (auto &unit : impl->units) {
             unit.onTurnEnd(*this);
         }
@@ -89,6 +92,7 @@ namespace rip {
         impl->ongoingCombats.clear();
 
         ++(impl->turn);
+        impl->inTurnEnd = false;
     }
 
     std::optional<UnitId> Game::getNextUnitToMove() {
@@ -369,7 +373,11 @@ namespace rip {
     }
 
     void Game::addCombat(Combat &combat) {
-        impl->ongoingCombats.push_back(combat);
+        if (impl->inTurnEnd) {
+            combat.finish(*this);
+        } else {
+            impl->ongoingCombats.push_back(combat);
+        }
     }
 
     void Game::onUnitMoved(UnitId unitID, std::optional<glm::uvec2> oldPos, glm::uvec2 newPos) {

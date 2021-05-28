@@ -32,7 +32,7 @@ namespace rip {
         double getUnitStrength(const Game &game, const Unit &unit, const Unit &opponent);
 
     public:
-        Combat(UnitId attacker, UnitId defender, const Game &game);
+        Combat(UnitId attacker, UnitId defender, Game &game);
 
         // Advances combat by the given time.
         void advance(Game &game, float dt);

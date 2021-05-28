@@ -109,11 +109,11 @@ namespace rip {
     }
 
     bool Unit::wouldAttack(const Game &game, const Unit &other) const {
-        return game.isCheatMode() || (
+        return
             other.getID() != id
             && !other.shouldDie()
             && owner != other.getOwner()
-            && game.getPlayer(owner).isAtWarWith(other.getOwner()));
+            && game.getPlayer(owner).isAtWarWith(other.getOwner());
     }
 
     std::optional<UnitId> Unit::wouldAttackPos(const Game &game, glm::uvec2 target) const {

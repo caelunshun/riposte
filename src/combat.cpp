@@ -11,15 +11,21 @@
 namespace rip {
     const float roundTime = 0.4;
 
-    Combat::Combat(UnitId attackerID, UnitId defenderID, const Game &game) : attackerID(attackerID), defenderID(defenderID) {
+    Combat::Combat(UnitId attackerID, UnitId defenderID, Game &game) : attackerID(attackerID), defenderID(defenderID) {
         assert(attackerID != defenderID);
-        const auto &attacker = game.getUnit(attackerID);
-        const auto &defender = game.getUnit(defenderID);
+        auto &attacker = game.getUnit(attackerID);
+        auto &defender = game.getUnit(defenderID);
         startingAttackerStrength = getUnitStrength(game, attacker, defender);
         startingDefenderStrength = getUnitStrength(game, defender, attacker);
 
         if (startingDefenderStrength == 0 || startingAttackerStrength == 0) {
             finished = true;
+
+            if (startingAttackerStrength == 0) {
+                attacker.setHealth(0);
+            }
+            if (startingDefenderStrength == 0)
+                defender.setHealth(0);
         }
     }
 
