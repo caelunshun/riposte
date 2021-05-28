@@ -11,16 +11,11 @@
 namespace rip {
     class Game;
 
-    class LongTermBrain;
-    class ShortTermBrain;
-    class TacticalBrain;
+    class AIimpl;
 
     // Maintains the state for an AI player.
     class AI {
-        std::unique_ptr<LongTermBrain> longTermBrain;
-        std::unique_ptr<ShortTermBrain> shortTermBrain;
-        std::unique_ptr<TacticalBrain> tacticalBrain;
-        PlayerId playerID;
+        std::unique_ptr<AIimpl> impl;
 
     public:
         explicit AI(PlayerId playerID);

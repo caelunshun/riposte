@@ -19,265 +19,123 @@
 #include <absl/container/flat_hash_map.h>
 
 namespace rip {
-    // The AI consists of two different "brains," each with
-    // its own role. They are:
-    // 1. The long-term strategy. Maintains a "goal" for the next hundred turns
-    // or so. (See the Goal class.) Goals include expansion through peace, expansion
-    // through war, and economic recovery. This brain never interacts directly with
-    // the game state.
-    // 2. The short-term strategy. This is responsible for executing the goals of the long-term
-    // strategy. In particular, it determines what to build in cities, and it
-    // directs the tactical brain toward targets.
-    // 3. The tactical brain. This is responsible for actually moving units.
-    // It responds to high-level commands from the short-term strategy, like "attack this city"
-    // or "settle over there."
-
-    // A goal set by the long term brain.
-    struct Goal {
-        virtual ~Goal() = default;
-
-        virtual bool requestsSettlerExpansion() const {
-            return false;
-        }
-    };
-
-    // A goal to expand peacefully (through settlement)
-    struct ExpandPeacefully: public Goal {
-        bool requestsSettlerExpansion() const override {
-            return true;
-        }
-    };
-
-    // A goal to improve our economy.
-    struct EconomyGoal : public Goal {};
-
-    class LongTermBrain {
-        std::unique_ptr<Goal> goal;
-        PlayerId playerID;
+    // An AI that controls a single unit.
+    class UnitAI {
+    protected:
+        // The unit being controlled.
+        UnitId unitID;
 
     public:
-        LongTermBrain(PlayerId playerID) : playerID(playerID) {
-            goal = std::make_unique<ExpandPeacefully>();
-        }
+        explicit UnitAI(UnitId unitID) : unitID(unitID) {}
 
-        void update(Game &game) {
-            if (game.getPlayer(playerID).getCities().size() == 4) {
-                goal = std::make_unique<EconomyGoal>();
-            }
-        }
+        virtual ~UnitAI() = default;
 
-        const Goal &getGoal() const {
-            return *goal;
+        virtual void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) = 0;
+
+        UnitId getUnitID() const {
+            return unitID;
         }
     };
 
-    // A command created by the short term brain.
-    struct TacticalCommand {
-        virtual ~TacticalCommand() = default;
-    };
-
-    // Directs the tactical brain to settle a city at a location
-    // using the next possible settler.
-    struct SettleCityCommand : public TacticalCommand {
-        glm::uvec2 settleLocation;
-
-        SettleCityCommand(const glm::uvec2 &settleLocation) : settleLocation(settleLocation) {}
-    };
-
-    class ShortTermBrain {
-        std::deque<std::unique_ptr<TacticalCommand>> commands;
-        PlayerId playerID;
-
-        std::optional<glm::uvec2> getBestCityLocation(Game &game) {
-            // Breadth-first search on the capital.
-            const auto &player = game.getPlayer(playerID);
-            glm::uvec2 capitalPos;
-            if (player.getCities().empty()) {
-                for (const auto &unit : game.getUnits()) {
-                    if (unit.getOwner() == playerID) {
-                        capitalPos = unit.getPos();
-                        break;
-                    }
-                }
-            } else {
-                capitalPos = game.getCity(player.getCities().at(0)).getPos();
-            }
-
-            std::vector<glm::uvec2> cityPositions;
-            for (const auto &city : game.getCities()) {
-                cityPositions.push_back(city.getPos());
-            }
-
-            std::deque<glm::uvec2> queue;
-            queue.push_back(capitalPos);
-
-            using Pos = std::pair<uint32_t, uint32_t>;
-            absl::flat_hash_set<Pos> visited;
-
-            while (!queue.empty()) {
-                auto current = queue[0];
-                queue.pop_front();
-
-                bool isTooFar = false;
-                for (const auto otherPos : cityPositions) {
-                    if (dist(current, otherPos) <= 6) {
-                        isTooFar = true;
-                        break;
-                    }
-                }
-
-                if (!isTooFar) {
-                    return current;
-                }
-
-                // Add neighbors
-                for (const auto neighbor : getNeighbors(current)) {
-                    if (!game.containsTile(neighbor)) {
-                        continue;
-                    }
-
-                    const auto &tile = game.getTile(neighbor);
-                    if (tile.getTerrain() == Terrain::Ocean) {
-                        continue;
-                    }
-
-                    if (visited.contains(Pos(neighbor.x, neighbor.y))) {
-                        continue;
-                    }
-
-                    visited.emplace(neighbor.x, neighbor.y);
-                    queue.push_back(neighbor);
-                }
-            }
-
-            return std::optional<glm::uvec2>();
-        }
-
-        void handleGoal(Game &game, const Goal &goal) {
-            if (goal.requestsSettlerExpansion()) {
-                auto pos = getBestCityLocation(game);
-                if (pos.has_value()) {
-                    commands.push_back(std::make_unique<SettleCityCommand>(*pos));
-                }
-            }
-        }
-
-        std::unique_ptr<BuildTask> getBuildTask(Game &game, const Goal &goal) {
-            const auto &registry = game.getRegistry();
-            if (goal.requestsSettlerExpansion()) {
-                auto &settler = registry.getUnits().at(0);
-                return std::make_unique<UnitBuildTask>(settler);
-            } else {
-                auto &warrior = registry.getUnits().at(1);
-                return std::make_unique<UnitBuildTask>(warrior);
-            }
-        }
-
-        void setCityBuildTasks(Game &game, const Goal &goal) {
-            const auto &player = game.getPlayer(playerID);
-            for (const auto cityID : player.getCities()) {
-                auto &city = game.getCity(cityID);
-                if (!city.hasBuildTask()) {
-                    auto task = getBuildTask(game, goal);
-                    city.setBuildTask(std::move(task));
-                }
-            }
-        }
+    class AIimpl {
+        // A unit AI for each unit.
+        std::vector<std::unique_ptr<UnitAI>> unitAIs;
+        absl::flat_hash_set<UnitId> unitAISet;
 
     public:
-        ShortTermBrain(const PlayerId &playerId) : playerID(playerId) {}
-
-        void update(Game &game, const Goal &goal) {
-            handleGoal(game, goal);
-            setCityBuildTasks(game, goal);
-        }
-
-        bool hasCommand() {
-            return !commands.empty();
-        }
-
-        std::unique_ptr<TacticalCommand> popCommand() {
-            auto cmd = std::move(commands.at(0));
-            commands.pop_front();
-            return cmd;
-        }
-    };
-
-    class TacticalBrain {
+        // ID of the controlled player.
         PlayerId playerID;
+        Rng rng;
 
-        absl::flat_hash_map<UnitId, glm::uvec2> settlersDeploying;
+        explicit AIimpl(PlayerId playerId) : playerID(playerId) {}
 
-        void moveScouts(Game &game) {
-            Rng rng;
+        std::unique_ptr<UnitAI> makeUnitAI(Unit &unit);
+
+        void updateUnits(Game &game) {
+            // Add new unit AIs for newly created units.
             for (auto &unit : game.getUnits()) {
-                if (unit.getOwner() == playerID
-                    && !unit.hasCapability<FoundCityCapability>() && !unit.hasPath()) {
-                    std::optional<Path> path;
-                    while (!path.has_value()) {
-                        glm::uvec2 target(rng.u32(unit.getPos().x - 10, unit.getPos().x + 10),
-                                          rng.u32(unit.getPos().y - 10, unit.getPos().y + 10));
-                        path = computeShortestPath(game, unit.getPos(), target, std::optional<VisibilityMap>());
+                if (unit.getOwner() != playerID) continue;
+
+                if (!unitAISet.contains(unit.getID())) {
+                    auto ai = makeUnitAI(unit);
+                    unitAIs.push_back(std::move(ai));
+                    unitAISet.insert(unit.getID());
+                }
+            }
+
+            if (!unitAIs.empty()) {
+                for (int i = unitAIs.size() - 1; i >= 0; i--) {
+                    auto &unitAI = unitAIs.at(i);
+                    const auto unitID = unitAI->getUnitID();
+
+                    if (!game.getUnits().id_is_valid(unitID)) {
+                        // Unit died - delete its AI.
+                        unitAIs.erase(unitAIs.begin() + i);
+                        unitAISet.erase(unitID);
+                        continue;
                     }
+
+                    auto &unit = game.getUnit(unitID);
+                    unit.moveAlongCurrentPath(game);
+                    auto &player = game.getPlayer(playerID);
+                    unitAI->doTurn(game, *this, player, unit);
+                }
+            }
+        }
+
+        void doTurn(Game &game) {
+            updateUnits(game);
+        }
+    };
+
+    class SettlerAI : public UnitAI {
+    public:
+        SettlerAI(const UnitId &unitId) : UnitAI(unitId) {}
+
+        ~SettlerAI() override = default;
+
+        void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) override {
+            auto &foundCityCap = *unit.getCapability<FoundCityCapability>();
+            if (player.getCities().empty()) {
+                // Settle NOW.
+                foundCityCap.foundCity(game);
+            }
+        }
+    };
+
+    class ReconUnitAI : public UnitAI {
+    public:
+        ReconUnitAI(const UnitId &unitId) : UnitAI(unitId) {}
+
+        ~ReconUnitAI() override = default;
+
+        void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) override {
+            int attempts = 0;
+            while (!unit.hasPath() && attempts < 10) {
+                glm::uvec2 target(unit.getPos().x + static_cast<int>(ai.rng.u32(0, 20)) - 10,
+                                  unit.getPos().y + static_cast<int>(ai.rng.u32(0, 20)) - 10);
+                auto path = computeShortestPath(game, unit.getPos(), target, {});
+                if (path.has_value()) {
                     unit.setPath(std::move(*path));
                 }
-            }
-        }
 
-    public:
-        TacticalBrain(const PlayerId &playerId) : playerID(playerId) {}
-
-        void handleCommand(Game &game, const TacticalCommand &command) {
-            auto asSettle = dynamic_cast<const SettleCityCommand*>(&command);
-            if (asSettle) {
-                for (auto &unit : game.getUnits()) {
-                    if (unit.getOwner() != playerID) {
-                        continue;
-                    }
-                    if (settlersDeploying.contains(unit.getID())) {
-                        continue;
-                    }
-                    if (unit.hasCapability<FoundCityCapability>()) {
-                        auto path = computeShortestPath(game, unit.getPos(), asSettle->settleLocation, std::optional<VisibilityMap>());
-                        if (path.has_value()) {
-                            unit.setPath(std::move(*path));
-                            settlersDeploying[unit.getID()] = asSettle->settleLocation;
-                            break;
-                        }
-                    }
-                }
-            }
-        }
-
-        void update(Game &game) {
-            moveScouts(game);
-            for (auto &unit : game.getUnits()) {
-                if (unit.getOwner() == playerID) {
-                    unit.moveAlongCurrentPath(game);
-                }
-            }
-
-            std::vector<UnitId> toRemove;
-            for (auto &pair : settlersDeploying) {
-                auto &unit = game.getUnit(pair.first);
-                if (unit.getPos() == pair.second) {
-                    unit.getCapability<FoundCityCapability>()->foundCity(game);
-                    toRemove.push_back(unit.getID());
-                    std::cout << "[ai] founded city" << std::endl;
-                }
-            }
-
-            for (auto id : toRemove) {
-                settlersDeploying.erase(id);
+                ++attempts;
             }
         }
     };
 
-    AI::AI(PlayerId playerID) : playerID(playerID),
-        longTermBrain(std::make_unique<LongTermBrain>(playerID)),
-        shortTermBrain(std::make_unique<ShortTermBrain>(playerID)),
-        tacticalBrain(std::make_unique<TacticalBrain>(playerID)) {
+    std::unique_ptr<UnitAI> AIimpl::makeUnitAI(Unit &unit) {
+        if (unit.hasCapability<FoundCityCapability>()) {
+            return std::make_unique<SettlerAI>(unit.getID());
+        } else {
+            return std::make_unique<ReconUnitAI>(unit.getID());
+        }
+    }
 
+    AI::AI(PlayerId playerID) : impl(std::make_unique<AIimpl>(playerID)) {}
+
+    void AI::doTurn(Game &game) {
+        impl->doTurn(game);
     }
 
     AI::~AI() = default;
@@ -285,14 +143,4 @@ namespace rip {
     AI::AI(AI &&other) = default;
 
     AI &AI::operator=(AI &&other) noexcept = default;
-
-    void AI::doTurn(Game &game) {
-        longTermBrain->update(game);
-        const auto &goal = longTermBrain->getGoal();
-        shortTermBrain->update(game, goal);
-        while (shortTermBrain->hasCommand()) {
-            tacticalBrain->handleCommand(game, *shortTermBrain->popCommand());
-        }
-        tacticalBrain->update(game);
-    }
 }
