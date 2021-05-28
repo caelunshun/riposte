@@ -280,7 +280,7 @@ namespace rip {
             posY += spacing;
         }
 
-        if (!messages.empty() && messages[0].disappearTime <= glfwGetTime()) {
+        while (!messages.empty() && messages[0].disappearTime <= glfwGetTime()) {
             messages.pop_front();
         }
     }

@@ -107,9 +107,10 @@ namespace rip {
         const auto &image = std::dynamic_pointer_cast<Image>(assets.get(assetID));
         nvgBeginPath(vg);
         auto aspectRatio = 640.0f / 512;
-        auto width = 60.0f;
+        auto width = 30.0f;
         auto height = aspectRatio * width;
-        offset += 50.0f;
+        offset.y += 15;
+        offset.x += 50;
         offset -= glm::vec2(width, height) / 2.0f;
         nvgRect(vg, offset.x, offset.y, width, height);
         auto paint = nvgImagePattern(vg, offset.x, offset.y, width, height, 0, image->id, 1);
