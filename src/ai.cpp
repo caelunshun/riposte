@@ -12,6 +12,7 @@
 #include "path.h"
 #include "player.h"
 #include "worker.h"
+#include "traversal.h"
 #include <glm/glm.hpp>
 #include <deque>
 #include <iostream>
@@ -72,6 +73,7 @@ namespace rip {
         Rng rng;
 
         absl::flat_hash_set<glm::uvec2, PosHash> claimedWorkerTiles;
+        absl::flat_hash_set<glm::uvec2, PosHash> claimedSettlerTiles;
 
         explicit AIimpl(PlayerId playerId) : playerID(playerId) {}
 
@@ -149,6 +151,23 @@ namespace rip {
             std::cout << "[ai-" << playerName << "] " << message << std::endl;
         }
 
+        // Gets the closest city (that we own) to the given position.
+        std::pair<double, CityId> getDistanceToNearestCity(const Game &game, glm::uvec2 pos) {
+            double bestDist = 1000000;
+            CityId bestCity;
+
+            for (const auto cityID : getCities()) {
+                const auto &city = game.getCity(cityID);
+                const auto d = dist(pos, city.getPos());
+                if (d > bestDist) {
+                    bestDist = d;
+                    bestCity = cityID;
+                }
+            }
+
+            return {bestDist, bestCity};
+        }
+
         void doTurn(Game &game) {
             auto &player = game.getPlayer(playerID);
             playerName = player.getCiv().leader;
@@ -161,17 +180,127 @@ namespace rip {
     // UNIT
 
     class SettlerAI : public UnitAI {
+        std::optional<glm::uvec2> targetPos;
+        absl::flat_hash_set<glm::uvec2, PosHash> blacklist;
+
     public:
         SettlerAI(const UnitId &unitId) : UnitAI(unitId) {}
 
         ~SettlerAI() override = default;
 
+        // Returns a rating for a tile.
+        double rateCityLocation(Game &game, AIimpl &ai, Unit &unit, const Tile &tile, glm::uvec2 tilePos) {
+            const double optimalDist = 6;
+            double distanceFactor = -abs(ai.getDistanceToNearestCity(game, tilePos).first - optimalDist) + 5;
+
+            double tileFactor = 0;
+            if (tile.getTerrain() == Terrain::Desert) {
+                tileFactor = -10;
+            }
+
+            double resourceFactor = 0;
+            for (const auto bfcTile : getBigFatCross(tilePos)) {
+                if (!game.containsTile(bfcTile)) continue;
+
+                if (game.getTile(bfcTile).hasResource()) {
+                    resourceFactor += 3;
+                }
+            }
+
+            double existingCityFactor = 0;
+            if (game.getCityAtLocation(tilePos)) {
+                existingCityFactor = -100000;
+            }
+
+            double blacklistFactor = 0;
+            if (blacklist.contains(tilePos)) {
+                blacklistFactor = -100000;
+            }
+
+            return distanceFactor + tileFactor + resourceFactor + existingCityFactor + blacklistFactor;
+        }
+
+        // Finds the best location to build a city based on rateCityLocation.
+        std::optional<glm::uvec2> findBestCityLocation(Game &game, AIimpl &ai, Player &player, Unit &unit) {
+            std::optional<glm::uvec2> result;
+            double bestRating;
+
+            const auto maxDistFromBorder = 10;
+
+            // Custom breadth-first search to track the distance from our cultural borders.
+            struct Entry {
+                glm::uvec2 pos;
+                int distFromBorder;
+
+                Entry(const glm::uvec2 &pos, int distFromBorder) : pos(pos), distFromBorder(distFromBorder) {}
+            };
+
+            std::deque<Entry> entries;
+            entries.emplace_back(game.getCity(player.getCapital()).getPos(), 0);
+
+            absl::flat_hash_set<glm::uvec2, PosHash> visited;
+
+            while (!entries.empty()) {
+                auto entry = entries[0];
+                entries.pop_front();
+
+                const double rating = rateCityLocation(game, ai, unit, game.getTile(entry.pos), entry.pos);
+                if (!result.has_value() || rating > bestRating) {
+                    result = entry.pos;
+                    bestRating = rating;
+                }
+
+                for (const auto neighborPos : getSideNeighbors(entry.pos)) {
+                    if (visited.contains(neighborPos)) continue;
+
+                    if (!game.containsTile(neighborPos)) continue;
+
+                    const auto &neighbor = game.getTile(neighborPos);
+                    if (neighbor.getTerrain() == Terrain::Ocean) continue;
+
+                    const auto owner = game.getCultureMap().getTileOwner(neighborPos);
+                    if (owner.has_value() && owner != ai.playerID) {
+                        // can't settle into opponent land
+                        continue;
+                    }
+
+                    Entry newEntry(neighborPos, entry.distFromBorder + 1);
+                    if (owner == ai.playerID) {
+                        newEntry.distFromBorder = 0;
+                    }
+
+                    if (newEntry.distFromBorder > maxDistFromBorder) continue;
+
+                    entries.push_back(newEntry);
+                    visited.insert(newEntry.pos);
+                }
+            }
+
+            return result;
+        }
+
         void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) override {
             auto &foundCityCap = *unit.getCapability<FoundCityCapability>();
-            if (player.getCities().empty()) {
+            if (player.getCities().empty() || (targetPos.has_value() && unit.getPos() == targetPos)) {
                 // Settle NOW.
-                foundCityCap.foundCity(game);
-                ai.log(" founded city");
+                if (foundCityCap.foundCity(game)) {
+                    ai.log(" founded city");
+                    return;
+                }
+            }
+
+            if (!targetPos.has_value()) {
+                targetPos = findBestCityLocation(game, ai, player, unit);
+                if (targetPos.has_value()) {
+                    auto path = computeShortestPath(game, unit.getPos(), *targetPos, {});
+                    if (path.has_value()) {
+                        unit.setPath(std::move(*path));
+                        ai.log("settler pathfinded to new city location");
+                    } else {
+                        blacklist.insert(*targetPos);
+                        targetPos = {};
+                    }
+                }
             }
         }
     };
@@ -297,12 +426,15 @@ namespace rip {
         if (city.getBuildTask()) return;
 
         std::shared_ptr<UnitKind> unitToBuild;
-        if (buildIndex % 3 <= 1) {
+        if (buildIndex % 5 < 3) {
             // warrior
             unitToBuild = game.getRegistry().getUnits().at(1);
-        } else {
+        } else if (buildIndex % 5 < 4) {
             // worker
             unitToBuild = game.getRegistry().getUnits().at(2);
+        } else {
+            // settler
+            unitToBuild = game.getRegistry().getUnits().at(0);
         }
 
         city.setBuildTask(std::make_unique<UnitBuildTask>(unitToBuild));
