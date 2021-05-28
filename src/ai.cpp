@@ -192,6 +192,7 @@ namespace rip {
         // Returns a rating for a tile.
         double rateCityLocation(Game &game, AIimpl &ai, Unit &unit, const Tile &tile, glm::uvec2 tilePos) {
             const double optimalDist = 6;
+            const auto minDist = 3;
             double distanceFactor = 2 * -pow(ai.getDistanceToNearestCity(game, tilePos).first - optimalDist, 2) + 5;
 
             double tileFactor = 0;
@@ -209,7 +210,7 @@ namespace rip {
             }
 
             double existingCityFactor = 0;
-            if (game.getCityAtLocation(tilePos)) {
+            if (ai.getDistanceToNearestCity(game, tilePos).first < minDist) {
                 existingCityFactor = -100000;
             }
 

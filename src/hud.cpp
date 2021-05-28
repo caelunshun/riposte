@@ -540,7 +540,7 @@ namespace rip {
             if (nk_widget_is_hovered(nk)) {
                 // Show tooltip.
                 if (nk_tooltip_begin(nk, 300)) {
-                    nk_layout_row_begin(nk, NK_STATIC, 100, 2);
+                    nk_layout_row_begin(nk, NK_STATIC, 150, 2);
                     nk_layout_row_push(nk, 30);
                     nk_spacing(nk, 1);
 
