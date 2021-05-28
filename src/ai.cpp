@@ -247,7 +247,7 @@ namespace rip {
                 entries.pop_front();
 
                 const double rating = rateCityLocation(game, ai, unit, game.getTile(entry.pos), entry.pos);
-                if (!result.has_value() || rating > bestRating) {
+                if (rating >= -100 && (!result.has_value() || rating > bestRating)) {
                     result = entry.pos;
                     bestRating = rating;
                 }

@@ -324,6 +324,6 @@ namespace rip {
     }
 
     bool Player::isAtWarWith(PlayerId player) const {
-        return player != getID();
+        return false;
     }
 }
