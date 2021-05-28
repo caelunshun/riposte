@@ -4,6 +4,7 @@
   "adjective": "Korean",
   "color": [190, 198, 192],
   "leader": "Yi Sun-sin",
+  "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "Seoul",
     "Peongchang",

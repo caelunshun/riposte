@@ -4,6 +4,7 @@
   "adjective": "Aztec",
   "color": [167, 225, 99],
   "leader": "Montezuma",
+  "startingTechs": ["Hunting", "Agriculture"],
   "cities": [
     "Tenochtitlan",
     "Tetzcoco",

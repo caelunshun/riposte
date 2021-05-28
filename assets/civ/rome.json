@@ -4,6 +4,7 @@
   "adjective": "Roman",
   "color": [78, 0, 142],
   "leader": "Julius Caesar",
+  "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "Rome",
     "Ariminum",

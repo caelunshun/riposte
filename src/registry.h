@@ -27,8 +27,10 @@ namespace rip {
         std::string leader;
         // A pool of city names to use
         std::vector<std::string> cities;
+        // List of starting tech names
+        std::vector<std::string> startingTechs;
 
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(CivKind, id, name, adjective, color, leader, cities);
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(CivKind, id, name, adjective, color, leader, cities, startingTechs);
     };
 
     class ParseException : public std::exception {

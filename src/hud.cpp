@@ -391,6 +391,7 @@ namespace rip {
     }
 
     void Hud::updateSelectedUnit(Game &game) {
+        return; // DEBUG - AI
         auto unit = game.getNextUnitToMove();
         selectedUnits.clear();
         if (unit.has_value()) {

@@ -4,6 +4,7 @@
   "adjective": "Chinese",
   "color": [106, 52, 96],
   "leader": "Han Wudi",
+  "startingTechs": ["Mining", "Agriculture"],
   "cities": [
     "Beijing",
     "Chang'an",

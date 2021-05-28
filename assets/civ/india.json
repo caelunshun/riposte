@@ -4,6 +4,7 @@
   "adjective": "Indian",
   "color": [226, 119, 205],
   "leader": "Ashoka the Great",
+  "startingTechs": ["The Wheel", "Hunting"],
   "cities": [
     "Delhi",
     "Mumbai",

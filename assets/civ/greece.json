@@ -4,6 +4,7 @@
   "adjective": "Greek",
   "color": [167, 198, 237],
   "leader": "Pericles",
+  "startingTechs": ["Mining", "Agriculture"],
   "cities": [
     "Athens",
     "Sparta",

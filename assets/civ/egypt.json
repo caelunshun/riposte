@@ -4,6 +4,7 @@
   "adjective": "Egyptian",
   "color": [248, 229, 154],
   "leader": "Ramesses II",
+  "startingTechs": ["Hunting", "Agriculture"],
   "cities": [
     "Cairo",
     "Alexandria",

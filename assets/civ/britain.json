@@ -4,6 +4,7 @@
   "adjective": "British",
   "color": [0, 119, 207],
   "leader": "Churchill",
+  "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "London",
     "Norwich",

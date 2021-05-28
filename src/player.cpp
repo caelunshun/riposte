@@ -13,7 +13,9 @@ namespace rip {
     Player::Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree)
         : username(std::move(username)), visibilityMap(mapWidth, mapHeight), civ(civ),
         techs(techTree) {
-
+        for (const auto &startingTechName : civ->startingTechs) {
+            techs.unlockTech(techTree->getTechs().at(startingTechName));
+        }
     }
 
     void Player::setID(PlayerId id) {

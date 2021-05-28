@@ -4,6 +4,7 @@
   "adjective": "Holy Roman",
   "color": [207, 127, 0],
   "leader": "Charlemagne",
+  "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "Aachen",
     "Prague",

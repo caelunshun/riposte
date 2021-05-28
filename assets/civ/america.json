@@ -4,6 +4,7 @@
   "adjective": "American",
   "color": [59, 63, 182],
   "leader": "Lincoln",
+  "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "Washington",
     "New York City",
