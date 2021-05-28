@@ -7,17 +7,17 @@
     218,
     37
   ],
-  "leader": "Yi Sun-sin",
-  "startingTechs": ["The Wheel", "Agriculture"],
+  "leader": "Pierre Trudeau",
+  "startingTechs": ["The Wheel", "Pottery"],
   "cities": [
-    "Ottowa",
-    "Peongchang",
-    "Busan",
-    "Incheon",
-    "Daegu",
-    "Gwangju",
-    "Daejeon",
-    "Ulsan",
-    "Changwon"
+    "Ottawa",
+    "Toronto",
+    "Montreal",
+    "Vancouver",
+    "Calgary",
+    "Quebec City",
+    "Hamilton",
+    "Winnipeg",
+    "Halifax"
   ]
 }

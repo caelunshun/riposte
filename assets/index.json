@@ -130,6 +130,11 @@
     "loader": "civ"
   },
   {
+    "path": "civ/canada.json",
+    "id": "civ/canada",
+    "loader": "civ"
+  },
+  {
     "path": "font/Merriweather-Regular.ttf",
     "id": "font/merriweather/regular",
     "loader": "font"
