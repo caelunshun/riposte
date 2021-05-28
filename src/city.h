@@ -89,6 +89,10 @@ namespace rip {
         bool canBuild(const Game &game, const City &builder) override;
 
         const std::string &getName() const override;
+
+        const std::shared_ptr<UnitKind> &getUnitKind() const {
+            return unitKind;
+        }
     };
 
     class City {

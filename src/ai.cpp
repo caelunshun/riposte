@@ -317,13 +317,16 @@ namespace rip {
 
         ~WorkerAI() override = default;
 
-        double rateTask(Game &game, Unit &unit, glm::uvec2 pos, const BuildImprovementTask &task) {
-            double distFactor = -(dist(unit.getPos(), pos) - 6);
+        double rateTask(Game &game, AIimpl &ai, Unit &unit, glm::uvec2 pos, const BuildImprovementTask &task) {
+            double distFactor = -dist(unit.getPos(), pos);
 
             double resourceFactor = 0;
             const auto &tile = game.getTile(pos);
+            if (tile.hasResource()) {
+                ai.log("worker detected resource: " + (*tile.getResource())->name);
+            }
             if (tile.hasImproveableResource(task.getImprovement().getName())) {
-                resourceFactor = 5;
+                resourceFactor = 10;
             }
 
             double suitabilityFactor = -2;
@@ -347,10 +350,11 @@ namespace rip {
                 ai.log("worker started building " + targetTask->getImprovement().getName());
                 workCap.setTask(std::make_unique<BuildImprovementTask>(std::move(*targetTask)));
                 targetTask = {};
-                targetPos = {};
             }
 
             if (workCap.getTask() != nullptr) return;
+
+            ai.claimedWorkerTiles.erase(targetPos);
 
             // Find the best task to complete, based on the values of rateTask().
             std::optional<BuildImprovementTask> bestTask;
@@ -369,7 +373,7 @@ namespace rip {
 
                         const auto buildTurns = improvement->getNumBuildTurns();
                         BuildImprovementTask task(buildTurns, tilePos, std::move(improvement));
-                        double rating = rateTask(game, unit, tilePos, task);
+                        double rating = rateTask(game, ai, unit, tilePos, task);
 
                         if (!bestTask.has_value() || rating > bestRating) {
                             bestTask = std::move(task);
@@ -443,10 +447,27 @@ namespace rip {
     void CityAI::updateTask(Game &game, AIimpl &ai, Player &player, City &city) {
         if (city.getBuildTask()) return;
 
+        int currentProtectionCount = 0;
+        auto stackID = game.getStackByKey(player.getID(), city.getPos());
+        if (stackID) {
+            currentProtectionCount = game.getStack(*stackID).getUnits().size();
+        }
+
         std::shared_ptr<UnitKind> unitToBuild;
-        if ((buildIndex + 3) % 5 < 2) {
-            // warrior
-            unitToBuild = game.getRegistry().getUnits().at(1);
+        if (buildIndex != 0 && (currentProtectionCount < 2 || (buildIndex + 3) % 5 < 3)) {
+            // best military unit we can build
+            std::optional<UnitBuildTask> bestTask;
+            for (const auto &unitKind : game.getRegistry().getUnits()) {
+                UnitBuildTask task(unitKind);
+                if (task.canBuild(game, city) &&
+                        (!bestTask.has_value() || unitKind->strength > bestTask->getUnitKind()->strength)) {
+                    bestTask = std::move(task);
+                }
+            }
+
+            if (bestTask.has_value()) {
+                unitToBuild = bestTask->getUnitKind();
+            }
         } else if ((buildIndex + 3) % 5 < 4) {
             // worker
             unitToBuild = game.getRegistry().getUnits().at(2);
@@ -455,8 +476,10 @@ namespace rip {
             unitToBuild = game.getRegistry().getUnits().at(0);
         }
 
-        city.setBuildTask(std::make_unique<UnitBuildTask>(unitToBuild));
-        ++buildIndex;
+        if (unitToBuild) {
+            city.setBuildTask(std::make_unique<UnitBuildTask>(unitToBuild));
+            ++buildIndex;
+        }
     }
 
     void CityAI::doTurn(Game &game, AIimpl &ai, Player &player, City &city) {
