@@ -4,6 +4,17 @@
   "adjective": "American",
   "color": [59, 63, 182],
   "leader": "Lincoln",
+  "leaders": [
+    {
+      "name": "Lincoln",
+      "aggressive": 4,
+      "nukemonger": 1,
+      "submissive": 4,
+      "paranoia": 7,
+      "expansiveness": 4,
+      "religious": 2
+    }
+  ],
   "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "Washington",

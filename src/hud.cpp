@@ -685,10 +685,24 @@ namespace rip {
 
             nvgFillColor(vg, nvgRGB(255, 255, 255));
             nvgText(vg, pos.x, textCursor, std::to_string(score).c_str(), nullptr);
-            float _bounds[4];
-            float advance = nvgTextBounds(vg, pos.x, textCursor, std::to_string(score).c_str(), nullptr, _bounds);
+            float bounds[4];
+            float advance = nvgTextBounds(vg, pos.x, textCursor, std::to_string(score).c_str(), nullptr, bounds);
+
+            auto leaderText = " " + leaderName;
             nvgFillColor(vg, nvgRGB(color[0], color[1], color[2]));
-            nvgText(vg, pos.x + advance, textCursor, (" " + leaderName).c_str(), nullptr);
+            nvgText(vg, pos.x + advance, textCursor, leaderText.c_str(), nullptr);
+            float _bounds[4];
+            float leaderAdvance = nvgTextBounds(vg, pos.x, textCursor, leaderText.c_str(), nullptr, bounds);
+
+            if (wasRectClicked(glm::vec2(bounds[0], bounds[1]), glm::vec2(bounds[2] - bounds[0], bounds[3] - bounds[1]))) {
+                game.getThePlayer().declareWarOn(player->getID(), game);
+            }
+
+            if (player->isAtWarWith(game.getThePlayerID())) {
+                auto warText = " (WAR)";
+                nvgFillColor(vg, nvgRGB(210, 39, 48));
+                nvgText(vg, pos.x + advance + leaderAdvance, textCursor, warText, nullptr);
+            }
 
             textCursor += 30;
         }

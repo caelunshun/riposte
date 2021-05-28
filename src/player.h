@@ -99,6 +99,8 @@ namespace rip {
 
          CityId capital;
 
+         absl::flat_hash_set<PlayerId> atWarWith;
+
          std::string getNextCityName(const Game &game);
 
          void recomputeRevenue(Game &game);
@@ -158,6 +160,11 @@ namespace rip {
          void recomputeScore(Game &game);
 
          bool isAtWarWith(PlayerId player) const;
+         void declareWarOn(PlayerId player, Game &game);
+
+         void onWarDeclared(PlayerId withPlayer, Game &game);
+
+         void expelUnitsInTerritoryOf(PlayerId player, Game &game);
      };
 }
 

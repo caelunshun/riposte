@@ -324,6 +324,30 @@ namespace rip {
     }
 
     bool Player::isAtWarWith(PlayerId player) const {
-        return false;
+        return atWarWith.contains(player);
+    }
+
+    void Player::declareWarOn(PlayerId player, Game &game) {
+        if (atWarWith.insert(player).second) {
+            onWarDeclared(player, game);
+            auto &other = game.getPlayer(player);
+            other.onWarDeclared(id, game);
+        }
+    }
+
+    void Player::onWarDeclared(PlayerId withPlayer, Game &game) {
+        atWarWith.insert(withPlayer);
+        expelUnitsInTerritoryOf(withPlayer, game);
+    }
+
+    void Player::expelUnitsInTerritoryOf(PlayerId player, Game &game) {
+        for (auto &unit : game.getUnits()) {
+            if (unit.getOwner() != id) continue;
+
+            if (game.getCultureMap().getTileOwner(unit.getPos()) == player) {
+                auto capitalPos = game.getCity(capital).getPos();
+                unit.teleportTo(capitalPos, game);
+            }
+        }
     }
 }

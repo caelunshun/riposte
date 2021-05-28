@@ -157,23 +157,8 @@ namespace rip {
 
         movementLeft -= game.getTile(target).getMovementCost();
         if (movementLeft <= 0.1) movementLeft = 0;
-        pos = target;
 
-        // Unit has moved; update visibility
-        game.getPlayer(owner).recomputeVisibility(game);
-
-        fortified = false;
-        skippingTurn = false;
-        fortifiedUntilHeal = false;
-
-        game.onUnitMoved(id, oldPos, target);
-
-        // Update capabilities
-        for (auto &capability : getCapabilities()) {
-            capability->onUnitMoved(game);
-        }
-
-        inCombat = false;
+        teleportTo(target, game);
     }
 
     bool Unit::hasPath() const {
@@ -273,5 +258,26 @@ namespace rip {
 
     void Unit::skipTurn() {
         skippingTurn = true;
+    }
+
+    void Unit::teleportTo(glm::uvec2 target, Game &game) {
+         const auto oldPos = pos;
+        pos = target;
+
+        // Unit has moved; update visibility
+        game.getPlayer(owner).recomputeVisibility(game);
+
+        fortified = false;
+        skippingTurn = false;
+        fortifiedUntilHeal = false;
+
+        game.onUnitMoved(id, oldPos, target);
+
+        // Update capabilities
+        for (auto &capability : getCapabilities()) {
+            capability->onUnitMoved(game);
+        }
+
+        inCombat = false;
     }
 }

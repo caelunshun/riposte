@@ -137,6 +137,8 @@ namespace rip {
         void fortifyUntilHealed();
         void skipTurn();
 
+        void teleportTo(glm::uvec2 newPos, Game &game);
+
         template<class T>
         T *getCapability() {
             for (auto &cap : capabilities) {
