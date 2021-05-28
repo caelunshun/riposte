@@ -2,6 +2,8 @@
 // Created by Caelum van Ispelen on 5/16/21.
 //
 
+// The AI powerhouse.
+
 #include "ai.h"
 #include "game.h"
 #include "ripmath.h"
@@ -139,7 +141,6 @@ namespace rip {
                     }
 
                     auto &city = game.getCity(cityID);
-                    auto &player = game.getPlayer(playerID);
                     cityAI.doTurn(game, *this, player, city);
                 }
             }
@@ -159,7 +160,7 @@ namespace rip {
             for (const auto cityID : getCities()) {
                 const auto &city = game.getCity(cityID);
                 const auto d = dist(pos, city.getPos());
-                if (d > bestDist) {
+                if (d < bestDist) {
                     bestDist = d;
                     bestCity = cityID;
                 }
@@ -191,7 +192,7 @@ namespace rip {
         // Returns a rating for a tile.
         double rateCityLocation(Game &game, AIimpl &ai, Unit &unit, const Tile &tile, glm::uvec2 tilePos) {
             const double optimalDist = 6;
-            double distanceFactor = -abs(ai.getDistanceToNearestCity(game, tilePos).first - optimalDist) + 5;
+            double distanceFactor = 2 * -pow(ai.getDistanceToNearestCity(game, tilePos).first - optimalDist, 2) + 5;
 
             double tileFactor = 0;
             if (tile.getTerrain() == Terrain::Desert) {
@@ -286,6 +287,8 @@ namespace rip {
                 if (foundCityCap.foundCity(game)) {
                     ai.log(" founded city");
                     return;
+                } else {
+                    targetPos = {};
                 }
             }
 
@@ -426,7 +429,7 @@ namespace rip {
         if (city.getBuildTask()) return;
 
         std::shared_ptr<UnitKind> unitToBuild;
-        if (buildIndex % 5 < 3) {
+        if (buildIndex % 5 < 2) {
             // warrior
             unitToBuild = game.getRegistry().getUnits().at(1);
         } else if (buildIndex % 5 < 4) {
