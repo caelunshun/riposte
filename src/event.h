@@ -58,6 +58,20 @@ namespace rip {
 
         std::optional<std::string> getAudioID(Era era) override;
     };
+
+    class WarDeclaredEvent : public Event {
+        std::string declaredBy;
+        std::string declaredOn;
+
+    public:
+        WarDeclaredEvent(const std::string &declaredBy, const std::string &declaredOn);
+
+        ~WarDeclaredEvent() override = default;
+
+        std::optional<Message> getMessage() override;
+
+        std::optional<std::string> getAudioID(Era era) override;
+    };
 }
 
 #endif //RIPOSTE_EVENT_H

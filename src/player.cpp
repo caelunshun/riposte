@@ -8,6 +8,7 @@
 #include "city.h"
 #include "tile.h"
 #include "unit.h"
+#include "event.h"
 
 namespace rip {
     Player::Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree)
@@ -328,10 +329,13 @@ namespace rip {
     }
 
     void Player::declareWarOn(PlayerId player, Game &game) {
+        if (player == id) return;
         if (atWarWith.insert(player).second) {
             onWarDeclared(player, game);
             auto &other = game.getPlayer(player);
             other.onWarDeclared(id, game);
+
+            game.addEvent(std::make_unique<WarDeclaredEvent>(civ->leader, other.civ->leader));
         }
     }
 

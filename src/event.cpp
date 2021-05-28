@@ -48,4 +48,18 @@ namespace rip {
     std::optional<std::string> CityCapturedEvent::getAudioID(Era era) {
         return "sound/event/city_capture";
     }
+
+    WarDeclaredEvent::WarDeclaredEvent(const std::string &declaredBy, const std::string &declaredOn) : declaredBy(
+            declaredBy), declaredOn(declaredOn) {}
+
+    std::optional<Message> WarDeclaredEvent::getMessage() {
+        return Message(
+                declaredBy + " has declared war on " + declaredOn + "!",
+                colorBad
+                );
+    }
+
+    std::optional<std::string> WarDeclaredEvent::getAudioID(Era era) {
+        return "sound/event/combat_defeat";
+    }
 }
