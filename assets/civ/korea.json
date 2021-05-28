@@ -4,6 +4,17 @@
   "adjective": "Korean",
   "color": [190, 198, 192],
   "leader": "Yi Sun-sin",
+  "leaders": [
+    {
+      "name": "Yi Sun-sin",
+      "aggressive": 3,
+      "nukemonger": 1,
+      "submissive": 5,
+      "paranoia": 4,
+      "expansiveness": 6,
+      "religious": 2
+    }
+  ],
   "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "Seoul",

@@ -4,6 +4,17 @@
   "adjective": "Holy Roman",
   "color": [207, 127, 0],
   "leader": "Charlemagne",
+  "leaders": [
+    {
+      "name": "Charlemagne",
+      "aggressive": 4,
+      "nukemonger": 1,
+      "submissive": 4,
+      "paranoia": 7,
+      "expansiveness": 4,
+      "religious": 2
+    }
+  ],
   "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "Aachen",

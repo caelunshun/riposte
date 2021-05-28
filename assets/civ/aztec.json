@@ -4,6 +4,17 @@
   "adjective": "Aztec",
   "color": [167, 225, 99],
   "leader": "Montezuma",
+  "leaders": [
+    {
+      "name": "Montezuma",
+      "aggressive": 9,
+      "nukemonger": 5,
+      "submissive": 6,
+      "paranoia": 1,
+      "expansiveness": 5,
+      "religious": 8
+    }
+  ],
   "startingTechs": ["Hunting", "Agriculture"],
   "cities": [
     "Tenochtitlan",

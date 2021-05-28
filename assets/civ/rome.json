@@ -4,6 +4,17 @@
   "adjective": "Roman",
   "color": [78, 0, 142],
   "leader": "Julius Caesar",
+  "leaders": [
+    {
+      "name": "Julius Caesar",
+      "aggressive": 4,
+      "nukemonger": 4,
+      "submissive": 2,
+      "paranoia": 8,
+      "expansiveness": 10,
+      "religious": 6
+    }
+  ],
   "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "Rome",

@@ -4,6 +4,17 @@
   "adjective": "Indian",
   "color": [226, 119, 205],
   "leader": "Ashoka the Great",
+  "leaders": [
+    {
+      "name": "Ashoka the Great",
+      "aggressive": 4,
+      "nukemonger": 1,
+      "submissive": 4,
+      "paranoia": 7,
+      "expansiveness": 4,
+      "religious": 2
+    }
+  ],
   "startingTechs": ["The Wheel", "Hunting"],
   "cities": [
     "Delhi",

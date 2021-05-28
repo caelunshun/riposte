@@ -8,6 +8,17 @@
     37
   ],
   "leader": "Pierre Trudeau",
+  "leaders": [
+    {
+      "name": "Lincoln",
+      "aggressive": 2,
+      "nukemonger": 1,
+      "submissive": 1,
+      "paranoia": 7,
+      "expansiveness": 4,
+      "religious": 2
+    }
+  ],
   "startingTechs": ["The Wheel", "Pottery"],
   "cities": [
     "Ottawa",

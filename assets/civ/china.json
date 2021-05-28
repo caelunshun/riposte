@@ -4,6 +4,17 @@
   "adjective": "Chinese",
   "color": [106, 52, 96],
   "leader": "Han Wudi",
+  "leaders": [
+    {
+      "name": "Han Wudi",
+      "aggressive": 4,
+      "nukemonger": 1,
+      "submissive": 1,
+      "paranoia": 8,
+      "expansiveness": 6,
+      "religious": 5
+    }
+  ],
   "startingTechs": ["Mining", "Agriculture"],
   "cities": [
     "Beijing",

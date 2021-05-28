@@ -4,6 +4,17 @@
   "adjective": "British",
   "color": [0, 119, 207],
   "leader": "Churchill",
+  "leaders": [
+    {
+      "name": "Churchill",
+      "aggressive": 3,
+      "nukemonger": 1,
+      "submissive": 4,
+      "paranoia": 3,
+      "expansiveness": 4,
+      "religious": 1
+    }
+  ],
   "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
     "London",

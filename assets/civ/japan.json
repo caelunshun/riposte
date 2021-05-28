@@ -4,6 +4,17 @@
   "adjective": "Japanese",
   "color": [235, 51, 0],
   "leader": "Jimmu",
+  "leaders": [
+    {
+      "name": "Jimmu",
+      "aggressive": 3,
+      "nukemonger": 10,
+      "submissive": 0,
+      "paranoia": 9,
+      "expansiveness": 5,
+      "religious": 3
+    }
+  ],
   "startingTechs": ["Mining", "Agriculture"],
   "cities": [
     "Tokyo",

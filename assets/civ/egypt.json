@@ -4,6 +4,17 @@
   "adjective": "Egyptian",
   "color": [248, 229, 154],
   "leader": "Ramesses II",
+  "leaders": [
+    {
+      "name": "Ramesses II",
+      "aggressive": 4,
+      "nukemonger": 1,
+      "submissive": 4,
+      "paranoia": 7,
+      "expansiveness": 4,
+      "religious": 2
+    }
+  ],
   "startingTechs": ["Hunting", "Agriculture"],
   "cities": [
     "Cairo",
