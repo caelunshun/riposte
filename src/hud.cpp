@@ -392,10 +392,12 @@ namespace rip {
 
     void Hud::updateSelectedUnit(Game &game) {
         auto unit = game.getNextUnitToMove();
+        selectedUnits.clear();
         if (unit.has_value()) {
-            selectedUnits.clear();
             selectedStack = game.getUnit(*unit).getStack(game);
             selectedUnits.push_back(*unit);
+        } else {
+            selectedStack = {};
         }
         if (selectedStack.has_value() && !hasFocus(game)) {
             SmoothAnimation animation(game.getView().getMapCenter(), glm::vec2(game.getStack(*selectedStack).getPos()) * 100.0f, 2000.0f, 2.0f);

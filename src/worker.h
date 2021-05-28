@@ -27,6 +27,9 @@ namespace rip {
             --remainingTurns;
         }
 
+        glm::uvec2 getPos() const {
+            return pos;
+        }
         int getRemainingTurns() const;
         bool isFinished() const;
 
@@ -58,14 +61,18 @@ namespace rip {
     class WorkerCapability : public Capability {
         std::optional<std::unique_ptr<WorkerTask>> currentTask;
 
-        std::vector<std::unique_ptr<WorkerTask>> getPossibleTasks(const Game &game) const;
-
     public:
         explicit WorkerCapability(UnitId unitID);
 
         void onTurnEnd(Game &game) override;
 
         UnitUIStatus paintMainUI(Game &game, nk_context *nk) override;
+
+        std::vector<std::unique_ptr<WorkerTask>> getPossibleTasks(const Game &game) const;
+
+        void setTask(std::unique_ptr<WorkerTask> task);
+
+        const WorkerTask *getTask() const;
 
         void onUnitMoved(Game &game) override;
     };

@@ -118,4 +118,16 @@ namespace rip {
     const Improvement &BuildImprovementTask::getImprovement() const {
         return *improvement;
     }
+
+    void WorkerCapability::setTask(std::unique_ptr<WorkerTask> task) {
+        currentTask = std::move(task);
+    }
+
+    const WorkerTask *WorkerCapability::getTask() const {
+        if (currentTask.has_value()) {
+            return &**currentTask;
+        } else {
+            return nullptr;
+        }
+    }
 }

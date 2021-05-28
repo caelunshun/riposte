@@ -11,6 +11,7 @@
 #include "unit.h"
 #include "path.h"
 #include "player.h"
+#include "worker.h"
 #include <glm/glm.hpp>
 #include <deque>
 #include <iostream>
@@ -40,6 +41,7 @@ namespace rip {
     // An AI that controls a single city.
     class CityAI {
         CityId cityID;
+        int buildIndex = 0;
         void updateTask(Game &game, AIimpl &ai, Player &player, City &city);
     public:
         CityAI(CityId cityID) : cityID(cityID) {}
@@ -70,6 +72,10 @@ namespace rip {
         explicit AIimpl(PlayerId playerId) : playerID(playerId) {}
 
         std::unique_ptr<UnitAI> makeUnitAI(Unit &unit);
+
+        const absl::flat_hash_set<CityId> &getCities() const {
+            return cityAISet;
+        }
 
         void updateUnits(Game &game) {
             // Add new unit AIs for newly created units.
@@ -165,6 +171,82 @@ namespace rip {
         }
     };
 
+    class WorkerAI : public UnitAI {
+        glm::uvec2 targetPos;
+        std::optional<BuildImprovementTask> targetTask;
+
+    public:
+        WorkerAI(const UnitId &unitId) : UnitAI(unitId) {}
+
+        ~WorkerAI() override = default;
+
+        double rateTask(Game &game, Unit &unit, glm::uvec2 pos, const BuildImprovementTask &task) {
+            double distFactor = -(dist(unit.getPos(), pos) - 6);
+
+            double resourceFactor = 0;
+            const auto &tile = game.getTile(pos);
+            if (tile.hasImproveableResource(task.getImprovement().getName())) {
+                resourceFactor = 5;
+            }
+
+            double suitabilityFactor = -2;
+            if (tile.getTerrain() == Terrain::Plains && task.getImprovement().getName() == "Farm") {
+                suitabilityFactor = 2;
+            } else if (tile.getTerrain() == Terrain::Grassland && task.getImprovement().getName() == "Mine") {
+                suitabilityFactor = 2;
+            }
+
+            return distFactor + resourceFactor + suitabilityFactor;
+        }
+
+        void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) override {
+            auto &workCap = *unit.getCapability<WorkerCapability>();
+
+            if (unit.getPos() == targetPos && targetTask.has_value()) {
+                ai.log("worker started building " + targetTask->getImprovement().getName());
+                workCap.setTask(std::make_unique<BuildImprovementTask>(std::move(*targetTask)));
+                targetTask = {};
+            }
+
+            if (workCap.getTask() != nullptr) return;
+
+            // Find the best task to complete, based on the values of rateTask().
+            std::optional<BuildImprovementTask> bestTask;
+            double bestRating;
+
+            for (const auto cityID : ai.getCities()) {
+                const auto &city = game.getCity(cityID);
+                for (const auto tilePos : getBigFatCross(city.getPos())) {
+                    if (!game.containsTile(tilePos)) continue;
+                    const auto &tile = game.getTile(tilePos);
+                    for (auto &improvement : tile.getPossibleImprovements(game, tilePos)) {
+                        if (!player.getTechs().isImprovementUnlocked(improvement->getName())) continue;
+
+                        const auto buildTurns = improvement->getNumBuildTurns();
+                        BuildImprovementTask task(buildTurns, tilePos, std::move(improvement));
+                        double rating = rateTask(game, unit, tilePos, task);
+
+                        if (!bestTask.has_value() || rating > bestRating) {
+                            bestTask = std::move(task);
+                            bestRating = rating;
+                        }
+                    }
+                }
+            }
+
+            if (bestTask.has_value()) {
+                auto path = computeShortestPath(game, unit.getPos(), bestTask->getPos(), {});
+                if (path.has_value()) {
+                    ai.log("worker chose to build " + bestTask->getImprovement().getName());
+
+                    targetPos = bestTask->getPos();
+                    targetTask = std::move(bestTask);
+                    unit.setPath(std::move(*path));
+                }
+            }
+        }
+    };
+
     class ReconUnitAI : public UnitAI {
     public:
         ReconUnitAI(const UnitId &unitId) : UnitAI(unitId) {}
@@ -189,6 +271,8 @@ namespace rip {
     std::unique_ptr<UnitAI> AIimpl::makeUnitAI(Unit &unit) {
         if (unit.hasCapability<FoundCityCapability>()) {
             return std::make_unique<SettlerAI>(unit.getID());
+        } else if (unit.hasCapability<WorkerCapability>()) {
+            return std::make_unique<WorkerAI>(unit.getID());
         } else {
             return std::make_unique<ReconUnitAI>(unit.getID());
         }
@@ -199,8 +283,17 @@ namespace rip {
     void CityAI::updateTask(Game &game, AIimpl &ai, Player &player, City &city) {
         if (city.getBuildTask()) return;
 
-        auto worker = game.getRegistry().getUnits().at(2);
-        city.setBuildTask(std::make_unique<UnitBuildTask>(worker));
+        std::shared_ptr<UnitKind> unitToBuild;
+        if (buildIndex % 3 <= 1) {
+            // warrior
+            unitToBuild = game.getRegistry().getUnits().at(1);
+        } else {
+            // worker
+            unitToBuild = game.getRegistry().getUnits().at(2);
+        }
+
+        city.setBuildTask(std::make_unique<UnitBuildTask>(unitToBuild));
+        ++buildIndex;
     }
 
     void CityAI::doTurn(Game &game, AIimpl &ai, Player &player, City &city) {

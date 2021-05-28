@@ -255,4 +255,23 @@ namespace rip {
     void Pasture::paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) {
         paintImprovementIcon(vg, assets, game.getScreenOffset(pos), "icon/pasture");
     }
+
+    std::vector<std::unique_ptr<Improvement>> Tile::getPossibleImprovements(Game &game, glm::uvec2 pos) const {
+        std::vector<std::unique_ptr<Improvement>> results;
+
+        results.push_back(std::make_unique<Cottage>(pos));
+        results.push_back(std::make_unique<Mine>(pos));
+        results.push_back(std::make_unique<Farm>(pos));
+        results.push_back(std::make_unique<Pasture>(pos));
+        results.push_back(std::make_unique<Road>(pos));
+
+        // Remove illegal improvements.
+        for (int i = results.size() - 1; i >= 0; i--) {
+            if (!results[i]->isCompatible(*this)) {
+                results.erase(results.begin() + i);
+            }
+        }
+
+        return results;
+    }
 }
