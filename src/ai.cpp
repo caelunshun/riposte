@@ -14,6 +14,7 @@
 #include "path.h"
 #include "player.h"
 #include "worker.h"
+#include "stack.h"
 #include "traversal.h"
 #include <glm/glm.hpp>
 #include <deque>
@@ -361,6 +362,7 @@ namespace rip {
                 for (const auto tilePos : getBigFatCross(city.getPos())) {
                     if (!game.containsTile(tilePos)) continue;
                     if (ai.claimedWorkerTiles.contains(tilePos)) continue;
+                    if (game.getCultureMap().getTileOwner(tilePos) != ai.playerID) continue;
 
                     const auto &tile = game.getTile(tilePos);
                     for (auto &improvement : tile.getPossibleImprovements(game, tilePos)) {
@@ -399,6 +401,20 @@ namespace rip {
         ~ReconUnitAI() override = default;
 
         void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) override {
+            // Stay in the city if it needs protection.
+            const auto minCityUnits = 1;
+            auto *city = game.getCityAtLocation(unit.getPos());
+            if (city && city->getOwner() == ai.playerID) {
+                auto stackID = game.getStackByKey(ai.playerID, unit.getPos());
+                if (stackID.has_value() && game.getStack(*stackID).getUnits().size() <= minCityUnits) {
+                    unit.fortify();
+                    return;
+                }
+            }
+
+            if (unit.isFortified()) return;
+
+            // Scout randomly.
             int attempts = 0;
             while (!unit.hasPath() && attempts < 10) {
                 glm::uvec2 target(unit.getPos().x + static_cast<int>(ai.rng.u32(0, 20)) - 10,
