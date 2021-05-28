@@ -101,13 +101,16 @@ namespace rip {
             return false;
         }
 
+        if (!canFight() && wouldAttackPos(game, target)) {
+            return false;
+        }
+
         return true;
     }
 
     bool Unit::wouldAttack(const Game &game, const Unit &other) const {
         return game.isCheatMode() || (
-            canFight()
-            && other.getID() != id
+            other.getID() != id
             && !other.shouldDie()
             && owner != other.getOwner()
             && game.getPlayer(owner).isAtWarWith(other.getOwner()));

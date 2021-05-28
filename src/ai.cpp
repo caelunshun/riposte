@@ -37,10 +37,30 @@ namespace rip {
         }
     };
 
+    // An AI that controls a single city.
+    class CityAI {
+        CityId cityID;
+        void updateTask(Game &game, AIimpl &ai, Player &player, City &city);
+    public:
+        CityAI(CityId cityID) : cityID(cityID) {}
+
+        CityId getCityID() const {
+            return cityID;
+        }
+
+        void doTurn(Game &game, AIimpl &ai, Player &player, City &city);
+    };
+
     class AIimpl {
         // A unit AI for each unit.
         std::vector<std::unique_ptr<UnitAI>> unitAIs;
         absl::flat_hash_set<UnitId> unitAISet;
+
+        // A city AI for each city.
+        std::vector<CityAI> cityAIs;
+        absl::flat_hash_set<CityId> cityAISet;
+
+        std::string playerName;
 
     public:
         // ID of the controlled player.
@@ -83,10 +103,51 @@ namespace rip {
             }
         }
 
+        void updateCities(Game &game, Player &player) {
+            // Add new city AIs for newly created cities.
+            for (const auto cityID : player.getCities()) {
+                if (!cityAISet.contains(cityID)) {
+                    cityAIs.emplace_back(cityID);
+                    cityAISet.insert(cityID);
+                }
+            }
+
+            // Update each city.
+            if (!cityAIs.empty()) {
+                for (int i = cityAIs.size() - 1; i >= 0; i--) {
+                    auto &cityAI = cityAIs.at(i);
+                    const auto cityID = cityAI.getCityID();
+
+                    if (!game.getCities().id_is_valid(cityID) || game.getCity(cityID).getOwner() != playerID) {
+                        // Lost the city - delete its AI.
+                        cityAIs.erase(cityAIs.begin() + i);
+                        cityAISet.erase(cityID);
+                        continue;
+                    }
+
+                    auto &city = game.getCity(cityID);
+                    auto &player = game.getPlayer(playerID);
+                    cityAI.doTurn(game, *this, player, city);
+                }
+            }
+        }
+
+        void updateResearch(Game &game, Player &player);
+
+        void log(std::string message) const {
+            std::cout << "[ai-" << playerName << "] " << message << std::endl;
+        }
+
         void doTurn(Game &game) {
+            auto &player = game.getPlayer(playerID);
+            playerName = player.getCiv().leader;
             updateUnits(game);
+            updateCities(game, player);
+            updateResearch(game, player);
         }
     };
+
+    // UNIT
 
     class SettlerAI : public UnitAI {
     public:
@@ -99,6 +160,7 @@ namespace rip {
             if (player.getCities().empty()) {
                 // Settle NOW.
                 foundCityCap.foundCity(game);
+                ai.log(" founded city");
             }
         }
     };
@@ -130,6 +192,32 @@ namespace rip {
         } else {
             return std::make_unique<ReconUnitAI>(unit.getID());
         }
+    }
+
+    // CITY
+
+    void CityAI::updateTask(Game &game, AIimpl &ai, Player &player, City &city) {
+        if (city.getBuildTask()) return;
+
+        auto worker = game.getRegistry().getUnits().at(2);
+        city.setBuildTask(std::make_unique<UnitBuildTask>(worker));
+    }
+
+    void CityAI::doTurn(Game &game, AIimpl &ai, Player &player, City &city) {
+        updateTask(game, ai, player, city);
+    }
+
+    // RESEARCH
+
+    void AIimpl::updateResearch(Game &game, Player &player) {
+        if (player.getResearchingTech().has_value()) return;
+
+        auto options = player.getTechs().getPossibleResearches();
+        if (options.empty()) return;
+
+        auto &choice = options[rng.u32(0, options.size())];
+        player.setResearchingTech(choice);
+        log("researching " + choice->name);
     }
 
     AI::AI(PlayerId playerID) : impl(std::make_unique<AIimpl>(playerID)) {}

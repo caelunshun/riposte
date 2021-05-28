@@ -210,11 +210,11 @@ namespace rip {
         nk_layout_row_push(nk, 100);
 
         if (nk_button_label(nk, "Next Turn") && !hasFocus(game)) {
-            if (game.getNextUnitToMove().has_value()) {
+            /*if (game.getNextUnitToMove().has_value()) { // DEBUG - AI
                 // Need to move all units first.
                 pushMessage("Move all your units before ending the turn!", {255,255,255});
                 updateSelectedUnit(game);
-            } else {
+            } else*/ {
                 game.advanceTurn();
                 updateSelectedUnit(game);
             }
