@@ -412,8 +412,7 @@ namespace rip {
             if (tile.getTerrain() == Terrain::Plains && task.getImprovement().getName() == "Farm") {
                 suitabilityFactor = 2;
             } else if (tile.getTerrain() == Terrain::Grassland && task.getImprovement().getName() == "Cottage") {
-                suitabilityFactor = 4;
-                suitabilityFactor = 4;
+                suitabilityFactor = 2;
             }
 
             return distFactor + resourceFactor + suitabilityFactor;
