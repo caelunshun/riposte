@@ -131,6 +131,15 @@ namespace rip {
         return yield;
     }
 
+    void City::workTiles(Game &game) {
+        for (const auto tilePos : workedTiles) {
+            auto &tile = game.getTile(tilePos);
+            for (auto &improvement : tile.getImprovements()) {
+                improvement->onWorked(game, *this);
+            }
+        }
+    }
+
     void City::onTurnEnd(Game &game) {
         auto yield = computeYield(game);
         if (hasBuildTask()) {
@@ -143,6 +152,7 @@ namespace rip {
             }
         }
         updateWorkedTiles(game);
+        workTiles(game);
         doGrowth(game);
 
         culture.addCultureForPlayer(owner, getCulturePerTurn());

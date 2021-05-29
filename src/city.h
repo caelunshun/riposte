@@ -122,6 +122,8 @@ namespace rip {
 
         void doGrowth(Game &game);
 
+        void workTiles(Game &game);
+
     public:
         City(glm::uvec2 pos, std::string name, PlayerId owner);
 

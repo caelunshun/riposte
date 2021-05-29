@@ -143,7 +143,7 @@ namespace rip {
     }
 
     Yield Cottage::getYieldContribution(const Game &game) const {
-        return Yield(0, 1, 0);
+        return Yield(0, static_cast<int>(level), 0);
     }
 
     void Cottage::paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) {
@@ -156,6 +156,29 @@ namespace rip {
 
     int Cottage::getNumBuildTurns() const {
         return 4;
+    }
+
+    void Cottage::onWorked(Game &game, City &workedBy) {
+        --turnsUntilGrowth;
+        if (turnsUntilGrowth <= 0 && level != CottageLevel::Town) {
+            if (level == CottageLevel::Cottage) {
+                level = CottageLevel::Hamlet;
+                turnsUntilGrowth = 20;
+            } else if (level == CottageLevel::Hamlet) {
+                level = CottageLevel::Village;
+                turnsUntilGrowth = 40;
+            } else if (level == CottageLevel::Village) {
+                level = CottageLevel::Town;
+            }
+        }
+    }
+
+    CottageLevel Cottage::getLevel() const {
+        return level;
+    }
+
+    int Cottage::getTurnsUntilGrowth() const {
+        return turnsUntilGrowth;
     }
 
     bool Farm::isCompatible(const Tile &tile) const {

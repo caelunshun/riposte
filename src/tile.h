@@ -42,6 +42,9 @@ namespace rip {
 
         virtual int getNumBuildTurns() const = 0;
 
+        // Called each turn the improvement is worked by a city.
+        virtual void onWorked(Game &game, City &workedBy) {}
+
         virtual std::string getName() const = 0;
 
         virtual ~Improvement() = default;
@@ -62,7 +65,17 @@ namespace rip {
         void paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) override;
     };
 
+    enum class CottageLevel {
+        Cottage = 1,
+        Hamlet = 2,
+        Village = 3,
+        Town = 4,
+    };
+
     class Cottage : public Improvement {
+        CottageLevel level = CottageLevel::Cottage;
+        int turnsUntilGrowth = 10;
+
     public:
         explicit Cottage(glm::uvec2 pos) : Improvement(pos) {}
 
@@ -73,6 +86,12 @@ namespace rip {
         int getNumBuildTurns() const override;
 
         std::string getName() const override;
+
+        void onWorked(Game &game, City &workedBy) override;
+
+        CottageLevel getLevel() const;
+
+        int getTurnsUntilGrowth() const;
 
         void paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) override;
     };
