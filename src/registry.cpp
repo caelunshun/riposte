@@ -37,4 +37,13 @@ namespace rip {
     const absl::flat_hash_map<std::string, std::shared_ptr<Resource>> &Registry::getResources() const {
         return resources;
     }
+
+    const std::shared_ptr<UnitKind> &Registry::getUnit(const std::string &id) const {
+        for (const auto &unit : units) {
+            if (unit->id == id) {
+                return unit;
+            }
+        }
+        throw std::string("missing unit '" + id + "'");
+    }
 }

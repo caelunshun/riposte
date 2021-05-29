@@ -211,6 +211,8 @@ namespace rip {
 
         const std::vector<std::shared_ptr<UnitKind>> &getUnits() const;
 
+        const std::shared_ptr<UnitKind> &getUnit(const std::string &id) const;
+
         const absl::flat_hash_map<std::string, std::shared_ptr<Resource>> &getResources() const;
     };
 

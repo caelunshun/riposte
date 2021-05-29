@@ -35,9 +35,11 @@ namespace rip {
 
         virtual ~UnitAI() = default;
 
-        virtual void onDeath(Game &game, AIimpl &ai, Player &player) {}
-
         virtual void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) = 0;
+
+        virtual void onCreated(Game &game, AIimpl &ai, Player &player, Unit &unit) {}
+
+        virtual void onDeath(Game &game, AIimpl &ai, Player &player) {}
 
         UnitId getUnitID() const {
             return unitID;
@@ -59,6 +61,18 @@ namespace rip {
         void doTurn(Game &game, AIimpl &ai, Player &player, City &city);
     };
 
+    // EMPIRE
+
+    // A global goal for the empire in the next 50-100 turns.
+    enum class Goal {
+        // Expand with settlers
+        ExpandPeacefully,
+        // Expand with the sword
+        ExpandWar,
+        // Improve economy
+        Thrive,
+    };
+
     class AIimpl {
         // A unit AI for each unit.
         std::vector<std::unique_ptr<UnitAI>> unitAIs;
@@ -70,6 +84,11 @@ namespace rip {
 
         std::string playerName;
 
+        // The current long-term goal.
+        Goal goal = Goal::ExpandPeacefully;
+
+        PlayerId thePlayerID;
+
     public:
         // ID of the controlled player.
         PlayerId playerID;
@@ -78,7 +97,17 @@ namespace rip {
         absl::flat_hash_set<glm::uvec2, PosHash> claimedWorkerTiles;
         absl::flat_hash_set<glm::uvec2, PosHash> claimedSettlerTiles;
 
+        bool isPeacefulExpansionExhausted = false;
+
+        // The number of settlers we own. *This
+        // includes settlers currently being built.*
+        int settlerCount = 1; // starts at 1 because of starting settler
+
         explicit AIimpl(PlayerId playerId) : playerID(playerId) {}
+
+        Goal getGoal() const {
+            return goal;
+        }
 
         std::unique_ptr<UnitAI> makeUnitAI(Unit &unit);
 
@@ -147,10 +176,54 @@ namespace rip {
             }
         }
 
+        bool isEconomyReadyForWar(Game &game, Player &player) const {
+            return (static_cast<double>(player.getBaseRevenue()) / player.getExpenses() >= 1.5 && player.getBeakerRevenue() >= 10);
+        }
+
+        bool hasBaseDesiredCities(Game &game, Player &player) const {
+            const auto numCities = getCities().size();
+
+            const auto baseDesiredCities = round(4 + 5 * (player.getLeader().expansiveness / 10 - 0.2));
+
+            return (numCities >= baseDesiredCities);
+        }
+
+        bool needsExpansion(Game &game, Player &player) const {
+            if (!hasBaseDesiredCities(game, player)) return true;
+
+            // We have the base desired cities - but more expansion might still
+            // be good if we're thriving economically.
+            return isEconomyReadyForWar(game, player);
+        }
+
+        void setGoal(Goal newGoal) {
+            if (goal != newGoal) {
+                const char *goalNames[3] = {"ExpandPeacefully", "ExpandWar", "Thrive"};
+                log("NEW GOAL: " + std::string(goalNames[static_cast<int>(newGoal)]));
+            }
+            goal = newGoal;
+        }
+
+        void updateGoal(Game &game, Player &player) {
+            if (isPeacefulExpansionExhausted && goal == Goal::ExpandPeacefully && needsExpansion(game, player)) {
+                setGoal(Goal::ExpandWar);
+            }
+
+            if (hasBaseDesiredCities(game, player) && isEconomyReadyForWar(game, player)) {
+                setGoal(Goal::ExpandWar);
+            }
+
+            if (goal == Goal::ExpandPeacefully && !isEconomyReadyForWar(game, player) && hasBaseDesiredCities(game, player)) {
+                setGoal(Goal::Thrive);
+            }
+        }
+
         void updateResearch(Game &game, Player &player);
 
         void log(std::string message) const {
-            std::cout << "[ai-" << playerName << "] " << message << std::endl;
+            if (playerID == thePlayerID) {
+                std::cout << "[ai-" << playerName << "] " << message << std::endl;
+            }
         }
 
         // Gets the closest city (owned by anyone) to the given position.
@@ -172,6 +245,8 @@ namespace rip {
         void doTurn(Game &game) {
             auto &player = game.getPlayer(playerID);
             playerName = player.getLeader().name;
+            thePlayerID = game.getThePlayerID();
+            updateGoal(game, player);
             updateUnits(game);
             updateCities(game, player);
             updateResearch(game, player);
@@ -304,8 +379,14 @@ namespace rip {
                         blacklist.insert(*targetPos);
                         targetPos = {};
                     }
+                } else {
+                    ai.isPeacefulExpansionExhausted = true;
                 }
             }
+        }
+
+        void onDeath(Game &game, AIimpl &ai, Player &player) override {
+            --ai.settlerCount;
         }
     };
 
@@ -451,30 +532,37 @@ namespace rip {
             currentProtectionCount = game.getStack(*stackID).getUnits().size();
         }
 
-        std::shared_ptr<UnitKind> unitToBuild;
-        if (buildIndex != 0 && (currentProtectionCount < 2 || (buildIndex + 3) % 5 < 3)) {
-            // best military unit we can build
-            std::optional<UnitBuildTask> bestTask;
-            for (const auto &unitKind : game.getRegistry().getUnits()) {
-                UnitBuildTask task(unitKind);
-                if (task.canBuild(game, city) &&
-                        (!bestTask.has_value() || unitKind->strength > bestTask->getUnitKind()->strength)) {
-                    bestTask = std::move(task);
-                }
+        std::shared_ptr<UnitKind> bestMilitaryUnit;
+        for (const auto &unitKind : game.getRegistry().getUnits()) {
+            UnitBuildTask task(unitKind);
+            if (task.canBuild(game, city) &&
+                (!bestMilitaryUnit || unitKind->strength > bestMilitaryUnit->strength)) {
+                bestMilitaryUnit = task.getUnitKind();
             }
+        }
 
-            if (bestTask.has_value()) {
-                unitToBuild = bestTask->getUnitKind();
-            }
-        } else if ((buildIndex + 3) % 5 < 4) {
-            // worker
-            unitToBuild = game.getRegistry().getUnits().at(2);
+        std::shared_ptr<UnitKind> unitToBuild;
+
+        const auto &registry = game.getRegistry();
+        if (ai.getGoal() == Goal::ExpandPeacefully && ai.settlerCount == 0 && game.getTurn() != 0) {
+            ++ai.settlerCount;
+            unitToBuild = registry.getUnit("settler");
+        } else if (ai.getGoal() == Goal::Thrive) {
+            unitToBuild = registry.getUnit("worker");
+        } else if (ai.getGoal() == Goal::ExpandWar) {
+            unitToBuild = bestMilitaryUnit;
         } else {
-            // settler
-            unitToBuild = game.getRegistry().getUnits().at(0);
+            // pick between worker or best military unit
+            if (game.getTurn() == 0 || buildIndex % 3 >= 1) {
+                unitToBuild = registry.getUnit("worker");
+            } else {
+                unitToBuild = bestMilitaryUnit;
+            }
         }
 
         if (unitToBuild) {
+            ai.log("city building " + unitToBuild->name + " (settlers=" + std::to_string(ai.settlerCount) + ", goal="
+                + std::to_string(static_cast<int>(ai.getGoal())) + ")");
             city.setBuildTask(std::make_unique<UnitBuildTask>(unitToBuild));
             ++buildIndex;
         }
