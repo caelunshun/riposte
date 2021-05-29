@@ -1,5 +1,5 @@
 {
   "name": "Sailing",
   "cost": 60,
-  "prerequisites": ["Pottery"]
+  "prerequisites": ["Pottery", "Fishing"]
 }
