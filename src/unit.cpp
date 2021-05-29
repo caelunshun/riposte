@@ -129,7 +129,7 @@ namespace rip {
         return {};
     }
 
-    void Unit::moveTo(glm::uvec2 target, Game &game) {
+    void Unit::moveTo(glm::uvec2 target, Game &game, bool allowCombat) {
         if (!canMove(target, game)) return;
 
         auto oldPos = pos;
@@ -137,6 +137,7 @@ namespace rip {
         // Check for attacks.
         auto otherUnit = wouldAttackPos(game, target);
         if (otherUnit.has_value()) {
+            if (!allowCombat) return;
             Combat combat(getID(), *otherUnit, game);
             game.addCombat(combat);
             game.getUnit(*otherUnit).setInCombat(true);
@@ -169,11 +170,15 @@ namespace rip {
         currentPath = std::move(path);
     }
 
-    void Unit::moveAlongCurrentPath(Game &game) {
+    void Unit::moveAlongCurrentPath(Game &game, bool allowCombat) {
         if (currentPath.has_value()) {
             while (currentPath->getNumPoints() > 0 && movementLeft != 0) {
                 auto point = currentPath->popNextPoint();
-                moveTo(*point, game);
+                if (!allowCombat && wouldAttackPos(game, *point)) {
+                    currentPath = {};
+                    return;
+                }
+                moveTo(*point, game, allowCombat);
             }
 
             if (currentPath->getNumPoints() == 0) {

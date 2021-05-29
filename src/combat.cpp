@@ -116,7 +116,7 @@ namespace rip {
             winner = defenderID;
         } else if (defender.shouldDie() || defender.getCombatStrength() == 0) {
             game.deferKillUnit(defenderID);
-            attacker.moveTo(defender.getPos(), game);
+            attacker.moveTo(defender.getPos(), game, false);
             winner = attackerID;
         }
 

@@ -99,8 +99,9 @@ namespace rip {
         for (auto &unit : impl->units) {
             if (unit.getMovementLeft() != 0 && unit.getOwner() == impl->thePlayer && !unit.isFortified()) {
                 if (unit.hasPath()) {
-                    unit.moveAlongCurrentPath(*this);
-                } else {
+                    unit.moveAlongCurrentPath(*this, false);
+                }
+                if (!unit.hasPath()) {
                     return std::make_optional<UnitId>(unit.getID());
                 }
             }

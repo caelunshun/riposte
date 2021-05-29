@@ -439,7 +439,7 @@ namespace rip {
             for (const auto unitID : selectedUnits) {
                 auto &unit = game.getUnit(unitID);
                 unit.setPath(selectedUnitPath);
-                unit.moveAlongCurrentPath(game);
+                unit.moveAlongCurrentPath(game, true);
                 selectedStack = unit.getStack(game);
 
                 if (unit.getMovementLeft() == 0) {
