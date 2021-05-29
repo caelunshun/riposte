@@ -98,20 +98,22 @@ namespace rip {
             entries.emplace_back(yield, bfcPos);
         }
 
-        std::stable_sort(entries.begin(), entries.end(), [] (const BfcEntry &a, const BfcEntry &b) {
+        std::stable_sort(entries.begin(), entries.end(), [&] (const BfcEntry &a, const BfcEntry &b) {
             if (a.yield.food < b.yield.food) {
                 return false;
             } else if (b.yield.food < a.yield.food) {
                 return true;
-            } else if (a.yield.hammers < b.yield.hammers) {
+            } else if (a.yield.hammers + a.yield.commerce < b.yield.hammers + b.yield.commerce) {
                 return false;
-            } else if (b.yield.hammers < a.yield.hammers) {
-                return true;
-            } else if (a.yield.commerce < b.yield.commerce) {
-                return false;
-            } else {
-                return true;
+            } else if (a.yield.hammers + a.yield.commerce == b.yield.hammers + b.yield.commerce) {
+                if (game.getTile(a.pos).hasNonRoadImprovements()) {
+                    return true;
+                } else if (game.getTile(b.pos).hasNonRoadImprovements()) {
+                    return false;
+                }
             }
+
+            return true;
         });
 
         // The city's own tile is always worked.
