@@ -12,6 +12,15 @@
       "paranoia": 4,
       "expansiveness": 6,
       "religious": 5
+    },
+    {
+      "name": "Van Ispelen",
+      "aggressive": 3,
+      "nukemonger": 1,
+      "submissive": 2,
+      "paranoia": 10,
+      "expansiveness": 2,
+      "religious": 0
     }
   ],
   "startingTechs": ["Hunting", "Agriculture"],
