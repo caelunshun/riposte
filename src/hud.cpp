@@ -679,7 +679,7 @@ namespace rip {
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
         float textCursor = pos.y + 5;
         for (const auto *player : players) {
-            const auto &leaderName = player->getCiv().leader;
+            const auto &leaderName = player->getLeader().name;
             const auto score = player->getScore();
             const auto color = player->getCiv().color;
 

@@ -3,7 +3,6 @@
   "name": "British Empire",
   "adjective": "British",
   "color": [0, 119, 207],
-  "leader": "Churchill",
   "leaders": [
     {
       "name": "Churchill",

@@ -3,7 +3,6 @@
   "name": "Roman Empire",
   "adjective": "Roman",
   "color": [78, 0, 142],
-  "leader": "Julius Caesar",
   "leaders": [
     {
       "name": "Julius Caesar",

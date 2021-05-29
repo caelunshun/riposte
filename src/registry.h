@@ -14,6 +14,22 @@
 #include "yield.h"
 
 namespace rip {
+    struct Leader {
+        // Leader name (Lincoln etc.)
+        std::string name;
+
+        // Leader traits - used in AI.
+        // Range is [0, 10].
+        float aggressive;
+        float nukemonger;
+        float submissive;
+        float paranoia;
+        float expansiveness;
+        float religious;
+
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(Leader, name, aggressive, nukemonger, submissive, paranoia, expansiveness, religious);
+    };
+
     struct CivKind : public Asset {
         // Unique string ID
         std::string id;
@@ -23,14 +39,14 @@ namespace rip {
         std::string adjective;
         // Color for borders, etc.
         std::array<uint8_t, 3> color;
-        // Leader name
-        std::string leader;
+        // List of possible leaders for the civ
+        std::vector<Leader> leaders;
         // A pool of city names to use
         std::vector<std::string> cities;
         // List of starting tech names
         std::vector<std::string> startingTechs;
 
-        NLOHMANN_DEFINE_TYPE_INTRUSIVE(CivKind, id, name, adjective, color, leader, cities, startingTechs);
+        NLOHMANN_DEFINE_TYPE_INTRUSIVE(CivKind, id, name, adjective, color, leaders, cities, startingTechs);
     };
 
     class ParseException : public std::exception {

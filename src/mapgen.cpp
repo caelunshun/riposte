@@ -117,7 +117,10 @@ namespace rip {
             }
             usedCivIDs.insert(civ->id);
 
-            Player player(civ->leader, civ, game.getMapWidth(), game.getMapHeight(), techTree);
+            assert(!civ.leaders.empty());
+            auto leader = civ->leaders[rng.u32(0, civ->leaders.size())];
+
+            Player player(leader.name, civ, leader, game.getMapWidth(), game.getMapHeight(), techTree);
             auto playerID = game.addPlayer(std::move(player));
 
             auto &p = game.getPlayer(playerID);

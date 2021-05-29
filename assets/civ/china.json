@@ -3,7 +3,6 @@
   "name": "Chinese Empire",
   "adjective": "Chinese",
   "color": [106, 52, 96],
-  "leader": "Han Wudi",
   "leaders": [
     {
       "name": "Han Wudi",

@@ -11,8 +11,8 @@
 #include "event.h"
 
 namespace rip {
-    Player::Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree)
-        : username(std::move(username)), visibilityMap(mapWidth, mapHeight), civ(civ),
+    Player::Player(std::string username, std::shared_ptr<CivKind> civ, Leader leader, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree)
+        : username(std::move(username)), visibilityMap(mapWidth, mapHeight), civ(civ), leader(std::move(leader)),
         techs(techTree) {
         for (const auto &startingTechName : civ->startingTechs) {
             techs.unlockTech(techTree->getTechs().at(startingTechName));
@@ -49,6 +49,10 @@ namespace rip {
 
     const CivKind &Player::getCiv() const {
         return *civ;
+    }
+
+    const Leader &Player::getLeader() const {
+        return leader;
     }
 
     void Player::registerCity(CityId id) {
@@ -341,7 +345,7 @@ namespace rip {
             auto &other = game.getPlayer(player);
             other.onWarDeclared(id, game);
 
-            game.addEvent(std::make_unique<WarDeclaredEvent>(civ->leader, other.civ->leader));
+            game.addEvent(std::make_unique<WarDeclaredEvent>(leader.name, other.leader.name));
         }
     }
 

@@ -171,7 +171,7 @@ namespace rip {
 
         void doTurn(Game &game) {
             auto &player = game.getPlayer(playerID);
-            playerName = player.getCiv().leader;
+            playerName = player.getLeader().name;
             updateUnits(game);
             updateCities(game, player);
             updateResearch(game, player);

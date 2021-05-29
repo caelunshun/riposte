@@ -80,6 +80,8 @@ namespace rip {
          VisibilityMap visibilityMap;
          // The player's civilization.
          std::shared_ptr<CivKind> civ;
+         // The player's leader (must be one of civ->leaders)
+         Leader leader;
 
          std::optional<AI> ai;
 
@@ -111,7 +113,7 @@ namespace rip {
          int getTotalPopulation(const Game &game);
 
      public:
-         Player(std::string username, std::shared_ptr<CivKind> civ, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree);
+         Player(std::string username, std::shared_ptr<CivKind> civ, Leader leader, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree);
 
          Player(Player &&other) = default;
          Player(const Player &other) = delete;
@@ -126,6 +128,7 @@ namespace rip {
          const std::vector<CityId> &getCities() const;
          const VisibilityMap &getVisibilityMap() const;
          const CivKind &getCiv() const;
+         const Leader &getLeader() const;
          CityId getCapital() const;
 
          void registerCity(CityId id);

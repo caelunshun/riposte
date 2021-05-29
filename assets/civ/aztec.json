@@ -3,7 +3,6 @@
   "name": "Aztec Empire",
   "adjective": "Aztec",
   "color": [167, 225, 99],
-  "leader": "Montezuma",
   "leaders": [
     {
       "name": "Montezuma",
