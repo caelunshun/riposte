@@ -191,7 +191,7 @@ namespace rip {
     }
 
     void Player::recomputeExpenses(Game &game) {
-        // City maintanence expenses
+        // City maintenence expenses
         expenses = 0;
         for (const auto cityID : cities) {
             const auto &city = game.getCity(cityID);
@@ -212,6 +212,12 @@ namespace rip {
                 unitExpensesDoubled += 1;
             }
         }
+
+        // heheh
+        if (ai.has_value()) {
+            unitExpensesDoubled = 0;
+        }
+
         if (unitExpensesDoubled > 0) {
             expenses += unitExpensesDoubled / 2;
         }

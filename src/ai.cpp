@@ -323,9 +323,6 @@ namespace rip {
 
             double resourceFactor = 0;
             const auto &tile = game.getTile(pos);
-            if (tile.hasResource()) {
-                ai.log("worker detected resource: " + (*tile.getResource())->name);
-            }
             if (tile.hasImproveableResource(task.getImprovement().getName())) {
                 resourceFactor = 10;
             }
@@ -333,8 +330,8 @@ namespace rip {
             double suitabilityFactor = -2;
             if (tile.getTerrain() == Terrain::Plains && task.getImprovement().getName() == "Farm") {
                 suitabilityFactor = 2;
-            } else if (tile.getTerrain() == Terrain::Grassland && task.getImprovement().getName() == "Mine") {
-                suitabilityFactor = 2;
+            } else if (tile.getTerrain() == Terrain::Grassland && task.getImprovement().getName() == "Cottage") {
+                suitabilityFactor = 4;
             }
 
             return distFactor + resourceFactor + suitabilityFactor;
@@ -493,7 +490,10 @@ namespace rip {
         if (player.getResearchingTech().has_value()) return;
 
         auto options = player.getTechs().getPossibleResearches();
-        if (options.empty()) return;
+        if (options.empty()) {
+            log("teched out on turn " + std::to_string(game.getTurn()));
+            return;
+        }
 
         auto &choice = options[rng.u32(0, options.size())];
         player.setResearchingTech(choice);
