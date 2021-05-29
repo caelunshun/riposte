@@ -71,8 +71,7 @@ namespace rip {
 
     std::string Player::getNextCityName(const Game &game) {
         std::unordered_set<std::string> usedNames;
-        for (const auto cityID : cities) {
-            const auto &city = game.getCity(cityID);
+        for (const auto &city : game.getCities()) {
             usedNames.emplace(city.getName());
         }
 
