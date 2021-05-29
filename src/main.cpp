@@ -74,7 +74,10 @@ int main() {
     glfwMakeContextCurrent(window);
     glfwSetTime(0);
 
+#ifdef __APPLE__
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+#endif
+
     glfwSetMouseButtonCallback(window, mouse_callback);
     glfwSetKeyCallback(window, key_callback);
 

@@ -11,6 +11,7 @@
 #include "stack.h"
 #include "city.h"
 #include <nuklear.h>
+#include <iostream>
 
 namespace rip {
      FoundCityCapability::FoundCityCapability(UnitId unitID) : Capability(unitID) {}
@@ -142,6 +143,7 @@ namespace rip {
             game.addCombat(combat);
             game.getUnit(*otherUnit).setInCombat(true);
             this->setInCombat(true);
+            std::cout << "attack" << std::endl;
             return;
         }
 

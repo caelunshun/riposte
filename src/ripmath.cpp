@@ -119,5 +119,9 @@ namespace rip {
             return "a";
         }
     }
+
+    bool isAdjacent(glm::uvec2 a, glm::uvec2 b) {
+        return dist(a, b) < 1.9;
+    }
 }
 

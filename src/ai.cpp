@@ -73,6 +73,43 @@ namespace rip {
         Thrive,
     };
 
+    // An AI's plan for an upcoming or ongoing war.
+    struct WarPlan {
+        // The player to attack.
+        PlayerId opponent;
+
+        // The city to target.
+        CityId targetCityID;
+
+        // The location to gather troops for the attack.
+        CityId gatherCityID;
+
+        // Whether troops are already en route from gatherCity to targetCity.
+        bool enRoute = false;
+
+        // Whether troops are to attack the city this turn.
+        bool shouldAttack = false;
+
+        // The units that are ready to attack (i.e., in position in gatherCity)
+        absl::flat_hash_set<UnitId> readyUnits;
+
+        // The units that are next to the targetCity and can attack on the next turn
+        absl::flat_hash_set<UnitId> attackingUnits;
+
+        std::optional<CityId> findNewTargetCity(Game &game, AIimpl &ai, Player &player);
+
+        CityId updateGatherCity(Game &game, AIimpl &ai, Player &player);
+
+        // Updates the war plan. Returns whether the opponent is still valid.
+        bool update(Game &game, AIimpl &ai, Player &player);
+
+        void setTargetCity(Game &game, AIimpl &ai, Player &player, CityId newTarget);
+
+        int getNeededUnitCount(Game &game);
+
+        PlayerId findBestOpponent(Game &game, AIimpl &ai, Player &player);
+    };
+
     class AIimpl {
         // A unit AI for each unit.
         std::vector<std::unique_ptr<UnitAI>> unitAIs;
@@ -86,6 +123,10 @@ namespace rip {
 
         // The current long-term goal.
         Goal goal = Goal::ExpandPeacefully;
+
+        // The current war plan.
+        // Only applicable if goal == Goal::ExpandWar.
+        WarPlan warPlan;
 
         PlayerId thePlayerID;
 
@@ -107,6 +148,10 @@ namespace rip {
 
         Goal getGoal() const {
             return goal;
+        }
+
+        WarPlan &getWarPlan() {
+            return warPlan;
         }
 
         std::unique_ptr<UnitAI> makeUnitAI(Unit &unit);
@@ -142,7 +187,7 @@ namespace rip {
                     }
 
                     auto &unit = game.getUnit(unitID);
-                    unit.moveAlongCurrentPath(game, true);
+                    unit.moveAlongCurrentPath(game, false);
                     unitAI->doTurn(game, *this, player, unit);
                 }
             }
@@ -196,25 +241,31 @@ namespace rip {
             return isEconomyReadyForWar(game, player);
         }
 
-        void setGoal(Goal newGoal) {
+        void setGoal(Goal newGoal, Game &game, Player &player) {
             if (goal != newGoal) {
                 const char *goalNames[3] = {"ExpandPeacefully", "ExpandWar", "Thrive"};
                 log("NEW GOAL: " + std::string(goalNames[static_cast<int>(newGoal)]));
+
+                if (newGoal == Goal::ExpandWar) {
+                    warPlan.opponent = warPlan.findBestOpponent(game, *this, player);
+                    warPlan.setTargetCity(game, *this, player, *warPlan.findNewTargetCity(game, *this, player));
+                    log("PLOTTING WAR against " + game.getPlayer(warPlan.opponent).getLeader().name);
+                }
             }
             goal = newGoal;
         }
 
         void updateGoal(Game &game, Player &player) {
             if (isPeacefulExpansionExhausted && goal == Goal::ExpandPeacefully && needsExpansion(game, player)) {
-                setGoal(Goal::ExpandWar);
+                setGoal(Goal::ExpandWar, game, player);
             }
 
             if (hasBaseDesiredCities(game, player) && isEconomyReadyForWar(game, player)) {
-                setGoal(Goal::ExpandWar);
+                setGoal(Goal::ExpandWar, game, player);
             }
 
             if (goal == Goal::ExpandPeacefully && !isEconomyReadyForWar(game, player) && hasBaseDesiredCities(game, player)) {
-                setGoal(Goal::Thrive);
+                setGoal(Goal::Thrive, game, player);
             }
         }
 
@@ -227,11 +278,12 @@ namespace rip {
         }
 
         // Gets the closest city (owned by anyone) to the given position.
-        std::pair<double, CityId> getDistanceToNearestCity(const Game &game, glm::uvec2 pos) {
+        std::pair<double, CityId> getDistanceToNearestCity(const Game &game, glm::uvec2 pos, bool onlyOurs) {
             double bestDist = 1000000;
             CityId bestCity;
 
             for (const auto &city : game.getCities()) {
+                if (onlyOurs && city.getOwner() != playerID) continue;
                 const auto d = dist(pos, city.getPos());
                 if (d < bestDist) {
                     bestDist = d;
@@ -242,16 +294,124 @@ namespace rip {
             return {bestDist, bestCity};
         }
 
+        void updateWarPlan(Game &game, Player &player) {
+            if (goal != Goal::ExpandWar) return;
+
+            warPlan.update(game, *this, player);
+        }
+
         void doTurn(Game &game) {
             auto &player = game.getPlayer(playerID);
             playerName = player.getLeader().name;
             thePlayerID = game.getThePlayerID();
+            updateWarPlan(game, player);
             updateGoal(game, player);
             updateUnits(game);
             updateCities(game, player);
             updateResearch(game, player);
         }
     };
+
+    // WAR
+    PlayerId WarPlan::findBestOpponent(Game &game, AIimpl &ai, Player &player) {
+        // Find opponent with closest capital.
+        std::optional<PlayerId> closest;
+        double closestDist;
+        for (const auto &player : game.getPlayers()) {
+            if (player.getID() == ai.playerID) continue;
+
+            double dist = ai.getDistanceToNearestCity(game, game.getCity(player.getCapital()).getPos(), true).first;
+            if (!closest.has_value() || dist < closestDist) {
+                closestDist = dist;
+                closest = player.getID();
+            }
+        }
+
+        return *closest;
+    }
+
+    std::optional<CityId> WarPlan::findNewTargetCity(Game &game, AIimpl &ai, Player &player) {
+        // Find closest city to our land.
+        std::optional<CityId> result;
+        double resultDist;
+        for (const auto cityID : game.getPlayer(opponent).getCities()) {
+            const auto &city = game.getCity(cityID);
+            const auto dist = ai.getDistanceToNearestCity(game, city.getPos(), true).first;
+            if (!result.has_value() || dist < resultDist) {
+                resultDist = dist;
+                result = cityID;
+            }
+        }
+        return result;
+    }
+
+    CityId WarPlan::updateGatherCity(Game &game, AIimpl &ai, Player &player) {
+        gatherCityID = ai.getDistanceToNearestCity(game, game.getCity(targetCityID).getPos(), true).second;
+    }
+
+    void WarPlan::setTargetCity(Game &game, AIimpl &ai, Player &player, CityId newTarget) {
+        if (newTarget != targetCityID) {
+            ai.log("WAR: targeting " + game.getCity(newTarget).getName());
+            targetCityID = newTarget;
+            updateGatherCity(game, ai, player);
+            enRoute = false;
+            shouldAttack = false;
+            attackingUnits.clear();
+            readyUnits.clear();
+        }
+    }
+
+    bool WarPlan::update(Game &game, AIimpl &ai, Player &player) {
+        ai.log("war plan: ready = " + std::to_string(readyUnits.size()) + ", attacking = " + std::to_string(attackingUnits.size())
+            + ", enRoute = " + std::to_string(enRoute) + ", shouldAttack = " + std::to_string(shouldAttack));
+        // Check that the target city is still owned by the opponent.
+        const auto &targetCity = game.getCity(targetCityID);
+        if (targetCity.getOwner() != opponent) {
+            auto newTarget = findNewTargetCity(game, ai, player);
+            if (newTarget.has_value()) {
+                setTargetCity(game, ai, player, *newTarget);
+            } else {
+                return true;
+            }
+        }
+
+        // Check that the target city is still the best city.
+        auto bestCity = findNewTargetCity(game, ai, player);
+        if (bestCity.has_value() && *bestCity != targetCityID) {
+            setTargetCity(game, ai, player, *bestCity);
+        }
+
+        if (readyUnits.size() >= getNeededUnitCount(game)
+            && !player.isAtWarWith(opponent)) {
+            // We're ready for war.
+            player.declareWarOn(opponent, game);
+        }
+
+        if (readyUnits.size() >= getNeededUnitCount(game)) {
+            enRoute = true;
+        } else {
+            enRoute = false;
+        }
+
+        if (attackingUnits.size() >= getNeededUnitCount(game)
+            && player.isAtWarWith(opponent)) {
+            shouldAttack = true;
+        } else {
+            shouldAttack = false;
+        }
+
+        return false;
+    }
+
+    // Gets the number of units we need to take the city.
+    int WarPlan::getNeededUnitCount(Game &game) {
+        const auto targetStack = game.getStackByKey(opponent, game.getCity(targetCityID).getPos());
+        if (targetStack.has_value()) {
+            return game.getStack(*targetStack).getUnits().size();
+        } else {
+            return 2;
+        }
+    }
 
     // UNIT
 
@@ -268,7 +428,7 @@ namespace rip {
         double rateCityLocation(Game &game, AIimpl &ai, Unit &unit, const Tile &tile, glm::uvec2 tilePos) {
             const double optimalDist = 6;
             const auto minDist = 3;
-            double distanceFactor = 2 * -pow(ai.getDistanceToNearestCity(game, tilePos).first - optimalDist, 2) + 5;
+            double distanceFactor = 2 * -pow(ai.getDistanceToNearestCity(game, tilePos, true).first - optimalDist, 2) + 5;
 
             double tileFactor = 0;
             if (tile.getTerrain() == Terrain::Desert) {
@@ -285,7 +445,7 @@ namespace rip {
             }
 
             double existingCityFactor = 0;
-            if (ai.getDistanceToNearestCity(game, tilePos).first < minDist) {
+            if (ai.getDistanceToNearestCity(game, tilePos, false).first < minDist) {
                 existingCityFactor = -100000;
             }
 
@@ -476,15 +636,15 @@ namespace rip {
         }
     };
 
-    class ReconUnitAI : public UnitAI {
+    class MilitaryGroundUnitAI : public UnitAI {
     public:
-        ReconUnitAI(const UnitId &unitId) : UnitAI(unitId) {}
+        MilitaryGroundUnitAI(const UnitId &unitId) : UnitAI(unitId) {}
 
-        ~ReconUnitAI() override = default;
+        ~MilitaryGroundUnitAI() override = default;
 
         void doTurn(Game &game, AIimpl &ai, Player &player, Unit &unit) override {
             // Stay in the city if it needs protection.
-            const auto minCityUnits = 6;
+            const auto minCityUnits = 2;
             auto *city = game.getCityAtLocation(unit.getPos());
             if (city && city->getOwner() == ai.playerID) {
                 auto stackID = game.getStackByKey(ai.playerID, unit.getPos());
@@ -496,18 +656,67 @@ namespace rip {
 
             if (unit.isFortified()) return;
 
-            // Scout randomly.
-            int attempts = 0;
-            while (!unit.hasPath() && attempts < 10) {
-                glm::uvec2 target(unit.getPos().x + static_cast<int>(ai.rng.u32(0, 20)) - 10,
-                                  unit.getPos().y + static_cast<int>(ai.rng.u32(0, 20)) - 10);
-                auto path = computeShortestPath(game, unit.getPos(), target, {});
-                if (path.has_value()) {
-                    unit.setPath(std::move(*path));
+            if (ai.getGoal() == Goal::ExpandWar) {
+                // Follow the war plan.
+                auto &plan = ai.getWarPlan();
+                const auto targetCityPos = game.getCity(plan.targetCityID).getPos();
+                const auto gatherCityPos = game.getCity(plan.gatherCityID).getPos();
+
+                glm::uvec2 targetPos;
+                if (plan.enRoute) {
+                    targetPos = targetCityPos;
+                } else {
+                    targetPos = gatherCityPos;
                 }
 
-                ++attempts;
+                if (!unit.hasPath() || unit.getPath().getDestination() != targetPos) {
+                    auto path = computeShortestPath(game, unit.getPos(), targetPos, {});
+                    if (path.has_value()) {
+                        unit.setPath(std::move(*path));
+                    } else {
+                        ai.log("can't pathfind to gather location");
+                    }
+                }
+
+                if (!plan.enRoute && unit.getPos() == gatherCityPos) {
+                    plan.readyUnits.insert(unit.getID());
+                } else if (!plan.enRoute) {
+                    plan.readyUnits.erase(unit.getID());
+                }
+
+                if (plan.enRoute && isAdjacent(unit.getPos(), targetCityPos)) {
+                    plan.attackingUnits.insert(unit.getID());
+                    plan.readyUnits.insert(unit.getID());
+
+                    // Attack if we can.
+                    if (plan.shouldAttack) {
+                        ai.log("unit ATTACKING city");
+                        unit.moveTo(targetCityPos, game, true);
+                    } else {
+                        ai.log("unit READY but NOT attacking");
+                    }
+                } else {
+                    plan.attackingUnits.erase(unit.getID());
+                }
+            } else {
+                // Scout randomly.
+                int attempts = 0;
+                while (!unit.hasPath() && attempts < 10) {
+                    glm::uvec2 target(unit.getPos().x + static_cast<int>(ai.rng.u32(0, 20)) - 10,
+                                      unit.getPos().y + static_cast<int>(ai.rng.u32(0, 20)) - 10);
+                    auto path = computeShortestPath(game, unit.getPos(), target, {});
+                    if (path.has_value()) {
+                        unit.setPath(std::move(*path));
+                    }
+
+                    ++attempts;
+                }
             }
+        }
+
+        void onDeath(Game &game, AIimpl &ai, Player &player) override {
+            ai.getWarPlan().readyUnits.erase(unitID);
+            ai.getWarPlan().attackingUnits.erase(unitID);
         }
     };
 
@@ -517,7 +726,7 @@ namespace rip {
         } else if (unit.hasCapability<WorkerCapability>()) {
             return std::make_unique<WorkerAI>(unit.getID());
         } else {
-            return std::make_unique<ReconUnitAI>(unit.getID());
+            return std::make_unique<MilitaryGroundUnitAI>(unit.getID());
         }
     }
 

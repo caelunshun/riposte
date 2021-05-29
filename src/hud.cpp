@@ -517,6 +517,7 @@ namespace rip {
     }
 
     bool Hud::shouldShowTechPrompt(const Game &game) const {
+        return false; // DEBUG - AI
         return game.getTurn() != 0 && !game.getThePlayer().getResearchingTech().has_value();
     }
 

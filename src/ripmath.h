@@ -54,6 +54,8 @@ namespace rip {
 
     // Returns "a" or "an" depending on the proceeding noun or adjective.
     const char *article(const std::string &noun);
+
+    bool isAdjacent(glm::uvec2 a, glm::uvec2 b);
 }
 
 #endif //RIPOSTE_RIPMATH_H
