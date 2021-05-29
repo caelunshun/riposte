@@ -12,7 +12,27 @@
       "paranoia": 7,
       "expansiveness": 4,
       "religious": 2
-    }
+    },
+    {
+      "name": "Trump",
+      "aggressive": 9,
+      "nukemonger": 7,
+      "submissive": 3,
+      "paranoia": 4,
+      "expansiveness": 4,
+      "religious": 5
+    },
+    {
+      "name": "Klein",
+      "aggressive": 10,
+      "nukemonger": 10,
+      "submissive": 0,
+      "paranoia": 10,
+      "expansiveness": 10,
+      "religious": 0
+    },
+
+
   ],
   "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [

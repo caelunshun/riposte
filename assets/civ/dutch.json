@@ -1,0 +1,35 @@
+{
+  "id": "dutch",
+  "name": "Dutch Empire",
+  "adjective": "Dutch",
+  "color": [255, 105, 0],
+  "leaders": [
+    {
+      "name": "Willem van Oranje",
+      "aggressive": 3,
+      "nukemonger": 1,
+      "submissive": 5,
+      "paranoia": 4,
+      "expansiveness": 6,
+      "religious": 5
+    }
+  ],
+  "startingTechs": ["Hunting", "Agriculture"],
+  "cities": [
+    "Amsterdam",
+    "Utrecht",
+    "Rotterdam",
+    "Nijmegen",
+    "Maastricht",
+    "Middelburg",
+    "Delft",
+    "Leiden",
+    "Haarlem",
+    "Dorestad",
+    "Deventer",
+    "Kampen",
+    "Groningen",
+    "Leeuwarden",
+    "Windmill"
+  ]
+}

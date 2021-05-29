@@ -135,6 +135,11 @@
     "loader": "civ"
   },
   {
+    "path": "civ/dutch.json",
+    "id": "civ/dutch",
+    "loader": "civ"
+  },
+  {
     "path": "font/Merriweather-Regular.ttf",
     "id": "font/merriweather/regular",
     "loader": "font"
