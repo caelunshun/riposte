@@ -1,0 +1,6 @@
+{
+  "name": "Monotheism",
+  "cost": 80,
+  "prerequisites": ["Polytheism"]
+
+}

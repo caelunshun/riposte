@@ -1,5 +1,5 @@
 {
   "name": "Construction",
   "cost": 160,
-  "prerequisites": ["Alphabet"]
+  "prerequisites": ["Mathematics"]
 }

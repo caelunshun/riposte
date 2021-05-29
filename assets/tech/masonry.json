@@ -1,0 +1,6 @@
+{
+  "name": "Masonry",
+  "cost": 90,
+  "prerequisites": ["Mining", "Mysticism"]
+
+}

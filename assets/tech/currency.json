@@ -1,0 +1,6 @@
+{
+  "name": "Currency",
+  "cost": 140,
+  "prerequisites": ["Mathematics", "Alphabet"]
+
+}

@@ -365,8 +365,43 @@
   "loader": "tech"
 },
   {
-    "path": "tech/fishing.json",
-    "id": "tech/fishing",
+  "path": "tech/fishing.json",
+  "id": "tech/fishing",
+  "loader": "tech"
+},
+  {
+    "path": "tech/currency.json",
+    "id": "tech/currency",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/masonry.json",
+    "id": "tech/masonry",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/mathematics.json",
+    "id": "tech/mathematics",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/metal_casting.json",
+    "id": "tech/metal_casting",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/monarchy.json",
+    "id": "tech/monarchy",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/monotheism.json",
+    "id": "tech/monotheism",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/priesthood.json",
+    "id": "tech/priesthood",
     "loader": "tech"
   },
   {

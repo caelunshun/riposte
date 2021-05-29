@@ -1,0 +1,6 @@
+{
+  "name": "Mathematics",
+  "cost": 130,
+  "prerequisites": ["Writing"]
+
+}

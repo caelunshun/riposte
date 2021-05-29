@@ -1,0 +1,6 @@
+{
+  "name": "Priesthood",
+  "cost": 110,
+  "prerequisites": ["Meditation", "Polytheism"]
+
+}
