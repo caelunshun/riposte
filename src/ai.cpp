@@ -413,6 +413,7 @@ namespace rip {
                 suitabilityFactor = 2;
             } else if (tile.getTerrain() == Terrain::Grassland && task.getImprovement().getName() == "Cottage") {
                 suitabilityFactor = 4;
+                suitabilityFactor = 4;
             }
 
             return distFactor + resourceFactor + suitabilityFactor;
@@ -574,6 +575,15 @@ namespace rip {
 
     // RESEARCH
 
+    // Predefined techs that are important to research.
+    static const char *researchOrder[5] = {
+            "Agriculture",
+            "Pottery",
+            "Mining",
+            "The Wheel",
+            "Bronze Working",
+    };
+
     void AIimpl::updateResearch(Game &game, Player &player) {
         if (player.getResearchingTech().has_value()) return;
 
@@ -583,7 +593,25 @@ namespace rip {
             return;
         }
 
-        auto &choice = options[rng.u32(0, options.size())];
+        std::shared_ptr<Tech> choice;
+        bool finished = false;
+        // Check prioritized techs.
+        for (const auto prioritized : researchOrder) {
+            if (finished) break;
+            for (const auto &option : options) {
+                if (option->name == prioritized) {
+                    choice = option;
+                    finished = true;
+                    break;
+                }
+            }
+        }
+
+        if (!choice) {
+            // Choose by fair die roll.
+            choice = options[rng.u32(0, options.size())];
+        }
+
         player.setResearchingTech(choice);
         log("researching " + choice->name);
     }
