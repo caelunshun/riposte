@@ -28,7 +28,11 @@ namespace rip {
 
         absl::flat_hash_map<Era, FairPicker<std::shared_ptr<SoundAsset>>> eraMusic;
 
+        std::vector<InstanceHandle*> playingSounds;
+
         void updateEraMusic(const Game &game);
+
+        InstanceHandle *playSound(const SoundAsset &sound);
 
     public:
         OutputDevice *rodio;

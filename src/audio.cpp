@@ -47,17 +47,38 @@ namespace rip {
 
             auto sound = eraMusic[currentEra].pickNext();
 
-            currentMusic = rodio_start_sound(rodio, sound->handle);
+            currentMusic = playSound(*sound);
+            if (currentMusic == nullptr) currentMusic = {};
             currentMusicEra = currentEra;
         }
     }
 
     void AudioManager::playSound(const std::string &id) {
         auto sound = std::dynamic_pointer_cast<SoundAsset>(assets->get(id));
-        rodio_start_sound(rodio, sound->handle);
+        playSound(*sound);
     }
 
     void AudioManager::update(const Game &game) {
         updateEraMusic(game);
+
+        // check for completed sounds
+        if (!playingSounds.empty()) {
+            for (int i = playingSounds.size() - 1; i >= 0; i--) {
+                if (rodio_is_sound_done(playingSounds[i])) {
+                    playingSounds.erase(playingSounds.begin() + i);
+                }
+            }
+        }
+    }
+
+    InstanceHandle *AudioManager::playSound(const SoundAsset &sound) {
+        const auto maxSounds = 16;
+        if (playingSounds.size() > maxSounds) {
+            return nullptr;
+        }
+
+        auto *instance = rodio_start_sound(rodio, sound.handle);
+        playingSounds.push_back(instance);
+        return instance;
     }
 }
