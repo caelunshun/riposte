@@ -1,0 +1,6 @@
+{
+  "name": "Meditation",
+  "cost": 70,
+  "prerequisites": ["Mysticism"]
+
+}

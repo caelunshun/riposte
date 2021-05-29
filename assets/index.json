@@ -335,6 +335,31 @@
     "loader": "tech"
   },
   {
+    "path": "tech/construction.json",
+    "id": "tech/construction",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/meditation.json",
+    "id": "tech/meditation",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/mysticism.json",
+    "id": "tech/mysticism",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/polytheism.json",
+    "id": "tech/polytheism",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/sailing.json",
+    "id": "tech/sailing",
+    "loader": "tech"
+  },
+  {
     "path": "resource/copper.json",
     "id": "resource/copper",
     "loader": "resource"
