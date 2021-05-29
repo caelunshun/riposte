@@ -360,8 +360,13 @@
     "loader": "tech"
   },
   {
-    "path": "tech/sailing.json",
-    "id": "tech/sailing",
+  "path": "tech/sailing.json",
+  "id": "tech/sailing",
+  "loader": "tech"
+},
+  {
+    "path": "tech/fishing.json",
+    "id": "tech/fishing",
     "loader": "tech"
   },
   {
