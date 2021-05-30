@@ -22,6 +22,10 @@ namespace rip {
         nk_glfw3_mouse_button_callback(window, button, action, mods);
     }
 
+    void ui_scroll_callback(GLFWwindow *window, double offsetX, double offsetY) {
+        nk_gflw3_scroll_callback(window, offsetX, offsetY);
+    }
+
     struct Ui::impl {
         nk_context *nk;
         nk_font_atlas *fontAtlas;
@@ -43,7 +47,6 @@ namespace rip {
         nk_style_load_all_cursors(nk, atlas->cursors);
         nk_style_hide_cursor(nk);
 
-        glfwSetScrollCallback(window, nk_gflw3_scroll_callback);
         glfwSetCharCallback(window, nk_glfw3_char_callback);
 
         _impl = std::make_unique<impl>(nk, atlas, std::move(nkGlfw));

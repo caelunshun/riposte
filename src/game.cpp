@@ -164,7 +164,9 @@ namespace rip {
     }
 
     glm::uvec2 Game::getPosFromScreenOffset(glm::vec2 offset) const {
-        auto translated = offset + getMapOrigin();
+        auto centered = offset - getCursor().getWindowSize() / 2.0f;
+        centered /= getView().getZoomFactor();
+        auto translated = centered + getView().getMapCenter();
         auto scaled = translated / 100.0f;
         return glm::uvec2(static_cast<uint32_t>(floor(scaled.x)), static_cast<uint32_t>(floor(scaled.y)));
     }

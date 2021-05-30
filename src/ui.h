@@ -12,6 +12,7 @@ struct nk_context;
 
 namespace rip {
     void ui_mouse_callback(GLFWwindow *window, int button, int action, int mods);
+    void ui_scroll_callback(GLFWwindow *window, double offsetX, double offsetY);
 
     enum MouseButton {
         Right,

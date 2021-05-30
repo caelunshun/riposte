@@ -14,6 +14,7 @@
 
 static std::deque<rip::MouseEvent> mouseEvents;
 static std::deque<int> keyEvents;
+static std::deque<double> scrollEvents;
 
 static void mouse_callback(GLFWwindow *window, int button, int action, int mods) {
     rip::ui_mouse_callback(window, button, action, mods);
@@ -54,6 +55,11 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
     keyEvents.push_back(key);
 }
 
+static void scroll_callback(GLFWwindow *window, double offsetX, double offsetY) {
+    rip::ui_scroll_callback(window, offsetX, offsetY);
+    scrollEvents.push_back(offsetY);
+}
+
 static void error_callback(int error, const char* description)
 {
     fprintf(stderr, "Error: %s\n", description);
@@ -80,6 +86,7 @@ int main() {
 
     glfwSetMouseButtonCallback(window, mouse_callback);
     glfwSetKeyCallback(window, key_callback);
+    glfwSetScrollCallback(window, scroll_callback);
 
     glewExperimental = true;
 
@@ -159,6 +166,13 @@ int main() {
             auto event = keyEvents[0];
             hud.handleKey(game, event);
             keyEvents.pop_front();
+        }
+        while (!scrollEvents.empty()) {
+            auto event = scrollEvents[0];
+            if (!hud.hasFocus(game)) {
+                game.getView().handleScroll(event);
+            }
+            scrollEvents.pop_front();
         }
 
         // Handle and clear events.

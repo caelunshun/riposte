@@ -14,6 +14,9 @@
 #include "assets.h"
 
 namespace rip {
+    // Applies scaling based on the zoom factor.
+    void scale(NVGcontext *vg, const Game &game);
+
     class Painter {
     public:
         virtual void paint(NVGcontext *vg, Game &game) = 0;
@@ -51,9 +54,11 @@ namespace rip {
         }
 
         void paintGame(Game &game) {
+            scale(vg, game);
             for (auto &painter : gamePainters) {
                 painter->paint(vg, game);
             }
+            nvgResetTransform(vg);
         }
 
         void paintOverlays(Game &game) {

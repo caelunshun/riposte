@@ -29,16 +29,17 @@ namespace rip {
         glm::vec2 moveTime = glm::vec2(0);
         uint32_t moveDir = 0;
 
-        float zoomVelocity;
         glm::vec2 centerVelocity;
 
         // Used to animate the view position when it is moved programatically.
         std::optional<SmoothAnimation> centerAnimation;
 
     public:
-        View() : mapCenter(500, 500), zoomFactor(1), zoomVelocity(0), centerVelocity(0, 0) {}
+        View() : mapCenter(500, 500), zoomFactor(1), centerVelocity(0, 0) {}
 
         void tick(float dt, const Cursor &cursor, bool hudHasFocus);
+
+        void handleScroll(double offsetY);
 
         glm::vec2 getMapCenter() const;
 

@@ -58,6 +58,10 @@ namespace rip {
     bool isAdjacent(glm::uvec2 a, glm::uvec2 b);
 
     int percentOf(int amount, int percent);
+
+    double cosineInterpolate(
+            double y1,double y2,
+            double time);
 }
 
 #endif //RIPOSTE_RIPMATH_H

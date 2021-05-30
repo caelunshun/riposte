@@ -21,6 +21,15 @@
 #include <glm/glm.hpp>
 
 namespace rip {
+    void scale(NVGcontext *vg, const Game &game) {
+        auto zoom = game.getView().getZoomFactor();
+        auto windowSize = game.getCursor().getWindowSize();
+        nvgScale(vg, zoom, zoom);
+        auto newDim = windowSize / zoom;
+        auto diff = windowSize - newDim;
+        nvgTranslate(vg, -diff.x / 2, -diff.y / 2);
+    }
+
     std::shared_ptr<Asset> ImageLoader::loadAsset(const std::string &data) {
         auto id = nvgCreateImageMem(vg, NVG_IMAGE_GENERATE_MIPMAPS | NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY,
                                     (unsigned char *) data.c_str(), data.size());
@@ -45,10 +54,15 @@ namespace rip {
 
     // Simple 2D frustum cull.
     bool shouldPaintTile(glm::vec2 offset, glm::uvec2 pos, Game &game, bool allowFog) {
-        auto &cursor = game.getCursor();
-        if (offset.x < -100 || offset.y < -100
-            || offset.x > cursor.getWindowSize().x
-            || offset.y > cursor.getWindowSize().y) {
+        const auto &cursor = game.getCursor();
+        const auto halfWindowSize = cursor.getWindowSize() / 2.0f;
+        auto centered = offset - halfWindowSize;
+        centered *= game.getView().getZoomFactor();
+
+        if (centered.x < -halfWindowSize.x - (100 * game.getView().getZoomFactor())
+            || centered.y < -halfWindowSize.y - (100 * game.getView().getZoomFactor())
+            || centered.x > halfWindowSize.x
+            || centered.y > halfWindowSize.y) {
             return false;
         }
 

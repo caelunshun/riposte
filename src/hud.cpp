@@ -51,6 +51,7 @@ namespace rip {
     }
 
     void Hud::paintSelectedUnit(Game &game) {
+        scale(vg, game);
         if (selectedStack.has_value()) {
             auto stackID = *selectedStack;
 
@@ -104,6 +105,7 @@ namespace rip {
                 nvgStroke(vg);
             }
         }
+        nvgResetTransform(vg);
     }
 
     void Hud::paintGenericUnitUI(Game &game) {

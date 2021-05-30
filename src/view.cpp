@@ -14,6 +14,9 @@ namespace rip {
     const auto DIR_UP = 0x04;
     const auto DIR_DOWN = 0x10;
 
+    const float maxZoomFactor = 8;
+    const float minZoomFactor = 0.2;
+
     float sampleVelocityCurve(float time) {
         const auto cutoff = 1;
         const auto max = 300;
@@ -81,6 +84,13 @@ namespace rip {
 
         moveTime += dt;
         mapCenter += (centerVelocity * (1 / zoomFactor)) * dt;
+    }
+
+    void View::handleScroll(double offsetY) {
+        const auto sensitivity = 0.2;
+        zoomFactor += offsetY * sensitivity;
+
+        zoomFactor = std::clamp(zoomFactor, minZoomFactor, maxZoomFactor);
     }
 
     glm::vec2 View::getMapCenter() const {

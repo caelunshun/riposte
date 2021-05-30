@@ -127,5 +127,10 @@ namespace rip {
     int percentOf(int amount, int percent) {
         return (amount * percent) / 100;
     }
+
+    double cosineInterpolate(double y1, double y2, double time) {
+        double mu2 = (1 - cos(time * pi())) / 2;
+        return(y1 * (1 - mu2) + y2 * mu2);
+    }
 }
 
