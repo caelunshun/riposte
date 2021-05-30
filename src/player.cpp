@@ -198,7 +198,7 @@ namespace rip {
         expenses = 0;
         for (const auto cityID : cities) {
             const auto &city = game.getCity(cityID);
-            expenses += city.getMaintanenceCost(game);
+            expenses += city.getMaintenanceCost(game);
         }
 
         // Unit upkeep. Each unit costs 1 GPT.

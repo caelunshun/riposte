@@ -117,7 +117,7 @@ namespace rip {
             }
             usedCivIDs.insert(civ->id);
 
-            assert(!civ.leaders.empty());
+            assert(!civ->leaders.empty());
             auto leader = civ->leaders[rng.u32(0, civ->leaders.size())];
 
             Player player(leader.name, civ, leader, game.getMapWidth(), game.getMapHeight(), techTree);

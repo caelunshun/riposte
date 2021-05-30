@@ -26,6 +26,9 @@ namespace rip {
         std::vector<std::shared_ptr<UnitKind>> unlocksUnits;
         // The set of improvements unlocked by researching this tech.
         std::vector<std::string> unlocksImprovements;
+        // The set of buildings unlocked by researching this tech.
+        // Note that buildings may depend on multiple techs.
+        std::vector<std::shared_ptr<Building>> unlocksBuildings;
 
         // The set of techs that need to be unlocked to research this one.
         std::vector<std::shared_ptr<Tech>> prerequisites;
@@ -70,6 +73,8 @@ namespace rip {
         bool isUnitUnlocked(const UnitKind &kind) const;
 
         bool isImprovementUnlocked(const std::string &name) const;
+
+        bool isBuildingUnlocked(const Building &building) const;
     };
 
     class TechLoader : public AssetLoader {

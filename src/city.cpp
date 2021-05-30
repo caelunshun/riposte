@@ -128,8 +128,24 @@ namespace rip {
     Yield City::computeYield(const Game &game) const {
         Yield yield(0, 0, 0);
         for (const auto workedPos : workedTiles) {
-            yield += game.getTile(workedPos).getYield(game, workedPos, owner);
+            const auto &tile = game.getTile(workedPos);
+
+            yield += tile.getYield(game, workedPos, owner);
+
+            if (tile.getTerrain() == Terrain::Ocean) {
+                yield += Yield(0, 0, buildingEffects.oceanFoodBonus);
+            }
         }
+
+        // Apply building effects
+        yield.hammers += buildingEffects.bonusHammers;
+        yield.commerce += buildingEffects.bonusCommerce;
+        yield.food += buildingEffects.bonusFood;
+
+        yield.hammers += percentOf(yield.hammers, buildingEffects.bonusHammerPercent);
+        yield.commerce += percentOf(yield.commerce, buildingEffects.bonusCommercePercent);
+        yield.food += percentOf(yield.food, buildingEffects.bonusFoodPercent);
+
         return yield;
     }
 
@@ -216,6 +232,14 @@ namespace rip {
             tasks.push_back(std::move(task));
         }
 
+        for (const auto &building : game.getRegistry().getBuildings()) {
+            auto task = std::make_unique<BuildingBuildTask>(building);
+            if (!task->canBuild(game, *this)) {
+                continue;
+            }
+            tasks.push_back(std::move(task));
+        }
+
         return tasks;
     }
 
@@ -247,6 +271,10 @@ namespace rip {
             ++population;
             updateWorkedTiles(game);
             storedFood -= neededFoodForGrowth;
+
+            if (buildingEffects.hasGranaryFoodStore) {
+                storedFood += neededFoodForGrowth / 2;
+            }
         }
     }
 
@@ -255,7 +283,15 @@ namespace rip {
     }
 
     int City::getCulturePerTurn() const {
-        return population; // TODO?
+        int culture = 0;
+        if (isCapital()) {
+            culture += 2;
+        }
+
+        culture += buildingEffects.bonusCulture;
+        culture += percentOf(culture, buildingEffects.bonusCulturePercent);
+
+        return culture;
     }
 
     CultureLevel City::getCultureLevel() const {
@@ -278,6 +314,15 @@ namespace rip {
     void City::onCreated(Game &game) {
         game.getCultureMap().onCityCreated(game, getID());
         game.getTradeRoutes().onCityCreated(game, *this);
+
+        // Check coastal status.
+        for (const auto neighborPos : getNeighbors(pos)) {
+            const auto &tile = game.getTile(neighborPos);
+            if (tile.getTerrain() == Terrain::Ocean) {
+                coastal = true;
+                break;
+            }
+        }
     }
 
     int City::getGoldProduced(Game &game) const {
@@ -304,14 +349,18 @@ namespace rip {
         }
     }
 
-    int City::getMaintanenceCost(const Game &game) const {
+    int City::getMaintenanceCost(const Game &game) const {
         const auto &capitalCity = game.getCity(game.getPlayer(owner).getCapital());
         float baseDistanceCost = dist(pos, capitalCity.getPos()) * 0.25;
         int distanceFromPalaceCost = static_cast<int>((7 + population) * (baseDistanceCost / 8));
 
         int numberOfCitiesCost = static_cast<int>(0.6 + 0.033 * population * game.getPlayer(owner).getCities().size() / 2);
 
-        return distanceFromPalaceCost + numberOfCitiesCost;
+        int total = distanceFromPalaceCost + numberOfCitiesCost;
+
+        total -= percentOf(total, buildingEffects.minusMaintenancePercent);
+
+        return total;
     }
 
     void City::transferControlTo(Game &game, PlayerId newOwnerID) {
@@ -333,6 +382,55 @@ namespace rip {
 
         newOwner.recomputeScore(game);
         oldOwner.recomputeScore(game);
+    }
+
+    const std::vector<std::shared_ptr<Building>> &City::getBuildings() const {
+        return buildings;
+    }
+
+    bool City::hasBuilding(const std::string &buildingName) const {
+        for (const auto &building : getBuildings()) {
+            if (building->name == buildingName) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    void City::addBuilding(std::shared_ptr<Building> building) {
+        if (hasBuilding(building->name)) return;
+        for (const auto &effect : building->effects) {
+            buildingEffects += effect;
+        }
+        buildings.emplace_back(std::move(building));
+    }
+
+    const BuildingEffect &City::getBuildingEffects() const {
+        return buildingEffects;
+    }
+
+    bool City::isCoastal() const {
+        return coastal;
+    }
+
+    bool BuildingBuildTask::canBuild(const Game &game, const City &builder) {
+        return
+                !builder.hasBuilding(building->name)
+                && (!building->onlyCoastal || builder.isCoastal())
+                && game.getPlayer(builder.getOwner()).getTechs().isBuildingUnlocked(*building);
+    }
+
+    void BuildingBuildTask::onCompleted(Game &game, City &builder) {
+        builder.addBuilding(building);
+    }
+
+    const std::string &BuildingBuildTask::getName() const {
+        return building->name;
+    }
+
+    BuildingBuildTask::BuildingBuildTask(std::shared_ptr<Building> building)
+        : BuildTask(building->cost), building(building) {
+
     }
 }
 

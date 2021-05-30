@@ -56,6 +56,8 @@ namespace rip {
     const char *article(const std::string &noun);
 
     bool isAdjacent(glm::uvec2 a, glm::uvec2 b);
+
+    int percentOf(int amount, int percent);
 }
 
 #endif //RIPOSTE_RIPMATH_H

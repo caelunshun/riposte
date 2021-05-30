@@ -51,11 +51,18 @@ namespace rip {
             }
         }
 
-        // Step 3: resolve unit kinds
+        // Step 3: resolve unit kinds and buildings
         for (const auto &unit : registry.getUnits()) {
             for (const auto &techName : unit->techs) {
-                auto &tech = techs[techName];
+                auto &tech = techs.at(techName);
                 tech->unlocksUnits.push_back(unit);
+            }
+        }
+
+        for (const auto &building : registry.getBuildings()) {
+            for (const auto &techName : building->techs) {
+                auto &tech = techs.at(techName);
+                tech->unlocksBuildings.push_back(building);
             }
         }
     }
@@ -118,6 +125,13 @@ namespace rip {
             }
         }
         return false;
+    }
+
+    bool PlayerTechs::isBuildingUnlocked(const Building &building) const {
+        for (const auto &techName : building.techs) {
+            if (!isTechUnlocked(techName)) return false;
+        }
+        return true;
     }
 
     std::shared_ptr<Asset> TechLoader::loadAsset(const std::string &data) {

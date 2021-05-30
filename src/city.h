@@ -95,6 +95,26 @@ namespace rip {
         }
     };
 
+    // A build task to build a building.
+    class BuildingBuildTask : public BuildTask {
+        std::shared_ptr<Building> building;
+
+    public:
+        BuildingBuildTask(std::shared_ptr<Building> building);
+
+        ~BuildingBuildTask() override = default;
+
+        bool canBuild(const Game &game, const City &builder) override;
+
+        void onCompleted(Game &game, City &builder) override;
+
+        const std::string &getName() const override;
+
+        const std::shared_ptr<Building> &getBuilding() const {
+            return building;
+        }
+    };
+
     class City {
         glm::uvec2 pos;
         std::string name;
@@ -117,6 +137,13 @@ namespace rip {
 
         // Resources accessible to this city.
         absl::flat_hash_set<std::shared_ptr<Resource>, ResourceHash> resources;
+
+        // Buildings present in the city.
+        std::vector<std::shared_ptr<Building>> buildings;
+        // Sum of the building effects present in the city.
+        BuildingEffect buildingEffects;
+
+        bool coastal = false;
 
         bool capital = false;
 
@@ -165,7 +192,14 @@ namespace rip {
         void addResource(std::shared_ptr<Resource> resource);
         void clearResources();
 
-        int getMaintanenceCost(const Game &game) const;
+        int getMaintenanceCost(const Game &game) const;
+
+        const std::vector<std::shared_ptr<Building>> &getBuildings() const;
+        bool hasBuilding(const std::string &buildingName) const;
+        void addBuilding(std::shared_ptr<Building> building);
+        const BuildingEffect &getBuildingEffects() const;
+
+        bool isCoastal() const;
 
         void transferControlTo(Game &game, PlayerId newOwner);
     };

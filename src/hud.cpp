@@ -553,6 +553,9 @@ namespace rip {
                         for (const auto &unit : tech->unlocksUnits) {
                             nk_label(nk, ("* Can train " + std::string(article(unit->name)) + " " + unit->name).c_str(), NK_TEXT_ALIGN_LEFT);
                         }
+                        for (const auto &building : tech->unlocksBuildings) {
+                            nk_label(nk, ("* Can build " + std::string(article(building->name)) + " " + building->name).c_str(), NK_TEXT_ALIGN_LEFT);
+                        }
                         for (const auto &improvement : tech->unlocksImprovements) {
                             nk_label(nk, ("* Can build " + std::string(article(improvement)) + " " + improvement).c_str(), NK_TEXT_ALIGN_LEFT);
                         }

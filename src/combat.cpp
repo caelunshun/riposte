@@ -7,6 +7,7 @@
 #include "game.h"
 #include "unit.h"
 #include "event.h"
+#include "city.h"
 
 namespace rip {
     const float roundTime = 0.4;
@@ -36,6 +37,8 @@ namespace rip {
         bool attacking = unit.getID() == attackerID;
         assert(defending || attacking);
 
+        const auto *city = game.getCityAtLocation(unit.getPos());
+
         // Apply a percent bonus to the base strength,
         // based on the unit's combatBonuses.
         int percentBonus = 0;
@@ -43,7 +46,7 @@ namespace rip {
             if ((defending && bonus.onlyOnAttack) || (attacking && bonus.onlyOnDefense)) {
                 continue;
             }
-            if (game.getCityAtLocation(unit.getPos())) {
+            if (city) {
                 percentBonus += bonus.whenInCityBonus;
             }
             if (opponent.getKind().id == bonus.unit) {
@@ -52,6 +55,10 @@ namespace rip {
             if (opponent.getKind().category == bonus.unitCategory) {
                 percentBonus += bonus.againstUnitCategoryBonus;
             }
+        }
+
+        if (city && city->getOwner() == unit.getOwner()) {
+            percentBonus += city->getBuildingEffects().defenseBonusPercent;
         }
 
         return baseStrength + (percentBonus / 100.0) * baseStrength;

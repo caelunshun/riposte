@@ -123,5 +123,9 @@ namespace rip {
     bool isAdjacent(glm::uvec2 a, glm::uvec2 b) {
         return dist(a, b) < 1.9;
     }
+
+    int percentOf(int amount, int percent) {
+        return (amount * percent) / 100;
+    }
 }
 
