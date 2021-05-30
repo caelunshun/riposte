@@ -222,7 +222,7 @@ namespace rip {
         }
 
         bool isEconomyReadyForWar(Game &game, Player &player) const {
-            return (static_cast<double>(player.getBaseRevenue()) / player.getExpenses() >= 1.5 && player.getBeakerRevenue() >= 10);
+            return (static_cast<double>(player.getBaseRevenue()) / player.getExpenses() >= 1.2 && player.getBeakerRevenue() >= 10);
         }
 
         bool hasBaseDesiredCities(Game &game, Player &player) const {
@@ -272,9 +272,9 @@ namespace rip {
         void updateResearch(Game &game, Player &player);
 
         void log(std::string message) const {
-            if (playerID == thePlayerID) {
+            //if (playerID == thePlayerID) {
                 std::cout << "[ai-" << playerName << "] " << message << std::endl;
-            }
+            //}
         }
 
         // Gets the closest city (owned by anyone) to the given position.
@@ -322,6 +322,7 @@ namespace rip {
         double closestDist;
         for (const auto &player : game.getPlayers()) {
             if (player.getID() == ai.playerID) continue;
+            if (player.isDead()) continue;
 
             double dist = ai.getDistanceToNearestCity(game, game.getCity(player.getCapital()).getPos(), true).first;
             if (!closest.has_value() || dist < closestDist) {
@@ -637,6 +638,14 @@ namespace rip {
                     targetPos = bestTask->getPos();
                     targetTask = std::move(bestTask);
                     unit.setPath(std::move(*path));
+                }
+            } else {
+                auto capitalPos = game.getCity(player.getCapital()).getPos();
+                if (unit.getPos() != capitalPos) {
+                    auto path = computeShortestPath(game, unit.getPos(), capitalPos, {});
+                    if (path) {
+                        unit.setPath(std::move(*path));
+                    }
                 }
             }
         }

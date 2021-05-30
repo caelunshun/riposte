@@ -138,7 +138,7 @@ namespace rip {
         // Check for attacks.
         auto otherUnit = wouldAttackPos(game, target);
         if (otherUnit.has_value()) {
-            if (!allowCombat) return;
+            if (!allowCombat && game.getUnit(*otherUnit).canFight()) return;
             Combat combat(getID(), *otherUnit, game);
             game.addCombat(combat);
             game.getUnit(*otherUnit).setInCombat(true);
