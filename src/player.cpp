@@ -182,15 +182,28 @@ namespace rip {
 
     void Player::recomputeRevenue(Game &game) {
         baseRevenue = 0;
+        beakerRevenue = 0;
+        goldRevenue = 0;
         for (const auto cityID : cities) {
             auto &city = game.getCity(cityID);
-            baseRevenue += city.getGoldProduced(game);
-        }
 
-        // Split base revenue into gold and beaker revenue
-        // based on beakerPercent.
-        beakerRevenue = static_cast<int>(baseRevenue * (sciencePercent / 100.0));
-        goldRevenue = baseRevenue - beakerRevenue;
+            const auto cityBaseCommerce = city.getGoldProduced(game);
+
+            // Split base revenue into gold and beaker revenue
+            // based on beakerPercent.
+
+            int cityBeakers = percentOf(cityBaseCommerce, sciencePercent);
+            cityBeakers += city.getBuildingEffects().bonusBeakers;
+            cityBeakers += percentOf(cityBeakers, city.getBuildingEffects().bonusBeakerPercent);
+
+            int cityGold = cityBaseCommerce - percentOf(cityBaseCommerce, sciencePercent);
+            cityGold += city.getBuildingEffects().bonusGold;
+            cityGold += percentOf(cityGold, city.getBuildingEffects().bonusGoldPercent);
+
+            baseRevenue += cityBaseCommerce;
+            beakerRevenue += cityBeakers;
+            goldRevenue += cityGold;
+        }
     }
 
     void Player::recomputeExpenses(Game &game) {

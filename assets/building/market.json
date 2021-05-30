@@ -4,7 +4,7 @@
   "techs": ["Currency"],
   "effects": [
     {
-      "type": "bonusGoldPercent",
+      "type": "bonusCommercePercent",
       "amount": 25
     }
   ]
