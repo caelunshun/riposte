@@ -751,13 +751,24 @@ namespace rip {
         }
 
         std::shared_ptr<UnitKind> unitToBuild;
+        std::optional<BuildingBuildTask> building;
 
         const auto &registry = game.getRegistry();
         if (ai.getGoal() == Goal::ExpandPeacefully && ai.settlerCount == 0 && game.getTurn() != 0) {
             ++ai.settlerCount;
             unitToBuild = registry.getUnit("settler");
         } else if (ai.getGoal() == Goal::Thrive) {
-            unitToBuild = registry.getUnit("worker");
+            BuildingBuildTask buildMarket(registry.getBuilding("Market"));
+            BuildingBuildTask buildLibrary(registry.getBuilding("Library"));
+
+            const auto commerce = city.computeYield(game).commerce;
+            if (commerce >= 8 && buildMarket.canBuild(game, city)) {
+                building = std::move(buildMarket);
+            } else if (commerce >= 8 && buildLibrary.canBuild(game, city)) {
+                building = std::move(buildLibrary);
+            } else {
+                unitToBuild = registry.getUnit("worker");
+            }
         } else if (ai.getGoal() == Goal::ExpandWar) {
             unitToBuild = bestMilitaryUnit;
         } else {
@@ -769,7 +780,16 @@ namespace rip {
             }
         }
 
-        if (unitToBuild) {
+        BuildingBuildTask granary(registry.getBuilding("Granary"));
+        if (ai.getGoal() != Goal::ExpandWar && granary.canBuild(game, city) && game.getTurn() > 60) {
+            building = std::move(granary);
+        }
+
+        if (building.has_value()) {
+            ai.log("city building " + building->getBuilding()->name);
+            city.setBuildTask(std::make_unique<BuildingBuildTask>(std::move(*building)));
+            ++buildIndex;
+        } else if (unitToBuild) {
             ai.log("city building " + unitToBuild->name + " (settlers=" + std::to_string(ai.settlerCount) + ", goal="
                 + std::to_string(static_cast<int>(ai.getGoal())) + ")");
             city.setBuildTask(std::make_unique<UnitBuildTask>(unitToBuild));
@@ -784,12 +804,16 @@ namespace rip {
     // RESEARCH
 
     // Predefined techs that are important to research.
-    static const char *researchOrder[5] = {
+    static const char *researchOrder[9] = {
             "Agriculture",
             "Pottery",
             "Mining",
             "The Wheel",
             "Bronze Working",
+            "Writing",
+            "Alphabet",
+            "Mathematics",
+            "Currency"
     };
 
     void AIimpl::updateResearch(Game &game, Player &player) {

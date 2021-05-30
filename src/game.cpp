@@ -101,7 +101,7 @@ namespace rip {
                 if (unit.hasPath()) {
                     unit.moveAlongCurrentPath(*this, false);
                 }
-                if (!unit.hasPath()) {
+                if (unit.getMovementLeft() != 0 && !unit.hasPath()) {
                     return std::make_optional<UnitId>(unit.getID());
                 }
             }

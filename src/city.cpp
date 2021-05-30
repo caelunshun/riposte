@@ -317,6 +317,7 @@ namespace rip {
 
         // Check coastal status.
         for (const auto neighborPos : getNeighbors(pos)) {
+            if (!game.containsTile(neighborPos)) continue;
             const auto &tile = game.getTile(neighborPos);
             if (tile.getTerrain() == Terrain::Ocean) {
                 coastal = true;
