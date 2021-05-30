@@ -62,4 +62,17 @@ namespace rip {
     std::optional<std::string> WarDeclaredEvent::getAudioID(Era era) {
         return "sound/event/combat_defeat";
     }
+
+    std::optional<Message> PlayerKilledEvent::getMessage() {
+        return Message(
+                "The " + civName + " has been destroyed!",
+                colorTerrible
+                );
+    }
+
+    std::optional<std::string> PlayerKilledEvent::getAudioID(Era era) {
+        return std::optional<std::string>();
+    }
+
+    PlayerKilledEvent::PlayerKilledEvent(const std::string &civName) : civName(civName) {}
 }

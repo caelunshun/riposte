@@ -283,9 +283,9 @@ namespace rip {
     }
 
     int City::getCulturePerTurn() const {
-        int culture = 0;
+        int culture = 1;
         if (isCapital()) {
-            culture += 2;
+            culture += 1;
         }
 
         culture += buildingEffects.bonusCulture;
@@ -367,7 +367,7 @@ namespace rip {
     void City::transferControlTo(Game &game, PlayerId newOwnerID) {
         game.getCultureMap().onCityDestroyed(game, id);
         auto &oldOwner = game.getPlayer(owner);
-        oldOwner.removeCity(id);
+        oldOwner.removeCity(id, game);
         auto &newOwner = game.getPlayer(newOwnerID);
         newOwner.registerCity(id);
         if (population > 1) --population;

@@ -660,7 +660,7 @@ namespace rip {
 
     void Hud::paintScoreHud(Game &game) {
         auto windowSize = game.getCursor().getWindowSize();
-        glm::vec2 size(200, 200);
+        glm::vec2 size(250, 200);
         auto pos = windowSize - size - glm::vec2(0, 100);
 
         nvgBeginPath(vg);
@@ -683,6 +683,7 @@ namespace rip {
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
         float textCursor = pos.y + 5;
         for (const auto *player : players) {
+            if (player->isDead()) continue;
             const auto &leaderName = player->getLeader().name;
             const auto score = player->getScore();
             const auto color = player->getCiv().color;

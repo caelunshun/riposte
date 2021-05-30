@@ -14,6 +14,7 @@ namespace rip {
 
     static const Color colorBad = {193, 0, 22};
     static const Color colorGood = {68, 194, 113};
+    static const Color colorTerrible = {90, 44, 29};
 
     struct Message {
         std::string text;
@@ -67,6 +68,19 @@ namespace rip {
         WarDeclaredEvent(const std::string &declaredBy, const std::string &declaredOn);
 
         ~WarDeclaredEvent() override = default;
+
+        std::optional<Message> getMessage() override;
+
+        std::optional<std::string> getAudioID(Era era) override;
+    };
+
+    class PlayerKilledEvent : public Event {
+        std::string civName;
+
+    public:
+        PlayerKilledEvent(const std::string &civName);
+
+        ~PlayerKilledEvent() override = default;
 
         std::optional<Message> getMessage() override;
 

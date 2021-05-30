@@ -297,7 +297,10 @@ namespace rip {
         void updateWarPlan(Game &game, Player &player) {
             if (goal != Goal::ExpandWar) return;
 
-            warPlan.update(game, *this, player);
+            if (warPlan.update(game, *this, player)) {
+                // We finished this player off. Switch to thriving
+                setGoal(Goal::Thrive, game, player);
+            }
         }
 
         void doTurn(Game &game) {
@@ -362,6 +365,9 @@ namespace rip {
     }
 
     bool WarPlan::update(Game &game, AIimpl &ai, Player &player) {
+        // Check that opponent isn't dead.
+        if (game.getPlayer(opponent).isDead()) return true;
+
         ai.log("war plan: ready = " + std::to_string(readyUnits.size()) + ", attacking = " + std::to_string(attackingUnits.size())
             + ", enRoute = " + std::to_string(enRoute) + ", shouldAttack = " + std::to_string(shouldAttack));
         // Check that the target city is still owned by the opponent.

@@ -103,6 +103,8 @@ namespace rip {
 
          absl::flat_hash_set<PlayerId> atWarWith;
 
+         bool dead = false;
+
          std::string getNextCityName(const Game &game);
 
          void recomputeRevenue(Game &game);
@@ -132,7 +134,7 @@ namespace rip {
          CityId getCapital() const;
 
          void registerCity(CityId id);
-         void removeCity(CityId);
+         void removeCity(CityId, Game &game);
 
          // Creates a City.
          CityId createCity(glm::uvec2 pos, Game &game);
@@ -168,6 +170,8 @@ namespace rip {
          void onWarDeclared(PlayerId withPlayer, Game &game);
 
          void expelUnitsInTerritoryOf(PlayerId player, Game &game);
+
+         void die(Game &game);
      };
 }
 

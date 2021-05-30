@@ -59,12 +59,14 @@ namespace rip {
         cities.push_back(id);
     }
 
-    void Player::removeCity(CityId id) {
+    void Player::removeCity(CityId id, Game &game) {
         cities.erase(std::remove(cities.begin(), cities.end(), id), cities.end());
         if (capital == id) {
             capital = {};
             if (!cities.empty()) {
                 capital = cities[0];
+            } else {
+                die(game);
             }
         }
     }
@@ -163,10 +165,11 @@ namespace rip {
     }
 
     bool Player::isDead() const {
-        return cities.empty();
+        return dead;
     }
 
     void Player::onTurnEnd(Game &game) {
+        if (isDead()) return;
         recomputeRevenue(game);
         recomputeExpenses(game);
         doEconomyTurn(game);
@@ -375,5 +378,19 @@ namespace rip {
                 unit.teleportTo(capitalPos, game);
             }
         }
+    }
+
+    void Player::die(Game &game) {
+        // Kill all units. They can't live without cities
+        // to support them.
+        for (const auto &unit : game.getUnits()) {
+            if (unit.getOwner() == id) {
+                game.deferKillUnit(unit.getID());
+            }
+        }
+
+        game.addEvent(std::make_unique<PlayerKilledEvent>(civ->name));
+
+        dead = true;
     }
 }
