@@ -1,6 +1,6 @@
 {
   "name": "Currency",
-  "cost": 140,
+  "cost": 500,
   "prerequisites": ["Mathematics", "Alphabet"]
 
 }

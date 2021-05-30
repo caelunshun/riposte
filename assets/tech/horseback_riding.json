@@ -1,5 +1,5 @@
 {
   "name": "Horseback Riding",
-  "cost": 120,
+  "cost": 200,
   "prerequisites": ["Animal Husbandry"]
 }

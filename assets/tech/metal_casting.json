@@ -1,6 +1,6 @@
 {
   "name": "Metal Casting",
-  "cost": 200,
+  "cost": 550,
   "prerequisites": ["Pottery", "Bronze Working"]
 
 }
