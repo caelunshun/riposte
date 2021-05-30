@@ -1,0 +1,11 @@
+{
+  "name": "Walls",
+  "cost": 50,
+  "techs": ["Masonry"],
+  "effects": [
+    {
+      "type": "defenseBonusPercent",
+      "amount": 50
+    }
+  ]
+}

@@ -1,0 +1,10 @@
+{
+  "name": "Granary",
+  "cost": 60,
+  "techs": ["Pottery"],
+  "effects": [
+    {
+      "type": "granaryFoodStore"
+    }
+  ]
+}

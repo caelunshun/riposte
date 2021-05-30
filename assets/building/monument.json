@@ -1,0 +1,11 @@
+{
+  "name": "Monument",
+  "cost": 30,
+  "techs": ["Mysticism"],
+  "effects": [
+    {
+      "type": "bonusCulture",
+      "amount": 1
+    }
+  ]
+}

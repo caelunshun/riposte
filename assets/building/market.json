@@ -1,0 +1,11 @@
+{
+  "name": "Market",
+  "cost": 150,
+  "techs": ["Currency"],
+  "effects": [
+    {
+      "type": "bonusGoldPercent",
+      "amount": 25
+    }
+  ]
+}

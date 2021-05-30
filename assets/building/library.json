@@ -1,0 +1,15 @@
+{
+  "name": "Library",
+  "cost": 90,
+  "techs": ["Writing"],
+  "effects": [
+    {
+      "type": "bonusCulture",
+      "amount": 2
+    },
+    {
+      "type": "bonusBeakerPercent",
+      "amount": 25
+    }
+  ]
+}

@@ -46,4 +46,24 @@ namespace rip {
         }
         throw std::string("missing unit '" + id + "'");
     }
+
+    std::shared_ptr<Asset> BuildingLoader::loadAsset(const std::string &data) {
+        auto building = nlohmann::json::parse(data).get<Building>();
+        auto ptr = std::make_shared<Building>(std::move(building));
+        registry->addBuilding(ptr);
+        return ptr;
+    }
+
+    const std::vector<std::shared_ptr<Building>> &Registry::getBuildings() const {
+        return buildings;
+    }
+
+    const std::shared_ptr<Building> &Registry::getBuilding(const std::string &name) const {
+        for (const auto &building : buildings) {
+            if (building->name == name) {
+                return building;
+            }
+        }
+        throw std::string("missing building '" + name + "'");
+    }
 }

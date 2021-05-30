@@ -190,6 +190,51 @@
     "loader": "unit"
   },
   {
+    "path": "building/barracks.json",
+    "id": "building/barracks",
+    "loader": "building"
+  },
+  {
+    "path": "building/forge.json",
+    "id": "building/forge",
+    "loader": "building"
+  },
+  {
+    "path": "building/granary.json",
+    "id": "building/granary",
+    "loader": "building"
+  },
+  {
+    "path": "building/library.json",
+    "id": "building/library",
+    "loader": "building"
+  },
+  {
+    "path": "building/lighthouse.json",
+    "id": "building/lighthouse",
+    "loader": "building"
+  },
+  {
+    "path": "building/market.json",
+    "id": "building/market",
+    "loader": "building"
+  },
+  {
+    "path": "building/monument.json",
+    "id": "building/monument",
+    "loader": "building"
+  },
+  {
+    "path": "building/stable.json",
+    "id": "building/stable",
+    "loader": "building"
+  },
+  {
+    "path": "building/walls.json",
+    "id": "building/walls",
+    "loader": "building"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"

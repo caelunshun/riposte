@@ -99,6 +99,7 @@ int main() {
     assets->addLoader("font", std::make_unique<rip::FontLoader>(renderer));
     assets->addLoader("civ", std::make_unique<rip::CivLoader>(registry));
     assets->addLoader("unit", std::make_unique<rip::UnitLoader>(registry));
+    assets->addLoader("building", std::make_unique<rip::BuildingLoader>(registry));
     assets->addLoader("resource", std::make_unique<rip::ResourceLoader>(registry));
     assets->addLoader("tech", std::make_unique<rip::TechLoader>());
     assets->addLoader("sound", std::make_unique<rip::AudioLoader>(audio));

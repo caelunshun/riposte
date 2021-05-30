@@ -1,0 +1,11 @@
+{
+  "name": "Forge",
+  "cost": 120,
+  "techs": ["Metal Casting"],
+  "effects": [
+    {
+      "type": "bonusHammerPercent",
+      "amount": 25
+    }
+  ]
+}

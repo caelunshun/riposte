@@ -170,6 +170,105 @@ namespace rip {
         }
     };
 
+    // An effect given by a building.
+    struct BuildingEffect {
+        int bonusHammers = 0;
+        int bonusHammerPercent = 0;
+        int bonusCommerce = 0;
+        int bonusCommercePercent = 0;
+        int bonusFood = 0;
+        int bonusFoodPercent = 0;
+
+        // Difference with bonusCommerce:
+        // gold applies only to gold production after the
+        // research slider is applied.
+        int bonusGold = 0;
+        int bonusGoldPercent = 0;
+        int bonusBeakers = 0;
+        int bonusBeakerPercent = 0;
+
+        int bonusCulture = 0;
+        int bonusCulturePercent = 0;
+
+        int defenseBonusPercent = 0;
+
+        bool hasGranaryFoodStore = false;
+
+        int oceanFoodBonus = 0;
+
+        friend void from_json(const nlohmann::json &json, BuildingEffect &e) {
+            auto type = json.at("type").get<std::string>();
+
+            if (type == "granaryFoodStore") {
+                e.hasGranaryFoodStore = true;
+            } else {
+                auto amount = json.at("amount").get<int>();
+                int *target = nullptr;
+                if (type == "bonusHammers") {
+                    target = &e.bonusHammers;
+                } else if (type == "bonusHammerPercent") {
+                    target = &e.bonusHammerPercent;
+                } else if (type == "bonusCommerce") {
+                    target = &e.bonusCommerce;
+                } else if (type == "bonusCommercePercent") {
+                    target = &e.bonusCommercePercent;
+                } else if (type == "bonusFood") {
+                    target = &e.bonusFood;
+                } else if (type == "bonusFoodPercent") {
+                    target = &e.bonusFoodPercent;
+                } else if (type == "bonusGold") {
+                    target = &e.bonusGold;
+                } else if (type == "bonusGoldPercent") {
+                    target = &e.bonusGoldPercent;
+                } else if (type == "bonusBeakers") {
+                    target = &e.bonusBeakers;
+                } else if (type == "bonusBeakerPercent") {
+                    target = &e.bonusBeakerPercent;
+                } else if (type == "bonusCulture") {
+                    target = &e.bonusCulture;
+                } else if (type == "bonusCulturePercent") {
+                    target = &e.bonusCulturePercent;
+                } else if (type == "defenseBonusPercent") {
+                    target = &e.defenseBonusPercent;
+                } else if (type == "oceanFoodBonus") {
+                    target = &e.oceanFoodBonus;
+                } else {
+                    throw ParseException("unknown building effect type '" + type + "'");
+                }
+
+                *target = amount;
+            }
+        }
+    };
+
+    struct Building : public Asset {
+        // Name displayed in the UI
+        std::string name;
+        // Cost in hammers
+        int cost;
+        // Any buildings required in a city before it can build this building
+        std::vector<std::string> prerequisites;
+        // Techs required to build
+        std::vector<std::string> techs;
+        // Whether the building can only be built in coastal cities
+        bool onlyCoastal = false;
+        // Effects of the building when built
+        std::vector<BuildingEffect> effects;
+
+        friend void from_json(const nlohmann::json &json, Building &b) {
+            json.at("name").get_to(b.name);
+            json.at("cost").get_to(b.cost);
+            if (json.contains("prerequisites")) {
+                json.at("prerequisites").get_to(b.prerequisites);
+            }
+            json.at("techs").get_to(b.techs);
+            if (json.contains("onlyCoastal")) {
+                json.at("onlyCoastal").get_to(b.onlyCoastal);
+            }
+            json.at("effects").get_to(b.effects);
+        }
+    };
+
     struct ResourceHash {
         size_t operator()(const std::shared_ptr<Resource> &resource)const
         {
@@ -189,9 +288,12 @@ namespace rip {
         std::vector<std::shared_ptr<CivKind>> civs;
         std::vector<std::shared_ptr<UnitKind>> units;
         absl::flat_hash_map<std::string, std::shared_ptr<Resource>> resources;
+        std::vector<std::shared_ptr<Building>> buildings;
 
     public:
         const std::vector<std::shared_ptr<CivKind>> &getCivs() const;
+
+        const std::vector<std::shared_ptr<Building>> &getBuildings() const;
 
         void addCiv(std::shared_ptr<CivKind> c) {
             civs.push_back(std::move(c));
@@ -205,6 +307,10 @@ namespace rip {
             resources.emplace(r->name, std::move(r));
         }
 
+        void addBuilding(std::shared_ptr<Building> b) {
+            buildings.push_back(std::move(b));
+        }
+
         const std::shared_ptr<Resource> &getResource(const std::string &name) const {
             return resources.at(name);
         }
@@ -214,6 +320,8 @@ namespace rip {
         const std::shared_ptr<UnitKind> &getUnit(const std::string &id) const;
 
         const absl::flat_hash_map<std::string, std::shared_ptr<Resource>> &getResources() const;
+
+        const std::shared_ptr<Building> &getBuilding(const std::string &name) const;
     };
 
     class CivLoader : public AssetLoader {
@@ -239,6 +347,15 @@ namespace rip {
 
     public:
         ResourceLoader(std::shared_ptr<Registry> registry) : registry(std::move(registry)) {}
+
+        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+    };
+
+    class BuildingLoader : public AssetLoader {
+        std::shared_ptr<Registry> registry;
+
+    public:
+        BuildingLoader(std::shared_ptr<Registry> registry) : registry(std::move(registry)) {}
 
         std::shared_ptr<Asset> loadAsset(const std::string &data) override;
     };

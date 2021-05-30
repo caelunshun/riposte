@@ -1,0 +1,12 @@
+{
+  "name": "Lighthouse",
+  "cost": 60,
+  "techs": ["Sailing"],
+  "onlyCoastal": true,
+  "effects": [
+    {
+      "type": "oceanFoodBonus",
+      "amount": 1
+    }
+  ]
+}
