@@ -187,7 +187,7 @@ namespace rip {
                     }
 
                     auto &unit = game.getUnit(unitID);
-                    unit.moveAlongCurrentPath(game, false);
+                    unit.moveAlongCurrentPath(game, true);
                     unitAI->doTurn(game, *this, player, unit);
                 }
             }

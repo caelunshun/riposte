@@ -143,7 +143,7 @@ namespace rip {
                 auto y = rng.u32(0, game.getMapHeight());
                 glm::uvec2 pos(x, y);
 
-                const auto minDistToOtherCities = 15;
+                const auto minDistToOtherCities = 12;
                 bool foundClose = false;
                 for (auto otherPos : positions) {
                     if (dist(pos, otherPos) < minDistToOtherCities) {
@@ -156,14 +156,22 @@ namespace rip {
                 }
 
                 if (game.getTile(pos).getTerrain() == Terrain::Ocean) {
-                    continue;
+                   continue;
                 }
 
                 if (game.getCityAtLocation(pos) == nullptr) {
                     Unit settler(game.getRegistry().getUnits().at(0), pos, player.getID());
                     game.addUnit(std::move(settler));
 
-                    Unit warrior(game.getRegistry().getUnits().at(1), pos + glm::uvec2(1, 0), player.getID());
+                    glm::uvec2 warriorPos;
+                    auto neighbors = getNeighbors(pos);
+                    while (true) {
+                        warriorPos = rng.choose(neighbors);
+                        if (game.getTile(warriorPos).getTerrain() != Terrain::Ocean) {
+                           break;
+                        }
+                    }
+                    Unit warrior(game.getRegistry().getUnits().at(1), warriorPos, player.getID());
                     game.addUnit(std::move(warrior));
 
                     positions.push_back(pos);
@@ -198,27 +206,86 @@ namespace rip {
     // MAIN GENERATOR
 
     void buildTerrain(Game &game, Rng &rng) {
-        LandMap landMap(4, 4);
-        const auto numContinents = 10;
-        for (int continent = 0; continent < numContinents; continent++) {
-            auto x = rng.u32(0, 4);
-            auto y = rng.u32(0, 4);
-            landMap.setLand(glm::uvec2(x, y), true);
+        // Generate land/ocean map based on continents.
+        const auto dim = 16;
+        LandMap landMap(dim, dim);
+        const auto numContinents = 3;
+        const auto minSpacing = 7;
+        const auto minDistFromEdge = 1;
+        std::vector<glm::uvec2> continentCenters;
+
+        while (continentCenters.size() < numContinents) {
+            glm::uvec2 candidate(rng.u32(0, dim), rng.u32(0, dim));
+
+            // Ensure we're a minimum distance away from all other continents
+            // as well as the edges.
+            bool valid = true;
+            for (const auto otherPos : continentCenters) {
+                if (dist(candidate, otherPos) < minSpacing) {
+                    valid = false;
+                    break;
+                }
+            }
+
+            if (candidate.x < minDistFromEdge || candidate.y < minDistFromEdge
+                || dim - candidate.x < minDistFromEdge || dim - candidate.y < minDistFromEdge) {
+                valid = false;
+            }
+
+            if (valid) {
+                continentCenters.push_back(candidate);
+            }
         }
 
-        const auto zooms = 4;
+        // Write continents to the land map.
+
+        auto continentNoiseGen = FastNoise::New<FastNoise::CellularValue>();
+        std::vector<float> continentNoise(dim * dim);
+        continentNoiseGen->GenUniformGrid2D(continentNoise.data(), 0, 0, dim, dim, 0.2, rng.u32(0, 0xFFFFFFFF));
+
+        std::vector<glm::uvec2> landPositions;
+
+        for (const auto center : continentCenters) {
+            std::vector<glm::uvec2> continentLand;
+            float noiseValue = continentNoise[center.x + dim * center.y];
+            for (int x = 1; x < dim - 1; x++) {
+                for (int y = 1; y < dim - 1; y++) {
+                    float thisNoiseValue = continentNoise[x + dim * y];
+
+                    // Prevent continents from merging.
+                    bool isTooClose = false;
+                    for (const auto otherPos : landPositions) {
+                        if (isAdjacent(otherPos, glm::uvec2(x, y))) {
+                            isTooClose = true;
+                            break;
+                        }
+                    }
+
+                    if (thisNoiseValue == noiseValue && !isTooClose) {
+                        landMap.setLand(glm::uvec2(x, y), true);
+                        continentLand.emplace_back(x, y);
+                    }
+                }
+            }
+
+            for (const auto p : continentLand) landPositions.push_back(p);
+        }
+
+        // Zoom the map to add detail.
+        const auto zooms = 2;
         for (int i = 0; i < zooms; i++) {
             landMap = landMap.grow(rng);
         }
 
-        auto simplex = FastNoise::New<FastNoise::Simplex>();
+        // Set terrain types with a noise.
+        auto cellular = FastNoise::New<FastNoise::CellularValue>();
         auto noise = FastNoise::New<FastNoise::FractalFBm>();
-        noise->SetSource(simplex);
+        noise->SetSource(cellular);
         auto treeNoise = FastNoise::New<FastNoise::FractalFBm>();
-        treeNoise->SetSource(simplex);
+        treeNoise->SetSource(cellular);
 
         std::vector<float> noiseOutput(game.getMapWidth() * game.getMapHeight());
-        noise->GenUniformGrid2D(noiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 10.0f, rng.u32(0, 0xFFFFFFFF));
+        noise->GenUniformGrid2D(noiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 0.5, rng.u32(0, 0xFFFFFFFF));
 
         std::vector<float> treeNoiseOutput(game.getMapWidth() * game.getMapHeight());
         treeNoise->GenUniformGrid2D(treeNoiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 5.0f, rng.u32(0, 0xFFFFFFFF));
@@ -244,7 +311,7 @@ namespace rip {
                 game.getTile(pos).setTerrain(t);
 
                 if (t != Terrain::Ocean && t != Terrain::Desert) {
-                    if (treeNoiseOutput[noiseIndex] < 0.0) {
+                    if (treeNoiseOutput[noiseIndex] < 0.3) {
                         game.getTile(pos).setForested(true);
                     }
                 }
