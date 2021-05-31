@@ -792,16 +792,17 @@ namespace rip {
 
     void Hud::paintWindows(Game &game) {
         if (windows.empty()) return;
-        for (int i = windows.size() - 1; i >= 0; i--) {
-            auto &window = windows[i];
+        for (int i = 0; i < windows.size(); i++) {
+            auto window = windows[i];
             window->paint(game, nk);
             if (window->shouldClose()) {
                 windows.erase(windows.begin() + i);
+                --i;
             }
         }
     }
 
-    void Hud::openWindow(std::unique_ptr<Window> window) {
+    void Hud::openWindow(std::shared_ptr<Window> window) {
         windows.push_back(std::move(window));
     }
 

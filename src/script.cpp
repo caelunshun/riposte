@@ -149,7 +149,7 @@ namespace rip {
 
         auto hud_type = lua.new_usertype<Hud>("Hud");
         hud_type["openWindow"] = [=] (Hud &hud, sol::table window) {
-            hud.openWindow(std::make_unique<LuaWindow>(std::move(window)));
+            hud.openWindow(std::make_shared<LuaWindow>(std::move(window)));
         };
 
         lua["hud"] = hud;

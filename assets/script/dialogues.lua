@@ -85,8 +85,7 @@ local currentDialogue = nil
 function DialogueWindow.paintOptions(self, ui)
   if self.state == DialogueState.Main then
     if not game:getThePlayer():isAtWarWith(self.withPlayer) and ui:buttonLabel("Your head would look good on the end of a pole. (WAR)") then
-      self.thePlayer:declareWarOn(self.withPlayer)
-      self.close = true
+      hud:openWindow(ConfirmWarWindow:new(self.withPlayer))
     end
 
     if ui:buttonLabel("Farewell (exit)") then
@@ -135,7 +134,7 @@ function DialogueWindow.new(self, state, thePlayer, withPlayer)
   end
 
   numDialogues = numDialogues + 1
-  o = { state = state, close = false, thePlayer = thePlayer, withPlayer = withPlayer }
+  local o = { state = state, close = false, thePlayer = thePlayer, withPlayer = withPlayer }
 
   if state == DialogueState.Main then
     o.text = getGreeting(withPlayer, thePlayer)
@@ -159,5 +158,49 @@ engine:registerEventHandler("onWarDeclared", function(declaringPlayer, declaredP
   end)
 
 engine:registerEventHandler("onDialogueOpened", function(withPlayer)
+  if withPlayer == game:getThePlayer() then return end
   hud:openWindow(DialogueWindow:new(DialogueState.Main, game:getThePlayer(), withPlayer))
 end)
+
+if ConfirmWarWindow == nil then
+  ConfirmWarWindow = {}
+end
+
+function ConfirmWarWindow.paint(self, ui)
+  local windowSize = game:getCursor():getWindowSize()
+  local size = { x = 250, y = 250 }
+  ui:beginWindow("confirmWar", windowSize.x - size.x - 50, 50, size.x, size.y)
+
+  ui:layoutDynamic(50, 1)
+  ui:labelWrap(string.format("Are you sure you want to declare war on %s?", self.declared:getName()))
+
+  if ui:buttonLabel("Yes, WAR!") then
+    game:getThePlayer():declareWarOn(self.declared)
+    currentDialogue.close = true
+    self.close = true
+  end
+  if ui:buttonLabel("Reconsider...") then
+    self.close = true
+  end
+
+  ui:endWindow()
+end
+
+function ConfirmWarWindow.shouldClose(self)
+  return self.close
+end
+
+local currentConfirm = nil
+
+function ConfirmWarWindow.new(self, declared)
+  if currentConfirm ~= nil then
+    currentConfirm.close = true
+  end
+
+  local o = { declared = declared, close = false }
+  setmetatable(o, self)
+  self.__index = self
+
+  currentConfirm = o
+  return o
+end

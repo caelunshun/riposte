@@ -64,7 +64,7 @@ namespace rip {
         std::shared_ptr<Image> goldIcon;
         std::shared_ptr<Image> beakerIcon;
 
-        std::vector<std::unique_ptr<Window>> windows;
+        std::vector<std::shared_ptr<Window>> windows;
 
         void paintSelectedUnit(Game &game);
         void paintMainHud(Game &game);
@@ -108,7 +108,7 @@ namespace rip {
 
         bool hasFocus(const Game &game) const;
 
-        void openWindow(std::unique_ptr<Window> window);
+        void openWindow(std::shared_ptr<Window> window);
     };
 }
 
