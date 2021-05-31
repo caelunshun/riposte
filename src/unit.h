@@ -95,6 +95,7 @@ namespace rip {
 
         void setID(UnitId id);
 
+
         const UnitKind &getKind() const;
         glm::uvec2 getPos() const;
         UnitId getID() const;
