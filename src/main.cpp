@@ -8,6 +8,7 @@
 #include "unit.h"
 #include "event.h"
 #include "player.h"
+#include "script.h"
 
 #include <iostream>
 #include <deque>
@@ -101,6 +102,8 @@ int main() {
 
     auto audio = std::make_shared<rip::AudioManager>();
 
+    auto scriptEngine = std::make_shared<rip::ScriptEngine>();
+
     auto assets = std::make_shared<rip::Assets>();
     assets->addLoader("image", std::make_unique<rip::ImageLoader>(renderer));
     assets->addLoader("font", std::make_unique<rip::FontLoader>(renderer));
@@ -110,6 +113,7 @@ int main() {
     assets->addLoader("resource", std::make_unique<rip::ResourceLoader>(registry));
     assets->addLoader("tech", std::make_unique<rip::TechLoader>());
     assets->addLoader("sound", std::make_unique<rip::AudioLoader>(audio));
+    assets->addLoader("script", std::make_unique<rip::ScriptLoader>(scriptEngine));
     assets->loadAssetsDir("assets");
 
     audio->addSounds(assets);

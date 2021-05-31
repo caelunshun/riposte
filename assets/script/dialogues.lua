@@ -130,7 +130,7 @@ function DialogueWindow.new(state, thePlayer, withPlayer)
   return o
 end
 
-game:registerEventHandler("onWarDeclared", function(declaringPlayer, declaredPlayer)
+engine:registerEventHandler("onWarDeclared", function(declaringPlayer, declaredPlayer)
   if declaringPlayer:hasAI() and not declaredPlayer:hasAI() then
     hud:openWindow(DialogueWindow.new(DialogueState.DeclareWar, declaredPlayer, declaringPlayer))
   end

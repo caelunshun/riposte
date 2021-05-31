@@ -1,5 +1,15 @@
 [
   {
+    "path": "script/init.lua",
+    "id": "script/init",
+    "loader": "script"
+  },
+  {
+    "path": "script/dialogues.lua",
+    "id": "script/dialogues",
+    "loader": "script"
+  },
+  {
     "path": "texture/tile/desert_basecolor.png",
     "id": "texture/tile/desert",
     "loader": "image"
