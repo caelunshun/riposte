@@ -29,6 +29,7 @@ namespace rip {
     class Combat;
     class Stack;
     class Event;
+    class ScriptEngine;
 
     class Game {
         class _impl;
@@ -130,6 +131,12 @@ namespace rip {
 
         void addEvent(std::unique_ptr<Event> event);
         std::vector<std::unique_ptr<Event>> &getEvents();
+
+        void setScriptEngine(std::shared_ptr<ScriptEngine> engine);
+        ScriptEngine &getScriptEngine();
+
+        void onWarDeclared(Player &declarer, Player &declared);
+        void onDialogueOpened(Player &with);
     };
 }
 

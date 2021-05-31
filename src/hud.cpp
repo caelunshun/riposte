@@ -371,6 +371,7 @@ namespace rip {
         paintTopLeftHud(game);
         paintScoreHud(game);
         paintStackSelectionBar(game);
+        paintWindows(game);
 
         clickPos = {};
     }
@@ -509,7 +510,7 @@ namespace rip {
     }
 
     bool Hud::hasFocus(const Game &game) const {
-        return getCityBuildPrompt(game).has_value() || shouldShowTechPrompt(game);
+        return getCityBuildPrompt(game).has_value() || shouldShowTechPrompt(game) || !windows.empty();
     }
 
     void Hud::handleKey(Game &game, int key) {
@@ -671,9 +672,9 @@ namespace rip {
         nvgFill(vg);
 
         // Sort players by score.
-        std::vector<const Player*> players(game.getPlayers().size());
+        std::vector<Player*> players(game.getPlayers().size());
         int i = 0;
-        for (const auto &player : game.getPlayers()) {
+        for (auto &player : game.getPlayers()) {
             players[i++] = &player;
         }
         std::sort(players.begin(), players.end(), [] (const Player *a, const Player *b) {
@@ -684,7 +685,7 @@ namespace rip {
         nvgFontSize(vg, 15);
         nvgTextAlign(vg, NVG_ALIGN_LEFT | NVG_ALIGN_TOP);
         float textCursor = pos.y + 5;
-        for (const auto *player : players) {
+        for (auto *player : players) {
             if (player->isDead()) continue;
             const auto &leaderName = player->getLeader().name;
             const auto score = player->getScore();
@@ -702,7 +703,7 @@ namespace rip {
             float leaderAdvance = nvgTextBounds(vg, pos.x, textCursor, leaderText.c_str(), nullptr, bounds);
 
             if (wasRectClicked(glm::vec2(bounds[0], bounds[1]), glm::vec2(bounds[2] - bounds[0], bounds[3] - bounds[1]))) {
-                game.getThePlayer().declareWarOn(player->getID(), game);
+                game.onDialogueOpened(*player);
             }
 
             if (player->isAtWarWith(game.getThePlayerID())) {
@@ -787,6 +788,21 @@ namespace rip {
 
             pos.x += iconWidth + padding;
         }
+    }
+
+    void Hud::paintWindows(Game &game) {
+        if (windows.empty()) return;
+        for (int i = windows.size() - 1; i >= 0; i--) {
+            auto &window = windows[i];
+            window->paint(game, nk);
+            if (window->shouldClose()) {
+                windows.erase(windows.begin() + i);
+            }
+        }
+    }
+
+    void Hud::openWindow(std::unique_ptr<Window> window) {
+        windows.push_back(std::move(window));
     }
 
     bool Hud::wasRectClicked(glm::vec2 pos, glm::vec2 size) const {

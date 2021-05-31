@@ -19,6 +19,19 @@ namespace rip {
     class Game;
     class Stack;
 
+    // A window opened in the HUD.
+    class Window {
+    public:
+        virtual ~Window() = default;
+
+        // Paints the window with Nuklear.
+        //
+        // This method _must_ call nk_begin and nk_end.
+        virtual void paint(Game &game, nk_context *nk) = 0;
+
+        virtual bool shouldClose() = 0;
+    };
+
     struct HudMessage {
         std::string text;
         float disappearTime;
@@ -51,6 +64,8 @@ namespace rip {
         std::shared_ptr<Image> goldIcon;
         std::shared_ptr<Image> beakerIcon;
 
+        std::vector<std::unique_ptr<Window>> windows;
+
         void paintSelectedUnit(Game &game);
         void paintMainHud(Game &game);
         void paintMessages(Game &game);
@@ -74,6 +89,8 @@ namespace rip {
 
         void paintTopLeftHud(Game &game);
 
+        void paintWindows(Game &game);
+
         bool wasRectClicked(glm::vec2 pos, glm::vec2 size) const;
 
     public:
@@ -90,6 +107,8 @@ namespace rip {
         void pushMessage(std::string message, std::array<uint8_t, 3> color);
 
         bool hasFocus(const Game &game) const;
+
+        void openWindow(std::unique_ptr<Window> window);
     };
 }
 

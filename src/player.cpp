@@ -31,6 +31,10 @@ namespace rip {
         ai = std::make_optional<AI>(id);
     }
 
+    bool Player::hasAI() const {
+        return ai.has_value();
+    }
+
     PlayerId Player::getID() const {
         return id;
     }
@@ -360,6 +364,7 @@ namespace rip {
             auto &other = game.getPlayer(player);
             other.onWarDeclared(id, game);
 
+            game.onWarDeclared(*this, other);
             game.addEvent(std::make_unique<WarDeclaredEvent>(leader.name, other.leader.name));
         }
     }

@@ -125,6 +125,8 @@ int main() {
     rip::Game game(64, 64, registry);
     rip::MapGenerator mapgen;
     mapgen.generate(game, techTree);
+    scriptEngine->setGame(&game);
+    game.setScriptEngine(scriptEngine);
 
     for (auto &player : game.getPlayers()) {
         player.recomputeVisibility(game);
@@ -134,7 +136,9 @@ int main() {
     game.getView().setMapCenter(glm::vec2(startPos) * glm::vec2(100, 100));
 
     rip::Ui ui(window);
-    rip::Hud hud(assets, renderer.getNvg(), ui.getNk(), window);
+    auto hud = std::make_shared<rip::Hud>(assets, renderer.getNvg(), ui.getNk(), window);
+
+    scriptEngine->registerHudBindings(hud);
 
     auto vendor = glGetString(GL_VENDOR);
     auto model = glGetString(GL_RENDERER);
@@ -142,7 +146,7 @@ int main() {
 
     glfwSwapInterval(0);
     while (!glfwWindowShouldClose(window)) {
-        game.tick(window, hud.hasFocus(game));
+        game.tick(window, hud->hasFocus(game));
         audio->update(game);
 
         // Paint order: game, UI, overlays
@@ -150,7 +154,7 @@ int main() {
         renderer.paintGame(game);
 
         ui.begin();
-        hud.update(game);
+        hud->update(game);
         renderer.end();
         ui.render();
 
@@ -163,17 +167,17 @@ int main() {
 
         while (!mouseEvents.empty()) {
             auto event = mouseEvents[0];
-            hud.handleClick(game, event);
+            hud->handleClick(game, event);
             mouseEvents.pop_front();
         }
         while (!keyEvents.empty()) {
             auto event = keyEvents[0];
-            hud.handleKey(game, event);
+            hud->handleKey(game, event);
             keyEvents.pop_front();
         }
         while (!scrollEvents.empty()) {
             auto event = scrollEvents[0];
-            if (!hud.hasFocus(game)) {
+            if (!hud->hasFocus(game)) {
                 game.getView().handleScroll(event);
             }
             scrollEvents.pop_front();
@@ -189,7 +193,7 @@ int main() {
 
             auto message = event->getMessage();
             if (message.has_value()) {
-                hud.pushMessage(std::move(message->text), message->color);
+                hud->pushMessage(std::move(message->text), message->color);
             }
         }
         events.clear();

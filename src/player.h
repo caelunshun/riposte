@@ -124,6 +124,7 @@ namespace rip {
          void setCapital(CityId capital);
 
          void enableAI();
+         bool hasAI() const;
 
          PlayerId getID() const;
          const std::string &getUsername() const;

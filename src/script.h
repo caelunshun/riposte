@@ -12,6 +12,7 @@ namespace rip {
     struct ScriptImpl;
     class Player;
     class Game;
+    class Hud;
 
     // Intentionally empty.
     struct ScriptAsset : public Asset {};
@@ -26,9 +27,12 @@ namespace rip {
         ScriptEngine(ScriptEngine &&other);
         ScriptEngine(const ScriptEngine &other) = delete;
 
+        void registerHudBindings(std::shared_ptr<Hud> hud);
+
         void setGame(Game *game);
 
         void onWarDeclared(Player &declarer, Player &declared);
+        void onDialogueOpened(Player &with);
     };
 
     class ScriptLoader : public AssetLoader {
