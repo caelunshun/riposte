@@ -323,6 +323,7 @@ namespace rip {
         for (const auto &player : game.getPlayers()) {
             if (player.getID() == ai.playerID) continue;
             if (player.isDead()) continue;
+            if (player.getCities().empty()) continue;
 
             double dist = ai.getDistanceToNearestCity(game, game.getCity(player.getCapital()).getPos(), true).first;
             if (!closest.has_value() || dist < closestDist) {
@@ -543,8 +544,7 @@ namespace rip {
                         unit.setPath(std::move(*path));
                         ai.log("settler pathfinded to new city location");
                     } else {
-                        blacklist.insert(*targetPos);
-                        targetPos = {};
+                        ai.isPeacefulExpansionExhausted = true;
                     }
                 } else {
                     ai.isPeacefulExpansionExhausted = true;
