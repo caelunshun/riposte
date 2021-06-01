@@ -1,0 +1,11 @@
+{
+  "id": "galley",
+  "name": "Galley",
+  "strength": 2,
+  "movement": 2,
+  "cost": 80,
+  "techs": ["Sailing"],
+  "resources": [],
+  "category": "naval",
+  "ship": true
+}

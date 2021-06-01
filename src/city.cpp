@@ -274,7 +274,9 @@ namespace rip {
         }
 
         bool hasTech = game.getPlayer(builder.getOwner()).getTechs().isUnitUnlocked(*unitKind);
-        return hasTech;
+        bool isCoastal = !unitKind->ship || builder.isCoastal();
+
+        return hasTech && isCoastal;
     }
 
     std::vector<std::unique_ptr<BuildTask>> City::getPossibleBuildTasks(const Game &game) const {

@@ -539,7 +539,7 @@ namespace rip {
             if (!targetPos.has_value()) {
                 targetPos = findBestCityLocation(game, ai, player, unit);
                 if (targetPos.has_value()) {
-                    auto path = computeShortestPath(game, unit.getPos(), *targetPos, {});
+                    auto path = computeShortestPath(game, unit.getPos(), *targetPos, {}, unit.getKind());
                     if (path.has_value()) {
                         unit.setPath(std::move(*path));
                         ai.log("settler pathfinded to new city location");
@@ -630,7 +630,7 @@ namespace rip {
             }
 
             if (bestTask.has_value()) {
-                auto path = computeShortestPath(game, unit.getPos(), bestTask->getPos(), {});
+                auto path = computeShortestPath(game, unit.getPos(), bestTask->getPos(), {}, unit.getKind());
                 if (path.has_value()) {
                     ai.log("worker chose to build " + bestTask->getImprovement().getName());
                     ai.claimedWorkerTiles.insert(bestTask->getPos());
@@ -642,7 +642,7 @@ namespace rip {
             } else {
                 auto capitalPos = game.getCity(player.getCapital()).getPos();
                 if (unit.getPos() != capitalPos) {
-                    auto path = computeShortestPath(game, unit.getPos(), capitalPos, {});
+                    auto path = computeShortestPath(game, unit.getPos(), capitalPos, {}, unit.getKind());
                     if (path) {
                         unit.setPath(std::move(*path));
                     }
@@ -685,7 +685,7 @@ namespace rip {
                 }
 
                 if (!unit.hasPath() || unit.getPath().getDestination() != targetPos) {
-                    auto path = computeShortestPath(game, unit.getPos(), targetPos, {});
+                    auto path = computeShortestPath(game, unit.getPos(), targetPos, {}, unit.getKind());
                     if (path.has_value()) {
                         unit.setPath(std::move(*path));
                     } else {
@@ -719,7 +719,7 @@ namespace rip {
                 while (!unit.hasPath() && attempts < 10) {
                     glm::uvec2 target(unit.getPos().x + static_cast<int>(ai.rng.u32(0, 20)) - 10,
                                       unit.getPos().y + static_cast<int>(ai.rng.u32(0, 20)) - 10);
-                    auto path = computeShortestPath(game, unit.getPos(), target, {});
+                    auto path = computeShortestPath(game, unit.getPos(), target, {}, unit.getKind());
                     if (path.has_value()) {
                         unit.setPath(std::move(*path));
                     }

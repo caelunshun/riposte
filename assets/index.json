@@ -210,6 +210,16 @@
     "loader": "unit"
   },
   {
+    "path": "unit/galley.json",
+    "id": "unit/galley",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/trireme.json",
+    "id": "unit/trireme",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -300,6 +310,16 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/trireme.png",
+    "id": "texture/unit/trireme",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/galley.png",
+    "id": "texture/unit/galley",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -342,6 +362,16 @@
   {
     "path": "icon/unit_head/spearman.png",
     "id": "icon/unit_head/spearman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/trireme.png",
+    "id": "icon/unit_head/trireme",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/galley.png",
+    "id": "icon/unit_head/galley",
     "loader": "image"
   },
   {

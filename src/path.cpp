@@ -34,7 +34,7 @@ namespace rip {
         return points.at(points.size() - 1);
     }
 
-    std::optional<Path> computeShortestPath(const Game &game, glm::uvec2 source, glm::uvec2 target, std::optional<VisibilityMap> visibilityMask) {
+    std::optional<Path> computeShortestPath(const Game &game, glm::uvec2 source, glm::uvec2 target, std::optional<VisibilityMap> visibilityMask, const UnitKind &unit) {
         // A* algorithm.
         using Pos = std::pair<uint32_t, uint32_t>;
         using OpenEntry = std::pair<double, Pos>;
@@ -81,7 +81,10 @@ namespace rip {
                 }
 
                 const auto &tile = game.getTile(neighbor);
-                if (tile.getTerrain() == Terrain::Ocean) {
+                if (!unit.ship && tile.getTerrain() == Terrain::Ocean) {
+                    continue;
+                }
+                if (unit.ship && tile.getTerrain() != Terrain::Ocean) {
                     continue;
                 }
 

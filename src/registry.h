@@ -116,26 +116,32 @@ namespace rip {
         std::vector<CombatBonus> combatBonuses;
         // Category of the unit - melee, mounted, gunpowder, etc.
         std::string category;
+        // Whether the unit can only travel on water
+        bool ship = false;
 
-        friend void from_json(const nlohmann::json &nlohmann_json_j, UnitKind &nlohmann_json_t) {
-            nlohmann_json_j.at("id").get_to(nlohmann_json_t.id);
-            nlohmann_json_j.at("name").get_to(nlohmann_json_t.name);
-            nlohmann_json_j.at("strength").get_to(nlohmann_json_t.strength);
-            nlohmann_json_j.at("movement").get_to(nlohmann_json_t.movement);
-            if (nlohmann_json_j.contains("capabilities")) {
-                nlohmann_json_j.at("capabilities").get_to(nlohmann_json_t.capabilities);
+        friend void from_json(const nlohmann::json &json, UnitKind &unit) {
+            json.at("id").get_to(unit.id);
+            json.at("name").get_to(unit.name);
+            json.at("strength").get_to(unit.strength);
+            json.at("movement").get_to(unit.movement);
+            if (json.contains("capabilities")) {
+                json.at("capabilities").get_to(unit.capabilities);
             }
-            nlohmann_json_j.at("cost").get_to(nlohmann_json_t.cost);
-            nlohmann_json_j.at("techs").get_to(nlohmann_json_t.techs);
-            if (nlohmann_json_j.contains("resources")) {
-                nlohmann_json_j.at("resources").get_to(nlohmann_json_t.resources);
-            }
-
-            if (nlohmann_json_j.contains("combatBonuses")) {
-                nlohmann_json_j.at("combatBonuses").get_to(nlohmann_json_t.combatBonuses);
+            json.at("cost").get_to(unit.cost);
+            json.at("techs").get_to(unit.techs);
+            if (json.contains("resources")) {
+                json.at("resources").get_to(unit.resources);
             }
 
-            nlohmann_json_j.at("category").get_to(nlohmann_json_t.category);
+            if (json.contains("combatBonuses")) {
+                json.at("combatBonuses").get_to(unit.combatBonuses);
+            }
+
+            json.at("category").get_to(unit.category);
+
+            if (json.contains("ship")) {
+                json.at("ship").get_to(unit.ship);
+            }
         }
     };
 

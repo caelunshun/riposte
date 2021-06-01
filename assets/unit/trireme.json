@@ -1,0 +1,18 @@
+{
+  "id": "trireme",
+  "name": "Trireme",
+  "strength": 2,
+  "movement": 2,
+  "cost": 50,
+  "techs": ["Metal Casting", "Sailing"],
+  "resources": [],
+  "category": "naval",
+  "combatBonuses": [
+    {
+      "type": "againstUnit",
+      "unit": "galley",
+      "bonusPercent": 50
+    }
+  ],
+  "ship": true
+}

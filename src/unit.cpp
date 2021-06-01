@@ -98,7 +98,11 @@ namespace rip {
             return false;
         }
 
-        if (game.getTile(target).getTerrain() == Terrain::Ocean) {
+        const auto terrain = game.getTile(target).getTerrain();
+        if (!kind->ship && terrain == Terrain::Ocean ) {
+            return false;
+        }
+        if (kind->ship && terrain != Terrain::Ocean) {
             return false;
         }
 
