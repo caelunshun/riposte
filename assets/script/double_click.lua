@@ -6,7 +6,7 @@ function registerDoubleClickHandler(callback)
     handlers[#handlers + 1] = callback
 end
 
-local lastClickTime = 0
+local lastClickTime = os.time()
 
 engine:registerEventHandler("onPosClicked", function(pos)
     local currentTime = os.time()

@@ -435,8 +435,6 @@ namespace rip {
         }
 
         if (event.button == MouseButton::Left && event.action == MouseAction::Press) {
-            game.getScriptEngine().onPosClicked(tilePos);
-
             auto stackID = game.getStackByKey(game.getThePlayerID(), tilePos);
             selectedUnits.clear();
             selectedStack = stackID;

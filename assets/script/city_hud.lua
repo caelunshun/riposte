@@ -207,6 +207,10 @@ function WorkedTilesWindow.toggleManualWork(self, pos)
         return
     end
 
+    if pos == self.city:getPos() then
+        return
+    end
+
     -- Determine whether to disable or enable
     local manualWorked = self.city:getManualWorkedTiles()
     local alreadyWorked = false
