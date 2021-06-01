@@ -425,11 +425,14 @@ namespace rip {
             return;
         }
 
+        auto tilePos = game.getPosFromScreenOffset(game.getCursor().getPos());
+        if (event.button == MouseButton::Left && event.action == MouseAction::Press) {
+            game.getScriptEngine().onPosClicked(tilePos);
+        }
+
         if (hasFocus(game)) {
             return;
         }
-
-        auto tilePos = game.getPosFromScreenOffset(game.getCursor().getPos());
 
         if (event.button == MouseButton::Left && event.action == MouseAction::Press) {
             game.getScriptEngine().onPosClicked(tilePos);

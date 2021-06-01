@@ -7,6 +7,7 @@ local infoBarSize = Vec2.new(440, 100)
 local CityHUD = {}
 local BuildingsWindow = {}
 local InfoBarWindow = {}
+local WorkedTilesWindow = {}
 
 local currentCityHUD = nil
 
@@ -15,9 +16,11 @@ function CityHUD.new(self, city)
 
     o.buildingsWindow = BuildingsWindow:new(city)
     o.infoBarWindow = InfoBarWindow:new(city)
+    o.workedTilesWindow = WorkedTilesWindow:new(city)
 
     hud:openWindow(o.buildingsWindow)
     hud:openWindow(o.infoBarWindow)
+    hud:openWindow(o.workedTilesWindow)
 
     -- take UI control
     hud:takeFullControl(true)
@@ -33,6 +36,7 @@ end
 function CityHUD.close(self)
     self.buildingsWindow.close = true
     self.infoBarWindow.close = true
+    self.workedTilesWindow.close = true
 
     -- concede UI control
     hud:takeFullControl(false)
@@ -142,6 +146,57 @@ function InfoBarWindow.shouldClose(self)
     return self.close
 end
 
+function WorkedTilesWindow.new(self, city)
+    local o = { close = false, city = city }
+
+    setmetatable(o, self)
+    self.__index = self
+
+    return o
+end
+
+function WorkedTilesWindow.paint(self, ui, cv)
+    local workedTiles = self.city:getWorkedTiles()
+    for i = 1, #workedTiles do
+        local tilePos = workedTiles[i]
+
+        local offset = game:getScreenOffset(tilePos)
+
+        cv:beginPath()
+        cv:circle(offset.x + 50, offset.y + 50, 50)
+        cv:strokeColor({255, 255, 255})
+        cv:strokeWidth(2)
+        cv:stroke()
+    end
+end
+
+function WorkedTilesWindow.shouldClose(self)
+    return self.close
+end
+
+function WorkedTilesWindow.toggleManualWork(self, pos)
+    if not self.city:canWorkTile(pos) then
+        return
+    end
+
+    -- Determine whether to disable or enable
+    local manualWorked = self.city:getManualWorkedTiles()
+    local alreadyWorked = false
+    for i = 0, #manualWorked do
+        if manualWorked[i] == pos then
+            alreadyWorked = true
+            break
+        end
+    end
+
+    if alreadyWorked then
+        self.city:removeManualWorkedTile(pos)
+    else
+        self.city:addManualWorkedTile(pos)
+    end
+    self.city:updateWorkedTiles()
+end
+
 registerDoubleClickHandler(function(pos)
     if currentCityHUD ~= nil then return end
 
@@ -155,4 +210,11 @@ engine:registerEventHandler("onKeyPressed", function(key)
     if key == Key.Escape and currentCityHUD ~= nil then
         currentCityHUD:close()
     end
+end)
+
+engine:registerEventHandler("onPosClicked", function(pos)
+    -- Toggle worked tiles if needed.
+    if currentCityHUD == nil then return end
+
+    currentCityHUD.workedTilesWindow:toggleManualWork(pos)
 end)

@@ -126,6 +126,7 @@ namespace rip {
         std::string previousBuildTask;
 
         std::vector<glm::uvec2> workedTiles;
+        std::vector<glm::uvec2> manualWorkedTiles;
 
         int population = 1;
         int storedFood = 0;
@@ -169,7 +170,20 @@ namespace rip {
 
         void setName(std::string name);
 
+        // Updates automatically chosen worked tiles.
+        // Also, removes manually worked tiles that can
+        // no longer be worked.
         void updateWorkedTiles(Game &game);
+        // Returns whether this city can work the given tile.
+        bool canWorkTile(glm::uvec2 pos, const Game &game) const;
+        // Adds a manual worked tile that overrides an automatic one.
+        void addManualWorkedTile(glm::uvec2 pos);
+        // Removes a manual worked tile.
+        void removeManualWorkedTile(glm::uvec2 pos);
+        // Gets a list of worked tiles.
+        const std::vector<glm::uvec2> &getWorkedTiles() const;
+        const std::vector<glm::uvec2> &getManualWorkedTiles() const;
+
         Yield computeYield(const Game &game) const;
 
         int getGoldProduced(Game &game) const;

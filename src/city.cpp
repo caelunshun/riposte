@@ -71,8 +71,9 @@ namespace rip {
     public:
         Yield yield;
         glm::uvec2 pos;
+        bool forced;
 
-        BfcEntry(const Yield &yield, const glm::uvec2 &pos) : yield(yield), pos(pos) {}
+        BfcEntry(const Yield &yield, const glm::uvec2 &pos, bool forced) : yield(yield), pos(pos), forced(forced) {}
     };
 
     void City::updateWorkedTiles(Game &game) {
@@ -89,17 +90,29 @@ namespace rip {
         // Iterate over the BFC and optimize these.
         std::vector<BfcEntry> entries;
 
+        // Account for manual tiles
+        for (int i = 0; i < manualWorkedTiles.size(); i++) {
+            auto tilePos = manualWorkedTiles[i];
+            if (!canWorkTile(tilePos, game)) {
+                removeManualWorkedTile(tilePos);
+                --i;
+                continue;
+            }
+
+            entries.emplace_back(game.getTile(tilePos).getYield(game, tilePos, owner), tilePos, true);
+        }
+
         for (const auto bfcPos : getBigFatCross(getPos())) {
-            if (!game.containsTile(bfcPos)) continue;
-            if (game.isTileWorked(bfcPos)) continue;
-            if (game.getCultureMap().getTileOwner(bfcPos) != std::make_optional<PlayerId>(getOwner())) continue;
+            if (!canWorkTile(bfcPos, game)) continue;
             const auto &tile = game.getTile(bfcPos);
             const auto yield = tile.getYield(game, bfcPos, owner);
-            entries.emplace_back(yield, bfcPos);
+            entries.emplace_back(yield, bfcPos, false);
         }
 
         std::stable_sort(entries.begin(), entries.end(), [&] (const BfcEntry &a, const BfcEntry &b) {
-            if (a.yield.food < b.yield.food) {
+            if (b.forced) return false;
+            else if (a.forced) return true;
+            else if (a.yield.food < b.yield.food) {
                 return false;
             } else if (b.yield.food < a.yield.food) {
                 return true;
@@ -117,12 +130,50 @@ namespace rip {
         });
 
         // The city's own tile is always worked.
-        entries.emplace(entries.begin(), game.getTile(pos).getYield(game, pos, owner), pos);
+        entries.emplace(entries.begin(), game.getTile(pos).getYield(game, pos, owner), pos, true);
 
         for (int i = 0; i < std::min(population + 1, (int) entries.size()); i++) {
             workedTiles.push_back(entries[i].pos);
             game.setTileWorked(entries[i].pos, true);
         }
+
+        // Remove manual worked tiles that are no longer worked.
+        if (!manualWorkedTiles.empty()) {
+            for (int i = manualWorkedTiles.size() - 1; i >= 0; i--) {
+                auto p = manualWorkedTiles[i];
+                if (std::find(workedTiles.begin(), workedTiles.end(), p) == workedTiles.end()) {
+                    manualWorkedTiles.erase(manualWorkedTiles.begin() + i);
+                }
+            }
+        }
+    }
+
+    bool City::canWorkTile(glm::uvec2 tilePos, const Game &game) const {
+        if (!game.containsTile(tilePos)) return false;
+        if (dist(tilePos, pos) >= 2.5) return false;
+        if (game.isTileWorked(tilePos)) return false;
+        if (game.getCultureMap().getTileOwner(tilePos) != std::make_optional<PlayerId>(getOwner())) return false;
+        return true;
+    }
+
+    void City::addManualWorkedTile(glm::uvec2 pos) {
+        removeManualWorkedTile(pos);
+        manualWorkedTiles.push_back(pos);
+    }
+
+    void City::removeManualWorkedTile(glm::uvec2 pos) {
+        auto it = std::find(manualWorkedTiles.begin(), manualWorkedTiles.end(), pos);
+        if (it != manualWorkedTiles.end()) {
+            manualWorkedTiles.erase(it);
+        }
+    }
+
+    const std::vector<glm::uvec2> &City::getWorkedTiles() const {
+        return workedTiles;
+    }
+
+    const std::vector<glm::uvec2> &City::getManualWorkedTiles() const {
+        return manualWorkedTiles;
     }
 
     Yield City::computeYield(const Game &game) const {

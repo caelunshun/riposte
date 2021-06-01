@@ -25,7 +25,7 @@ FetchContent_MakeAvailable(Corrosion)
 
 corrosion_import_crate(MANIFEST_PATH crodio/Cargo.toml)
 
-target_compile_definitions(riposte PRIVATE FONS_USE_FREETYPE)
+target_compile_definitions(riposte PRIVATE FONS_USE_FREETYPE SOL_ALL_SAFETIES_ON)
 target_include_directories(riposte PRIVATE
         external/nanovg/src
         external/FastNoise2/include

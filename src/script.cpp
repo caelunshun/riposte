@@ -217,6 +217,14 @@ namespace rip {
             city_type["computeYield"] = [&] (City &self) {
                 return self.computeYield(*game);
             };
+            city_type["getWorkedTiles"] = &City::getWorkedTiles;
+            city_type["updateWorkedTiles"] = [&] (City &self) {
+                self.updateWorkedTiles(*game);
+            };
+            city_type["addManualWorkedTile"] = &City::addManualWorkedTile;
+            city_type["removeManualWorkedTile"] = &City::removeManualWorkedTile;
+            city_type["getManualWorkedTiles"] = &City::getManualWorkedTiles;
+            city_type["canWorkTile"] = &City::canWorkTile;
 
             auto player_type = lua.new_usertype<Player>("Player");
             player_type["getLeader"] = &Player::getLeader;
@@ -270,6 +278,8 @@ namespace rip {
                 auto *city = game.getCityAtLocation(pos);
                 return city;
             };
+            game_type["getScreenOffset"] = &Game::getScreenOffset;
+            game_type["getPosFromScreenOffset"] = &Game::getPosFromScreenOffset;
 
             auto cv_type = lua.new_usertype<Canvas>("Canvas");
             cv_type["beginPath"] = [] (Canvas &cv) {
