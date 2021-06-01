@@ -2,7 +2,7 @@
 -- and yield information, etc.
 
 local buildingsSize = Vec2.new(200, 600)
-local infoBarSize = Vec2.new(440, 100)
+local infoBarSize = Vec2.new(440, 150)
 
 local CityHUD = {}
 local BuildingsWindow = {}
@@ -123,6 +123,9 @@ function InfoBarWindow.paint(self, ui, cv)
     local endX = posX + infoBarSize.x
     local endY = posY + infoBarSize.y
 
+    local centerX = (posX + endX) / 2
+    local centerY = (posY + endY) / 2
+
     local padding = 20
 
     -- Background
@@ -130,6 +133,18 @@ function InfoBarWindow.paint(self, ui, cv)
     cv:rect(posX, posY, infoBarSize.x, infoBarSize.y)
     cv:fillColor({50, 50, 50})
     cv:fill()
+
+    -- Title
+    cv:fontSize(15)
+    cv:textFormat(TextBaseline.Top, TextAlign.Center)
+    cv:fillColor({255, 255, 255})
+    cv:text(centerX, posY + 5, self.city:getName())
+
+    cv:fontSize(12)
+    cv:text(centerX, posY + 25, string.format("Population: %d", self.city:getPopulation()))
+    if self.city:isCapital() then
+        cv:text(centerX, posY + 40, "Capital")
+    end
 
     -- Population progress bar
     local storedFood = self.city:getStoredFood()
@@ -153,7 +168,7 @@ function InfoBarWindow.paint(self, ui, cv)
         projectedProgressCol = {0, 0, 0}
         text = "Stagnant"
     end
-    paintProgressBar(cv, posX + padding, posY + padding, progress, projectedProgress, {237, 155, 51}, projectedProgressCol, text)
+    paintProgressBar(cv, posX + padding, posY + padding + 40, progress, projectedProgress, {237, 155, 51}, projectedProgressCol, text)
 
     -- Production progress bar
     local task = self.city:getBuildTask()
@@ -164,7 +179,7 @@ function InfoBarWindow.paint(self, ui, cv)
         local text = string.format("%s (%d turn", task:getName(), turnsLeft)
         if turnsLeft ~= 1 then text = text .. "s" end
         text = text .. ")"
-        paintProgressBar(cv, posX + padding, posY + padding + 40, progress, projectedProgress, progressColor, projectedProgressColor, text)
+        paintProgressBar(cv, posX + padding, posY + padding + 80, progress, projectedProgress, progressColor, projectedProgressColor, text)
     end
 end
 
