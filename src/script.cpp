@@ -16,6 +16,20 @@
 #include "city.h"
 
 namespace rip {
+    static NVGcolor luaColor(sol::table color) {
+        if (color.size() == 3) {
+            return nvgRGB(color.get<int>(1), color.get<int>(2), color.get<int>(3));
+        } else {
+            return nvgRGBA(color.get<int>(1), color.get<int>(2), color.get<int>(3), color.get<int>(4));
+        }
+    }
+
+    struct Canvas {
+        NVGcontext *vg;
+
+        Canvas(NVGcontext *vg) : vg(vg) {}
+    };
+
     // A HUD window written in Lua.
     class LuaWindow : public Window {
         sol::table luaTable;
@@ -25,9 +39,9 @@ namespace rip {
 
         LuaWindow(sol::table luaTable) : luaTable(std::move(luaTable)) {}
 
-        void paint(Game &game, nk_context *nk) override {
+        void paint(Game &game, nk_context *nk, NVGcontext *vg) override {
             sol::function paintFn = luaTable.get<sol::function>("paint");
-            paintFn.call<void>(luaTable, nk);
+            paintFn.call<void>(luaTable, nk, Canvas(vg));
         }
 
         bool shouldClose() override {
@@ -156,6 +170,26 @@ namespace rip {
                 self.teleportTo(pos, *game);
             };
 
+            auto building_type = lua.new_usertype<Building>("Building");
+            building_type["name"] = &Building::name;
+            building_type["cost"] = &Building::cost;
+            building_type["prerequisites"] = &Building::prerequisites;
+            building_type["techs"] = &Building::techs;
+            building_type["onlyCoastal"] = &Building::onlyCoastal;
+
+            auto build_type = lua.new_usertype<BuildTask>("BuildTask");
+            build_type["getCost"] = &BuildTask::getCost;
+            build_type["getProgress"] = &BuildTask::getProgress;
+            build_type["isFinished"] = &BuildTask::isFinished;
+            build_type["getOverflow"] = &BuildTask::getOverflow;
+            build_type["spendHammers"] = &BuildTask::spendHammers;
+            build_type["getName"] = &BuildTask::getName;
+
+            auto yield_type = lua.new_usertype<Yield>("Yield");
+            yield_type["hammers"] = &Yield::hammers;
+            yield_type["commerce"] = &Yield::commerce;
+            yield_type["food"] = &Yield::food;
+
             auto city_type = lua.new_usertype<City>("City");
             city_type["getPos"] = &City::getPos;
             city_type["getName"] = &City::getName;
@@ -173,6 +207,16 @@ namespace rip {
             city_type["setName"] = &City::setName;
             city_type["getPopulation"] = &City::getPopulation;
             city_type["isCoastal"] = &City::isCoastal;
+            city_type["hasBuildTask"] = &City::hasBuildTask;
+            city_type["getBuildTask"] = &City::getBuildTask;
+            city_type["estimateTurnsForCompletion"] = [&] (City &self, const BuildTask &task) {
+                return self.estimateTurnsForCompletion(task, *game);
+            };
+            city_type["getBuildings"] = &City::getBuildings;
+            city_type["hasBuilding"] = &City::hasBuilding;
+            city_type["computeYield"] = [&] (City &self) {
+                return self.computeYield(*game);
+            };
 
             auto player_type = lua.new_usertype<Player>("Player");
             player_type["getLeader"] = &Player::getLeader;
@@ -203,11 +247,11 @@ namespace rip {
                 self.die(*game);
             };
 
-            auto vec2_type = lua.new_usertype<glm::vec2>("Vec2");
+            auto vec2_type = lua.new_usertype<glm::vec2>("Vec2", sol::constructors<glm::vec2(float, float)>());
             vec2_type["x"] = &glm::vec2::x;
             vec2_type["y"] = &glm::vec2::y;
 
-            auto uvec2_type = lua.new_usertype<glm::uvec2>("UVec2");
+            auto uvec2_type = lua.new_usertype<glm::uvec2>("UVec2", sol::constructors<glm::uvec2(uint32_t, uint32_t)>());
             uvec2_type["x"] = &glm::uvec2::x;
             uvec2_type["y"] = &glm::uvec2::y;
 
@@ -222,6 +266,70 @@ namespace rip {
             game_type["getCursor"] = [=](Game &game) {
                 return &game.getCursor();
             };
+            game_type["getCityAtLocation"] = [=](Game &game, glm::uvec2 pos) {
+                auto *city = game.getCityAtLocation(pos);
+                return city;
+            };
+
+            auto cv_type = lua.new_usertype<Canvas>("Canvas");
+            cv_type["beginPath"] = [] (Canvas &cv) {
+                nvgBeginPath(cv.vg);
+            };
+            cv_type["rect"] = [] (Canvas &cv, float posX, float posY, float sizeX, float sizeY) {
+                nvgRect(cv.vg, posX, posY, sizeX, sizeY);
+            };
+            cv_type["circle"] = [] (Canvas &cv, float cx, float cy, float radius) {
+                nvgCircle(cv.vg, cx, cy, radius);
+            };
+            cv_type["lineTo"] = [] (Canvas &cv, float x, float y) {
+                nvgLineTo(cv.vg, x, y);
+            };
+            cv_type["fillColor"] = [] (Canvas &cv, sol::table color) {
+                nvgFillColor(cv.vg, luaColor(color));
+            };
+            cv_type["strokeColor"] = [] (Canvas &cv, sol::table color) {
+                nvgStrokeColor(cv.vg, luaColor(color));
+            };
+            cv_type["strokeWidth"] = [] (Canvas &cv, float width) {
+                nvgStrokeWidth(cv.vg, width);
+            };
+            cv_type["fill"] = [] (Canvas &cv) {
+                nvgFill(cv.vg);
+            };
+            cv_type["stroke"] = [] (Canvas &cv) {
+                nvgStroke(cv.vg);
+            };
+            cv_type["textFormat"] = [] (Canvas &cv, int baseline, int align) {
+                nvgTextAlign(cv.vg, baseline | align);
+            };
+            cv_type["fontSize"] = [] (Canvas &cv, float size) {
+                nvgFontSize(cv.vg, size);
+            };
+            cv_type["text"] = [] (Canvas &cv, float x, float y, const std::string &text) {
+                nvgText(cv.vg, x, y, text.c_str(), nullptr);
+            };
+
+            lua["TextBaseline"] = lua.create_table_with(
+                    "Alphabetic", NVG_ALIGN_BASELINE,
+                    "Top", NVG_ALIGN_TOP,
+                    "Bottom", NVG_ALIGN_BOTTOM,
+                    "Middle", NVG_ALIGN_MIDDLE
+                    );
+            lua["TextAlign"] = lua.create_table_with(
+                    "Left", NVG_ALIGN_LEFT,
+                    "Center", NVG_ALIGN_CENTER,
+                    "Right", NVG_ALIGN_RIGHT
+                    );
+
+            lua["Key"] = lua.create_table_with(
+                    "Escape", GLFW_KEY_ESCAPE,
+                    "Enter", GLFW_KEY_ENTER,
+                    "LeftShift", GLFW_KEY_LEFT_SHIFT,
+                    "RightShift", GLFW_KEY_RIGHT_SHIFT,
+                    "Control", GLFW_KEY_LEFT_CONTROL,
+                    "Alt", GLFW_KEY_LEFT_ALT,
+                    "Tab", GLFW_KEY_TAB
+                    );
         }
 
         void forEachHandler(const std::string &event, std::function<void(sol::function &)> callback) {
@@ -243,6 +351,7 @@ namespace rip {
         hud_type["openWindow"] = [=] (Hud &hud, sol::table window) {
             hud.openWindow(std::make_shared<LuaWindow>(std::move(window)));
         };
+        hud_type["takeFullControl"] = &Hud::takeFullControl;
 
         lua["hud"] = hud;
     }
@@ -265,6 +374,24 @@ namespace rip {
     void ScriptEngine::onDialogueOpened(Player &with) {
         impl->forEachHandler("onDialogueOpened", [&] (sol::function &handler) {
             handler.call<void>(with);
+        });
+    }
+
+    void ScriptEngine::onPosClicked(glm::uvec2 pos) {
+        impl->forEachHandler("onPosClicked", [=] (sol::function handler) {
+            handler.call<void>(pos);
+        });
+    }
+
+    void ScriptEngine::onKeyPressed(int key) {
+        impl->forEachHandler("onKeyPressed", [=] (sol::function handler) {
+            handler.call<void>(key);
+        });
+    }
+
+    void ScriptEngine::onTurnEnd() {
+        impl->forEachHandler("onTurnEnd", [=] (sol::function handler) {
+            handler.call<void>();
         });
     }
 

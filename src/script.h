@@ -6,6 +6,7 @@
 #define RIPOSTE_SCRIPT_H
 
 #include <memory>
+#include <glm/vec2.hpp>
 #include "assets.h"
 
 namespace rip {
@@ -33,6 +34,10 @@ namespace rip {
 
         void onWarDeclared(Player &declarer, Player &declared);
         void onDialogueOpened(Player &with);
+
+        void onPosClicked(glm::uvec2 pos);
+        void onKeyPressed(int key);
+        void onTurnEnd();
     };
 
     class ScriptLoader : public AssetLoader {

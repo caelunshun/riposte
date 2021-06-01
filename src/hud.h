@@ -27,7 +27,7 @@ namespace rip {
         // Paints the window with Nuklear.
         //
         // This method _must_ call nk_begin and nk_end.
-        virtual void paint(Game &game, nk_context *nk) = 0;
+        virtual void paint(Game &game, nk_context *nk, NVGcontext *vg) = 0;
 
         virtual bool shouldClose() = 0;
     };
@@ -65,6 +65,8 @@ namespace rip {
         std::shared_ptr<Image> beakerIcon;
 
         std::vector<std::shared_ptr<Window>> windows;
+
+        bool hasFullControl = true;
 
         void paintSelectedUnit(Game &game);
         void paintMainHud(Game &game);
@@ -109,6 +111,10 @@ namespace rip {
         bool hasFocus(const Game &game) const;
 
         void openWindow(std::shared_ptr<Window> window);
+
+        // Takes full control of the HUD by disabling most HUD
+        // items.
+        void takeFullControl(bool control);
     };
 }
 

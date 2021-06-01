@@ -189,7 +189,7 @@ namespace rip {
 
     int City::estimateTurnsForCompletion(const BuildTask &task, const Game &game) const {
         auto production = computeYield(game).hammers;
-        return (task.getCost() + production - 1) / production;
+        return (task.getCost() - task.getProgress() + production - 1) / production;
     }
 
     const std::string &City::getPreviousBuildTask() const {

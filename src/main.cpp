@@ -173,6 +173,7 @@ int main() {
         while (!keyEvents.empty()) {
             auto event = keyEvents[0];
             hud->handleKey(game, event);
+            game.getScriptEngine().onKeyPressed(event);
             keyEvents.pop_front();
         }
         while (!scrollEvents.empty()) {

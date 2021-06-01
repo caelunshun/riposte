@@ -10,6 +10,7 @@
 #include "city.h"
 #include "ripmath.h"
 #include "stack.h"
+#include "script.h"
 #include <nuklear.h>
 #include <sstream>
 #include <iomanip>
@@ -354,23 +355,28 @@ namespace rip {
             }
         }
 
-        paintSelectedUnit(game);
-        paintMainHud(game);
-        auto cityID = getCityBuildPrompt(game);
-        if (cityID.has_value()) {
-            if (*cityID != lastCityBuildPrompt) {
-                lastCityBuildPrompt = *cityID;
-                const auto &city = game.getCity(*cityID);
-                game.getView().setCenterAnimation(SmoothAnimation(game.getView().getMapCenter(), glm::vec2(city.getPos()) * 100.0f, 2000.0f, 0.5f));
+        if (hasFullControl) {
+            paintSelectedUnit(game);
+            paintMainHud(game);
+            auto cityID = getCityBuildPrompt(game);
+            if (cityID.has_value()) {
+                if (*cityID != lastCityBuildPrompt) {
+                    lastCityBuildPrompt = *cityID;
+                    const auto &city = game.getCity(*cityID);
+                    game.getView().setCenterAnimation(
+                            SmoothAnimation(game.getView().getMapCenter(), glm::vec2(city.getPos()) * 100.0f, 2000.0f,
+                                            0.5f));
+                }
+                paintCityBuildPrompt(game, *cityID);
             }
-            paintCityBuildPrompt(game, *cityID);
+            paintResearchBar(game);
+            paintTechPrompt(game);
+            paintMessages(game);
+            paintTopLeftHud(game);
+            paintScoreHud(game);
+            paintStackSelectionBar(game);
         }
-        paintResearchBar(game);
-        paintTechPrompt(game);
-        paintMessages(game);
-        paintTopLeftHud(game);
-        paintScoreHud(game);
-        paintStackSelectionBar(game);
+
         paintWindows(game);
 
         clickPos = {};
@@ -424,7 +430,10 @@ namespace rip {
         }
 
         auto tilePos = game.getPosFromScreenOffset(game.getCursor().getPos());
+
         if (event.button == MouseButton::Left && event.action == MouseAction::Press) {
+            game.getScriptEngine().onPosClicked(tilePos);
+
             auto stackID = game.getStackByKey(game.getThePlayerID(), tilePos);
             selectedUnits.clear();
             selectedStack = stackID;
@@ -794,7 +803,7 @@ namespace rip {
         if (windows.empty()) return;
         for (int i = 0; i < windows.size(); i++) {
             auto window = windows[i];
-            window->paint(game, nk);
+            window->paint(game, nk, vg);
             if (window->shouldClose()) {
                 windows.erase(windows.begin() + i);
                 --i;
@@ -810,5 +819,9 @@ namespace rip {
         return clickPos.has_value()
             && (clickPos->x >= pos.x && clickPos->y >= pos.y)
             && (clickPos->x <= pos.x + size.x && clickPos->y <= pos.y + size.y);
+    }
+
+    void Hud::takeFullControl(bool control) {
+        hasFullControl = !control;
     }
 }
