@@ -102,7 +102,7 @@ namespace rip {
         }
     };
 
-    const auto numPlayers = 1;
+    const auto numPlayers = 7;
 
     // CIVILIZATION GENERATOR
     void seedPlayers(Game &game, const std::shared_ptr<TechTree> &techTree, Rng &rng) {
