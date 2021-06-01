@@ -8,6 +8,7 @@
 #include <memory>
 #include <glm/vec2.hpp>
 #include "assets.h"
+#include <nanovg.h>
 
 namespace rip {
     struct ScriptImpl;
@@ -17,6 +18,12 @@ namespace rip {
 
     // Intentionally empty.
     struct ScriptAsset : public Asset {};
+
+    struct Canvas {
+        NVGcontext *vg;
+
+        Canvas(NVGcontext *vg) : vg(vg) {}
+    };
 
     // Manages Lua scripting.
     class ScriptEngine {
