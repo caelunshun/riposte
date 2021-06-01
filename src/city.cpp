@@ -315,10 +315,10 @@ namespace rip {
 
     void City::doGrowth(Game &game) {
         auto yield = computeYield(game);
-        auto consumedFood = population * 2;
+        auto consumedFood = getConsumedFood();
         auto excessFood = yield.food - consumedFood;
 
-        auto neededFoodForGrowth = 30 + 3 * population;
+        auto neededFoodForGrowth = getFoodNeededForGrowth();
 
         storedFood += excessFood;
         if (storedFood < 0) {
@@ -334,6 +334,18 @@ namespace rip {
                 storedFood += neededFoodForGrowth / 2;
             }
         }
+    }
+
+    int City::getStoredFood() const {
+        return storedFood;
+    }
+
+    int City::getFoodNeededForGrowth() const {
+        return 30 + 3 * population;
+    }
+
+    int City::getConsumedFood() const {
+        return population * 2;
     }
 
     const Culture &City::getCulture() const {

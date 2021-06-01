@@ -131,14 +131,40 @@ function InfoBarWindow.paint(self, ui, cv)
     cv:fillColor({50, 50, 50})
     cv:fill()
 
+    -- Population progress bar
+    local storedFood = self.city:getStoredFood()
+    local neededFood = self.city:getFoodNeededForGrowth()
+    local foodSurplus = self.city:computeYield().food - self.city:getConsumedFood()
+    local progress = storedFood / neededFood
+    local projectedProgress = (storedFood + foodSurplus) / neededFood
+
+    local projectedProgressCol = nil
+    local text = nil
+    if foodSurplus > 0 then
+        local projectedTurns = math.ceil((neededFood - storedFood) / foodSurplus)
+        text = string.format("Growing (%d turn", projectedTurns)
+        if projectedTurns ~= 1 then text = text .. "s" end
+        text = text .. ")"
+        projectedProgressCol = {185, 112, 0}
+    elseif foodSurplus < 0 then
+        text = "STARVATION!"
+        projectedProgressCol = {209, 65, 36}
+    else
+        projectedProgressCol = {0, 0, 0}
+        text = "Stagnant"
+    end
+    paintProgressBar(cv, posX + padding, posY + padding, progress, projectedProgress, {237, 155, 51}, projectedProgressCol, text)
+
     -- Production progress bar
     local task = self.city:getBuildTask()
     if task ~= nil then
         local turnsLeft = self.city:estimateTurnsForCompletion(task)
         local progress = task:getProgress() / task:getCost()
         local projectedProgress = (task:getProgress() + self.city:computeYield().hammers) / task:getCost()
-        local text = string.format("%s (%d turns)", task:getName(), turnsLeft)
-        paintProgressBar(cv, posX + padding, posY + padding, progress, projectedProgress, progressColor, projectedProgressColor, text)
+        local text = string.format("%s (%d turn", task:getName(), turnsLeft)
+        if turnsLeft ~= 1 then text = text .. "s" end
+        text = text .. ")"
+        paintProgressBar(cv, posX + padding, posY + padding + 40, progress, projectedProgress, progressColor, projectedProgressColor, text)
     end
 end
 

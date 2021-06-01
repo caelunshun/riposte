@@ -229,6 +229,9 @@ namespace rip {
             city_type["canWorkTile"] = [&] (City &self, glm::uvec2 pos) {
                 return self.canWorkTile(pos, *game);
             };
+            city_type["getStoredFood"] = &City::getStoredFood;
+            city_type["getFoodNeededForGrowth"] = &City::getFoodNeededForGrowth;
+            city_type["getConsumedFood"] = &City::getConsumedFood;
 
             auto player_type = lua.new_usertype<Player>("Player");
             player_type["getLeader"] = &Player::getLeader;

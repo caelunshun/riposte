@@ -215,6 +215,10 @@ namespace rip {
 
         bool isCoastal() const;
 
+        int getStoredFood() const;
+        int getFoodNeededForGrowth() const;
+        int getConsumedFood() const;
+
         void transferControlTo(Game &game, PlayerId newOwner);
     };
 }
