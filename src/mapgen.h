@@ -14,7 +14,7 @@ namespace rip {
     class MapGenerator {
         Rng rng;
     public:
-        void generate(Game &game, const std::shared_ptr<TechTree> &techTree);
+        Game generate(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry, const std::shared_ptr<TechTree> &techTree);
     };
 }
 

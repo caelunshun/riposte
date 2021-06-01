@@ -102,6 +102,10 @@ namespace rip {
         }
     };
 
+    // NB: most functions here return bools that indicate
+    // whether generating was successful. If not, we need
+    // to start over with a new seed.
+
     const auto numPlayers = 7;
 
     // CIVILIZATION GENERATOR
@@ -135,10 +139,15 @@ namespace rip {
     }
 
     // CITY GENERATOR
-    void placeCities(Game &game, Rng &rng) {
+    bool placeCities(Game &game, Rng &rng) {
         std::vector<glm::uvec2> positions;
         for (auto &player : game.getPlayers()) {
+            int attempts = 0;
             while(true) {
+                if (++attempts > 1000) {
+                    return false;
+                }
+
                 auto x = rng.u32(0, game.getMapWidth());
                 auto y = rng.u32(0, game.getMapHeight());
                 glm::uvec2 pos(x, y);
@@ -180,16 +189,22 @@ namespace rip {
                 }
             }
         }
+        return true;
     }
 
-    void placeResources(Game &game, Rng &rng) {
+    bool placeResources(Game &game, Rng &rng) {
         const auto numTiles = game.getMapWidth() * game.getMapHeight();
         for (const auto &entry : game.getRegistry().getResources()) {
             const auto &resource = entry.second;
             const auto minPlacements = resource->scarcity * (static_cast<float>(numTiles) / 1000);
 
             int placed = 0;
+            int attempts = 0;
             while (placed < minPlacements) {
+                if (++attempts > 1000) {
+                    return false;
+                }
+
                 glm::uvec2 pos(rng.u32(0, game.getMapWidth()), rng.u32(0, game.getMapHeight()));
                 auto &tile = game.getTile(pos);
 
@@ -201,11 +216,12 @@ namespace rip {
                 ++placed;
             }
         }
+        return true;
     }
 
     // MAIN GENERATOR
 
-    void buildTerrain(Game &game, Rng &rng) {
+    bool buildTerrain(Game &game, Rng &rng) {
         // Generate land/ocean map based on continents.
         const auto dim = 16;
         LandMap landMap(dim, dim);
@@ -214,7 +230,12 @@ namespace rip {
         const auto minDistFromEdge = 1;
         std::vector<glm::uvec2> continentCenters;
 
+        int attempts = 0;
         while (continentCenters.size() < numContinents) {
+            if (++attempts > 1000) {
+                return false;
+            }
+
             glm::uvec2 candidate(rng.u32(0, dim), rng.u32(0, dim));
 
             // Ensure we're a minimum distance away from all other continents
@@ -317,12 +338,25 @@ namespace rip {
                 }
             }
         }
+
+        return true;
     }
 
-    void MapGenerator::generate(rip::Game &game, const std::shared_ptr<TechTree> &techTree) {
-        buildTerrain(game, rng);
+    bool tryGenerate(Game &game, Rng &rng, const std::shared_ptr<TechTree> &techTree) {
+        if (!buildTerrain(game, rng)) return false;
         seedPlayers(game, techTree, rng);
-        placeCities(game, rng);
-        placeResources(game, rng);
+        if (!placeCities(game, rng)) return false;
+        if (!placeResources(game, rng)) return false;
+        return true;
+    }
+
+    Game MapGenerator::generate(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry,
+                                const std::shared_ptr<TechTree> &techTree) {
+        while (true) {
+            Game game(mapWidth, mapHeight, registry);
+            if (tryGenerate(game, rng, techTree)) {
+                return game;
+            }
+        }
     }
 }

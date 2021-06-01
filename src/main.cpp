@@ -122,9 +122,8 @@ int main() {
 
     renderer.init(assets);
 
-    rip::Game game(64, 64, registry);
     rip::MapGenerator mapgen;
-    mapgen.generate(game, techTree);
+    rip::Game game = mapgen.generate(64, 64, registry, techTree);
     scriptEngine->setGame(&game);
     game.setScriptEngine(scriptEngine);
 
