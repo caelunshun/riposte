@@ -98,7 +98,7 @@ namespace rip {
 
         std::optional<CityId> findNewTargetCity(Game &game, AIimpl &ai, Player &player);
 
-        CityId updateGatherCity(Game &game, AIimpl &ai, Player &player);
+        void updateGatherCity(Game &game, AIimpl &ai, Player &player);
 
         // Updates the war plan. Returns whether the opponent is still valid.
         bool update(Game &game, AIimpl &ai, Player &player);
@@ -350,7 +350,7 @@ namespace rip {
         return result;
     }
 
-    CityId WarPlan::updateGatherCity(Game &game, AIimpl &ai, Player &player) {
+    void WarPlan::updateGatherCity(Game &game, AIimpl &ai, Player &player) {
         gatherCityID = ai.getDistanceToNearestCity(game, game.getCity(targetCityID).getPos(), true).second;
     }
 

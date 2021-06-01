@@ -14,7 +14,7 @@ namespace rip {
 
     static const Color colorBad = {193, 0, 22};
     static const Color colorGood = {68, 194, 113};
-    static const Color colorTerrible = {60, 219, 292};
+    static const Color colorTerrible = {60, 219, 192};
 
     struct Message {
         std::string text;
