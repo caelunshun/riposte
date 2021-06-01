@@ -79,7 +79,7 @@ namespace rip {
     void City::updateWorkedTiles(Game &game) {
         // Clear worked tiles and recompute them.
         for (const auto tile : workedTiles) {
-            game.setTileWorked(tile, false);
+            game.setTileWorked(tile, false, id);
         }
         workedTiles.clear();
 
@@ -134,7 +134,7 @@ namespace rip {
 
         for (int i = 0; i < std::min(population + 1, (int) entries.size()); i++) {
             workedTiles.push_back(entries[i].pos);
-            game.setTileWorked(entries[i].pos, true);
+            game.setTileWorked(entries[i].pos, true, id);
         }
 
         // Remove manual worked tiles that are no longer worked.
@@ -151,7 +151,8 @@ namespace rip {
     bool City::canWorkTile(glm::uvec2 tilePos, const Game &game) const {
         if (!game.containsTile(tilePos)) return false;
         if (dist(tilePos, pos) >= 2.5) return false;
-        if (game.isTileWorked(tilePos)) return false;
+        auto worker = game.isTileWorked(tilePos);
+        if (!(!worker.has_value() || worker == id)) return false;
         if (game.getCultureMap().getTileOwner(tilePos) != std::make_optional<PlayerId>(getOwner())) return false;
         return true;
     }
@@ -159,6 +160,10 @@ namespace rip {
     void City::addManualWorkedTile(glm::uvec2 pos) {
         removeManualWorkedTile(pos);
         manualWorkedTiles.push_back(pos);
+
+        if (manualWorkedTiles.size() > population) {
+            manualWorkedTiles.erase(manualWorkedTiles.begin());
+        }
     }
 
     void City::removeManualWorkedTile(glm::uvec2 pos) {
@@ -365,6 +370,7 @@ namespace rip {
     void City::onCreated(Game &game) {
         game.getCultureMap().onCityCreated(game, getID());
         game.getTradeRoutes().onCityCreated(game, *this);
+        updateWorkedTiles(game);
 
         // Check coastal status.
         for (const auto neighborPos : getNeighbors(pos)) {

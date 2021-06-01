@@ -156,6 +156,7 @@ function WorkedTilesWindow.new(self, city)
 end
 
 function WorkedTilesWindow.paint(self, ui, cv)
+    cv:applyZoom()
     local workedTiles = self.city:getWorkedTiles()
     for i = 1, #workedTiles do
         local tilePos = workedTiles[i]
@@ -168,6 +169,7 @@ function WorkedTilesWindow.paint(self, ui, cv)
         cv:strokeWidth(2)
         cv:stroke()
     end
+    cv:removeZoom()
 end
 
 function WorkedTilesWindow.shouldClose(self)
@@ -189,6 +191,7 @@ function WorkedTilesWindow.toggleManualWork(self, pos)
         end
     end
 
+
     if alreadyWorked then
         self.city:removeManualWorkedTile(pos)
     else
@@ -202,6 +205,7 @@ registerDoubleClickHandler(function(pos)
 
     local city = game:getCityAtLocation(pos)
     if city ~= nil then
+        if city:getOwner() ~= game:getThePlayer() then return end
         currentCityHUD = CityHUD:new(city)
     end
 end)

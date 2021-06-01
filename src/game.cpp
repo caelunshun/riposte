@@ -47,7 +47,7 @@ namespace rip {
 
         bool cheatMode = false;
 
-        std::vector<bool> workedTiles;
+        std::vector<std::optional<CityId>> workedTiles;
 
         CultureMap cultureMap;
 
@@ -335,12 +335,14 @@ namespace rip {
         return impl->cheatMode;
     }
 
-    bool Game::isTileWorked(glm::uvec2 pos) const {
+    std::optional<CityId> Game::isTileWorked(glm::uvec2 pos) const {
         return impl->workedTiles[pos.x + pos.y * getMapWidth()];
     }
 
-    void Game::setTileWorked(glm::uvec2 pos, bool worked) {
-        impl->workedTiles[pos.x + pos.y * getMapWidth()] = worked;
+    void Game::setTileWorked(glm::uvec2 pos, bool worked, CityId worker) {
+        std::optional<CityId> val;
+        if (worked) val = worker;
+        impl->workedTiles[pos.x + pos.y * getMapWidth()] = val;
     }
 
     CultureMap &Game::getCultureMap() {

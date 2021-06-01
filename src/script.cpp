@@ -2,6 +2,8 @@
 // Created by Caelum van Ispelen on 5/31/21.
 //
 
+#include "renderer.h"
+
 #include "script.h"
 
 #include <sol/sol.hpp>
@@ -224,7 +226,9 @@ namespace rip {
             city_type["addManualWorkedTile"] = &City::addManualWorkedTile;
             city_type["removeManualWorkedTile"] = &City::removeManualWorkedTile;
             city_type["getManualWorkedTiles"] = &City::getManualWorkedTiles;
-            city_type["canWorkTile"] = &City::canWorkTile;
+            city_type["canWorkTile"] = [&] (City &self, glm::uvec2 pos) {
+                return self.canWorkTile(pos, *game);
+            };
 
             auto player_type = lua.new_usertype<Player>("Player");
             player_type["getLeader"] = &Player::getLeader;
@@ -317,6 +321,12 @@ namespace rip {
             };
             cv_type["text"] = [] (Canvas &cv, float x, float y, const std::string &text) {
                 nvgText(cv.vg, x, y, text.c_str(), nullptr);
+            };
+            cv_type["applyZoom"] = [&] (Canvas &cv) {
+                scale(cv.vg, *game);
+            };
+            cv_type["removeZoom"] = [&] (Canvas &cv) {
+                nvgResetTransform(cv.vg);
             };
 
             lua["TextBaseline"] = lua.create_table_with(

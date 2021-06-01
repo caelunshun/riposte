@@ -104,8 +104,8 @@ namespace rip {
         void toggleCheatMode();
         bool isCheatMode() const;
 
-        bool isTileWorked(glm::uvec2 pos) const;
-        void setTileWorked(glm::uvec2 pos, bool worked);
+        std::optional<CityId> isTileWorked(glm::uvec2 pos) const;
+        void setTileWorked(glm::uvec2 pos, bool worked, CityId worker);
 
         CultureMap &getCultureMap();
         const CultureMap &getCultureMap() const;
