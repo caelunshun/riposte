@@ -11,7 +11,6 @@ local InfoBarWindow = {}
 local currentCityHUD = nil
 
 function CityHUD.new(self, city)
-    -- TODO close old
     local o = { city = city }
 
     o.buildingsWindow = BuildingsWindow:new(city)

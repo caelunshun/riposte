@@ -66,6 +66,11 @@ namespace rip {
             while (routes.size() > 1) {
                 auto first = routes[routes.size() - 1];
                 auto second = routes[routes.size() - 2];
+
+                for (const auto tile : getRoute(first).getTiles()) {
+                    routesByPos[tile] = second;
+                }
+
                 mergeRoutes(second, first);
                 routes.erase(routes.begin() + routes.size() - 1);
             }
