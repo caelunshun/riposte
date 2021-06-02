@@ -66,7 +66,7 @@ namespace rip {
 
         void onTurnEnd(Game &game) override;
 
-        UnitUIStatus paintMainUI(Game &game, nk_context *nk) override;
+        UnitUIStatus paintMainUI(Game &game, Hud &hud, nk_context *nk) override;
 
         std::vector<std::unique_ptr<WorkerTask>> getPossibleTasks(const Game &game) const;
 

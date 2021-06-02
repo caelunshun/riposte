@@ -182,7 +182,7 @@ namespace rip {
             }
 
             for (const auto &capability : unit.getCapabilities()) {
-                if (capability->paintMainUI(game, nk) == UnitUIStatus::Deselect) {
+                if (capability->paintMainUI(game, *this, nk) == UnitUIStatus::Deselect) {
                     selectedStack = {};
                     return;
                 }

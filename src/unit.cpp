@@ -10,6 +10,7 @@
 #include "combat.h"
 #include "stack.h"
 #include "city.h"
+#include "ship.h"
 #include <nuklear.h>
 #include <iostream>
 
@@ -28,7 +29,7 @@ namespace rip {
          }
      }
 
-     UnitUIStatus FoundCityCapability::paintMainUI(Game &game, nk_context *nk) {
+     UnitUIStatus FoundCityCapability::paintMainUI(Game &game, Hud &hud, nk_context *nk) {
          nk_layout_row_push(nk, 100);
          if (nk_button_label(nk, "Found City")) {
              foundCity(game);
@@ -55,6 +56,8 @@ namespace rip {
                 capabilities.push_back(std::make_unique<FoundCityCapability>(id));
             } else if (capabilityName == "do_work") {
                 capabilities.push_back(std::make_unique<WorkerCapability>(id));
+            } else if (capabilityName == "carry_units") {
+                capabilities.push_back(std::make_unique<CarryUnitsCapability>(id, kind->carryUnitCapacity));
             } else {
                 throw std::string("missing capability: " + capabilityName);
             }

@@ -174,13 +174,18 @@ namespace rip {
 
                     glm::uvec2 warriorPos;
                     auto neighbors = getNeighbors(pos);
+                    int att = 0;
                     while (true) {
                         warriorPos = rng.choose(neighbors);
-                        if (game.getTile(warriorPos).getTerrain() != Terrain::Ocean) {
+                        if (game.getTile(warriorPos).getTerrain() == Terrain::Ocean) {
                            break;
                         }
+                        if (++att > 100) {
+                            return false;
+                        }
                     }
-                    Unit warrior(game.getRegistry().getUnits().at(1), warriorPos, player.getID());
+                    warriorPos = pos;
+                    Unit warrior(game.getRegistry().getUnit("galley"), warriorPos, player.getID());
                     game.addUnit(std::move(warrior));
 
                     positions.push_back(pos);

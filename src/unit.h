@@ -14,6 +14,7 @@ struct nk_context;
 
 namespace rip {
     class Game;
+    class Hud;
 
     // Value returned by Capability::paintMainUI which determines whether the unit
     // should remain selected.
@@ -38,7 +39,7 @@ namespace rip {
 
         virtual void onUnitMoved(Game &game) {}
 
-        virtual UnitUIStatus paintMainUI(Game &game, nk_context *nk) {
+        virtual UnitUIStatus paintMainUI(Game &game, Hud &hud, nk_context *nk) {
             return UnitUIStatus::None;
         }
     };
@@ -48,7 +49,7 @@ namespace rip {
     public:
         explicit FoundCityCapability(UnitId unitID);
 
-        UnitUIStatus paintMainUI(Game &game, nk_context *nk) override;
+        UnitUIStatus paintMainUI(Game &game, Hud &hud, nk_context *nk) override;
 
         // Founds a city. If successful, the unit is killed.
         // Don't use it anymore.

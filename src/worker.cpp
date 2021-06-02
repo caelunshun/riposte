@@ -72,7 +72,7 @@ namespace rip {
         currentTask = {};
     }
 
-    UnitUIStatus WorkerCapability::paintMainUI(Game &game, nk_context *nk) {
+    UnitUIStatus WorkerCapability::paintMainUI(Game &game, Hud &hud, nk_context *nk) {
         auto &unit = game.getUnit(unitID);
 
         if (currentTask.has_value()) {

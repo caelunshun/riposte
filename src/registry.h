@@ -118,6 +118,9 @@ namespace rip {
         std::string category;
         // Whether the unit can only travel on water
         bool ship = false;
+        // If the unit has the carry_units capability,
+        // this is the number of units it can hold.
+        int carryUnitCapacity = 0;
 
         friend void from_json(const nlohmann::json &json, UnitKind &unit) {
             json.at("id").get_to(unit.id);
@@ -141,6 +144,10 @@ namespace rip {
 
             if (json.contains("ship")) {
                 json.at("ship").get_to(unit.ship);
+            }
+
+            if (json.contains("carryUnitCapacity")) {
+                json.at("carryUnitCapacity").get_to(unit.carryUnitCapacity);
             }
         }
     };
