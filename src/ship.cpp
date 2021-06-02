@@ -16,6 +16,10 @@ namespace rip {
         const auto newPos = game.getUnit(unitID).getPos();
         std::vector<UnitId> toRemove;
         for (const auto unitID : carryingUnits) {
+            if (!game.getUnits().id_is_valid(unitID)) {
+                toRemove.push_back(unitID);
+                continue;
+            }
             auto &unit = game.getUnit(unitID);
             if (unit.getPos() == oldPos) {
                 unit.teleportTo(newPos, game);
