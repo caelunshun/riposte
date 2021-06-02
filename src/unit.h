@@ -37,7 +37,7 @@ namespace rip {
     public:
         virtual void onTurnEnd(Game &game) {}
 
-        virtual void onUnitMoved(Game &game) {}
+        virtual void onUnitMoved(Game &game, glm::uvec2 oldPos) {}
 
         virtual UnitUIStatus paintMainUI(Game &game, Hud &hud, nk_context *nk) {
             return UnitUIStatus::None;

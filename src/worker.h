@@ -74,7 +74,7 @@ namespace rip {
 
         const WorkerTask *getTask() const;
 
-        void onUnitMoved(Game &game) override;
+        void onUnitMoved(Game &game, glm::uvec2 oldPos) override;
     };
 }
 

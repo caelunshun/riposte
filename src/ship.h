@@ -17,7 +17,9 @@ namespace rip {
     public:
         CarryUnitsCapability(const UnitId &unitId, int capacity);
 
-        void onUnitMoved(Game &game) override;
+        void onUnitMoved(Game &game, glm::uvec2 oldPos) override;
+
+        void update(Game &game);
 
         UnitUIStatus paintMainUI(Game &game, Hud &hud, nk_context *nk) override;
 

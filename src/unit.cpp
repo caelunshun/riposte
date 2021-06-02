@@ -289,7 +289,7 @@ namespace rip {
 
         // Update capabilities
         for (auto &capability : getCapabilities()) {
-            capability->onUnitMoved(game);
+            capability->onUnitMoved(game, oldPos);
         }
 
         inCombat = false;

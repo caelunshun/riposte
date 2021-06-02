@@ -68,7 +68,7 @@ namespace rip {
         return tasks;
     }
 
-    void WorkerCapability::onUnitMoved(Game &game) {
+    void WorkerCapability::onUnitMoved(Game &game, glm::uvec2 oldPos) {
         currentTask = {};
     }
 
