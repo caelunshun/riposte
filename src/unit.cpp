@@ -105,7 +105,7 @@ namespace rip {
         if (!kind->ship && terrain == Terrain::Ocean ) {
             return false;
         }
-        if (kind->ship && terrain != Terrain::Ocean) {
+        if (kind->ship && terrain != Terrain::Ocean && !game.getCityAtLocation(target)) {
             return false;
         }
 

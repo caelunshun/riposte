@@ -84,7 +84,8 @@ namespace rip {
                 if (!unit.ship && tile.getTerrain() == Terrain::Ocean) {
                     continue;
                 }
-                if (unit.ship && tile.getTerrain() != Terrain::Ocean) {
+                if (unit.ship && tile.getTerrain() != Terrain::Ocean
+                    && !game.getCityAtLocation(neighbor)) {
                     continue;
                 }
 
