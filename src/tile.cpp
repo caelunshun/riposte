@@ -10,7 +10,7 @@
 
 namespace rip {
     float Tile::getMovementCost() const {
-        float cost = forested ? 2 : 1;
+        float cost = (forested || hilled) ? 2 : 1;
 
         if (hasImprovement<Road>()) {
             cost /= 3;
@@ -25,6 +25,14 @@ namespace rip {
 
     void Tile::setForested(bool forested) {
         this->forested = forested;
+    }
+
+    bool Tile::isHilled() const {
+        return hilled;
+    }
+
+    void Tile::setHilled(bool hilled) {
+        this->hilled = hilled;
     }
 
     bool Tile::hasImprovement(const std::string &name) const {
@@ -60,6 +68,11 @@ namespace rip {
             yield.hammers += 1;
         }
 
+        if (hilled) {
+            yield.hammers += 1;
+            yield.food -= 1;
+        }
+
         if (game.getCityAtLocation(pos)) {
             yield.hammers += 1;
             yield.food += 1;
@@ -82,6 +95,8 @@ namespace rip {
                 }
             }
         }
+
+        if (yield.food < 0) yield.food = 0;
 
         return yield;
     }

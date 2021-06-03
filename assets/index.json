@@ -40,6 +40,21 @@
     "loader": "image"
   },
   {
+    "path": "texture/tile/grassland_basecolor_hill.png",
+    "id": "texture/tile/grassland/hill",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/plains_basecolor_hill.png",
+    "id": "texture/tile/plains/hill",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/desert_basecolor_hill.png",
+    "id": "texture/tile/desert/hill",
+    "loader": "image"
+  },
+  {
     "path": "icon/cursor.png",
     "id": "icon/cursor",
     "loader": "image"

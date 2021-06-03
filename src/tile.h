@@ -158,6 +158,7 @@ namespace rip {
     private:
         Terrain terrain;
         bool forested = false;
+        bool hilled = false;
         std::vector<std::unique_ptr<Improvement>> improvements;
         std::optional<std::shared_ptr<Resource>> resource;
 
@@ -178,6 +179,10 @@ namespace rip {
         bool isForested() const;
 
         void setForested(bool forested);
+
+        bool isHilled() const;
+
+        void setHilled(bool hilled);
 
         bool canSustainCity() const {
             return (terrain != Terrain::Desert);

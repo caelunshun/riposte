@@ -85,6 +85,9 @@ namespace rip {
 
         void paintTile(NVGcontext *vg, Game &game, glm::vec2 offset, glm::uvec2 tilePos, Tile &tile) {
             auto imageID = "texture/tile/" + std::string(tile.getTerrainID());
+            if (tile.isHilled()) {
+                imageID += "/hill";
+            }
             auto image = std::dynamic_pointer_cast<Image>(assets->get(imageID));
 
             auto p = offset;

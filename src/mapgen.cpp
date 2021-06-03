@@ -177,15 +177,14 @@ namespace rip {
                     int att = 0;
                     while (true) {
                         warriorPos = rng.choose(neighbors);
-                        if (game.getTile(warriorPos).getTerrain() == Terrain::Ocean) {
+                        if (game.getTile(warriorPos).getTerrain() != Terrain::Ocean) {
                            break;
                         }
                         if (++att > 100) {
                             return false;
                         }
                     }
-                    warriorPos = pos;
-                    Unit warrior(game.getRegistry().getUnit("galley"), warriorPos, player.getID());
+                    Unit warrior(game.getRegistry().getUnit("warrior"), warriorPos, player.getID());
                     game.addUnit(std::move(warrior));
 
                     positions.push_back(pos);
@@ -316,6 +315,13 @@ namespace rip {
         std::vector<float> treeNoiseOutput(game.getMapWidth() * game.getMapHeight());
         treeNoise->GenUniformGrid2D(treeNoiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 5.0f, rng.u32(0, 0xFFFFFFFF));
 
+        auto simplex = FastNoise::New<FastNoise::Simplex>();
+        auto hillNoise = FastNoise::New<FastNoise::FractalFBm>();
+        hillNoise->SetSource(simplex);
+
+        std::vector<float> hillNoiseOutput(game.getMapWidth() * game.getMapHeight());
+        hillNoise->GenUniformGrid2D(hillNoiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 5.0f, rng.u32(0, 0xFFFFFFFF));
+
         for (int x = 0; x < game.getMapWidth(); x++) {
             for (int y = 0; y < game.getMapHeight(); y++) {
                 auto noiseIndex = x + y * game.getMapWidth();
@@ -336,9 +342,17 @@ namespace rip {
 
                 game.getTile(pos).setTerrain(t);
 
-                if (t != Terrain::Ocean && t != Terrain::Desert) {
-                    if (treeNoiseOutput[noiseIndex] < 0.3) {
-                        game.getTile(pos).setForested(true);
+                if (t != Terrain::Ocean) {
+                    // Hills
+                    if (hillNoiseOutput[noiseIndex] > 0.2) {
+                        game.getTile(pos).setHilled(true);
+                    }
+
+                    // Forest
+                    if (t != Terrain::Desert) {
+                        if (treeNoiseOutput[noiseIndex] < 0.3) {
+                            game.getTile(pos).setForested(true);
+                        }
                     }
                 }
             }
