@@ -361,6 +361,7 @@ namespace rip {
         storedFood += excessFood;
         if (storedFood < 0) {
             --population;
+            if (population < 1) population = 1;
             updateWorkedTiles(game);
             storedFood = (30 + 3 * (population - 1)) - 1;
         } else if (storedFood >= neededFoodForGrowth) {
