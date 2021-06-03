@@ -157,8 +157,12 @@ namespace rip {
         // Check for city captures.
         auto *city = game.getCityAtLocation(target);
         if (city) {
-            if (game.getPlayer(city->getOwner()).isAtWarWith(getOwner())) {
-                city->transferControlTo(game, getOwner());
+            if (canFight()) {
+                if (game.getPlayer(city->getOwner()).isAtWarWith(getOwner())) {
+                    city->transferControlTo(game, getOwner());
+                }
+            } else {
+                return;
             }
         }
 
