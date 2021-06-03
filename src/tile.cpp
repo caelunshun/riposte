@@ -134,7 +134,7 @@ namespace rip {
     }
 
     bool Mine::isCompatible(const Tile &tile) const {
-        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert;
+        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert && tile.isHilled();
     }
 
     Yield Mine::getYieldContribution(const Game &game) const {
@@ -154,7 +154,7 @@ namespace rip {
     }
 
     bool Cottage::isCompatible(const Tile &tile) const {
-        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert;
+        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert && !tile.isHilled();
     }
 
     Yield Cottage::getYieldContribution(const Game &game) const {
@@ -197,7 +197,7 @@ namespace rip {
     }
 
     bool Farm::isCompatible(const Tile &tile) const {
-        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert;
+        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert && !tile.isHilled();
     }
 
     Yield Farm::getYieldContribution(const Game &game) const {

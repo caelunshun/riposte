@@ -576,7 +576,9 @@ namespace rip {
             }
 
             double suitabilityFactor = -2;
-            if (tile.getTerrain() == Terrain::Plains && task.getImprovement().getName() == "Farm") {
+            if (tile.isForested() && task.getImprovement().getName() == "Mine") {
+                suitabilityFactor = 2;
+            } else if (tile.getTerrain() == Terrain::Plains && task.getImprovement().getName() == "Farm") {
                 suitabilityFactor = 2;
             } else if (tile.getTerrain() == Terrain::Grassland && task.getImprovement().getName() == "Cottage") {
                 suitabilityFactor = 2;
