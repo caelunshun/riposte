@@ -46,6 +46,10 @@ namespace rip {
         virtual void onCompleted(Game &game, City &builder) = 0;
 
         virtual const std::string &getName() const = 0;
+
+        virtual std::vector<std::string> describe() const {
+            return {"Cost: " + std::to_string(getCost())};
+        }
     };
 
     struct CultureLevel {
@@ -93,6 +97,8 @@ namespace rip {
         const std::shared_ptr<UnitKind> &getUnitKind() const {
             return unitKind;
         }
+
+        std::vector<std::string> describe() const override;
     };
 
     // A build task to build a building.
@@ -113,6 +119,8 @@ namespace rip {
         const std::shared_ptr<Building> &getBuilding() const {
             return building;
         }
+
+        std::vector<std::string> describe() const override;
     };
 
     class City {

@@ -498,6 +498,19 @@ namespace rip {
         nk_label_colored_wrap(nk, text.c_str(), nk_rgb(255, 255, 255));
 
         for (auto &task : city.getPossibleBuildTasks(game)) {
+            if (nk_widget_is_hovered(nk)) {
+                // Add tooltip.
+                nk_tooltip_begin(nk, 300);
+
+                nk_layout_row_dynamic(nk, 25, 1);
+
+                for (const auto &entry : task->describe()) {
+                    nk_label(nk, ("    * " + entry).c_str(), NK_TEXT_ALIGN_LEFT);
+                }
+
+                nk_tooltip_end(nk);
+            }
+
             auto label = task->getName() + " ("
                     + std::to_string(city.estimateTurnsForCompletion(*task, game))
                     + ")";

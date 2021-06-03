@@ -23,7 +23,7 @@
       "religious": 0
     }
   ],
-  "startingTechs": ["Sailing", "Agriculture"],
+  "startingTechs": ["Fishing", "Agriculture"],
   "cities": [
     "Amsterdam",
     "Utrecht",

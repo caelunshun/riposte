@@ -279,6 +279,44 @@ namespace rip {
         return hasTech && isCoastal;
     }
 
+    std::vector<std::string> UnitBuildTask::describe() const {
+        std::vector<std::string> result = {
+             "Cost: " + std::to_string(getCost()),
+             "Type: " + unitKind->category + " unit",
+             "Strength: " + std::to_string(static_cast<int>(unitKind->strength)),
+             "Movement: " + std::to_string(static_cast<int>(unitKind->movement)),
+        };
+
+        if (unitKind->carryUnitCapacity != 0) {
+            result.push_back("Can carry " + std::to_string(unitKind->carryUnitCapacity) + " units");
+        }
+
+        for (const auto &bonus : unitKind->combatBonuses) {
+            int amount = 0;
+            std::string text;
+            if (bonus.againstUnitBonus != 0) {
+                amount = bonus.againstUnitBonus;
+                text = " against " + bonus.unit;
+            } else if (bonus.againstUnitCategoryBonus != 0) {
+                amount = bonus.againstUnitCategoryBonus;
+                text = " against " + bonus.unitCategory + " units";
+            } else if (bonus.whenInCityBonus != 0) {
+                amount = bonus.whenInCityBonus;
+                text = " when in city";
+            }
+
+            if (bonus.onlyOnAttack) {
+                text = " attack" + text;
+            } else if (bonus.onlyOnDefense) {
+                text = " defense" + text;
+            }
+
+            result.push_back("+" + std::to_string(amount) + "%" + text);
+        }
+
+        return result;
+    }
+
     std::vector<std::unique_ptr<BuildTask>> City::getPossibleBuildTasks(const Game &game) const {
         std::vector<std::unique_ptr<BuildTask>> tasks;
 
@@ -503,6 +541,10 @@ namespace rip {
     BuildingBuildTask::BuildingBuildTask(std::shared_ptr<Building> building)
         : BuildTask(building->cost), building(building) {
 
+    }
+
+    std::vector<std::string> BuildingBuildTask::describe() const {
+        return BuildTask::describe();
     }
 }
 
