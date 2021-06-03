@@ -199,7 +199,7 @@ namespace rip {
     bool Farm::isCompatible(const Tile &tile) const {
         return !tile.hasNonRoadImprovements()
             && tile.getTerrain() != Terrain::Desert &&
-                (!tile.isHilled() || tile.hasImproveableResource(getName());
+                (!tile.isHilled() || tile.hasImproveableResource(getName()));
     }
 
     Yield Farm::getYieldContribution(const Game &game) const {
