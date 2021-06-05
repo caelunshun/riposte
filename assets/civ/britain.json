@@ -12,6 +12,15 @@
       "paranoia": 3,
       "expansiveness": 4,
       "religious": 1
+    },
+    {
+      "name": "Queen Elizabeth",
+      "aggressive": 2,
+      "nukemonger": 1,
+      "submissive": 3,
+      "paranoia": 7,
+      "expansiveness": 5,
+      "religious": 5
     }
   ],
   "startingTechs": ["The Wheel", "Agriculture"],

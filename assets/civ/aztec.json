@@ -12,6 +12,15 @@
       "paranoia": 1,
       "expansiveness": 5,
       "religious": 8
+    },
+    {
+      "name": "Huitzilihuitl",
+      "aggressive": 5,
+      "nukemonger": 1,
+      "submissive": 0,
+      "paranoia": 3,
+      "expansiveness": 7,
+      "religious": 10
     }
   ],
   "startingTechs": ["Hunting", "Agriculture"],
