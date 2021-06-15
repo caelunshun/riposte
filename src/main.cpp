@@ -12,7 +12,6 @@
 
 #include <iostream>
 #include <deque>
-#include <mach-o/dyld.h>
 
 static std::deque<rip::MouseEvent> mouseEvents;
 static std::deque<int> keyEvents;
@@ -67,7 +66,7 @@ static void error_callback(int error, const char* description)
     fprintf(stderr, "Error: %s\n", description);
 }
 
-int main(int argc, char **argv) {
+int main() {
     glfwSetErrorCallback(error_callback);
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
@@ -115,14 +114,7 @@ int main(int argc, char **argv) {
     assets->addLoader("tech", std::make_unique<rip::TechLoader>());
     assets->addLoader("sound", std::make_unique<rip::AudioLoader>(audio));
     assets->addLoader("script", std::make_unique<rip::ScriptLoader>(scriptEngine));
-    char path[1024];
-    uint32_t size = sizeof(path);
-    _NSGetExecutablePath(path, &size);
-    path[size] = '\0';
-    auto dir = std::string(path) + "/../assets";
-    dir = realpath(dir.c_str(), nullptr);
-    std::cout << dir << std::endl;
-    assets->loadAssetsDir(dir);
+    assets->loadAssetsDir("assets");
 
     audio->addSounds(assets);
 
