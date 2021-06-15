@@ -1,0 +1,310 @@
+//
+// Created by Caelum van Ispelen on 6/14/21.
+//
+
+// Defines the packets. All of them.
+//
+// The client connects to the server and sends ClientInfo.
+// The server responds with ServerInfo.
+//
+// The client is now in a "Waiting for Game to Start" state.
+// It remains in this state until the server sends StartGame as
+// a result of one of the following events:
+// * the game admin starts the game
+// * the game was in progress, and the client was allowed to rejoin
+// (because its username matched one of the existing players)
+//
+// After receiving StartGame, the client is in the "playing" state.
+//
+// The server proceeds to send all of the data packets to initialize
+// game state on the client, including:
+// * UpdateGlobalData
+// * UpdateMap
+// * UpdateCity
+// * UpdateUnit
+// * UpdatePlayer
+// etc.
+//
+// The server sends StartTurn whenever the client's turn begins.
+// During a client's turn, it can send action packets such as:
+// * MoveUnit
+// * SetCityBuildTask
+// * SetWorkerTask
+// * ComputePath (server responds with PathComputed)
+// * SetEconomy
+// etc.
+//
+// The server responds to each of these packets with a data packet
+// to acknowledge the updated game state and cause it to be displayed on the client.
+// For example, it responds to MoveUnit with UpdateUnit set to the new position.
+//
+// When the client ends its turn, it sends EndTurn. Alternatively, the server
+// can force-end a turn by sending the same packet to the client. After the turn
+// ends, the client must wait for StartTurn before making further actions.
+
+syntax = "proto3";
+
+message Pos {
+  uint32 x = 1;
+  uint32 y = 2;
+}
+
+// Any packet sent by the client.
+message AnyClient {
+  oneof packet {
+    ClientInfo clientInfo = 1;
+
+  }
+}
+
+// Any packet sent by the server.
+message AnyServer {
+  oneof packet {
+    ServerInfo serverInfo = 1;
+    StartGame startGame = 2;
+  }
+}
+
+// Sent by the client upon connecting.
+message ClientInfo {
+  string username = 1;
+}
+
+// Response to ClientInfo.
+message ServerInfo {
+  // empty
+}
+
+// ---------------------
+// SERVER
+// ---------------------
+
+// Enters the game state.
+message StartGame {
+  // empty
+}
+
+message PlayerInfo {
+  // The player's username.
+  string username = 1;
+  string civID = 2;
+  string leader = 3;
+  int32 score = 4;
+  // A unique ID.
+  int32 id = 5;
+}
+
+enum Era {
+  Ancient = 0;
+  Classical = 1;
+  Medieval = 2;
+  Renaissance = 3;
+  Industrial = 4;
+  Modern = 5;
+  Future = 6;
+}
+
+// Sets global data for the entire game.
+message UpdateGlobalData {
+  // List of players in the game.
+  repeated PlayerInfo players = 1;
+  // The current turn number.
+  int32 turn = 2;
+  // The current era.
+  Era era = 3;
+}
+
+enum Terrain {
+  Ocean = 0;
+  Plains = 1;
+  Grassland = 2;
+  Desert = 3;
+}
+
+message Improvement {
+  // The type of improvement.
+  string id = 1;
+  // Only set for cottages
+  string cottageLevel = 2;
+}
+
+message Yield {
+  int32 hammers = 1;
+  int32 commerce = 2;
+  int32 food = 3;
+}
+
+message Tile {
+  Terrain terrain = 1;
+  bool forested = 2;
+  bool hilled = 3;
+  repeated Improvement improvements = 4;
+  Yield yield = 5;
+  int32 ownerID = 6;
+}
+
+enum Visibility {
+  Visible = 0;
+  Fogged = 1;
+  Hidden = 2;
+}
+
+// Sends all map tiles.
+message UpdateMap {
+  uint32 width = 1;
+  uint32 height = 2;
+  repeated Tile tiles = 3;
+  repeated Visibility visibility = 4;
+}
+
+message UnitBuildTask {
+  string unitKindID = 1;
+}
+
+message BuildingBuildTask {
+  string buildingID = 1;
+}
+
+message BuildTaskKind {
+  oneof task {
+    UnitBuildTask unit = 1;
+    BuildingBuildTask building = 2;
+  }
+}
+
+message BuildTask {
+  BuildTaskKind kind = 1;
+  int32 progress = 2;
+  int32 cost = 3;
+}
+
+// Creates or updates a city.
+message UpdateCity {
+  Pos pos = 1;
+  string name = 2;
+  int32 ownerID = 3;
+  BuildTask buildTask = 4;
+  int32 hammersPerTurn = 5;
+  int32 culture = 6;
+  // Culture needed to advance to the next level
+  int32 cultureNeeded = 7;
+  int32 ID = 8;
+}
+
+message Path {
+  // Encoded as a series of [x, y], such
+  // that the total length is the length of the path
+  // times 2.
+  repeated uint32 positions = 1;
+}
+
+message FoundCityCapability {}
+
+message WorkerTaskImprovement {
+  string improvementID = 1;
+}
+
+message WorkerTaskKind {
+  oneof kind {
+    WorkerTaskImprovement buildImprovement = 1;
+  }
+}
+
+message WorkerTask {
+  string name = 1;
+  int32 turnsLeft = 2;
+  WorkerTaskKind kind;
+}
+
+message WorkerCapability {
+  WorkerTask currentTask = 1;
+  repeated WorkerTask possibleTasks = 2;
+}
+
+message CarryUnitsCapability {
+  repeated int32 carryingUnitIDs = 1;
+}
+
+message Capability {
+  oneof cap {
+    FoundCityCapability foundCity = 1;
+    WorkerCapability worker = 2;
+    CarryUnitsCapability carryUnits = 3;
+  }
+}
+
+message UpdateUnit {
+  Pos pos = 1;
+  string kindID = 2;
+  int32 ownerID = 3;
+  // On [0, 1]
+  double health = 4;
+  double movementLeft = 5;
+  Path followingPath = 6;
+  repeated Capability capabilities = 7;
+}
+
+message ResearchingTech {
+  string techID = 1;
+  int32 progress = 2;
+}
+
+// Updates the client's own player data.
+message UpdatePlayer {
+  int32 ID = 1;
+  string username = 2;
+
+  int32 baseRevenue = 3;
+  int32 beakerRevenue = 4;
+  int32 goldRevenue = 5;
+  int32 expenses = 6;
+  int32 netGold = 7;
+
+  int32 gold = 8;
+
+  ResearchingTech researchingTech = 9;
+
+  int32 capitalCityID = 10;
+
+  repeated string unlockedTechIDs = 11;
+  repeated string possibleResearches = 12;
+}
+
+message PathComputed {
+  int32 pathID = 1;
+  Path path = 2;
+}
+
+// ---------------------
+// CLIENT
+// ---------------------
+
+message MoveUnit {
+  int32 unitID = 1;
+  Pos newPos = 2;
+}
+
+message SetCityBuildTask {
+  int32 cityID = 1;
+  BuildTaskKind task = 2;
+}
+
+message SetWorkerTask {
+  int32 workerID = 1;
+  WorkerTask task = 2;
+}
+
+message ComputePath {
+  int32 unitID = 1;
+  Pos from = 2;
+  Pos to = 3;
+  int32 pathID = 4;
+}
+
+message SetEconomySettings {
+  int32 beakerPercent = 1;
+}
+
+message SetResearch {
+  string techID = 1;
+}
