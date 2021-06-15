@@ -65,14 +65,46 @@ message AnyServer {
   }
 }
 
+// PRE-GAME
+
 // Sent by the client upon connecting.
 message ClientInfo {
   string username = 1;
 }
 
 // Response to ClientInfo.
+//
+// Also sent whenever the lobby data changes (e.g. a player
+// changes their leader)
 message ServerInfo {
-  // empty
+  // ID of the client's player
+  int32 playerID = 1;
+  // Players currently waiting in the lobby.
+  repeated PlayerInfo currentPlayers = 2;
+}
+
+// Can only be sent by the admin.
+message KickPlayer {
+  int32 ID = 1;
+  string reason = 2;
+}
+
+// Might fail if another player has chosen the same leader.
+//
+// Initially, the player's leader is randomly chosen (sent in ServerInfo)
+message SetLeader {
+  string civID = 1;
+  string leader = 2;
+}
+
+// Can only be sent by the admin.
+// Might be rejected.
+message AdminStartGame {}
+
+// Sent by the server when an action cannot be performed
+// (game cannot start, etc.)
+message LobbyError {
+  string message = 1;
 }
 
 // ---------------------
@@ -92,6 +124,7 @@ message PlayerInfo {
   int32 score = 4;
   // A unique ID.
   int32 id = 5;
+  bool isAdmin = 6;
 }
 
 enum Era {
