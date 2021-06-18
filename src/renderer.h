@@ -74,25 +74,11 @@ namespace rip {
         ~Renderer();
     };
 
-    class ImageLoader : public AssetLoader {
-        NVGcontext *vg;
-    public:
-        explicit ImageLoader(const Renderer &renderer) : vg(renderer.getNvg()) {}
-        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
-    };
-
     class Image : public Asset {
     public:
         int id;
 
         explicit Image(int id) : id(id) {}
-    };
-
-    class FontLoader : public AssetLoader {
-        NVGcontext *vg;
-    public:
-        explicit FontLoader(const Renderer &renderer) : vg(renderer.getNvg()) {}
-        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
     };
 
     class Font : public Asset {

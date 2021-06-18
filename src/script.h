@@ -52,7 +52,7 @@ namespace rip {
     public:
         ScriptLoader(const std::shared_ptr<ScriptEngine> &engine);
 
-        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+        std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) override;
     };
 }
 

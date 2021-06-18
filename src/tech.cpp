@@ -134,7 +134,7 @@ namespace rip {
         return true;
     }
 
-    std::shared_ptr<Asset> TechLoader::loadAsset(const std::string &data) {
+    std::shared_ptr<Asset> TechLoader::loadAsset(const std::string &id, const std::string &data) {
         auto tech = nlohmann::json::parse(data).get<JSONTech>();
         return std::make_unique<JSONTech>(std::move(tech));
     }

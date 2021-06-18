@@ -79,7 +79,7 @@ namespace rip {
 
     class TechLoader : public AssetLoader {
     public:
-        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+        std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) override;
     };
 }
 

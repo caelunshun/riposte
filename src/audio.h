@@ -52,7 +52,7 @@ namespace rip {
     public:
         explicit AudioLoader(std::shared_ptr<AudioManager> manager) : manager(manager) {}
 
-        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+        std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) override;
     };
 }
 

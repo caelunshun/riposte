@@ -30,20 +30,6 @@ namespace rip {
         nvgTranslate(vg, -diff.x / 2, -diff.y / 2);
     }
 
-    std::shared_ptr<Asset> ImageLoader::loadAsset(const std::string &data) {
-        auto id = nvgCreateImageMem(vg, NVG_IMAGE_GENERATE_MIPMAPS | NVG_IMAGE_REPEATX | NVG_IMAGE_REPEATY,
-                                    (unsigned char *) data.c_str(), data.size());
-        return std::make_shared<Image>(id);
-    }
-
-    std::shared_ptr<Asset> FontLoader::loadAsset(const std::string &data) {
-        // The data is now owned by NanoVG, so we have to make a copy to avoid use-after-free.
-        auto *dataCopy = (unsigned char *) malloc(data.size());
-        memcpy(dataCopy, data.data(), data.size());
-        auto id = nvgCreateFontMem(vg, "default", dataCopy, data.size(), 0);
-        return std::make_shared<Font>(id);
-    }
-
     Renderer::Renderer(GLFWwindow *window) : window(window) {
         vg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES | NVG_DEBUG);
     }

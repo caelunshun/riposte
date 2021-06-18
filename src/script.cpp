@@ -140,7 +140,7 @@ namespace rip {
         });
     }
 
-    std::shared_ptr<Asset> ScriptLoader::loadAsset(const std::string &data) {
+    std::shared_ptr<Asset> ScriptLoader::loadAsset(const std::string &id, const std::string &data) {
         engine->impl->lua.script(data);
         return std::make_shared<ScriptAsset>();
     }

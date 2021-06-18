@@ -1,25 +1,5 @@
 [
   {
-    "path": "script/init.lua",
-    "id": "script/init",
-    "loader": "script"
-  },
-  {
-    "path": "script/dialogues.lua",
-    "id": "script/dialogues",
-    "loader": "script"
-  },
-  {
-    "path": "script/double_click.lua",
-    "id": "script/double_click",
-    "loader": "script"
-  },
-  {
-    "path": "script/city_hud.lua",
-    "id": "script/city_hud",
-    "loader": "script"
-  },
-  {
     "path": "texture/tile/desert_basecolor.png",
     "id": "texture/tile/desert",
     "loader": "image"
@@ -112,6 +92,11 @@
   {
     "path": "icon/beaker.png",
     "id": "icon/beaker",
+    "loader": "image"
+  },
+  {
+    "path": "icon/menu.jpg",
+    "id": "icon/menu",
     "loader": "image"
   },
   {

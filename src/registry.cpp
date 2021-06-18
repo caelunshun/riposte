@@ -5,14 +5,14 @@
 #include "registry.h"
 
 namespace rip {
-    std::shared_ptr<Asset> CivLoader::loadAsset(const std::string &data) {
+    std::shared_ptr<Asset> CivLoader::loadAsset(const std::string &id, const std::string &data) {
         auto kind = nlohmann::json::parse(data).get<CivKind>();
         auto ptr = std::make_shared<CivKind>(std::move(kind));
         registry->addCiv(ptr);
         return ptr;
     }
 
-    std::shared_ptr<Asset> UnitLoader::loadAsset(const std::string &data) {
+    std::shared_ptr<Asset> UnitLoader::loadAsset(const std::string &id, const std::string &data) {
         auto unit = nlohmann::json::parse(data).get<UnitKind>();
         auto ptr = std::make_shared<UnitKind>(std::move(unit));
         registry->addUnit(ptr);
@@ -27,7 +27,7 @@ namespace rip {
         return units;
     }
 
-    std::shared_ptr<Asset> ResourceLoader::loadAsset(const std::string &data) {
+    std::shared_ptr<Asset> ResourceLoader::loadAsset(const std::string &id, const std::string &data) {
         auto resource = nlohmann::json::parse(data).get<Resource>();
         auto ptr = std::make_shared<Resource>(std::move(resource));
         registry->addResource(ptr);
@@ -47,7 +47,7 @@ namespace rip {
         throw std::string("missing unit '" + id + "'");
     }
 
-    std::shared_ptr<Asset> BuildingLoader::loadAsset(const std::string &data) {
+    std::shared_ptr<Asset> BuildingLoader::loadAsset(const std::string &id, const std::string &data) {
         auto building = nlohmann::json::parse(data).get<Building>();
         auto ptr = std::make_shared<Building>(std::move(building));
         registry->addBuilding(ptr);

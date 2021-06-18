@@ -9,7 +9,7 @@
 
 namespace rip {
 
-    std::shared_ptr<Asset> AudioLoader::loadAsset(const std::string &data) {
+    std::shared_ptr<Asset> AudioLoader::loadAsset(const std::string &id, const std::string &data) {
         auto handle = rodio_create_sound(reinterpret_cast<const uint8_t *>(data.data()), data.size());
         return std::make_shared<SoundAsset>(handle);
     }

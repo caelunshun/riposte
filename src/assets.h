@@ -18,7 +18,7 @@ namespace rip {
 
     class AssetLoader {
     public:
-        virtual std::shared_ptr<Asset> loadAsset(const std::string &data) = 0;
+        virtual std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) = 0;
         virtual ~AssetLoader() {}
     };
 

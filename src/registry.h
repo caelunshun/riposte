@@ -366,7 +366,7 @@ namespace rip {
     public:
         CivLoader(std::shared_ptr<Registry> registry) : registry(std::move(registry)) {}
 
-        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+        std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) override;
     };
 
     class UnitLoader : public AssetLoader {
@@ -375,7 +375,7 @@ namespace rip {
     public:
         UnitLoader(std::shared_ptr<Registry> registry) : registry(std::move(registry)) {}
 
-        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+        std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) override;
     };
 
     class ResourceLoader : public AssetLoader {
@@ -384,7 +384,7 @@ namespace rip {
     public:
         ResourceLoader(std::shared_ptr<Registry> registry) : registry(std::move(registry)) {}
 
-        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+        std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) override;
     };
 
     class BuildingLoader : public AssetLoader {
@@ -393,7 +393,7 @@ namespace rip {
     public:
         BuildingLoader(std::shared_ptr<Registry> registry) : registry(std::move(registry)) {}
 
-        std::shared_ptr<Asset> loadAsset(const std::string &data) override;
+        std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) override;
     };
 }
 
