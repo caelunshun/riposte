@@ -25,3 +25,9 @@ function handleEvent(event)
 
     ui:handleEvent(event)
 end
+
+function resize(newSize)
+    print(newSize.x, newSize.y)
+    ui:resize(Vector(cv:getWidth(), cv:getHeight()), newSize)
+end
+

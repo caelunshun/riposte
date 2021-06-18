@@ -48,6 +48,8 @@ int main() {
     glfwInit();
     GLFWwindow *window = glfwCreateWindow(windowWidth, windowHeight, "Riposte", nullptr, nullptr);
 
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+
 #ifdef __APPLE__
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 #endif
@@ -87,16 +89,17 @@ int main() {
 
     sol::function renderFunction = (*lua)["render"];
     sol::function handleEventFunction = (*lua)["handleEvent"];
+    sol::function resizeFunction = (*lua)["resize"];
 
-    canvas->setGlfwCallbacks(lua, handleEventFunction);
+    canvas->setGlfwCallbacks(canvas, lua, handleEventFunction, resizeFunction);
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();
-
         renderFunction.call<void>();
 
         canvas->render();
     }
 
+    glfwDestroyWindow(window);
     glfwTerminate();
 }
