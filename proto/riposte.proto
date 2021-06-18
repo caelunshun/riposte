@@ -246,7 +246,7 @@ message WorkerTaskKind {
 message WorkerTask {
   string name = 1;
   int32 turnsLeft = 2;
-  WorkerTaskKind kind;
+  WorkerTaskKind kind = 3;
 }
 
 message WorkerCapability {
