@@ -13,3 +13,6 @@
 [submodule "external/dume"]
 	path = external/dume
 	url = https://github.com/caelunshun/dume
+[submodule "external/lunajson"]
+	path = external/lunajson
+	url = https://github.com/grafi-tt/lunajson
