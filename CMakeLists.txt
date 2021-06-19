@@ -21,6 +21,7 @@ corrosion_import_crate(MANIFEST_PATH external/dume/renderer/Cargo.toml)
 set(DUME_SOURCES external/dume/src/dume.cpp)
 add_library(dume ${DUME_SOURCES})
 target_include_directories(dume PUBLIC external/dume/include/ external/dume/renderer/include/)
+target_include_directories(dume PRIVATE external/sol2/include)
 target_link_libraries(dume ${CONAN_LIBS} dume-renderer)
 
 set(NANOVG_SOURCES external/nanovg/src/nanovg.c)
@@ -39,6 +40,7 @@ target_include_directories(riposte PRIVATE
         external/FastNoise2/include
         external/Rea/Rea
         external/Nuklear
+        external/sol2/include
         crodio/include)
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")

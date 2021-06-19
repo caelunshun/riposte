@@ -56,7 +56,10 @@ local TileRenderer = {
 function TileRenderer:render(cv, game)
     local view = game.view
 
-    local renderers = self.renderers
+    local renderTiles = {}
+    local renderPos = {}
+    local renderTilePos = {}
+    local count = 1
 
     -- Render all tiles visible on the map.
     for x=0,game.mapWidth - 1 do
@@ -75,10 +78,17 @@ function TileRenderer:render(cv, game)
                 or centered.y > halfWindowSize.y)
             then
                 local tile = game:getTile(tilePos)
-                for i=1,#renderers do
-                    renderers[i]:renderTile(cv, tile, pos, tilePos, game)
-                end
+                renderTiles[count] = tile
+                renderPos[count] = pos
+                renderTilePos[count] = tilePos
+                count = count + 1
             end
+        end
+    end
+
+    for _, renderer in ipairs(self.renderers) do
+        for i=1,count-1 do
+            renderer:renderTile(cv, renderTiles[i], renderPos[i], renderTilePos[i], game)
         end
     end
 end
