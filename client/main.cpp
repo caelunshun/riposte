@@ -42,6 +42,18 @@ namespace rip {
             return std::make_shared<FontAsset>();
         }
     };
+
+    class DataIntoLuaLoader : public AssetLoader {
+        sol::function loadFunction;
+        std::string luaRegistry;
+
+    public:
+        explicit DataIntoLuaLoader(sol::function loadFunction, std::string luaRegistry) : loadFunction(loadFunction), luaRegistry(luaRegistry) {}
+
+        std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) override {
+            loadFunction.call<void>(id, luaRegistry, data);
+        }
+    };
 }
 
 int main() {
@@ -83,7 +95,7 @@ int main() {
     assets->addLoader("resource", std::make_unique<rip::ResourceLoader>(registry));
     assets->addLoader("tech", std::make_unique<rip::TechLoader>());
     assets->addLoader("sound", std::make_unique<rip::AudioLoader>(audio));
-    assets->loadAssetsDir("assets");
+    assets->loadAssetsDir("assets", false);
 
     lua->script_file("client/main.lua");
 
@@ -92,6 +104,16 @@ int main() {
     sol::function resizeFunction = (*lua)["resize"];
 
     canvas->setGlfwCallbacks(canvas, lua, handleEventFunction, resizeFunction);
+
+    // Load registry data into Lua.
+    sol::function loadFunction = (*lua)["loadDataFile"];
+    auto luaAssets = std::make_shared<rip::Assets>();
+    luaAssets->addLoader("civ", std::make_unique<rip::DataIntoLuaLoader>(loadFunction, "civs"));
+    luaAssets->addLoader("unit", std::make_unique<rip::DataIntoLuaLoader>(loadFunction, "unitKinds"));
+    luaAssets->addLoader("building", std::make_unique<rip::DataIntoLuaLoader>(loadFunction, "buildings"));
+    luaAssets->addLoader("resource", std::make_unique<rip::DataIntoLuaLoader>(loadFunction, "resources"));
+    luaAssets->addLoader("tech", std::make_unique<rip::DataIntoLuaLoader>(loadFunction, "techs"));
+    luaAssets->loadAssetsDir("assets", true); // skip non-data assets like images, etc.
 
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();

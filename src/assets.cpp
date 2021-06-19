@@ -23,7 +23,7 @@ namespace rip {
         loaders[std::move(name)] = std::move(loader);
     }
 
-    void Assets::loadAssetsDir(const std::string &dir) {
+    void Assets::loadAssetsDir(const std::string &dir, bool skipUnknownLoaders) {
         auto indexPath = dir + "/index.json";
         std::ifstream indexFile(indexPath);
         std::stringstream indexString;
@@ -32,6 +32,7 @@ namespace rip {
 
         auto entries = nlohmann::json::parse(index).get<std::vector<IndexEntry>>();
         for (const auto &entry : entries) {
+            if (skipUnknownLoaders && loaders.find(entry.loader) == loaders.end()) continue;
             auto &loader = loaders.at(entry.loader);
             std::ifstream assetFile(dir + "/" + entry.path);
             std::stringstream assetString;

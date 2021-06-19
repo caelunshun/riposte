@@ -29,7 +29,7 @@ namespace rip {
     public:
         void addLoader(std::string name, std::unique_ptr<AssetLoader> loader);
 
-        void loadAssetsDir(const std::string &dir);
+        void loadAssetsDir(const std::string &dir, bool skipUnknownLoaders);
 
         std::shared_ptr<Asset> get(const std::string &id) const;
 
