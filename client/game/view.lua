@@ -27,7 +27,7 @@ function View:getOrigin()
 end
 
 function View:getScreenOffsetForTilePos(tilePos)
-    return tilePos * 100 - self:getOrigin()
+    return (tilePos * 100 - self:getOrigin()) * 0.99
 end
 
 return View

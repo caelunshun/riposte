@@ -1,9 +1,10 @@
 -- Renders base terrain (grassland, desert, etc.)
 local TerrainRenderer = {}
 
+local dume = require("dume")
 local Vector = require("brinevector")
 
-function TerrainRenderer:renderTile(cv, tile, pos)
+function TerrainRenderer:renderTile(cv, tile)
     local spriteName = nil
     local terrain = tile.terrain
     if terrain == "Grassland" then
@@ -18,7 +19,19 @@ function TerrainRenderer:renderTile(cv, tile, pos)
 
     if terrain.hilled then spriteName = spriteName .. "_hill" end
 
-    cv:drawSprite(spriteName, pos, 100)
+    cv:drawSprite(spriteName, Vector(0, 0), 100)
+end
+
+-- Renders an overlay grid to show tile boundaries.
+local GridOverlayRenderer = {}
+
+local gridColor = dume.rgb(80, 80, 80, 200)
+function GridOverlayRenderer:renderTile(cv)
+    cv:beginPath()
+    cv:rect(Vector(0, 0), Vector(100, 100))
+    cv:strokeWidth(0.5)
+    cv:solidColor(gridColor)
+    cv:stroke()
 end
 
 -- Renders trees over terrain
@@ -28,7 +41,7 @@ local TreeRenderer = {
 
 cv:getSpriteSize("icon/tree", TreeRenderer.treeSpriteSize)
 
-function TreeRenderer:renderTile(cv, tile, pos, tilePos, game)
+function TreeRenderer:renderTile(cv, tile, tilePos, game)
     if not tile.forested then return end
 
     local seed = tilePos.x + tilePos.y * game.mapWidth
@@ -38,7 +51,7 @@ function TreeRenderer:renderTile(cv, tile, pos, tilePos, game)
     for _=0,numTrees do
         local scaleX = (math.random() + 1) * 25
         local scaleY = scaleX * self.treeSpriteSize.y / self.treeSpriteSize.x
-        local treePos = pos + Vector(math.random() * 100, math.random() * 100)
+        local treePos =  Vector(math.random() * 100, math.random() * 100)
         treePos = treePos - Vector(scaleX, scaleY) / 2
         cv:drawSprite("icon/tree", treePos, scaleX)
     end
@@ -49,6 +62,7 @@ local TileRenderer = {
     renderers = {
         -- NB: order determines layering
         TerrainRenderer,
+        GridOverlayRenderer,
         TreeRenderer,
     }
 }
@@ -88,7 +102,10 @@ function TileRenderer:render(cv, game)
 
     for _, renderer in ipairs(self.renderers) do
         for i=1,count-1 do
-            renderer:renderTile(cv, renderTiles[i], renderPos[i], renderTilePos[i], game)
+            local pos = renderPos[i]
+            cv:translate(pos)
+            renderer:renderTile(cv, renderTiles[i], renderTilePos[i], game)
+            cv:translate(-pos)
         end
     end
 end
