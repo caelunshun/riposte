@@ -60,14 +60,15 @@ game.tiles = {}
 game.view = View:new()
 game.mapWidth = 64
 game.mapHeight = 64
+local terrains = {"Plains", "Grassland", "Desert", "Ocean"}
 for x=1,64 do
     for y=1,64 do
+        local terrain = terrains[math.random(1, #terrains)]
         game.tiles[#game.tiles+1] = {
-            terrain = "Plains",
-            forested = (x % 4 == 1),
-            hilled = (y % 3 == 1),
+            terrain = terrain,
+            forested = math.random() < 0.7 and terrain ~= "Ocean",
+            hilled = math.random() < 0.3 and terrain ~= "Ocean",
         }
-        if x % 5 == 2 then game.tiles[#game.tiles].terrain = "Grassland" end
     end
 end
 

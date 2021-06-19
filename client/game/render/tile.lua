@@ -17,7 +17,7 @@ function TerrainRenderer:renderTile(cv, tile)
         spriteName = "texture/tile/desert"
     end
 
-    if terrain.hilled then spriteName = spriteName .. "_hill" end
+    if tile.hilled then spriteName = spriteName .. "/hill" end
 
     cv:drawSprite(spriteName, Vector(0, 0), 100)
 end
