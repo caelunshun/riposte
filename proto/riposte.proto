@@ -222,6 +222,7 @@ message UpdateCity {
   // Culture needed to advance to the next level
   int32 cultureNeeded = 7;
   int32 ID = 8;
+  repeated string buildingNames = 9;
 }
 
 message Path {

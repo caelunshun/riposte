@@ -115,9 +115,16 @@ int main() {
     luaAssets->addLoader("tech", std::make_unique<rip::DataIntoLuaLoader>(loadFunction, "techs"));
     luaAssets->loadAssetsDir("assets", true); // skip non-data assets like images, etc.
 
+    auto lastTime = glfwGetTime();
     while (!glfwWindowShouldClose(window)) {
+        const auto currentTime = glfwGetTime();
+        const auto dt = currentTime - lastTime;
+
+        std::cout << "Frame time: " << static_cast<int>(dt * 1000) << "ms" << std::endl;
+        lastTime = currentTime;
+
         glfwPollEvents();
-        renderFunction.call<void>();
+        renderFunction.call<void>(dt);
 
         canvas->render();
     }
