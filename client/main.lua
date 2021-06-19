@@ -1,4 +1,5 @@
 package.path = "client/?.lua;external/dume/ui/?.lua;external/lunajson/src/?.lua"
+jit.on()
 
 local buildMainMenu = require("ui/main_menu")
 local uiStyle = require("ui/style")

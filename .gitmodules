@@ -16,3 +16,6 @@
 [submodule "external/lunajson"]
 	path = external/lunajson
 	url = https://github.com/grafi-tt/lunajson
+[submodule "external/sol2"]
+	path = external/sol2
+	url = https://github.com/ThePhD/sol2

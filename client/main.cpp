@@ -1,4 +1,5 @@
 #define SOL_ALL_SAFETIES_ON 1
+#define SOL_LUAJIT 1
 
 #include <dume.h>
 #include <sol/sol.hpp>
@@ -71,10 +72,10 @@ int main() {
     auto lua = std::make_shared<sol::state>();
     lua->open_libraries(
             sol::lib::string, sol::lib::coroutine,
-            sol::lib::base, // sol::lib::bit32,
+            sol::lib::base, sol::lib::bit32,
             sol::lib::count, sol::lib::debug,
-            /* sol::lib::ffi, */ sol::lib::io,
-            /*sol::lib::jit, */ sol::lib::math,
+            sol::lib::ffi, sol::lib::io,
+            sol::lib::jit, sol::lib::math,
             sol::lib::os, sol::lib::package,
             sol::lib::table, sol::lib::utf8
             );
@@ -120,7 +121,10 @@ int main() {
         const auto currentTime = glfwGetTime();
         const auto dt = currentTime - lastTime;
 
-        std::cout << "Frame time: " << static_cast<int>(dt * 1000) << "ms" << std::endl;
+        const auto millis = static_cast<int>(dt * 1000);
+        if (millis > 16) {
+            std::cout << "Frame time: " << millis << "ms" << std::endl;
+        }
         lastTime = currentTime;
 
         glfwPollEvents();
