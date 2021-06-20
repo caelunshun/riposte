@@ -12,6 +12,7 @@
 #include <server.h>
 
 #include <memory>
+#include <thread>
 
 const int windowWidth = 1920 / 2;
 const int windowHeight = 1080 / 2;
@@ -63,6 +64,11 @@ namespace rip {
             auto bridges = newLocalBridgePair();
             Server server(registry, techTree);
             server.addConnection(std::move(bridges.first));
+
+            auto serverThread = std::thread([server = std::move(server)] () mutable {
+                server.run();
+            });
+            serverThread.detach();
 
             return std::move(bridges.second);
         };
