@@ -55,6 +55,10 @@ namespace rip {
             loadFunction.call<void>(id, luaRegistry, data);
         }
     };
+
+    void makeLuaClientBindings(sol::state &lua) {
+
+    }
 }
 
 int main() {

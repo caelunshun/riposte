@@ -20,6 +20,8 @@ namespace rip {
     public:
         virtual ~Bridge() = default;
 
+        Bridge(Bridge &&other) noexcept = default;
+
         virtual std::optional<std::string> pollReceivedPacket() = 0;
 
         virtual void sendPacket(std::string data) = 0;

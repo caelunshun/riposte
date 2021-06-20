@@ -18,6 +18,9 @@ FetchContent_MakeAvailable(Corrosion)
 
 corrosion_import_crate(MANIFEST_PATH external/dume/renderer/Cargo.toml)
 
+add_library(pb SHARED external/lua-protobuf/pb.c)
+target_link_libraries(pb ${CONAN_LIBS})
+
 set(DUME_SOURCES external/dume/src/dume.cpp)
 add_library(dume ${DUME_SOURCES})
 target_include_directories(dume PUBLIC external/dume/include/ external/dume/renderer/include/)
@@ -25,7 +28,7 @@ target_include_directories(dume PRIVATE external/sol2/include)
 target_link_libraries(dume ${CONAN_LIBS} dume-renderer)
 
 set(NANOVG_SOURCES external/nanovg/src/nanovg.c)
-set(SOURCES ${NANOVG_SOURCES} client/main.cpp src/ripmath.h src/tile.cpp src/tile.h src/game.cpp src/game.h src/renderer.cpp src/renderer.h src/assets.cpp src/assets.h src/view.cpp src/view.h src/cursor.cpp src/cursor.h src/mapgen.cpp src/mapgen.h src/rng.cpp src/rng.h src/city.cpp src/city.h src/player.cpp src/player.h src/registry.cpp src/registry.h src/unit.cpp src/unit.h src/ripmath.cpp src/hud.cpp src/hud.h src/ui.cpp src/ui.h src/path.cpp src/path.h src/ai.cpp src/ai.h src/worker.cpp src/traversal.h src/culture.cpp src/culture.h src/tech.cpp src/yield.cpp src/yield.h src/trade.cpp src/trade.h src/audio.cpp src/audio.h src/era.cpp src/era.h src/combat.cpp src/combat.h src/stack.cpp src/stack.h src/event.cpp src/event.h src/script.cpp src/script.h src/script_bindings/unit.cpp src/script_bindings/player.cpp src/script_bindings/game.cpp src/script_bindings/registry.cpp src/script_bindings/other.cpp src/script_bindings/city.cpp src/ship.cpp src/ship.h)
+set(SOURCES ${NANOVG_SOURCES} client/main.cpp src/ripmath.h src/tile.cpp src/tile.h src/game.cpp src/game.h src/renderer.cpp src/renderer.h src/assets.cpp src/assets.h src/view.cpp src/view.h src/cursor.cpp src/cursor.h src/mapgen.cpp src/mapgen.h src/rng.cpp src/rng.h src/city.cpp src/city.h src/player.cpp src/player.h src/registry.cpp src/registry.h src/unit.cpp src/unit.h src/ripmath.cpp src/hud.cpp src/hud.h src/ui.cpp src/ui.h src/path.cpp src/path.h src/ai.cpp src/ai.h src/worker.cpp src/traversal.h src/culture.cpp src/culture.h src/tech.cpp src/yield.cpp src/yield.h src/trade.cpp src/trade.h src/audio.cpp src/audio.h src/era.cpp src/era.h src/combat.cpp src/combat.h src/stack.cpp src/stack.h src/event.cpp src/event.h src/script.cpp src/script.h src/script_bindings/unit.cpp src/script_bindings/player.cpp src/script_bindings/game.cpp src/script_bindings/registry.cpp src/script_bindings/other.cpp src/script_bindings/city.cpp src/ship.cpp src/ship.h src/bridge.cpp src/server.cpp src/server.h)
 
 add_executable(riposte ${SOURCES})
 
@@ -60,4 +63,4 @@ elseif(UNIX)
     SET(NATIVE_AUDIO_LIBS rt ${ALSA_LIBRARIES} Threads::Threads)
 endif()
 
-target_link_libraries(riposte dume ${CONAN_LIBS} FastNoise ${NATIVE_AUDIO_LIBS} crodio)
+target_link_libraries(riposte dume ${CONAN_LIBS} FastNoise ${NATIVE_AUDIO_LIBS} crodio pb)
