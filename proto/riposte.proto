@@ -127,7 +127,7 @@ message PlayerInfo {
   // The player's username.
   string username = 1;
   string civID = 2;
-  string leader = 3;
+  string leaderName = 3;
   int32 score = 4;
   // A unique ID.
   int32 id = 5;
