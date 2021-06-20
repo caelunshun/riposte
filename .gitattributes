@@ -1,1 +1,4 @@
 .ogg filter=lfs diff=lfs merge=lfs -text
+
+proto/riposte.pb.cc linguist-generated
+proto/riposte.pb.h linguist-generated

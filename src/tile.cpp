@@ -192,6 +192,19 @@ namespace rip {
         return level;
     }
 
+    const char *Cottage::getLevelName() const {
+        switch (level) {
+            case CottageLevel::Cottage:
+                return "Cottage";
+            case CottageLevel::Hamlet:
+                return "Hamlet";
+            case CottageLevel::Village:
+                return "Village";
+            case CottageLevel::Town:
+                return "Town";
+        }
+    }
+
     int Cottage::getTurnsUntilGrowth() const {
         return turnsUntilGrowth;
     }

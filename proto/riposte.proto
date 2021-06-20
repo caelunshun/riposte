@@ -155,10 +155,10 @@ message UpdateGlobalData {
 }
 
 enum Terrain {
-  Ocean = 0;
-  Plains = 1;
-  Grassland = 2;
-  Desert = 3;
+  Grassland = 0;
+  Desert = 1;
+  Ocean = 2;
+  Plains = 3;
 }
 
 message Improvement {
@@ -181,6 +181,7 @@ message Tile {
   repeated Improvement improvements = 4;
   Yield yield = 5;
   int32 ownerID = 6;
+  bool hasOwner = 7;
 }
 
 enum Visibility {

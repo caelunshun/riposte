@@ -14,9 +14,18 @@ namespace rip {
     class Connection {
         // The bridge used to transfer packets.
         std::unique_ptr<Bridge> bridge;
+        // ID of the player using this connection.
+        PlayerId playerID;
+
+        template<typename T>
+        void send(T packet) {
+            std::string data;
+            packet.SerializeToString(&data);
+            bridge->sendPacket(std::move(data));
+        }
 
     public:
-        explicit Connection(std::unique_ptr<Bridge> bridge) : bridge(std::move(bridge)) {}
+        Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID) : bridge(std::move(bridge)), playerID(playerID) {}
 
         void joinGame(Game &game);
 

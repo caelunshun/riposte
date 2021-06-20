@@ -90,6 +90,7 @@ namespace rip {
         void onWorked(Game &game, City &workedBy) override;
 
         CottageLevel getLevel() const;
+        const char *getLevelName() const;
 
         int getTurnsUntilGrowth() const;
 
