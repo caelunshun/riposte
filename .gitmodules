@@ -19,3 +19,6 @@
 [submodule "external/sol2"]
 	path = external/sol2
 	url = https://github.com/ThePhD/sol2
+[submodule "external/lua-protobuf"]
+	path = external/lua-protobuf
+	url = https://github.com/starwing/lua-protobuf
