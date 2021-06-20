@@ -6,6 +6,7 @@ glew/2.2.0
 glm/0.9.9.8
 nlohmann_json/3.9.1
 luajit/2.0.5
+readerwriterqueue/1.0.3
 
 [generators]
 cmake
