@@ -9,10 +9,14 @@
 --- @field mapHeight number
 local Game = {}
 
+local View = require("game/view")
 local Player = require("game/player")
 
 function Game:new()
-    local o = {}
+    local o = {
+        players = {},
+        view = View:new(),
+    }
     setmetatable(o, self)
     self.__index = self
     return o

@@ -18,9 +18,9 @@ namespace rip {
     // a queue connected to another thread.
     class Bridge {
     public:
-        virtual ~Bridge() = default;
+        Bridge() = default;
 
-        Bridge(Bridge &&other) noexcept = default;
+        virtual ~Bridge() = default;
 
         virtual std::optional<std::string> pollReceivedPacket() = 0;
 
@@ -34,7 +34,7 @@ namespace rip {
 
     public:
         LocalBridge(std::shared_ptr<moodycamel::ReaderWriterQueue<std::string>> sendQueue,
-                    std::shared_ptr<moodycamel::ReaderWriterQueue<std::string>> receiveQueue) : sendQueue(sendQueue), receiveQueue(receiveQueue) {}
+                    std::shared_ptr<moodycamel::ReaderWriterQueue<std::string>> receiveQueue) : Bridge(), sendQueue(sendQueue), receiveQueue(receiveQueue) {}
 
         ~LocalBridge() override = default;
 
@@ -43,14 +43,7 @@ namespace rip {
         void sendPacket(std::string data) override;
     };
 
-    std::pair<LocalBridge, LocalBridge> newLocalBridgePair() {
-        auto queueA = std::make_shared<moodycamel::ReaderWriterQueue<std::string>>();
-        auto queueB = std::make_shared<moodycamel::ReaderWriterQueue<std::string>>();
-        return {
-            LocalBridge(queueA, queueB),
-            LocalBridge(queueB, queueA),
-        };
-    }
+    std::pair<std::unique_ptr<Bridge>, std::unique_ptr<Bridge>> newLocalBridgePair();
 }
 
 #endif //RIPOSTE_BRIDGE_H

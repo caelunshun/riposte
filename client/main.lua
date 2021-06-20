@@ -1,9 +1,11 @@
 package.path = "client/?.lua;external/dume/ui/?.lua;external/lunajson/src/?.lua;external/lua-protobuf/?.lua"
+package.cpath = "cmake-build-release/lib/lib?.so;cmake-build-debug/lib/lib?.so"
 jit.on()
 
 local buildMainMenu = require("ui/main_menu")
 local uiStyle = require("ui/style")
 local Game = require("game/game")
+local Client = require("game/client")
 local Renderer = require("game/renderer")
 local View = require("game/view")
 
@@ -54,28 +56,18 @@ function loadDataFile(id, type, jsonData)
     registryEntry:add(data)
 end
 
--- TEMP for testing.
 local game = Game:new()
-game.tiles = {}
-game.view = View:new()
-game.mapWidth = 64
-game.mapHeight = 64
-local terrains = {"Plains", "Grassland", "Desert", "Ocean"}
-for x=1,64 do
-    for y=1,64 do
-        local terrain = terrains[math.random(1, #terrains)]
-        game.tiles[#game.tiles+1] = {
-            terrain = terrain,
-            forested = math.random() < 0.7 and terrain ~= "Ocean",
-            hilled = math.random() < 0.3 and terrain ~= "Ocean",
-        }
-    end
-end
+local bridge = createSingleplayerGame()
+local client = Client:new(game, bridge)
 
 function render(dt)
-    ui:render()
-    game.view.center = Vector(game.view.center.x + 100 * dt, game.view.center.y + 100 * dt)
-    Renderer:render(cv, game)
+    local status, err = pcall(function()
+        client:handleReceivedPackets()
+        ui:render()
+        game.view.center = Vector(game.view.center.x + 100 * dt, game.view.center.y + 100 * dt)
+        Renderer:render(cv, game)
+    end)
+    if not status then print("LUA ERROR: " .. err) end
 end
 
 function handleEvent(event)

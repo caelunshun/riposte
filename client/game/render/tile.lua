@@ -68,6 +68,8 @@ local TileRenderer = {
 }
 
 function TileRenderer:render(cv, game)
+    if game.tiles == nil or game.mapWidth == nil or game.mapHeight == nil then return end
+
     local view = game.view
 
     local renderTiles = {}

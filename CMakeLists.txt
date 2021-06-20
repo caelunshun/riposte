@@ -6,6 +6,9 @@ conan_basic_setup()
 
 set(CMAKE_CXX_STANDARD 20)
 
+include(FindProtobuf)
+find_package(Protobuf REQUIRED)
+
 include(FetchContent)
 
 FetchContent_Declare(
@@ -45,7 +48,8 @@ target_include_directories(riposte PRIVATE
         external/Rea/Rea
         external/Nuklear
         external/sol2/include
-        crodio/include)
+        crodio/include
+        ${PROTOBUF_INCLUDE_DIR})
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
@@ -64,4 +68,4 @@ elseif(UNIX)
     SET(NATIVE_AUDIO_LIBS rt ${ALSA_LIBRARIES} Threads::Threads)
 endif()
 
-target_link_libraries(riposte dume ${CONAN_LIBS} FastNoise ${NATIVE_AUDIO_LIBS} crodio pb)
+target_link_libraries(riposte dume ${CONAN_LIBS} ${PROTOBUF_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} crodio pb)

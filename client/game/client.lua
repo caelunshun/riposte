@@ -4,6 +4,11 @@ local Client = {}
 local pb = require("pb")
 local protoc = require("protoc")
 
+local protoFile = io.open("proto/riposte.proto")
+local protoData = protoFile:read("*all")
+protoFile:close()
+protoc:load(protoData)
+
 function Client:new(game, bridge)
     local o = { game = game, bridge = bridge }
     setmetatable(o, self)
@@ -15,8 +20,9 @@ function Client:handleReceivedPackets()
     local packet = self.bridge:pollReceivedPacket()
     while packet ~= nil do
         local decodedPacket = pb.decode("AnyServer", packet)
+        for k, v in pairs(decodedPacket) do print(k, v) end
         self:handlePacket(decodedPacket)
-
+        print("successfully handled packet")
         packet = self.bridge:pollReceivedPacket()
     end
 end

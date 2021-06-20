@@ -6,10 +6,12 @@
 
 #include <assets.h>
 #include <registry.h>
-
-#include <memory>
 #include <tech.h>
 #include <audio.h>
+#include <bridge.h>
+#include <server.h>
+
+#include <memory>
 
 const int windowWidth = 1920 / 2;
 const int windowHeight = 1080 / 2;
@@ -56,8 +58,17 @@ namespace rip {
         }
     };
 
-    void makeLuaClientBindings(sol::state &lua) {
+    void makeLuaClientBindings(sol::state &lua, std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree) {
+        lua["createSingleplayerGame"] = [=]() {
+            auto bridges = newLocalBridgePair();
+            Server server(registry, techTree);
+            server.addConnection(std::move(bridges.first));
 
+            return std::move(bridges.second);
+        };
+
+        auto bridge_type = lua.new_usertype<Bridge>("Bridge");
+        bridge_type["pollReceivedPacket"] = &Bridge::pollReceivedPacket;
     }
 }
 
@@ -101,6 +112,9 @@ int main() {
     assets->addLoader("tech", std::make_unique<rip::TechLoader>());
     assets->addLoader("sound", std::make_unique<rip::AudioLoader>(audio));
     assets->loadAssetsDir("assets", false);
+
+    auto techTree = std::make_shared<rip::TechTree>(*assets, *registry);
+    rip::makeLuaClientBindings(*lua, registry, techTree);
 
     lua->script_file("client/main.lua");
 
