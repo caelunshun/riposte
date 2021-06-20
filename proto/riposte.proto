@@ -62,6 +62,13 @@ message AnyServer {
   oneof packet {
     ServerInfo serverInfo = 1;
     StartGame startGame = 2;
+    LobbyError lobbyError = 3;
+    UpdateGlobalData updateGlobalData = 4;
+    UpdateMap updateMap = 5;
+    UpdateCity updateCity = 6;
+    UpdateUnit updateUnit = 7;
+    UpdatePlayer updatePlayer = 8;
+    PathComputed pathComputed = 9;
   }
 }
 

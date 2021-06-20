@@ -1,4 +1,4 @@
-package.path = "client/?.lua;external/dume/ui/?.lua;external/lunajson/src/?.lua"
+package.path = "client/?.lua;external/dume/ui/?.lua;external/lunajson/src/?.lua;external/lua-protobuf/?.lua"
 jit.on()
 
 local buildMainMenu = require("ui/main_menu")
@@ -73,9 +73,9 @@ for x=1,64 do
 end
 
 function render(dt)
+    ui:render()
     game.view.center = Vector(game.view.center.x + 100 * dt, game.view.center.y + 100 * dt)
     Renderer:render(cv, game)
-    -- ui:render()
 end
 
 function handleEvent(event)
