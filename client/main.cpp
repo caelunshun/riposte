@@ -145,10 +145,6 @@ int main() {
         const auto currentTime = glfwGetTime();
         const auto dt = currentTime - lastTime;
 
-        const auto millis = static_cast<int>(dt * 1000);
-        if (millis > 16) {
-            std::cout << "Frame time: " << millis << "ms" << std::endl;
-        }
         lastTime = currentTime;
 
         glfwPollEvents();

@@ -56,33 +56,52 @@ function loadDataFile(id, type, jsonData)
     registryEntry:add(data)
 end
 
-local game = Game:new()
-local bridge = createSingleplayerGame()
-local client = Client:new(game, bridge)
+local game = nil
+local client = nil
+
+function enterGame(bridge)
+    game = Game:new()
+    client = Client:new(game, bridge)
+    -- Clear the UI to get rid of the menu.
+    for windowName, _ in pairs(ui.windows) do ui:deleteWindow(windowName) end
+end
 
 function render(dt)
-    local status, err = pcall(function()
-        client:handleReceivedPackets()
+    callSafe(function()
+        if client ~= nil then
+            client:handleReceivedPackets()
+        end
         ui:render()
-        game.view.center = Vector(game.view.center.x + 100 * dt, game.view.center.y + 100 * dt)
-        Renderer:render(cv, game)
+
+        if game ~= nil then
+            game.view.center = Vector(game.view.center.x + 100 * dt, game.view.center.y + 100 * dt)
+            Renderer:render(cv, game)
+        end
     end)
-    if not status then print("LUA ERROR: " .. err) end
 end
 
 function handleEvent(event)
-    -- convert tables to Vector
-    if event.pos ~= nil then
-        event.pos = Vector(event.pos.x, event.pos.y)
-    end
-    if event.offset ~= nil then
-        event.offset = Vector(event.offset.x, event.offset.y)
-    end
+    callSafe(function()
+        -- convert tables to Vector
+        if event.pos ~= nil then
+            event.pos = Vector(event.pos.x, event.pos.y)
+        end
+        if event.offset ~= nil then
+            event.offset = Vector(event.offset.x, event.offset.y)
+        end
 
-    ui:handleEvent(event)
+        ui:handleEvent(event)
+    end)
 end
 
 function resize(newSize)
-    ui:resize(Vector(cv:getWidth(), cv:getHeight()), newSize)
+    callSafe(function()
+        ui:resize(Vector(cv:getWidth(), cv:getHeight()), newSize)
+    end)
+end
+
+function callSafe(f)
+    local status, err = pcall(f)
+    if not status then print("LUA ERROR: " .. err) end
 end
 

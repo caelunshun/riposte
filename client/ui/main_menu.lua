@@ -15,7 +15,23 @@ local Fixed = require("widget/fixed")
 local Padding = require("widget/padding")
 
 local function build(ui)
-    local entries = { "SINGLEPLAYER", "MULTIPLAYER", "OPTIONS" }
+    local entries = {
+        {
+            name = "SINGLEPLAYER",
+            onclick = function()
+                local bridge = createSingleplayerGame()
+                enterGame(bridge)
+            end
+        },
+        {
+            name = "MULTIPLAYER",
+            onclick = function()  end
+        },
+        {
+            name = "OPTIONS",
+            onclick = function()  end
+        }
+    }
 
     local main = Flex:column()
     main:setMainAlign(dume.Align.Center)
@@ -35,9 +51,10 @@ local function build(ui)
     main.style.hovered.defaultTextStyle = hoveredText
 
     for _, entry in ipairs(entries) do
-        local text = Text:new("@size{24}{%entry}", {entry = entry})
+        local text = Text:new("@size{24}{%entry}", {entry = entry.name})
         local clickable = Clickable:new(text, function()
-            print("Selected " .. entry)
+            print("Selected " .. entry.name)
+            entry.onclick()
         end)
         main:addFixedChild(StyleModifier:new(clickable))
     end
