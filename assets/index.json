@@ -165,6 +165,41 @@
     "loader": "font"
   },
   {
+    "path": "font/Merriweather-Black.ttf",
+    "id": "font/merriweather/regular",
+    "loader": "font"
+  },
+  {
+    "path": "font/Merriweather-BlackItalic.ttf",
+    "id": "font/merriweather/regular",
+    "loader": "font"
+  },
+  {
+    "path": "font/Merriweather-Bold.ttf",
+    "id": "font/merriweather/regular",
+    "loader": "font"
+  },
+  {
+    "path": "font/Merriweather-BoldItalic.ttf",
+    "id": "font/merriweather/regular",
+    "loader": "font"
+  },
+  {
+    "path": "font/Merriweather-Italic.ttf",
+    "id": "font/merriweather/regular",
+    "loader": "font"
+  },
+  {
+    "path": "font/Merriweather-Light.ttf",
+    "id": "font/merriweather/regular",
+    "loader": "font"
+  },
+  {
+    "path": "font/Merriweather-LightItalic.ttf",
+    "id": "font/merriweather/regular",
+    "loader": "font"
+  },
+  {
     "path": "unit/settler.json",
     "id": "unit/settler",
     "loader": "unit"
