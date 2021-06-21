@@ -23,6 +23,8 @@ namespace rip {
 
         UnitUIStatus paintMainUI(Game &game, Hud &hud, nk_context *nk) override;
 
+        const std::vector<UnitId> &getCarryingUnits() const;
+
         void addCarryingUnit(UnitId unit);
         void removeCarryingUnit(UnitId unit);
         bool isCarryingUnit(UnitId unit) const;

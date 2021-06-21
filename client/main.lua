@@ -29,6 +29,7 @@ registry = {
     civs = {
         add = function(self, civ)
             self[civ.id] = civ
+            civ.color = dume.rgb(civ.color[1], civ.color[2], civ.color[3])
         end
     },
     techs = {
@@ -74,7 +75,6 @@ function render(dt)
         ui:render()
 
         if game ~= nil then
-            game.view.center = Vector(game.view.center.x + 100 * dt, game.view.center.y + 100 * dt)
             Renderer:render(cv, game)
         end
     end)

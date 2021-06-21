@@ -27,7 +27,7 @@ namespace rip {
     public:
         Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID) : bridge(std::move(bridge)), playerID(playerID) {}
 
-        void joinGame(Game &game);
+        void sendGameData(Game &game);
 
         void update(Game &game);
     };

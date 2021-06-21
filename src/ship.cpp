@@ -133,4 +133,8 @@ namespace rip {
             }
         }
     }
+
+    const std::vector<UnitId> &CarryUnitsCapability::getCarryingUnits() const {
+        return carryingUnits;
+    }
 }

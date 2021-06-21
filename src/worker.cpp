@@ -107,7 +107,7 @@ namespace rip {
         tile.setForested(false);
     }
 
-    std::string BuildImprovementTask::getName() {
+    std::string BuildImprovementTask::getName() const {
         return "Build " + improvement->getName();
     }
 

@@ -57,6 +57,16 @@ function TreeRenderer:renderTile(cv, tile, tilePos, game)
     end
 end
 
+-- Renders units.
+local UnitRenderer = {}
+
+function UnitRenderer:renderTile(cv, tile, tilePos, game)
+    local unit = game:getUnitsAtPos(tilePos)[1]
+    if unit ~= nil then
+        unit:render(cv, game)
+    end
+end
+
 -- Responsible for rendering tiles on the map.
 local TileRenderer = {
     renderers = {
@@ -64,6 +74,7 @@ local TileRenderer = {
         TerrainRenderer,
         GridOverlayRenderer,
         TreeRenderer,
+        UnitRenderer,
     }
 }
 

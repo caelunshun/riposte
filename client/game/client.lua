@@ -20,9 +20,8 @@ function Client:handleReceivedPackets()
     local packet = self.bridge:pollReceivedPacket()
     while packet ~= nil do
         local decodedPacket = pb.decode("AnyServer", packet)
-        for k, v in pairs(decodedPacket) do print(k, v) end
+        for k, _ in pairs(decodedPacket) do print("Received packet: " .. k) end
         self:handlePacket(decodedPacket)
-        print("successfully handled packet")
         packet = self.bridge:pollReceivedPacket()
     end
 end
@@ -33,6 +32,8 @@ function Client:handlePacket(packet)
         self:handleUpdateGlobalData(packet.updateGlobalData)
     elseif packet.updateMap ~= nil then
         self:handleUpdateMap(packet.updateMap)
+    elseif packet.updateUnit ~= nil then
+        self:handleUpdateUnit(packet.updateUnit)
     end
 end
 
@@ -50,6 +51,10 @@ function Client:handleUpdateMap(packet)
     self.game.mapWidth = packet.width
     self.game.mapHeight = packet.height
     self.game.visibility = packet.visibility
+end
+
+function Client:handleUpdateUnit(packet)
+    self.game:addUnit(packet)
 end
 
 return Client
