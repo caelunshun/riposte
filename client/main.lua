@@ -60,6 +60,8 @@ end
 local game = nil
 local client = nil
 
+local cursorPos = Vector(0, 0)
+
 function enterGame(bridge)
     game = Game:new()
     client = Client:new(game, bridge)
@@ -77,6 +79,8 @@ function render(dt)
         if game ~= nil then
             Renderer:render(cv, game)
         end
+
+        cv:drawSprite("icon/cursor", cursorPos, 25)
     end)
 end
 
@@ -91,6 +95,10 @@ function handleEvent(event)
         end
 
         ui:handleEvent(event)
+
+        if event.type == dume.EventType.CursorMove then
+            cursorPos = event.pos
+        end
     end)
 end
 
