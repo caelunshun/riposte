@@ -284,6 +284,7 @@ message UpdateUnit {
   double movementLeft = 5;
   Path followingPath = 6;
   repeated Capability capabilities = 7;
+  int32 id = 8;
 }
 
 message ResearchingTech {

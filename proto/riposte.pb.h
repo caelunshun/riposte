@@ -5406,6 +5406,7 @@ class UpdateUnit final :
     kHealthFieldNumber = 4,
     kMovementLeftFieldNumber = 5,
     kOwnerIDFieldNumber = 3,
+    kIdFieldNumber = 8,
   };
   // repeated .Capability capabilities = 7;
   int capabilities_size() const;
@@ -5502,6 +5503,15 @@ class UpdateUnit final :
   void _internal_set_ownerid(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
+  // int32 id = 8;
+  void clear_id();
+  ::PROTOBUF_NAMESPACE_ID::int32 id() const;
+  void set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_id() const;
+  void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
   // @@protoc_insertion_point(class_scope:UpdateUnit)
  private:
   class _Internal;
@@ -5516,6 +5526,7 @@ class UpdateUnit final :
   double health_;
   double movementleft_;
   ::PROTOBUF_NAMESPACE_ID::int32 ownerid_;
+  ::PROTOBUF_NAMESPACE_ID::int32 id_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -10949,6 +10960,26 @@ inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Capability >&
 UpdateUnit::capabilities() const {
   // @@protoc_insertion_point(field_list:UpdateUnit.capabilities)
   return capabilities_;
+}
+
+// int32 id = 8;
+inline void UpdateUnit::clear_id() {
+  id_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateUnit::_internal_id() const {
+  return id_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateUnit::id() const {
+  // @@protoc_insertion_point(field_get:UpdateUnit.id)
+  return _internal_id();
+}
+inline void UpdateUnit::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  id_ = value;
+}
+inline void UpdateUnit::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_id(value);
+  // @@protoc_insertion_point(field_set:UpdateUnit.id)
 }
 
 // -------------------------------------------------------------------
