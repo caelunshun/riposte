@@ -72,6 +72,8 @@ end
 local time = 0
 
 function render(dt)
+    cursorPos = Vector(_G.cursorPos.x, _G.cursorPos.y)
+
     time = time + dt
 
     callSafe(function()
@@ -81,8 +83,8 @@ function render(dt)
         ui:render()
 
         if game ~= nil then
+            game.view:tick(dt, cursorPos)
             Renderer:render(cv, game)
-
             game.hud:render(cv, time)
         end
 
@@ -101,10 +103,6 @@ function handleEvent(event)
         end
 
         ui:handleEvent(event)
-
-        if event.type == dume.EventType.CursorMove then
-            cursorPos = event.pos
-        end
 
         if game ~= nil then
             game.hud:handleEvent(event)

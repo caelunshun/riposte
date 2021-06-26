@@ -151,6 +151,23 @@ int main() {
         renderFunction.call<void>(dt);
 
         canvas->render();
+
+        int width, height;
+        glfwGetWindowSize(window, &width, &height);
+
+        double cursorX, cursorY;
+        glfwGetCursorPos(window, &cursorX, &cursorY);
+
+        bool shouldFixCursor = (cursorX < 0 || cursorY < 0 || cursorX > width || cursorY > height);
+
+        cursorX = std::clamp(cursorX, 0.0, (double) width);
+        cursorY = std::clamp(cursorY, 0.0, (double) height);
+
+        if (shouldFixCursor) {
+            glfwSetCursorPos(window, cursorX, cursorY);
+        }
+
+        (*lua)["cursorPos"] = lua->create_table_with("x", cursorX, "y", cursorY);
     }
 
     glfwDestroyWindow(window);

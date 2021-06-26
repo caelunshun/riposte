@@ -7,11 +7,22 @@ local View = {}
 
 local Vector = require("brinevector")
 
+local MoveDir = {
+    Right = 0x01,
+    Left = 0x02,
+    Down = 0x04,
+    Up = 0x10,
+}
+
 function View:new()
     local o = {
         center = Vector(0, 0),
         zoomFactor = 1,
         size = Vector(cv:getWidth(), cv:getHeight()),
+        moveDir = 0,
+
+        moveTime = Vector(0, 0),
+        centerVelocity = Vector(0, 0)
     }
     setmetatable(o, self)
     self.__index = self
@@ -36,6 +47,59 @@ function View:getTilePosForScreenOffset(screenOffset)
     local translated = centered + self.center
     local scaled = translated / 100
     return Vector(math.floor(scaled.x), math.floor(scaled.y))
+end
+
+local function sampleVelocityCurve(time)
+    local cutoff = 1
+    local max = 300
+    if time >= cutoff then return max end
+    return -(max / 2) * math.cos(time / (0.1 * math.pi)) + max / 2
+end
+
+function View:tick(dt, cursorPos)
+    local threshold = 2
+
+    self.moveDir = 0
+
+    if math.abs(cursorPos.x - self.size.x) <= threshold then
+        self.moveDir = bit.bor(self.moveDir, MoveDir.Right)
+    elseif math.abs(cursorPos.x) <= threshold then
+        self.moveDir = bit.bor(self.moveDir, MoveDir.Left)
+    end
+
+    if math.abs(cursorPos.y - self.size.y) <= threshold then
+        self.moveDir = bit.bor(self.moveDir, MoveDir.Down)
+    elseif math.abs(cursorPos.y) <= threshold then
+        self.moveDir = bit.bor(self.moveDir, MoveDir.Up)
+    end
+
+    if bit.band(self.moveDir, MoveDir.Left) == 0 and bit.band(self.moveDir, MoveDir.Right) == 0 then
+        self.centerVelocity.x = self.centerVelocity.x * (0.02 ^ dt)
+        self.moveTime.x = 0
+    end
+
+    if bit.band(self.moveDir, MoveDir.Up) == 0 and bit.band(self.moveDir, MoveDir.Down) == 0 then
+        self.centerVelocity.y = self.centerVelocity.y * (0.02 ^ dt)
+        self.moveTime.y = 0
+    end
+
+    local speedX = sampleVelocityCurve(self.moveTime.x)
+    local speedY = sampleVelocityCurve(self.moveTime.y)
+
+    if bit.band(self.moveDir, MoveDir.Left) ~= 0 then
+        self.centerVelocity.x = -speedX
+    elseif bit.band(self.moveDir, MoveDir.Right) ~= 0 then
+        self.centerVelocity.x = speedX
+    end
+
+    if bit.band(self.moveDir, MoveDir.Down) ~= 0 then
+        self.centerVelocity.y = speedY
+    elseif bit.band(self.moveDir, MoveDir.Up) ~= 0 then
+        self.centerVelocity.y = -speedY
+    end
+
+    self.moveTime = self.moveTime + Vector(dt, dt)
+    self.center = self.center + (self.centerVelocity * 1 / self.zoomFactor) * dt
 end
 
 return View
