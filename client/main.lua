@@ -69,7 +69,11 @@ function enterGame(bridge)
     for windowName, _ in pairs(ui.windows) do ui:deleteWindow(windowName) end
 end
 
+local time = 0
+
 function render(dt)
+    time = time + dt
+
     callSafe(function()
         if client ~= nil then
             client:handleReceivedPackets()
@@ -78,6 +82,8 @@ function render(dt)
 
         if game ~= nil then
             Renderer:render(cv, game)
+
+            game.hud:render(cv, time)
         end
 
         cv:drawSprite("icon/cursor", cursorPos, 25)
@@ -98,6 +104,10 @@ function handleEvent(event)
 
         if event.type == dume.EventType.CursorMove then
             cursorPos = event.pos
+        end
+
+        if game ~= nil then
+            game.hud:handleEvent(event)
         end
     end)
 end

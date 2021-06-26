@@ -11,6 +11,7 @@ local Game = {}
 
 local Vector = require("brinevector")
 
+local Hud = require("game/ui/main_hud")
 local View = require("game/view")
 local Player = require("game/player")
 local Unit = require("game/unit")
@@ -23,8 +24,12 @@ function Game:new()
         units = {},
         unitsByPos = {},
     }
+
     setmetatable(o, self)
     self.__index = self
+
+    o.hud = Hud:new(o)
+
     return o
 end
 
@@ -63,6 +68,10 @@ function Game:addUnit(data)
     if data.ownerID == 0 then
         self.view.center = Vector(data.pos.x * 100 + 50, data.pos.y * 100 + 50)
     end
+end
+
+function Game:isUnitAlive(unit)
+    return self.units[unit.id] == unit
 end
 
 function Game:getUnitsAtPos(pos)
