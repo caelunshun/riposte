@@ -246,7 +246,7 @@ struct UnitBuildTaskDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT UnitBuildTaskDefaultTypeInternal _UnitBuildTask_default_instance_;
 constexpr BuildingBuildTask::BuildingBuildTask(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
-  : buildingid_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string){}
+  : buildingname_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string){}
 struct BuildingBuildTaskDefaultTypeInternal {
   constexpr BuildingBuildTaskDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -288,11 +288,15 @@ constexpr UpdateCity::UpdateCity(
   , name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , pos_(nullptr)
   , buildtask_(nullptr)
+  , yield_(nullptr)
   , ownerid_(0)
-  , hammersperturn_(0)
   , culture_(0)
   , cultureneeded_(0)
-  , id_(0){}
+  , id_(0)
+  , population_(0)
+  , storedfood_(0)
+  , neededfoodforgrowth_(0)
+  , consumedfood_(0){}
 struct UpdateCityDefaultTypeInternal {
   constexpr UpdateCityDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -691,7 +695,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
-  PROTOBUF_FIELD_OFFSET(::BuildingBuildTask, buildingid_),
+  PROTOBUF_FIELD_OFFSET(::BuildingBuildTask, buildingname_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::BuildTaskKind, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -717,11 +721,15 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::UpdateCity, name_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, ownerid_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, buildtask_),
-  PROTOBUF_FIELD_OFFSET(::UpdateCity, hammersperturn_),
+  PROTOBUF_FIELD_OFFSET(::UpdateCity, yield_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, culture_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, cultureneeded_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, id_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, buildingnames_),
+  PROTOBUF_FIELD_OFFSET(::UpdateCity, population_),
+  PROTOBUF_FIELD_OFFSET(::UpdateCity, storedfood_),
+  PROTOBUF_FIELD_OFFSET(::UpdateCity, neededfoodforgrowth_),
+  PROTOBUF_FIELD_OFFSET(::UpdateCity, consumedfood_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Path, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -885,24 +893,24 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 139, -1, sizeof(::BuildTaskKind)},
   { 147, -1, sizeof(::BuildTask)},
   { 155, -1, sizeof(::UpdateCity)},
-  { 169, -1, sizeof(::Path)},
-  { 175, -1, sizeof(::FoundCityCapability)},
-  { 180, -1, sizeof(::WorkerTaskImprovement)},
-  { 186, -1, sizeof(::WorkerTaskKind)},
-  { 193, -1, sizeof(::WorkerTask)},
-  { 201, -1, sizeof(::WorkerCapability)},
-  { 208, -1, sizeof(::CarryUnitsCapability)},
-  { 214, -1, sizeof(::Capability)},
-  { 223, -1, sizeof(::UpdateUnit)},
-  { 236, -1, sizeof(::ResearchingTech)},
-  { 243, -1, sizeof(::UpdatePlayer)},
-  { 260, -1, sizeof(::PathComputed)},
-  { 267, -1, sizeof(::MoveUnit)},
-  { 274, -1, sizeof(::SetCityBuildTask)},
-  { 281, -1, sizeof(::SetWorkerTask)},
-  { 288, -1, sizeof(::ComputePath)},
-  { 297, -1, sizeof(::SetEconomySettings)},
-  { 303, -1, sizeof(::SetResearch)},
+  { 173, -1, sizeof(::Path)},
+  { 179, -1, sizeof(::FoundCityCapability)},
+  { 184, -1, sizeof(::WorkerTaskImprovement)},
+  { 190, -1, sizeof(::WorkerTaskKind)},
+  { 197, -1, sizeof(::WorkerTask)},
+  { 205, -1, sizeof(::WorkerCapability)},
+  { 212, -1, sizeof(::CarryUnitsCapability)},
+  { 218, -1, sizeof(::Capability)},
+  { 227, -1, sizeof(::UpdateUnit)},
+  { 240, -1, sizeof(::ResearchingTech)},
+  { 247, -1, sizeof(::UpdatePlayer)},
+  { 264, -1, sizeof(::PathComputed)},
+  { 271, -1, sizeof(::MoveUnit)},
+  { 278, -1, sizeof(::SetCityBuildTask)},
+  { 285, -1, sizeof(::SetWorkerTask)},
+  { 292, -1, sizeof(::ComputePath)},
+  { 301, -1, sizeof(::SetEconomySettings)},
+  { 307, -1, sizeof(::SetResearch)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -962,7 +970,7 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "putedH\000B\010\n\006packet\"\036\n\nClientInfo\022\020\n\010usern"
   "ame\030\001 \001(\t\"C\n\nServerInfo\022\020\n\010playerID\030\001 \001("
   "\005\022#\n\016currentPlayers\030\002 \003(\0132\013.PlayerInfo\"("
-  "\n\nKickPlayer\022\n\n\002ID\030\001 \001(\005\022\016\n\006reason\030\002 \001(\t"
+  "\n\nKickPlayer\022\n\n\002id\030\001 \001(\005\022\016\n\006reason\030\002 \001(\t"
   "\"*\n\tSetLeader\022\r\n\005civID\030\001 \001(\t\022\016\n\006leader\030\002"
   " \001(\t\"\020\n\016AdminStartGame\"\035\n\nLobbyError\022\017\n\007"
   "message\030\001 \001(\t\"\013\n\tStartGame\"m\n\nPlayerInfo"
@@ -980,63 +988,65 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "Owner\030\007 \001(\010\"a\n\tUpdateMap\022\r\n\005width\030\001 \001(\r\022"
   "\016\n\006height\030\002 \001(\r\022\024\n\005tiles\030\003 \003(\0132\005.Tile\022\037\n"
   "\nvisibility\030\004 \003(\0162\013.Visibility\"#\n\rUnitBu"
-  "ildTask\022\022\n\nunitKindID\030\001 \001(\t\"\'\n\021BuildingB"
-  "uildTask\022\022\n\nbuildingID\030\001 \001(\t\"_\n\rBuildTas"
-  "kKind\022\036\n\004unit\030\001 \001(\0132\016.UnitBuildTaskH\000\022&\n"
-  "\010building\030\002 \001(\0132\022.BuildingBuildTaskH\000B\006\n"
-  "\004task\"I\n\tBuildTask\022\034\n\004kind\030\001 \001(\0132\016.Build"
-  "TaskKind\022\020\n\010progress\030\002 \001(\005\022\014\n\004cost\030\003 \001(\005"
-  "\"\300\001\n\nUpdateCity\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\014\n\004na"
-  "me\030\002 \001(\t\022\017\n\007ownerID\030\003 \001(\005\022\035\n\tbuildTask\030\004"
-  " \001(\0132\n.BuildTask\022\026\n\016hammersPerTurn\030\005 \001(\005"
-  "\022\017\n\007culture\030\006 \001(\005\022\025\n\rcultureNeeded\030\007 \001(\005"
-  "\022\n\n\002ID\030\010 \001(\005\022\025\n\rbuildingNames\030\t \003(\t\"\031\n\004P"
-  "ath\022\021\n\tpositions\030\001 \003(\r\"\025\n\023FoundCityCapab"
-  "ility\".\n\025WorkerTaskImprovement\022\025\n\rimprov"
-  "ementID\030\001 \001(\t\"L\n\016WorkerTaskKind\0222\n\020build"
-  "Improvement\030\001 \001(\0132\026.WorkerTaskImprovemen"
-  "tH\000B\006\n\004kind\"L\n\nWorkerTask\022\014\n\004name\030\001 \001(\t\022"
-  "\021\n\tturnsLeft\030\002 \001(\005\022\035\n\004kind\030\003 \001(\0132\017.Worke"
-  "rTaskKind\"X\n\020WorkerCapability\022 \n\013current"
-  "Task\030\001 \001(\0132\013.WorkerTask\022\"\n\rpossibleTasks"
-  "\030\002 \003(\0132\013.WorkerTask\"/\n\024CarryUnitsCapabil"
-  "ity\022\027\n\017carryingUnitIDs\030\001 \003(\005\"\220\001\n\nCapabil"
-  "ity\022)\n\tfoundCity\030\001 \001(\0132\024.FoundCityCapabi"
-  "lityH\000\022#\n\006worker\030\002 \001(\0132\021.WorkerCapabilit"
-  "yH\000\022+\n\ncarryUnits\030\003 \001(\0132\025.CarryUnitsCapa"
-  "bilityH\000B\005\n\003cap\"\263\001\n\nUpdateUnit\022\021\n\003pos\030\001 "
-  "\001(\0132\004.Pos\022\016\n\006kindID\030\002 \001(\t\022\017\n\007ownerID\030\003 \001"
-  "(\005\022\016\n\006health\030\004 \001(\001\022\024\n\014movementLeft\030\005 \001(\001"
-  "\022\034\n\rfollowingPath\030\006 \001(\0132\005.Path\022!\n\014capabi"
-  "lities\030\007 \003(\0132\013.Capability\022\n\n\002id\030\010 \001(\005\"3\n"
-  "\017ResearchingTech\022\016\n\006techID\030\001 \001(\t\022\020\n\010prog"
-  "ress\030\002 \001(\005\"\225\002\n\014UpdatePlayer\022\n\n\002ID\030\001 \001(\005\022"
-  "\020\n\010username\030\002 \001(\t\022\023\n\013baseRevenue\030\003 \001(\005\022\025"
-  "\n\rbeakerRevenue\030\004 \001(\005\022\023\n\013goldRevenue\030\005 \001"
-  "(\005\022\020\n\010expenses\030\006 \001(\005\022\017\n\007netGold\030\007 \001(\005\022\014\n"
-  "\004gold\030\010 \001(\005\022)\n\017researchingTech\030\t \001(\0132\020.R"
-  "esearchingTech\022\025\n\rcapitalCityID\030\n \001(\005\022\027\n"
-  "\017unlockedTechIDs\030\013 \003(\t\022\032\n\022possibleResear"
-  "ches\030\014 \003(\t\"3\n\014PathComputed\022\016\n\006pathID\030\001 \001"
-  "(\005\022\023\n\004path\030\002 \001(\0132\005.Path\"0\n\010MoveUnit\022\016\n\006u"
-  "nitID\030\001 \001(\005\022\024\n\006newPos\030\002 \001(\0132\004.Pos\"@\n\020Set"
-  "CityBuildTask\022\016\n\006cityID\030\001 \001(\005\022\034\n\004task\030\002 "
-  "\001(\0132\016.BuildTaskKind\"<\n\rSetWorkerTask\022\020\n\010"
-  "workerID\030\001 \001(\005\022\031\n\004task\030\002 \001(\0132\013.WorkerTas"
-  "k\"S\n\013ComputePath\022\016\n\006unitID\030\001 \001(\005\022\022\n\004from"
-  "\030\002 \001(\0132\004.Pos\022\020\n\002to\030\003 \001(\0132\004.Pos\022\016\n\006pathID"
-  "\030\004 \001(\005\"+\n\022SetEconomySettings\022\025\n\rbeakerPe"
-  "rcent\030\001 \001(\005\"\035\n\013SetResearch\022\016\n\006techID\030\001 \001"
-  "(\t*h\n\003Era\022\013\n\007Ancient\020\000\022\r\n\tClassical\020\001\022\014\n"
-  "\010Medieval\020\002\022\017\n\013Renaissance\020\003\022\016\n\nIndustri"
-  "al\020\004\022\n\n\006Modern\020\005\022\n\n\006Future\020\006*;\n\007Terrain\022"
-  "\r\n\tGrassland\020\000\022\n\n\006Desert\020\001\022\t\n\005Ocean\020\002\022\n\n"
-  "\006Plains\020\003*1\n\nVisibility\022\013\n\007Visible\020\000\022\n\n\006"
-  "Fogged\020\001\022\n\n\006Hidden\020\002b\006proto3"
+  "ildTask\022\022\n\nunitKindID\030\001 \001(\t\")\n\021BuildingB"
+  "uildTask\022\024\n\014buildingName\030\001 \001(\t\"_\n\rBuildT"
+  "askKind\022\036\n\004unit\030\001 \001(\0132\016.UnitBuildTaskH\000\022"
+  "&\n\010building\030\002 \001(\0132\022.BuildingBuildTaskH\000B"
+  "\006\n\004task\"I\n\tBuildTask\022\034\n\004kind\030\001 \001(\0132\016.Bui"
+  "ldTaskKind\022\020\n\010progress\030\002 \001(\005\022\014\n\004cost\030\003 \001"
+  "(\005\"\232\002\n\nUpdateCity\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\014\n\004"
+  "name\030\002 \001(\t\022\017\n\007ownerID\030\003 \001(\005\022\035\n\tbuildTask"
+  "\030\004 \001(\0132\n.BuildTask\022\025\n\005yield\030\005 \001(\0132\006.Yiel"
+  "d\022\017\n\007culture\030\006 \001(\005\022\025\n\rcultureNeeded\030\007 \001("
+  "\005\022\n\n\002id\030\010 \001(\005\022\025\n\rbuildingNames\030\t \003(\t\022\022\n\n"
+  "population\030\n \001(\005\022\022\n\nstoredFood\030\013 \001(\005\022\033\n\023"
+  "neededFoodForGrowth\030\014 \001(\005\022\024\n\014consumedFoo"
+  "d\030\r \001(\005\"\031\n\004Path\022\021\n\tpositions\030\001 \003(\r\"\025\n\023Fo"
+  "undCityCapability\".\n\025WorkerTaskImproveme"
+  "nt\022\025\n\rimprovementID\030\001 \001(\t\"L\n\016WorkerTaskK"
+  "ind\0222\n\020buildImprovement\030\001 \001(\0132\026.WorkerTa"
+  "skImprovementH\000B\006\n\004kind\"L\n\nWorkerTask\022\014\n"
+  "\004name\030\001 \001(\t\022\021\n\tturnsLeft\030\002 \001(\005\022\035\n\004kind\030\003"
+  " \001(\0132\017.WorkerTaskKind\"X\n\020WorkerCapabilit"
+  "y\022 \n\013currentTask\030\001 \001(\0132\013.WorkerTask\022\"\n\rp"
+  "ossibleTasks\030\002 \003(\0132\013.WorkerTask\"/\n\024Carry"
+  "UnitsCapability\022\027\n\017carryingUnitIDs\030\001 \003(\005"
+  "\"\220\001\n\nCapability\022)\n\tfoundCity\030\001 \001(\0132\024.Fou"
+  "ndCityCapabilityH\000\022#\n\006worker\030\002 \001(\0132\021.Wor"
+  "kerCapabilityH\000\022+\n\ncarryUnits\030\003 \001(\0132\025.Ca"
+  "rryUnitsCapabilityH\000B\005\n\003cap\"\263\001\n\nUpdateUn"
+  "it\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\016\n\006kindID\030\002 \001(\t\022\017\n"
+  "\007ownerID\030\003 \001(\005\022\016\n\006health\030\004 \001(\001\022\024\n\014moveme"
+  "ntLeft\030\005 \001(\001\022\034\n\rfollowingPath\030\006 \001(\0132\005.Pa"
+  "th\022!\n\014capabilities\030\007 \003(\0132\013.Capability\022\n\n"
+  "\002id\030\010 \001(\005\"3\n\017ResearchingTech\022\016\n\006techID\030\001"
+  " \001(\t\022\020\n\010progress\030\002 \001(\005\"\225\002\n\014UpdatePlayer\022"
+  "\n\n\002id\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\023\n\013baseRev"
+  "enue\030\003 \001(\005\022\025\n\rbeakerRevenue\030\004 \001(\005\022\023\n\013gol"
+  "dRevenue\030\005 \001(\005\022\020\n\010expenses\030\006 \001(\005\022\017\n\007netG"
+  "old\030\007 \001(\005\022\014\n\004gold\030\010 \001(\005\022)\n\017researchingTe"
+  "ch\030\t \001(\0132\020.ResearchingTech\022\025\n\rcapitalCit"
+  "yID\030\n \001(\005\022\027\n\017unlockedTechIDs\030\013 \003(\t\022\032\n\022po"
+  "ssibleResearches\030\014 \003(\t\"3\n\014PathComputed\022\016"
+  "\n\006pathID\030\001 \001(\005\022\023\n\004path\030\002 \001(\0132\005.Path\"0\n\010M"
+  "oveUnit\022\016\n\006unitID\030\001 \001(\005\022\024\n\006newPos\030\002 \001(\0132"
+  "\004.Pos\"@\n\020SetCityBuildTask\022\016\n\006cityID\030\001 \001("
+  "\005\022\034\n\004task\030\002 \001(\0132\016.BuildTaskKind\"<\n\rSetWo"
+  "rkerTask\022\020\n\010workerID\030\001 \001(\005\022\031\n\004task\030\002 \001(\013"
+  "2\013.WorkerTask\"S\n\013ComputePath\022\016\n\006unitID\030\001"
+  " \001(\005\022\022\n\004from\030\002 \001(\0132\004.Pos\022\020\n\002to\030\003 \001(\0132\004.P"
+  "os\022\016\n\006pathID\030\004 \001(\005\"+\n\022SetEconomySettings"
+  "\022\025\n\rbeakerPercent\030\001 \001(\005\"\035\n\013SetResearch\022\016"
+  "\n\006techID\030\001 \001(\t*h\n\003Era\022\013\n\007Ancient\020\000\022\r\n\tCl"
+  "assical\020\001\022\014\n\010Medieval\020\002\022\017\n\013Renaissance\020\003"
+  "\022\016\n\nIndustrial\020\004\022\n\n\006Modern\020\005\022\n\n\006Future\020\006"
+  "*;\n\007Terrain\022\r\n\tGrassland\020\000\022\n\n\006Desert\020\001\022\t"
+  "\n\005Ocean\020\002\022\n\n\006Plains\020\003*1\n\nVisibility\022\013\n\007V"
+  "isible\020\000\022\n\n\006Fogged\020\001\022\n\n\006Hidden\020\002b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_riposte_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_riposte_2eproto = {
-  false, false, 3388, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
+  false, false, 3480, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
   &descriptor_table_riposte_2eproto_once, nullptr, 0, 39,
   schemas, file_default_instances, TableStruct_riposte_2eproto::offsets,
   file_level_metadata_riposte_2eproto, file_level_enum_descriptors_riposte_2eproto, file_level_service_descriptors_riposte_2eproto,
@@ -2750,7 +2760,7 @@ const char* KickPlayer::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // int32 ID = 1;
+      // int32 id = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
@@ -2795,7 +2805,7 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 ID = 1;
+  // int32 id = 1;
   if (this->_internal_id() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_id(), target);
@@ -2834,7 +2844,7 @@ size_t KickPlayer::ByteSizeLong() const {
         this->_internal_reason());
   }
 
-  // int32 ID = 1;
+  // int32 id = 1;
   if (this->_internal_id() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
@@ -5628,16 +5638,16 @@ BuildingBuildTask::BuildingBuildTask(::PROTOBUF_NAMESPACE_ID::Arena* arena,
 BuildingBuildTask::BuildingBuildTask(const BuildingBuildTask& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
-  buildingid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
-  if (!from._internal_buildingid().empty()) {
-    buildingid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_buildingid(), 
+  buildingname_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_buildingname().empty()) {
+    buildingname_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_buildingname(), 
       GetArenaForAllocation());
   }
   // @@protoc_insertion_point(copy_constructor:BuildingBuildTask)
 }
 
 inline void BuildingBuildTask::SharedCtor() {
-buildingid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+buildingname_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 BuildingBuildTask::~BuildingBuildTask() {
@@ -5649,7 +5659,7 @@ BuildingBuildTask::~BuildingBuildTask() {
 
 inline void BuildingBuildTask::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
-  buildingid_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  buildingname_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 }
 
 void BuildingBuildTask::ArenaDtor(void* object) {
@@ -5668,7 +5678,7 @@ void BuildingBuildTask::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  buildingid_.ClearToEmpty();
+  buildingname_.ClearToEmpty();
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -5678,12 +5688,12 @@ const char* BuildingBuildTask::_InternalParse(const char* ptr, ::PROTOBUF_NAMESP
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // string buildingID = 1;
+      // string buildingName = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 10)) {
-          auto str = _internal_mutable_buildingid();
+          auto str = _internal_mutable_buildingname();
           ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
-          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "BuildingBuildTask.buildingID"));
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "BuildingBuildTask.buildingName"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -5716,14 +5726,14 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // string buildingID = 1;
-  if (!this->_internal_buildingid().empty()) {
+  // string buildingName = 1;
+  if (!this->_internal_buildingname().empty()) {
     ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
-      this->_internal_buildingid().data(), static_cast<int>(this->_internal_buildingid().length()),
+      this->_internal_buildingname().data(), static_cast<int>(this->_internal_buildingname().length()),
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
-      "BuildingBuildTask.buildingID");
+      "BuildingBuildTask.buildingName");
     target = stream->WriteStringMaybeAliased(
-        1, this->_internal_buildingid(), target);
+        1, this->_internal_buildingname(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -5742,11 +5752,11 @@ size_t BuildingBuildTask::ByteSizeLong() const {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
-  // string buildingID = 1;
-  if (!this->_internal_buildingid().empty()) {
+  // string buildingName = 1;
+  if (!this->_internal_buildingname().empty()) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
-        this->_internal_buildingid());
+        this->_internal_buildingname());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -5777,8 +5787,8 @@ void BuildingBuildTask::MergeFrom(const BuildingBuildTask& from) {
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  if (!from._internal_buildingid().empty()) {
-    _internal_set_buildingid(from._internal_buildingid());
+  if (!from._internal_buildingname().empty()) {
+    _internal_set_buildingname(from._internal_buildingname());
   }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -5799,8 +5809,8 @@ void BuildingBuildTask::InternalSwap(BuildingBuildTask* other) {
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
-      &buildingid_, GetArenaForAllocation(),
-      &other->buildingid_, other->GetArenaForAllocation()
+      &buildingname_, GetArenaForAllocation(),
+      &other->buildingname_, other->GetArenaForAllocation()
   );
 }
 
@@ -6380,6 +6390,7 @@ class UpdateCity::_Internal {
  public:
   static const ::Pos& pos(const UpdateCity* msg);
   static const ::BuildTask& buildtask(const UpdateCity* msg);
+  static const ::Yield& yield(const UpdateCity* msg);
 };
 
 const ::Pos&
@@ -6389,6 +6400,10 @@ UpdateCity::_Internal::pos(const UpdateCity* msg) {
 const ::BuildTask&
 UpdateCity::_Internal::buildtask(const UpdateCity* msg) {
   return *msg->buildtask_;
+}
+const ::Yield&
+UpdateCity::_Internal::yield(const UpdateCity* msg) {
+  return *msg->yield_;
 }
 UpdateCity::UpdateCity(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
@@ -6419,9 +6434,14 @@ UpdateCity::UpdateCity(const UpdateCity& from)
   } else {
     buildtask_ = nullptr;
   }
+  if (from._internal_has_yield()) {
+    yield_ = new ::Yield(*from.yield_);
+  } else {
+    yield_ = nullptr;
+  }
   ::memcpy(&ownerid_, &from.ownerid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&id_) -
-    reinterpret_cast<char*>(&ownerid_)) + sizeof(id_));
+    static_cast<size_t>(reinterpret_cast<char*>(&consumedfood_) -
+    reinterpret_cast<char*>(&ownerid_)) + sizeof(consumedfood_));
   // @@protoc_insertion_point(copy_constructor:UpdateCity)
 }
 
@@ -6429,8 +6449,8 @@ inline void UpdateCity::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&pos_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&id_) -
-    reinterpret_cast<char*>(&pos_)) + sizeof(id_));
+    0, static_cast<size_t>(reinterpret_cast<char*>(&consumedfood_) -
+    reinterpret_cast<char*>(&pos_)) + sizeof(consumedfood_));
 }
 
 UpdateCity::~UpdateCity() {
@@ -6445,6 +6465,7 @@ inline void UpdateCity::SharedDtor() {
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete pos_;
   if (this != internal_default_instance()) delete buildtask_;
+  if (this != internal_default_instance()) delete yield_;
 }
 
 void UpdateCity::ArenaDtor(void* object) {
@@ -6473,9 +6494,13 @@ void UpdateCity::Clear() {
     delete buildtask_;
   }
   buildtask_ = nullptr;
+  if (GetArenaForAllocation() == nullptr && yield_ != nullptr) {
+    delete yield_;
+  }
+  yield_ = nullptr;
   ::memset(&ownerid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&id_) -
-      reinterpret_cast<char*>(&ownerid_)) + sizeof(id_));
+      reinterpret_cast<char*>(&consumedfood_) -
+      reinterpret_cast<char*>(&ownerid_)) + sizeof(consumedfood_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -6515,10 +6540,10 @@ const char* UpdateCity::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // int32 hammersPerTurn = 5;
+      // .Yield yield = 5;
       case 5:
-        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 40)) {
-          hammersperturn_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 42)) {
+          ptr = ctx->ParseMessage(_internal_mutable_yield(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -6536,7 +6561,7 @@ const char* UpdateCity::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // int32 ID = 8;
+      // int32 id = 8;
       case 8:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
@@ -6555,6 +6580,34 @@ const char* UpdateCity::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
             CHK_(ptr);
             if (!ctx->DataAvailable(ptr)) break;
           } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<74>(ptr));
+        } else goto handle_unusual;
+        continue;
+      // int32 population = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80)) {
+          population_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 storedFood = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 88)) {
+          storedfood_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 neededFoodForGrowth = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 96)) {
+          neededfoodforgrowth_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 consumedFood = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
+          consumedfood_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -6618,10 +6671,12 @@ failure:
         4, _Internal::buildtask(this), target, stream);
   }
 
-  // int32 hammersPerTurn = 5;
-  if (this->_internal_hammersperturn() != 0) {
+  // .Yield yield = 5;
+  if (this->_internal_has_yield()) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(5, this->_internal_hammersperturn(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        5, _Internal::yield(this), target, stream);
   }
 
   // int32 culture = 6;
@@ -6636,7 +6691,7 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(7, this->_internal_cultureneeded(), target);
   }
 
-  // int32 ID = 8;
+  // int32 id = 8;
   if (this->_internal_id() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(8, this->_internal_id(), target);
@@ -6650,6 +6705,30 @@ failure:
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
       "UpdateCity.buildingNames");
     target = stream->WriteString(9, s, target);
+  }
+
+  // int32 population = 10;
+  if (this->_internal_population() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(10, this->_internal_population(), target);
+  }
+
+  // int32 storedFood = 11;
+  if (this->_internal_storedfood() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(11, this->_internal_storedfood(), target);
+  }
+
+  // int32 neededFoodForGrowth = 12;
+  if (this->_internal_neededfoodforgrowth() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(12, this->_internal_neededfoodforgrowth(), target);
+  }
+
+  // int32 consumedFood = 13;
+  if (this->_internal_consumedfood() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(13, this->_internal_consumedfood(), target);
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -6697,18 +6776,18 @@ size_t UpdateCity::ByteSizeLong() const {
         *buildtask_);
   }
 
+  // .Yield yield = 5;
+  if (this->_internal_has_yield()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *yield_);
+  }
+
   // int32 ownerID = 3;
   if (this->_internal_ownerid() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_ownerid());
-  }
-
-  // int32 hammersPerTurn = 5;
-  if (this->_internal_hammersperturn() != 0) {
-    total_size += 1 +
-      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_hammersperturn());
   }
 
   // int32 culture = 6;
@@ -6725,11 +6804,39 @@ size_t UpdateCity::ByteSizeLong() const {
         this->_internal_cultureneeded());
   }
 
-  // int32 ID = 8;
+  // int32 id = 8;
   if (this->_internal_id() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
         this->_internal_id());
+  }
+
+  // int32 population = 10;
+  if (this->_internal_population() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_population());
+  }
+
+  // int32 storedFood = 11;
+  if (this->_internal_storedfood() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_storedfood());
+  }
+
+  // int32 neededFoodForGrowth = 12;
+  if (this->_internal_neededfoodforgrowth() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_neededfoodforgrowth());
+  }
+
+  // int32 consumedFood = 13;
+  if (this->_internal_consumedfood() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_consumedfood());
   }
 
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
@@ -6770,11 +6877,11 @@ void UpdateCity::MergeFrom(const UpdateCity& from) {
   if (from._internal_has_buildtask()) {
     _internal_mutable_buildtask()->::BuildTask::MergeFrom(from._internal_buildtask());
   }
+  if (from._internal_has_yield()) {
+    _internal_mutable_yield()->::Yield::MergeFrom(from._internal_yield());
+  }
   if (from._internal_ownerid() != 0) {
     _internal_set_ownerid(from._internal_ownerid());
-  }
-  if (from._internal_hammersperturn() != 0) {
-    _internal_set_hammersperturn(from._internal_hammersperturn());
   }
   if (from._internal_culture() != 0) {
     _internal_set_culture(from._internal_culture());
@@ -6784,6 +6891,18 @@ void UpdateCity::MergeFrom(const UpdateCity& from) {
   }
   if (from._internal_id() != 0) {
     _internal_set_id(from._internal_id());
+  }
+  if (from._internal_population() != 0) {
+    _internal_set_population(from._internal_population());
+  }
+  if (from._internal_storedfood() != 0) {
+    _internal_set_storedfood(from._internal_storedfood());
+  }
+  if (from._internal_neededfoodforgrowth() != 0) {
+    _internal_set_neededfoodforgrowth(from._internal_neededfoodforgrowth());
+  }
+  if (from._internal_consumedfood() != 0) {
+    _internal_set_consumedfood(from._internal_consumedfood());
   }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -6809,8 +6928,8 @@ void UpdateCity::InternalSwap(UpdateCity* other) {
       &other->name_, other->GetArenaForAllocation()
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(UpdateCity, id_)
-      + sizeof(UpdateCity::id_)
+      PROTOBUF_FIELD_OFFSET(UpdateCity, consumedfood_)
+      + sizeof(UpdateCity::consumedfood_)
       - PROTOBUF_FIELD_OFFSET(UpdateCity, pos_)>(
           reinterpret_cast<char*>(&pos_),
           reinterpret_cast<char*>(&other->pos_));
@@ -9426,7 +9545,7 @@ const char* UpdatePlayer::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_I
     ::PROTOBUF_NAMESPACE_ID::uint32 tag;
     ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
     switch (tag >> 3) {
-      // int32 ID = 1;
+      // int32 id = 1;
       case 1:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
@@ -9555,7 +9674,7 @@ failure:
   ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
   (void) cached_has_bits;
 
-  // int32 ID = 1;
+  // int32 id = 1;
   if (this->_internal_id() != 0) {
     target = stream->EnsureSpace(target);
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_id(), target);
@@ -9687,7 +9806,7 @@ size_t UpdatePlayer::ByteSizeLong() const {
         *researchingtech_);
   }
 
-  // int32 ID = 1;
+  // int32 id = 1;
   if (this->_internal_id() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(

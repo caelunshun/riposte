@@ -1373,7 +1373,7 @@ class KickPlayer final :
 
   enum : int {
     kReasonFieldNumber = 2,
-    kIDFieldNumber = 1,
+    kIdFieldNumber = 1,
   };
   // string reason = 2;
   void clear_reason();
@@ -1389,7 +1389,7 @@ class KickPlayer final :
   std::string* _internal_mutable_reason();
   public:
 
-  // int32 ID = 1;
+  // int32 id = 1;
   void clear_id();
   ::PROTOBUF_NAMESPACE_ID::int32 id() const;
   void set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
@@ -3340,20 +3340,20 @@ class BuildingBuildTask final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kBuildingIDFieldNumber = 1,
+    kBuildingNameFieldNumber = 1,
   };
-  // string buildingID = 1;
-  void clear_buildingid();
-  const std::string& buildingid() const;
+  // string buildingName = 1;
+  void clear_buildingname();
+  const std::string& buildingname() const;
   template <typename ArgT0 = const std::string&, typename... ArgT>
-  void set_buildingid(ArgT0&& arg0, ArgT... args);
-  std::string* mutable_buildingid();
-  PROTOBUF_MUST_USE_RESULT std::string* release_buildingid();
-  void set_allocated_buildingid(std::string* buildingid);
+  void set_buildingname(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_buildingname();
+  PROTOBUF_MUST_USE_RESULT std::string* release_buildingname();
+  void set_allocated_buildingname(std::string* buildingname);
   private:
-  const std::string& _internal_buildingid() const;
-  inline PROTOBUF_ALWAYS_INLINE void _internal_set_buildingid(const std::string& value);
-  std::string* _internal_mutable_buildingid();
+  const std::string& _internal_buildingname() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_buildingname(const std::string& value);
+  std::string* _internal_mutable_buildingname();
   public:
 
   // @@protoc_insertion_point(class_scope:BuildingBuildTask)
@@ -3363,7 +3363,7 @@ class BuildingBuildTask final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr buildingid_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr buildingname_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -3845,11 +3845,15 @@ class UpdateCity final :
     kNameFieldNumber = 2,
     kPosFieldNumber = 1,
     kBuildTaskFieldNumber = 4,
+    kYieldFieldNumber = 5,
     kOwnerIDFieldNumber = 3,
-    kHammersPerTurnFieldNumber = 5,
     kCultureFieldNumber = 6,
     kCultureNeededFieldNumber = 7,
-    kIDFieldNumber = 8,
+    kIdFieldNumber = 8,
+    kPopulationFieldNumber = 10,
+    kStoredFoodFieldNumber = 11,
+    kNeededFoodForGrowthFieldNumber = 12,
+    kConsumedFoodFieldNumber = 13,
   };
   // repeated string buildingNames = 9;
   int buildingnames_size() const;
@@ -3925,6 +3929,24 @@ class UpdateCity final :
       ::BuildTask* buildtask);
   ::BuildTask* unsafe_arena_release_buildtask();
 
+  // .Yield yield = 5;
+  bool has_yield() const;
+  private:
+  bool _internal_has_yield() const;
+  public:
+  void clear_yield();
+  const ::Yield& yield() const;
+  PROTOBUF_MUST_USE_RESULT ::Yield* release_yield();
+  ::Yield* mutable_yield();
+  void set_allocated_yield(::Yield* yield);
+  private:
+  const ::Yield& _internal_yield() const;
+  ::Yield* _internal_mutable_yield();
+  public:
+  void unsafe_arena_set_allocated_yield(
+      ::Yield* yield);
+  ::Yield* unsafe_arena_release_yield();
+
   // int32 ownerID = 3;
   void clear_ownerid();
   ::PROTOBUF_NAMESPACE_ID::int32 ownerid() const;
@@ -3932,15 +3954,6 @@ class UpdateCity final :
   private:
   ::PROTOBUF_NAMESPACE_ID::int32 _internal_ownerid() const;
   void _internal_set_ownerid(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
-  // int32 hammersPerTurn = 5;
-  void clear_hammersperturn();
-  ::PROTOBUF_NAMESPACE_ID::int32 hammersperturn() const;
-  void set_hammersperturn(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_hammersperturn() const;
-  void _internal_set_hammersperturn(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // int32 culture = 6;
@@ -3961,13 +3974,49 @@ class UpdateCity final :
   void _internal_set_cultureneeded(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // int32 ID = 8;
+  // int32 id = 8;
   void clear_id();
   ::PROTOBUF_NAMESPACE_ID::int32 id() const;
   void set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
   ::PROTOBUF_NAMESPACE_ID::int32 _internal_id() const;
   void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 population = 10;
+  void clear_population();
+  ::PROTOBUF_NAMESPACE_ID::int32 population() const;
+  void set_population(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_population() const;
+  void _internal_set_population(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 storedFood = 11;
+  void clear_storedfood();
+  ::PROTOBUF_NAMESPACE_ID::int32 storedfood() const;
+  void set_storedfood(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_storedfood() const;
+  void _internal_set_storedfood(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 neededFoodForGrowth = 12;
+  void clear_neededfoodforgrowth();
+  ::PROTOBUF_NAMESPACE_ID::int32 neededfoodforgrowth() const;
+  void set_neededfoodforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_neededfoodforgrowth() const;
+  void _internal_set_neededfoodforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 consumedFood = 13;
+  void clear_consumedfood();
+  ::PROTOBUF_NAMESPACE_ID::int32 consumedfood() const;
+  void set_consumedfood(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_consumedfood() const;
+  void _internal_set_consumedfood(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // @@protoc_insertion_point(class_scope:UpdateCity)
@@ -3981,11 +4030,15 @@ class UpdateCity final :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::Pos* pos_;
   ::BuildTask* buildtask_;
+  ::Yield* yield_;
   ::PROTOBUF_NAMESPACE_ID::int32 ownerid_;
-  ::PROTOBUF_NAMESPACE_ID::int32 hammersperturn_;
   ::PROTOBUF_NAMESPACE_ID::int32 culture_;
   ::PROTOBUF_NAMESPACE_ID::int32 cultureneeded_;
   ::PROTOBUF_NAMESPACE_ID::int32 id_;
+  ::PROTOBUF_NAMESPACE_ID::int32 population_;
+  ::PROTOBUF_NAMESPACE_ID::int32 storedfood_;
+  ::PROTOBUF_NAMESPACE_ID::int32 neededfoodforgrowth_;
+  ::PROTOBUF_NAMESPACE_ID::int32 consumedfood_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -5806,7 +5859,7 @@ class UpdatePlayer final :
     kPossibleResearchesFieldNumber = 12,
     kUsernameFieldNumber = 2,
     kResearchingTechFieldNumber = 9,
-    kIDFieldNumber = 1,
+    kIdFieldNumber = 1,
     kBaseRevenueFieldNumber = 3,
     kBeakerRevenueFieldNumber = 4,
     kGoldRevenueFieldNumber = 5,
@@ -5895,7 +5948,7 @@ class UpdatePlayer final :
       ::ResearchingTech* researchingtech);
   ::ResearchingTech* unsafe_arena_release_researchingtech();
 
-  // int32 ID = 1;
+  // int32 id = 1;
   void clear_id();
   ::PROTOBUF_NAMESPACE_ID::int32 id() const;
   void set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
@@ -8033,7 +8086,7 @@ ServerInfo::currentplayers() const {
 
 // KickPlayer
 
-// int32 ID = 1;
+// int32 id = 1;
 inline void KickPlayer::clear_id() {
   id_ = 0;
 }
@@ -8041,7 +8094,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 KickPlayer::_internal_id() const {
   return id_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 KickPlayer::id() const {
-  // @@protoc_insertion_point(field_get:KickPlayer.ID)
+  // @@protoc_insertion_point(field_get:KickPlayer.id)
   return _internal_id();
 }
 inline void KickPlayer::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -8050,7 +8103,7 @@ inline void KickPlayer::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
 }
 inline void KickPlayer::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_id(value);
-  // @@protoc_insertion_point(field_set:KickPlayer.ID)
+  // @@protoc_insertion_point(field_set:KickPlayer.id)
 }
 
 // string reason = 2;
@@ -9114,50 +9167,50 @@ inline void UnitBuildTask::set_allocated_unitkindid(std::string* unitkindid) {
 
 // BuildingBuildTask
 
-// string buildingID = 1;
-inline void BuildingBuildTask::clear_buildingid() {
-  buildingid_.ClearToEmpty();
+// string buildingName = 1;
+inline void BuildingBuildTask::clear_buildingname() {
+  buildingname_.ClearToEmpty();
 }
-inline const std::string& BuildingBuildTask::buildingid() const {
-  // @@protoc_insertion_point(field_get:BuildingBuildTask.buildingID)
-  return _internal_buildingid();
+inline const std::string& BuildingBuildTask::buildingname() const {
+  // @@protoc_insertion_point(field_get:BuildingBuildTask.buildingName)
+  return _internal_buildingname();
 }
 template <typename ArgT0, typename... ArgT>
 inline PROTOBUF_ALWAYS_INLINE
-void BuildingBuildTask::set_buildingid(ArgT0&& arg0, ArgT... args) {
+void BuildingBuildTask::set_buildingname(ArgT0&& arg0, ArgT... args) {
  
- buildingid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set:BuildingBuildTask.buildingID)
+ buildingname_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:BuildingBuildTask.buildingName)
 }
-inline std::string* BuildingBuildTask::mutable_buildingid() {
-  std::string* _s = _internal_mutable_buildingid();
-  // @@protoc_insertion_point(field_mutable:BuildingBuildTask.buildingID)
+inline std::string* BuildingBuildTask::mutable_buildingname() {
+  std::string* _s = _internal_mutable_buildingname();
+  // @@protoc_insertion_point(field_mutable:BuildingBuildTask.buildingName)
   return _s;
 }
-inline const std::string& BuildingBuildTask::_internal_buildingid() const {
-  return buildingid_.Get();
+inline const std::string& BuildingBuildTask::_internal_buildingname() const {
+  return buildingname_.Get();
 }
-inline void BuildingBuildTask::_internal_set_buildingid(const std::string& value) {
+inline void BuildingBuildTask::_internal_set_buildingname(const std::string& value) {
   
-  buildingid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+  buildingname_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline std::string* BuildingBuildTask::_internal_mutable_buildingid() {
+inline std::string* BuildingBuildTask::_internal_mutable_buildingname() {
   
-  return buildingid_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+  return buildingname_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
 }
-inline std::string* BuildingBuildTask::release_buildingid() {
-  // @@protoc_insertion_point(field_release:BuildingBuildTask.buildingID)
-  return buildingid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+inline std::string* BuildingBuildTask::release_buildingname() {
+  // @@protoc_insertion_point(field_release:BuildingBuildTask.buildingName)
+  return buildingname_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
 }
-inline void BuildingBuildTask::set_allocated_buildingid(std::string* buildingid) {
-  if (buildingid != nullptr) {
+inline void BuildingBuildTask::set_allocated_buildingname(std::string* buildingname) {
+  if (buildingname != nullptr) {
     
   } else {
     
   }
-  buildingid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), buildingid,
+  buildingname_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), buildingname,
       GetArenaForAllocation());
-  // @@protoc_insertion_point(field_set_allocated:BuildingBuildTask.buildingID)
+  // @@protoc_insertion_point(field_set_allocated:BuildingBuildTask.buildingName)
 }
 
 // -------------------------------------------------------------------
@@ -9705,24 +9758,94 @@ inline void UpdateCity::set_allocated_buildtask(::BuildTask* buildtask) {
   // @@protoc_insertion_point(field_set_allocated:UpdateCity.buildTask)
 }
 
-// int32 hammersPerTurn = 5;
-inline void UpdateCity::clear_hammersperturn() {
-  hammersperturn_ = 0;
+// .Yield yield = 5;
+inline bool UpdateCity::_internal_has_yield() const {
+  return this != internal_default_instance() && yield_ != nullptr;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::_internal_hammersperturn() const {
-  return hammersperturn_;
+inline bool UpdateCity::has_yield() const {
+  return _internal_has_yield();
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::hammersperturn() const {
-  // @@protoc_insertion_point(field_get:UpdateCity.hammersPerTurn)
-  return _internal_hammersperturn();
+inline void UpdateCity::clear_yield() {
+  if (GetArenaForAllocation() == nullptr && yield_ != nullptr) {
+    delete yield_;
+  }
+  yield_ = nullptr;
 }
-inline void UpdateCity::_internal_set_hammersperturn(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline const ::Yield& UpdateCity::_internal_yield() const {
+  const ::Yield* p = yield_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Yield&>(
+      ::_Yield_default_instance_);
+}
+inline const ::Yield& UpdateCity::yield() const {
+  // @@protoc_insertion_point(field_get:UpdateCity.yield)
+  return _internal_yield();
+}
+inline void UpdateCity::unsafe_arena_set_allocated_yield(
+    ::Yield* yield) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(yield_);
+  }
+  yield_ = yield;
+  if (yield) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:UpdateCity.yield)
+}
+inline ::Yield* UpdateCity::release_yield() {
   
-  hammersperturn_ = value;
+  ::Yield* temp = yield_;
+  yield_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
 }
-inline void UpdateCity::set_hammersperturn(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_hammersperturn(value);
-  // @@protoc_insertion_point(field_set:UpdateCity.hammersPerTurn)
+inline ::Yield* UpdateCity::unsafe_arena_release_yield() {
+  // @@protoc_insertion_point(field_release:UpdateCity.yield)
+  
+  ::Yield* temp = yield_;
+  yield_ = nullptr;
+  return temp;
+}
+inline ::Yield* UpdateCity::_internal_mutable_yield() {
+  
+  if (yield_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Yield>(GetArenaForAllocation());
+    yield_ = p;
+  }
+  return yield_;
+}
+inline ::Yield* UpdateCity::mutable_yield() {
+  ::Yield* _msg = _internal_mutable_yield();
+  // @@protoc_insertion_point(field_mutable:UpdateCity.yield)
+  return _msg;
+}
+inline void UpdateCity::set_allocated_yield(::Yield* yield) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete yield_;
+  }
+  if (yield) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::Yield>::GetOwningArena(yield);
+    if (message_arena != submessage_arena) {
+      yield = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, yield, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  yield_ = yield;
+  // @@protoc_insertion_point(field_set_allocated:UpdateCity.yield)
 }
 
 // int32 culture = 6;
@@ -9765,7 +9888,7 @@ inline void UpdateCity::set_cultureneeded(::PROTOBUF_NAMESPACE_ID::int32 value) 
   // @@protoc_insertion_point(field_set:UpdateCity.cultureNeeded)
 }
 
-// int32 ID = 8;
+// int32 id = 8;
 inline void UpdateCity::clear_id() {
   id_ = 0;
 }
@@ -9773,7 +9896,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::_internal_id() const {
   return id_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::id() const {
-  // @@protoc_insertion_point(field_get:UpdateCity.ID)
+  // @@protoc_insertion_point(field_get:UpdateCity.id)
   return _internal_id();
 }
 inline void UpdateCity::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -9782,7 +9905,7 @@ inline void UpdateCity::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
 }
 inline void UpdateCity::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_id(value);
-  // @@protoc_insertion_point(field_set:UpdateCity.ID)
+  // @@protoc_insertion_point(field_set:UpdateCity.id)
 }
 
 // repeated string buildingNames = 9;
@@ -9858,6 +9981,86 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
 UpdateCity::mutable_buildingnames() {
   // @@protoc_insertion_point(field_mutable_list:UpdateCity.buildingNames)
   return &buildingnames_;
+}
+
+// int32 population = 10;
+inline void UpdateCity::clear_population() {
+  population_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::_internal_population() const {
+  return population_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::population() const {
+  // @@protoc_insertion_point(field_get:UpdateCity.population)
+  return _internal_population();
+}
+inline void UpdateCity::_internal_set_population(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  population_ = value;
+}
+inline void UpdateCity::set_population(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_population(value);
+  // @@protoc_insertion_point(field_set:UpdateCity.population)
+}
+
+// int32 storedFood = 11;
+inline void UpdateCity::clear_storedfood() {
+  storedfood_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::_internal_storedfood() const {
+  return storedfood_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::storedfood() const {
+  // @@protoc_insertion_point(field_get:UpdateCity.storedFood)
+  return _internal_storedfood();
+}
+inline void UpdateCity::_internal_set_storedfood(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  storedfood_ = value;
+}
+inline void UpdateCity::set_storedfood(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_storedfood(value);
+  // @@protoc_insertion_point(field_set:UpdateCity.storedFood)
+}
+
+// int32 neededFoodForGrowth = 12;
+inline void UpdateCity::clear_neededfoodforgrowth() {
+  neededfoodforgrowth_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::_internal_neededfoodforgrowth() const {
+  return neededfoodforgrowth_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::neededfoodforgrowth() const {
+  // @@protoc_insertion_point(field_get:UpdateCity.neededFoodForGrowth)
+  return _internal_neededfoodforgrowth();
+}
+inline void UpdateCity::_internal_set_neededfoodforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  neededfoodforgrowth_ = value;
+}
+inline void UpdateCity::set_neededfoodforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_neededfoodforgrowth(value);
+  // @@protoc_insertion_point(field_set:UpdateCity.neededFoodForGrowth)
+}
+
+// int32 consumedFood = 13;
+inline void UpdateCity::clear_consumedfood() {
+  consumedfood_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::_internal_consumedfood() const {
+  return consumedfood_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::consumedfood() const {
+  // @@protoc_insertion_point(field_get:UpdateCity.consumedFood)
+  return _internal_consumedfood();
+}
+inline void UpdateCity::_internal_set_consumedfood(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  consumedfood_ = value;
+}
+inline void UpdateCity::set_consumedfood(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_consumedfood(value);
+  // @@protoc_insertion_point(field_set:UpdateCity.consumedFood)
 }
 
 // -------------------------------------------------------------------
@@ -11056,7 +11259,7 @@ inline void ResearchingTech::set_progress(::PROTOBUF_NAMESPACE_ID::int32 value) 
 
 // UpdatePlayer
 
-// int32 ID = 1;
+// int32 id = 1;
 inline void UpdatePlayer::clear_id() {
   id_ = 0;
 }
@@ -11064,7 +11267,7 @@ inline ::PROTOBUF_NAMESPACE_ID::int32 UpdatePlayer::_internal_id() const {
   return id_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::int32 UpdatePlayer::id() const {
-  // @@protoc_insertion_point(field_get:UpdatePlayer.ID)
+  // @@protoc_insertion_point(field_get:UpdatePlayer.id)
   return _internal_id();
 }
 inline void UpdatePlayer::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
@@ -11073,7 +11276,7 @@ inline void UpdatePlayer::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value)
 }
 inline void UpdatePlayer::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_id(value);
-  // @@protoc_insertion_point(field_set:UpdatePlayer.ID)
+  // @@protoc_insertion_point(field_set:UpdatePlayer.id)
 }
 
 // string username = 2;

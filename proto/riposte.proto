@@ -92,7 +92,7 @@ message ServerInfo {
 
 // Can only be sent by the admin.
 message KickPlayer {
-  int32 ID = 1;
+  int32 id = 1;
   string reason = 2;
 }
 
@@ -203,7 +203,7 @@ message UnitBuildTask {
 }
 
 message BuildingBuildTask {
-  string buildingID = 1;
+  string buildingName = 1;
 }
 
 message BuildTaskKind {
@@ -225,12 +225,16 @@ message UpdateCity {
   string name = 2;
   int32 ownerID = 3;
   BuildTask buildTask = 4;
-  int32 hammersPerTurn = 5;
+  Yield yield = 5;
   int32 culture = 6;
   // Culture needed to advance to the next level
   int32 cultureNeeded = 7;
-  int32 ID = 8;
+  int32 id = 8;
   repeated string buildingNames = 9;
+  int32 population = 10;
+  int32 storedFood = 11;
+  int32 neededFoodForGrowth = 12;
+  int32 consumedFood = 13;
 }
 
 message Path {
@@ -294,7 +298,7 @@ message ResearchingTech {
 
 // Updates the client's own player data.
 message UpdatePlayer {
-  int32 ID = 1;
+  int32 id = 1;
   string username = 2;
 
   int32 baseRevenue = 3;
