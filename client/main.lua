@@ -106,6 +106,7 @@ function handleEvent(event)
 
         if game ~= nil then
             game.hud:handleEvent(event)
+            game.view:handleEvent(event)
         end
     end)
 end

@@ -106,13 +106,14 @@ function TileRenderer:render(cv, game)
             then
                 local tile = game:getTile(tilePos)
                 renderTiles[count] = tile
-                renderPos[count] = pos
+                renderPos[count] = pos * view.zoomFactor
                 renderTilePos[count] = tilePos
                 count = count + 1
             end
         end
     end
 
+    game.view:applyZoom(cv)
     for _, renderer in ipairs(self.renderers) do
         for i=1,count-1 do
             local pos = renderPos[i]
@@ -121,6 +122,7 @@ function TileRenderer:render(cv, game)
             cv:translate(-pos)
         end
     end
+    cv:resetTransform()
 end
 
 return TileRenderer

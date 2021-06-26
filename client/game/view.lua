@@ -5,6 +5,7 @@
 --- @field size table the size of the window in logical pixels
 local View = {}
 
+local dume = require("dume")
 local Vector = require("brinevector")
 
 local MoveDir = {
@@ -13,6 +14,10 @@ local MoveDir = {
     Down = 0x04,
     Up = 0x10,
 }
+
+local minZoomFactor = 0.2
+local maxZoomFactor = 8
+local zoomSensitivity = 0.2
 
 function View:new()
     local o = {
@@ -100,6 +105,24 @@ function View:tick(dt, cursorPos)
 
     self.moveTime = self.moveTime + Vector(dt, dt)
     self.center = self.center + (self.centerVelocity * 1 / self.zoomFactor) * dt
+end
+
+function View:handleEvent(event)
+    if event.type == dume.EventType.Scroll then
+        self.zoomFactor = self.zoomFactor + event.offset.y * zoomSensitivity
+        self.zoomFactor = math.clamp(self.zoomFactor, minZoomFactor, maxZoomFactor)
+    end
+end
+
+-- Applies the zoom transformation to the canvas.
+--
+-- Make sure to call cv:resetTransform() to negate the
+-- transformation after rendering.
+function View:applyZoom(cv)
+    local newDim = self.size / self.zoomFactor
+    local diff = self.size - newDim
+    cv:translate(-diff / 2 * self.zoomFactor)
+    cv:scale(self.zoomFactor)
 end
 
 return View

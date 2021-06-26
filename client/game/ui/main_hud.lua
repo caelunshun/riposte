@@ -39,6 +39,7 @@ end
 local spinningColor = dume.rgb(255, 255, 255, 200)
 
 function Hud:render(cv, time)
+    self.game.view:applyZoom(cv)
     for _, unit in ipairs(self.selectedUnits) do
         -- Paint spinning white dashes
         local radius = 50
@@ -61,6 +62,7 @@ function Hud:render(cv, time)
         cv:strokeWidth(4)
         cv:stroke()
     end
+    cv:resetTransform()
 end
 
 return Hud
