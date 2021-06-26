@@ -43,7 +43,13 @@ function View:getOrigin()
 end
 
 function View:getScreenOffsetForTilePos(tilePos)
-    return (tilePos * 100 - self:getOrigin()) * 0.99
+    -- NB: we could use vector operations here instead of
+    -- computing each component separately. However, for some
+    -- reason this method runs an order of magnitude faster.
+    return Vector(
+            (tilePos.x * 100 - self.center.x + self.size.x / 2) * 0.99,
+            (tilePos.y * 100 - self.center.y + self.size.y / 2) * 0.99
+    )
 end
 
 function View:getTilePosForScreenOffset(screenOffset)
