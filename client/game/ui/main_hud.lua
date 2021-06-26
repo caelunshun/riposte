@@ -54,6 +54,7 @@ function Hud:render(cv, time)
             local arcStart = angleOffset + i * arcLength
             local arcEnd = angleOffset + (i + 1) * arcLength - 0.1
 
+            cv:moveTo(Vector(center.x + radius * math.cos(arcStart), center.y + radius * math.sin(arcStart)))
             cv:arc(center, radius, arcStart, arcEnd)
             cv:moveTo(Vector(center.x + radius * math.cos(arcEnd + 0.3), center.y + radius * math.sin(arcEnd + 0.3)))
         end
