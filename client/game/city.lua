@@ -19,6 +19,7 @@ function City:updateData(data, game)
     end
 
     self.owner = game.players[self.ownerID]
+    if self.owner == nil then print("city '" .. self.name .. "' has invalid owner!") end
 
     self.buildings = {}
     for _, buildingName in ipairs(data.buildingNames) do
@@ -27,7 +28,7 @@ function City:updateData(data, game)
         table.insert(self.buildings, building)
     end
 
-    self.populationText = cv:parseTextMarkup("@size{12}{@color{rgb(0,0,0)}{%pop}}", style.defaultTextStyle, {pop=tostring(self.population)})
+    self.populationText = cv:parseTextMarkup("@size{14}{@color{rgb(0,0,0)}{%pop}}", style.defaultTextStyle, {pop=tostring(self.population)})
     self.populationParagraph = cv:createParagraph(self.populationText, {
         alignH = dume.Align.Center,
         alignV = dume.Align.Start,
