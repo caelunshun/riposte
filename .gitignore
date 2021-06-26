@@ -2,4 +2,5 @@ cmake-build-*
 .idea
 asset_src
 crodio/target
+bundler/target
 **/.DS_Store

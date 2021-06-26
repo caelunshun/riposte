@@ -7,7 +7,6 @@ local uiStyle = require("ui/style")
 local Game = require("game/game")
 local Client = require("game/client")
 local Renderer = require("game/renderer")
-local View = require("game/view")
 
 local dume = require("dume")
 local Vector = require("brinevector")
