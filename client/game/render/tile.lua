@@ -100,27 +100,25 @@ function TileRenderer:render(cv, game)
     local count = 1
 
     -- Render all tiles visible on the map.
-    for x=0,game.mapWidth - 1 do
-        for y=0,game.mapHeight - 1 do
+    local firstVisibleTilePos = view:getTilePosForScreenOffset(Vector(0, 0))
+    local lastVisibleTilePos = view:getTilePosForScreenOffset(view.size)
+
+    firstVisibleTilePos.x = math.clamp(firstVisibleTilePos.x, 0, game.mapWidth - 1)
+    firstVisibleTilePos.y = math.clamp(firstVisibleTilePos.y, 0, game.mapHeight - 1)
+    lastVisibleTilePos.x = math.clamp(lastVisibleTilePos.x, 0, game.mapWidth - 1)
+    lastVisibleTilePos.y = math.clamp(lastVisibleTilePos.y, 0, game.mapHeight - 1)
+
+    for x=firstVisibleTilePos.x,lastVisibleTilePos.x do
+        for y=firstVisibleTilePos.y,lastVisibleTilePos.y do
             -- Simple 2D frustum cull.
             local tilePos = Vector(x, y)
             local pos = view:getScreenOffsetForTilePos(tilePos)
 
-            local halfWindowSize = view.size / 2
-            local centered = pos - halfWindowSize
-            centered = centered * view.zoomFactor
-
-            if not (centered.x < -halfWindowSize.x - (100 * view.zoomFactor)
-                or centered.y < -halfWindowSize.y - (100 * view.zoomFactor)
-                or centered.x > halfWindowSize.x
-                or centered.y > halfWindowSize.y)
-            then
-                local tile = game:getTile(tilePos)
-                renderTiles[count] = tile
-                renderPos[count] = pos * view.zoomFactor
-                renderTilePos[count] = tilePos
-                count = count + 1
-            end
+            local tile = game:getTile(tilePos)
+            renderTiles[count] = tile
+            renderPos[count] = pos * view.zoomFactor
+            renderTilePos[count] = tilePos
+            count = count + 1
         end
     end
 
