@@ -13,6 +13,7 @@ local Vector = require("brinevector")
 
 local Hud = require("game/ui/main_hud")
 local View = require("game/view")
+local City = require("game/city")
 local Player = require("game/player")
 local Unit = require("game/unit")
 
@@ -23,6 +24,9 @@ function Game:new()
 
         units = {},
         unitsByPos = {},
+
+        cities = {},
+        citiesByPos = {},
     }
 
     setmetatable(o, self)
@@ -76,6 +80,18 @@ end
 
 function Game:getUnitsAtPos(pos)
     return self.unitsByPos[pos.x + pos.y * self.mapWidth] or {}
+end
+
+function Game:addCity(data)
+    local city = self.cities[data.id] or City:new()
+    self.cities[data.id] = city
+    city:updateData(data, self)
+
+    self.citiesByPos[city.pos.x + city.pos.y * self.mapWidth] = city
+end
+
+function Game:getCityAtPos(pos)
+    return self.citiesByPos[pos.x + pos.y * self.mapWidth]
 end
 
 return Game

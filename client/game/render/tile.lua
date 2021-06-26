@@ -67,6 +67,16 @@ function UnitRenderer:renderTile(cv, tile, tilePos, game)
     end
 end
 
+-- Renders cities.
+local CityRenderer = {}
+
+function CityRenderer:renderTile(cv, tile, tilePos, game)
+    local city = game:getCityAtPos(tilePos)
+    if city ~= nil then
+        city:render(cv)
+    end
+end
+
 -- Responsible for rendering tiles on the map.
 local TileRenderer = {
     renderers = {
@@ -74,6 +84,7 @@ local TileRenderer = {
         TerrainRenderer,
         GridOverlayRenderer,
         TreeRenderer,
+        CityRenderer,
         UnitRenderer,
     }
 }

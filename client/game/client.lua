@@ -34,6 +34,10 @@ function Client:handlePacket(packet)
         self:handleUpdateMap(packet.updateMap)
     elseif packet.updateUnit ~= nil then
         self:handleUpdateUnit(packet.updateUnit)
+    elseif packet.updateCity ~= nil then
+        self:handleUpdateCity(packet.updateCity)
+    else
+        error("unhandled packet")
     end
 end
 
@@ -55,6 +59,10 @@ end
 
 function Client:handleUpdateUnit(packet)
     self.game:addUnit(packet)
+end
+
+function Client:handleUpdateCity(packet)
+    self.game:addCity(packet)
 end
 
 return Client

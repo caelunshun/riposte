@@ -9,6 +9,7 @@
 #include "unit.h"
 #include "culture.h"
 #include "worker.h"
+#include "city.h"
 #include "ship.h"
 #include <riposte.pb.h>
 #include <thread>
@@ -38,16 +39,19 @@ namespace rip {
         return packet;
     }
 
+    void writeYield(const Yield &yield, ::Yield &protoYield) {
+        protoYield.set_commerce(yield.commerce);
+        protoYield.set_food(yield.food);
+        protoYield.set_hammers(yield.hammers);
+    }
+
     void setTile(const Game &game, PlayerId player, glm::uvec2 pos, const Tile &tile, ::Tile &protoTile) {
         protoTile.set_terrain(static_cast<::Terrain>(static_cast<int>(tile.getTerrain())));
         protoTile.set_forested(tile.isForested());
         protoTile.set_hilled(tile.isHilled());
 
         const auto yield = tile.getYield(game, pos, player);
-        auto *protoYield = protoTile.mutable_yield();
-        protoYield->set_commerce(yield.commerce);
-        protoYield->set_food(yield.food);
-        protoYield->set_hammers(yield.hammers);
+        writeYield(yield, *protoTile.mutable_yield());
 
         const auto owner = game.getCultureMap().getTileOwner(pos);
         if (owner.has_value()) {
@@ -144,12 +148,61 @@ namespace rip {
         return packet;
     }
 
+    void writeBuildTask(const BuildTask &task, ::BuildTask &protoTask) {
+        protoTask.set_progress(task.getProgress());
+        protoTask.set_cost(task.getCost());
+
+        auto *kind = protoTask.mutable_kind();
+
+        const auto *building = dynamic_cast<const BuildingBuildTask*>(&task);
+        const auto *unit = dynamic_cast<const UnitBuildTask*>(&task);
+
+        if (building) {
+            kind->mutable_building()->set_buildingname(building->getBuilding()->name);
+        } else if (unit) {
+            kind->mutable_unit()->set_unitkindid(unit->getUnitKind()->id);
+        }
+    }
+
+    UpdateCity getUpdateCityPacket(Game &game, City &city) {
+        UpdateCity packet;
+
+        packet.mutable_pos()->set_x(city.getPos().x);
+        packet.mutable_pos()->set_y(city.getPos().y);
+
+        packet.set_name(city.getName());
+        packet.set_ownerid(city.getOwner().first);
+
+        if (city.hasBuildTask()) {
+            writeBuildTask(*city.getBuildTask(), *packet.mutable_buildtask());
+        }
+
+        writeYield(city.computeYield(game), *packet.mutable_yield());
+        packet.set_culture(city.getCulture().getCultureForPlayer(city.getOwner()));
+        // packet.set_cultureneeded(city.getCultureNeeded()); TODO
+        packet.set_id(city.getID().first);
+
+        for (const auto &building : city.getBuildings()) {
+            packet.add_buildingnames(building->name);
+        }
+
+        packet.set_population(city.getPopulation());
+        packet.set_storedfood(city.getStoredFood());
+        packet.set_neededfoodforgrowth(city.getFoodNeededForGrowth());
+        packet.set_consumedfood(city.getConsumedFood());
+
+        return packet;
+    }
+
     void Connection::sendGameData(Game &game) {
         SEND(getUpdateGlobalDataPacket(game), updateglobaldata);
         SEND(getUpdateMapPacket(game, playerID), updatemap);
 
         for (auto &unit : game.getUnits()) {
             SEND(getUpdateUnitPacket(game, unit), updateunit);
+        }
+        for (auto &city : game.getCities()) {
+            SEND(getUpdateCityPacket(game, city), updatecity);
         }
     }
 

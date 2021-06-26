@@ -169,8 +169,10 @@ namespace rip {
                 }
 
                 if (game.getCityAtLocation(pos) == nullptr) {
-                    Unit settler(game.getRegistry().getUnits().at(0), pos, player.getID());
-                    game.addUnit(std::move(settler));
+                    // Unit settler(game.getRegistry().getUnits().at(0), pos, player.getID());
+                    // game.addUnit(std::move(settler));
+
+                    player.createCity(pos, game);
 
                     glm::uvec2 warriorPos;
                     auto neighbors = getNeighbors(pos);
