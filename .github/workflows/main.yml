@@ -52,33 +52,3 @@ jobs:
            cd protobuf
            sudo make install
            sudo ldconfig    
-           
-      - name: Prepare build
-        run: |
-            sudo apt install libgl-dev libglu1-mesa-dev
-            mkdir cmake-build-release
-            cd cmake-build-release
-            conan install ..
-            cmake .. -DCMAKE_BUILD_TYPE=Release
-            cd ..
-      
-      - name: Build
-        run: cd cmake-build-release && cmake --build . --target riposte
-        
-      - name: Update Rust
-        run: rustup update
-        
-      - name: Build riposte-bundler
-        run: |
-            cd bundler
-            cargo build --release
-            cd ..
-            
-      - name: Bundle
-        run: bundler/target/release/riposte-bundler
-        
-      - name: Upload bundle artifact
-        uses: actions/upload-artifact@v2
-        with:
-          name: riposte-linux-x86_64.tar.zst
-          path: cmake-build-release/riposte.tar.zst
