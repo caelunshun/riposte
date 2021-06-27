@@ -9,6 +9,7 @@
 --- @field mapHeight number
 local Game = {}
 
+local dume = require("dume")
 local Vector = require("brinevector")
 
 local Hud = require("game/ui/main_hud")
@@ -27,6 +28,8 @@ function Game:new()
 
         cities = {},
         citiesByPos = {},
+
+        cheatMode = false,
     }
 
     setmetatable(o, self)
@@ -96,6 +99,13 @@ end
 
 function Game:getCityAtPos(pos)
     return self.citiesByPos[pos.x + pos.y * self.mapWidth]
+end
+
+function Game:handleEvent(event)
+    if event.type == dume.EventType.Key and event.key == dume.Key.L
+        and event.action == dume.Action.Press then
+        self.cheatMode = not self.cheatMode
+    end
 end
 
 return Game

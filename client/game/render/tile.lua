@@ -167,7 +167,7 @@ function TileRenderer:render(cv, game)
             -- Simple 2D frustum cull.
             local tilePos = Vector(x, y)
 
-            if game:getVisibility(tilePos) ~= "Hidden" then
+            if game.cheatMode or game:getVisibility(tilePos) ~= "Hidden" then
                 local pos = view:getScreenOffsetForTilePos(tilePos)
 
                 local tile = game:getTile(tilePos)
