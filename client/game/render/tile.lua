@@ -136,8 +136,8 @@ local TileRenderer = {
         TerrainRenderer,
         GridOverlayRenderer,
         TreeRenderer,
-        YieldRenderer,
         CityRenderer,
+        YieldRenderer,
         UnitRenderer,
         FogRenderer,
     }
@@ -164,7 +164,6 @@ function TileRenderer:render(cv, game)
 
     for x=firstVisibleTilePos.x,lastVisibleTilePos.x do
         for y=firstVisibleTilePos.y,lastVisibleTilePos.y do
-            -- Simple 2D frustum cull.
             local tilePos = Vector(x, y)
 
             if game.cheatMode or game:getVisibility(tilePos) ~= "Hidden" then
@@ -175,7 +174,6 @@ function TileRenderer:render(cv, game)
                 renderPos[count] = pos * view.zoomFactor
                 renderTilePos[count] = tilePos
                 count = count + 1
-
             end
         end
     end
