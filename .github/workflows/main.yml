@@ -29,6 +29,30 @@ jobs:
            conan --version
            ls
            
+      - name: Cache protobuf library
+        id: cache-protobuf
+        uses: actions/cache@v1
+        with:
+          path: protobuf
+          key: ${{ runner.os }}-protobuf
+          
+      - name: Build protobuf library
+        if: steps.cache-protobuf.outputs.cache-hit != 'true'
+        run: |
+           git clone https://github.com/protocolbuffers/protobuf.git
+           cd protobuf
+           git submodule update --init --recursive
+           ./autogen.sh
+           ./autogen.sh
+           ./configure
+           make -j2
+           
+      - name: Install protobuf library
+        run: |
+           cd protobuf
+           sudo make install
+           sudo ldconfig    
+           
       - name: Prepare build
         run: |
             sudo apt install libgl-dev libglu1-mesa-dev
