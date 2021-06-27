@@ -41,6 +41,10 @@ function Game:getTile(tilePos)
     return self.tiles[tilePos.x + tilePos.y * self.mapWidth + 1]
 end
 
+function Game:getVisibility(pos)
+    return self.visibility[pos.x + pos.y * self.mapWidth + 1]
+end
+
 function Game:updatePlayer(playerdata)
     self.players[playerdata.id] = Player:new(playerdata)
 end

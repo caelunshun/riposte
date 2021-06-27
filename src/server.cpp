@@ -70,17 +70,20 @@ namespace rip {
         }
     }
 
-    UpdateMap getUpdateMapPacket(Game &game, PlayerId player) {
+    UpdateMap getUpdateMapPacket(Game &game, PlayerId playerID) {
         UpdateMap packet;
         packet.set_width(game.getMapWidth());
         packet.set_height(game.getMapHeight());
 
+        const auto &player = game.getPlayer(playerID);
         for (int y = 0; y < game.getMapHeight(); y++) {
             for (int x = 0; x < game.getMapWidth(); x++) {
                 glm::uvec2 pos(x, y);
                 const auto &tile = game.getTile(pos);
                 auto protoTile = packet.add_tiles();
-                setTile(game, player, pos, tile, *protoTile);
+                setTile(game, playerID, pos, tile, *protoTile);
+
+                packet.add_visibility(static_cast<::Visibility>(static_cast<int>(player.getVisibilityMap()[pos])));
             }
         }
 

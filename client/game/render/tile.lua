@@ -58,7 +58,9 @@ function TreeRenderer:renderTile(cv, tile, tilePos, game)
 end
 
 -- Renders units.
-local UnitRenderer = {}
+local UnitRenderer = {
+    allowFog = false
+}
 
 function UnitRenderer:renderTile(cv, tile, tilePos, game)
     local unit = game:getUnitsAtPos(tilePos)[1]
@@ -74,6 +76,19 @@ function CityRenderer:renderTile(cv, tile, tilePos, game)
     local city = game:getCityAtPos(tilePos)
     if city ~= nil then
         city:render(cv)
+    end
+end
+
+-- Adds a fog layer on top of tiles that are fogged.
+local FogRenderer = {}
+local fogColor = dume.rgb(50, 50, 50, 150)
+
+function FogRenderer:renderTile(cv, tile, tilePos, game, visibility)
+    if visibility == "Fogged" then
+        cv:beginPath()
+        cv:rect(Vector(0, 0), Vector(100, 100))
+        cv:solidColor(fogColor)
+        cv:fill()
     end
 end
 
@@ -112,13 +127,17 @@ function TileRenderer:render(cv, game)
         for y=firstVisibleTilePos.y,lastVisibleTilePos.y do
             -- Simple 2D frustum cull.
             local tilePos = Vector(x, y)
-            local pos = view:getScreenOffsetForTilePos(tilePos)
 
-            local tile = game:getTile(tilePos)
-            renderTiles[count] = tile
-            renderPos[count] = pos * view.zoomFactor
-            renderTilePos[count] = tilePos
-            count = count + 1
+            if game:getVisibility(tilePos) ~= "Hidden" then
+                local pos = view:getScreenOffsetForTilePos(tilePos)
+
+                local tile = game:getTile(tilePos)
+                renderTiles[count] = tile
+                renderPos[count] = pos * view.zoomFactor
+                renderTilePos[count] = tilePos
+                count = count + 1
+
+            end
         end
     end
 
@@ -127,7 +146,10 @@ function TileRenderer:render(cv, game)
         for i=1,count-1 do
             local pos = renderPos[i]
             cv:translate(pos)
-            renderer:renderTile(cv, renderTiles[i], renderTilePos[i], game)
+            local visibility = game:getVisibility(renderTilePos[i])
+            if renderer.allowFog == nil or (renderer.allowFog or visibility ~= "Fogged") then
+                renderer:renderTile(cv, renderTiles[i], renderTilePos[i], game, visibility)
+            end
             cv:translate(-pos)
         end
     end

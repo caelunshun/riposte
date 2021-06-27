@@ -1041,8 +1041,8 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "assical\020\001\022\014\n\010Medieval\020\002\022\017\n\013Renaissance\020\003"
   "\022\016\n\nIndustrial\020\004\022\n\n\006Modern\020\005\022\n\n\006Future\020\006"
   "*;\n\007Terrain\022\r\n\tGrassland\020\000\022\n\n\006Desert\020\001\022\t"
-  "\n\005Ocean\020\002\022\n\n\006Plains\020\003*1\n\nVisibility\022\013\n\007V"
-  "isible\020\000\022\n\n\006Fogged\020\001\022\n\n\006Hidden\020\002b\006proto3"
+  "\n\005Ocean\020\002\022\n\n\006Plains\020\003*1\n\nVisibility\022\n\n\006H"
+  "idden\020\000\022\n\n\006Fogged\020\001\022\013\n\007Visible\020\002b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_riposte_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_riposte_2eproto = {

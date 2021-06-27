@@ -185,9 +185,9 @@ message Tile {
 }
 
 enum Visibility {
-  Visible = 0;
+  Hidden = 0;
   Fogged = 1;
-  Hidden = 2;
+  Visible = 2;
 }
 
 // Sends all map tiles.

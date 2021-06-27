@@ -271,15 +271,15 @@ inline bool Terrain_Parse(
     Terrain_descriptor(), name, value);
 }
 enum Visibility : int {
-  Visible = 0,
+  Hidden = 0,
   Fogged = 1,
-  Hidden = 2,
+  Visible = 2,
   Visibility_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
   Visibility_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
 };
 bool Visibility_IsValid(int value);
-constexpr Visibility Visibility_MIN = Visible;
-constexpr Visibility Visibility_MAX = Hidden;
+constexpr Visibility Visibility_MIN = Hidden;
+constexpr Visibility Visibility_MAX = Visible;
 constexpr int Visibility_ARRAYSIZE = Visibility_MAX + 1;
 
 const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* Visibility_descriptor();
