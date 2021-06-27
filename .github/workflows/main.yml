@@ -1,0 +1,59 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+    
+  pull_request:
+    branches: [ master ]
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Conan
+        run: |
+           pwd
+           pip3 install wheel setuptools
+           pip3 install conan
+           export PATH=$PATH:/home/runner/.local/bin
+           echo $PATH
+           sudo ln -s ~/.local/bin/conan /usr/local/bin/conan
+           conan --version
+           ls
+           
+      - name: Prepare build
+        run: |
+            mkdir cmake-build-release
+            cd cmake-build-release
+            conan install ..
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            cd ..
+      
+      - name: Build
+        run: cd cmake-build-release && cmake --build . --target riposte
+        
+      - name: Update Rust
+        run: rustup update
+        
+      - name: Build riposte-bundler
+        run: |
+            cd bundler
+            cargo build --release
+            cd ..
+            
+      - name: Bundle
+        run: bundler/target/release/riposte-bundler
+        
+      - name: Upload bundle artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: riposte-linux-x86_64.tar.zst
+          path: cmake-build-release/riposte.tar.zst
