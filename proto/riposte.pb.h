@@ -3852,7 +3852,7 @@ class UpdateCity final :
     kIdFieldNumber = 8,
     kPopulationFieldNumber = 10,
     kStoredFoodFieldNumber = 11,
-    kNeededFoodForGrowthFieldNumber = 12,
+    kFoodNeededForGrowthFieldNumber = 12,
     kConsumedFoodFieldNumber = 13,
   };
   // repeated string buildingNames = 9;
@@ -4001,13 +4001,13 @@ class UpdateCity final :
   void _internal_set_storedfood(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
-  // int32 neededFoodForGrowth = 12;
-  void clear_neededfoodforgrowth();
-  ::PROTOBUF_NAMESPACE_ID::int32 neededfoodforgrowth() const;
-  void set_neededfoodforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value);
+  // int32 foodNeededForGrowth = 12;
+  void clear_foodneededforgrowth();
+  ::PROTOBUF_NAMESPACE_ID::int32 foodneededforgrowth() const;
+  void set_foodneededforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_neededfoodforgrowth() const;
-  void _internal_set_neededfoodforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_foodneededforgrowth() const;
+  void _internal_set_foodneededforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // int32 consumedFood = 13;
@@ -4037,7 +4037,7 @@ class UpdateCity final :
   ::PROTOBUF_NAMESPACE_ID::int32 id_;
   ::PROTOBUF_NAMESPACE_ID::int32 population_;
   ::PROTOBUF_NAMESPACE_ID::int32 storedfood_;
-  ::PROTOBUF_NAMESPACE_ID::int32 neededfoodforgrowth_;
+  ::PROTOBUF_NAMESPACE_ID::int32 foodneededforgrowth_;
   ::PROTOBUF_NAMESPACE_ID::int32 consumedfood_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
@@ -10023,24 +10023,24 @@ inline void UpdateCity::set_storedfood(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:UpdateCity.storedFood)
 }
 
-// int32 neededFoodForGrowth = 12;
-inline void UpdateCity::clear_neededfoodforgrowth() {
-  neededfoodforgrowth_ = 0;
+// int32 foodNeededForGrowth = 12;
+inline void UpdateCity::clear_foodneededforgrowth() {
+  foodneededforgrowth_ = 0;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::_internal_neededfoodforgrowth() const {
-  return neededfoodforgrowth_;
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::_internal_foodneededforgrowth() const {
+  return foodneededforgrowth_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::neededfoodforgrowth() const {
-  // @@protoc_insertion_point(field_get:UpdateCity.neededFoodForGrowth)
-  return _internal_neededfoodforgrowth();
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateCity::foodneededforgrowth() const {
+  // @@protoc_insertion_point(field_get:UpdateCity.foodNeededForGrowth)
+  return _internal_foodneededforgrowth();
 }
-inline void UpdateCity::_internal_set_neededfoodforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void UpdateCity::_internal_set_foodneededforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value) {
   
-  neededfoodforgrowth_ = value;
+  foodneededforgrowth_ = value;
 }
-inline void UpdateCity::set_neededfoodforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_neededfoodforgrowth(value);
-  // @@protoc_insertion_point(field_set:UpdateCity.neededFoodForGrowth)
+inline void UpdateCity::set_foodneededforgrowth(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_foodneededforgrowth(value);
+  // @@protoc_insertion_point(field_set:UpdateCity.foodNeededForGrowth)
 }
 
 // int32 consumedFood = 13;

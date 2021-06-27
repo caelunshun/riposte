@@ -295,7 +295,7 @@ constexpr UpdateCity::UpdateCity(
   , id_(0)
   , population_(0)
   , storedfood_(0)
-  , neededfoodforgrowth_(0)
+  , foodneededforgrowth_(0)
   , consumedfood_(0){}
 struct UpdateCityDefaultTypeInternal {
   constexpr UpdateCityDefaultTypeInternal()
@@ -728,7 +728,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::UpdateCity, buildingnames_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, population_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, storedfood_),
-  PROTOBUF_FIELD_OFFSET(::UpdateCity, neededfoodforgrowth_),
+  PROTOBUF_FIELD_OFFSET(::UpdateCity, foodneededforgrowth_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, consumedfood_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Path, _internal_metadata_),
@@ -1000,7 +1000,7 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "d\022\017\n\007culture\030\006 \001(\005\022\025\n\rcultureNeeded\030\007 \001("
   "\005\022\n\n\002id\030\010 \001(\005\022\025\n\rbuildingNames\030\t \003(\t\022\022\n\n"
   "population\030\n \001(\005\022\022\n\nstoredFood\030\013 \001(\005\022\033\n\023"
-  "neededFoodForGrowth\030\014 \001(\005\022\024\n\014consumedFoo"
+  "foodNeededForGrowth\030\014 \001(\005\022\024\n\014consumedFoo"
   "d\030\r \001(\005\"\031\n\004Path\022\021\n\tpositions\030\001 \003(\r\"\025\n\023Fo"
   "undCityCapability\".\n\025WorkerTaskImproveme"
   "nt\022\025\n\rimprovementID\030\001 \001(\t\"L\n\016WorkerTaskK"
@@ -6596,10 +6596,10 @@ const char* UpdateCity::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
-      // int32 neededFoodForGrowth = 12;
+      // int32 foodNeededForGrowth = 12;
       case 12:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 96)) {
-          neededfoodforgrowth_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          foodneededforgrowth_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -6719,10 +6719,10 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(11, this->_internal_storedfood(), target);
   }
 
-  // int32 neededFoodForGrowth = 12;
-  if (this->_internal_neededfoodforgrowth() != 0) {
+  // int32 foodNeededForGrowth = 12;
+  if (this->_internal_foodneededforgrowth() != 0) {
     target = stream->EnsureSpace(target);
-    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(12, this->_internal_neededfoodforgrowth(), target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(12, this->_internal_foodneededforgrowth(), target);
   }
 
   // int32 consumedFood = 13;
@@ -6825,11 +6825,11 @@ size_t UpdateCity::ByteSizeLong() const {
         this->_internal_storedfood());
   }
 
-  // int32 neededFoodForGrowth = 12;
-  if (this->_internal_neededfoodforgrowth() != 0) {
+  // int32 foodNeededForGrowth = 12;
+  if (this->_internal_foodneededforgrowth() != 0) {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
-        this->_internal_neededfoodforgrowth());
+        this->_internal_foodneededforgrowth());
   }
 
   // int32 consumedFood = 13;
@@ -6898,8 +6898,8 @@ void UpdateCity::MergeFrom(const UpdateCity& from) {
   if (from._internal_storedfood() != 0) {
     _internal_set_storedfood(from._internal_storedfood());
   }
-  if (from._internal_neededfoodforgrowth() != 0) {
-    _internal_set_neededfoodforgrowth(from._internal_neededfoodforgrowth());
+  if (from._internal_foodneededforgrowth() != 0) {
+    _internal_set_foodneededforgrowth(from._internal_foodneededforgrowth());
   }
   if (from._internal_consumedfood() != 0) {
     _internal_set_consumedfood(from._internal_consumedfood());

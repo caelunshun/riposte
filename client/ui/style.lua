@@ -12,6 +12,26 @@ local researchProgressBar = {
     negativePredictedProgressColor = dume.rgb(207, 69, 32)
 }
 
+local populationProgressBar = {
+    backgroundColor = dume.rgb(0, 0, 0),
+    borderColor = dume.rgb(30, 30, 30),
+    borderRadius = 0,
+    borderWidth = 1,
+    progressColor = dume.rgb(237, 155, 51),
+    positivePredictedProgressColor = dume.rgb(185, 112, 0),
+    negativePredictedProgressColor = dume.rgb(209, 65, 36)
+}
+
+local productionProgressBar = {
+    backgroundColor = dume.rgb(0, 0, 0),
+    borderColor = dume.rgb(30, 30, 30),
+    borderRadius = 0,
+    borderWidth = 1,
+    progressColor = dume.rgb(72, 159, 223, 160),
+    positivePredictedProgressColor = dume.rgb(141, 200, 232, 160),
+    negativePredictedProgressColor = dume.rgb(209, 65, 36)
+}
+
 return {
     defaultTextStyle = {
         family = "Merriweather",
@@ -38,6 +58,8 @@ return {
         borderColor = dume.rgb(190, 77, 0),
     },
     researchProgressBar = researchProgressBar,
+    populationProgressBar = populationProgressBar,
+    productionProgressBar = productionProgressBar,
     scrollable = {
         barColor = dume.rgb(60, 60, 60),
         hoveredBarColor = dume.rgb(70, 70, 70),

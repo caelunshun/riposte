@@ -233,7 +233,7 @@ message UpdateCity {
   repeated string buildingNames = 9;
   int32 population = 10;
   int32 storedFood = 11;
-  int32 neededFoodForGrowth = 12;
+  int32 foodNeededForGrowth = 12;
   int32 consumedFood = 13;
 }
 

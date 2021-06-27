@@ -74,6 +74,20 @@ local populationCircleColor = dume.rgb(182, 207, 174)
 local black = dume.rgb(0, 0, 0)
 local buildCircleColor = dume.rgb(244, 195, 204)
 
+local function renderProgressBar(cv, pos, size, progress, projectedProgress, progressColor, projectedProgressColor)
+    projectedProgress = math.clamp(projectedProgress, 0, 1)
+
+    cv:beginPath()
+    cv:rect(pos, Vector(size.x * progress, size.y))
+    cv:solidColor(progressColor)
+    cv:fill()
+
+    cv:beginPath()
+    cv:rect(pos + Vector(size.x * progress, 0), Vector(size.x * (projectedProgress - progress), size.y))
+    cv:solidColor(projectedProgressColor)
+    cv:fill()
+end
+
 function City:renderBubble(cv)
     -- Rounded rectangle (bubble background)
     local bubbleWidth = 100
@@ -82,6 +96,20 @@ function City:renderBubble(cv)
     cv:roundedRect(Vector(0, 10), Vector(bubbleWidth, bubbleHeight), 5)
     cv:linearGradient(Vector(0, 10), Vector(0, 30), bubbleColorA, bubbleColorB)
     cv:fill()
+
+    -- Production progress bar
+    if self.buildTask ~= nil then
+        local progress = self.buildTask.progress / self.buildTask.cost
+        local projectedProgress = (self.buildTask.progress + self.yield.hammers) / self.buildTask.cost
+        renderProgressBar(cv, Vector(0, 20), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
+            style.productionProgressBar.progressColor, style.productionProgressBar.positivePredictedProgressColor)
+    end
+
+    -- Population growth population bar
+    local progress = self.storedFood / self.foodNeededForGrowth
+    local projectedProgress = (self.storedFood + self.yield.food - self.consumedFood) / self.foodNeededForGrowth
+    renderProgressBar(cv, Vector(0, 10), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
+        style.populationProgressBar.progressColor, style.populationProgressBar.positivePredictedProgressColor)
 
     -- Left circle
     local radius = 10
