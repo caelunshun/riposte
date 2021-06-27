@@ -31,6 +31,7 @@ jobs:
            
       - name: Prepare build
         run: |
+            sudo apt install libgl-dev
             mkdir cmake-build-release
             cd cmake-build-release
             conan install ..
