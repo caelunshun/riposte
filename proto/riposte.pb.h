@@ -2789,6 +2789,7 @@ class Tile final :
     kForestedFieldNumber = 2,
     kHilledFieldNumber = 3,
     kHasOwnerFieldNumber = 7,
+    kIsWorkedFieldNumber = 8,
     kOwnerIDFieldNumber = 6,
   };
   // repeated .Improvement improvements = 4;
@@ -2863,6 +2864,15 @@ class Tile final :
   void _internal_set_hasowner(bool value);
   public:
 
+  // bool isWorked = 8;
+  void clear_isworked();
+  bool isworked() const;
+  void set_isworked(bool value);
+  private:
+  bool _internal_isworked() const;
+  void _internal_set_isworked(bool value);
+  public:
+
   // int32 ownerID = 6;
   void clear_ownerid();
   ::PROTOBUF_NAMESPACE_ID::int32 ownerid() const;
@@ -2885,6 +2895,7 @@ class Tile final :
   bool forested_;
   bool hilled_;
   bool hasowner_;
+  bool isworked_;
   ::PROTOBUF_NAMESPACE_ID::int32 ownerid_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
@@ -8984,6 +8995,26 @@ inline void Tile::_internal_set_hasowner(bool value) {
 inline void Tile::set_hasowner(bool value) {
   _internal_set_hasowner(value);
   // @@protoc_insertion_point(field_set:Tile.hasOwner)
+}
+
+// bool isWorked = 8;
+inline void Tile::clear_isworked() {
+  isworked_ = false;
+}
+inline bool Tile::_internal_isworked() const {
+  return isworked_;
+}
+inline bool Tile::isworked() const {
+  // @@protoc_insertion_point(field_get:Tile.isWorked)
+  return _internal_isworked();
+}
+inline void Tile::_internal_set_isworked(bool value) {
+  
+  isworked_ = value;
+}
+inline void Tile::set_isworked(bool value) {
+  _internal_set_isworked(value);
+  // @@protoc_insertion_point(field_set:Tile.isWorked)
 }
 
 // -------------------------------------------------------------------

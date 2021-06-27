@@ -182,6 +182,7 @@ message Tile {
   Yield yield = 5;
   int32 ownerID = 6;
   bool hasOwner = 7;
+  bool isWorked = 8;
 }
 
 enum Visibility {

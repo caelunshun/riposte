@@ -58,6 +58,7 @@ namespace rip {
             protoTile.set_ownerid(owner->second);
         }
         protoTile.set_hasowner(owner.has_value());
+        protoTile.set_isworked(game.isTileWorked(pos).has_value());
 
         for (const auto &improvement : tile.getImprovements()) {
             auto *protoImprovement = protoTile.add_improvements();

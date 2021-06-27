@@ -79,6 +79,43 @@ function CityRenderer:renderTile(cv, tile, tilePos, game)
     end
 end
 
+-- Renders icons to indicate tile yields.
+local YieldRenderer = {}
+
+function YieldRenderer:renderTile(cv, tile)
+    local scale = 15
+    if tile.isWorked then scale = 25 end
+
+    local icons = {}
+    local cursor = 0
+    local spacing = 6
+    local bigSpacing = 20
+
+    for i=1,tile.yield.food do
+        icons[#icons + 1] = { pos = cursor, sprite = "icon/bread" }
+        cursor = cursor + spacing
+    end
+    if tile.yield.hammers ~= 0 then cursor = cursor + bigSpacing end
+    for i=1,tile.yield.hammers do
+        icons[#icons + 1] = { pos = cursor, sprite = "icon/hammer" }
+        cursor = cursor + spacing
+    end
+    if tile.yield.commerce ~= 0 then cursor = cursor + bigSpacing end
+    for i=1,tile.yield.commerce do
+        icons[#icons + 1] = { pos = cursor, sprite = "icon/coin" }
+        cursor = cursor + spacing
+    end
+
+    local length = 0
+    if #icons > 0 then length = icons[#icons].pos + scale end
+
+    for i=1,#icons do
+        local icon = icons[i]
+        local posX = icon.pos + (50 - length / 2)
+        cv:drawSprite(icon.sprite, Vector(posX, 50 - scale / 2), scale)
+    end
+end
+
 -- Adds a fog layer on top of tiles that are fogged.
 local FogRenderer = {}
 local fogColor = dume.rgb(50, 50, 50, 150)
@@ -99,8 +136,10 @@ local TileRenderer = {
         TerrainRenderer,
         GridOverlayRenderer,
         TreeRenderer,
+        YieldRenderer,
         CityRenderer,
         UnitRenderer,
+        FogRenderer,
     }
 }
 
