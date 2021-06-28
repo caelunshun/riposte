@@ -54,7 +54,7 @@ function Hud:handleEvent(event)
         if event.action == dume.Action.Press
                 and event.mouse == dume.Mouse.Left then
             -- Attempt to select a unit.
-            local unit = self.game:getUnitsAtPos(clickedPos)[1]
+            local unit = self.game:getStackAtPos(clickedPos).units[1]
             if unit ~= nil then
                 self.selectedUnits = { unit }
                 self.game.eventBus:trigger("selectedUnitsUpdated", nil)

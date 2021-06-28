@@ -63,7 +63,9 @@ local UnitRenderer = {
 }
 
 function UnitRenderer:renderTile(cv, tile, tilePos, game)
-    local unit = game:getUnitsAtPos(tilePos)[1]
+    -- Render the unit at the top of the stack,
+    -- which corresponds to the strongest unit.
+    local unit = game:getStackAtPos(tilePos).units[1]
     if unit ~= nil then
         unit:render(cv, game)
     end

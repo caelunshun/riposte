@@ -18,6 +18,7 @@ local View = require("game/view")
 local City = require("game/city")
 local Player = require("game/player")
 local Unit = require("game/unit")
+local Stack = require("game/stack")
 
 function Game:new()
     local o = {
@@ -25,7 +26,7 @@ function Game:new()
         view = View:new(),
 
         units = {},
-        unitsByPos = {},
+        stacksByPos = {},
 
         cities = {},
         citiesByPos = {},
@@ -66,18 +67,18 @@ end
 function Game:addUnit(data)
     local existingUnit = self.units[data.id]
     if existingUnit ~= nil then
-        local byPos = self.unitsByPos[existingUnit.pos.x + existingUnit.pos.y * self.mapWidth] or {}
-        for i, unit in ipairs(byPos) do
-            if unit == existingUnit then table.remove(byPos, i); break end
+        local stack = self:getStackAtPos(data.pos)
+        if stack ~= nil then
+            stack:removeUnit(existingUnit)
         end
     end
 
     self.units[data.id] = Unit:new(data)
 
-    local byPosIndex = data.pos.x + data.pos.y * self.mapWidth
-    local byPos = self.unitsByPos[byPosIndex]
-    if byPos == nil then self.unitsByPos[byPosIndex] = {}; byPos = self.unitsByPos[byPosIndex] end
-    table.insert(byPos, self.units[data.id])
+    local stackIndex = data.pos.x + data.pos.y * self.mapWidth
+    local stack = self.stacksByPos[stackIndex]
+    if stack == nil then self.stacksByPos[stackIndex] = Stack:new(data.pos); stack = self.stacksByPos[stackIndex] end
+    stack:addUnit(self.units[data.id])
 
     if data.ownerID == 0 then
         self.view.center = Vector(data.pos.x * 100 + 50, data.pos.y * 100 + 50)
@@ -90,8 +91,8 @@ function Game:isUnitAlive(unit)
     return self.units[unit.id] == unit
 end
 
-function Game:getUnitsAtPos(pos)
-    return self.unitsByPos[pos.x + pos.y * self.mapWidth] or {}
+function Game:getStackAtPos(pos)
+    return self.stacksByPos[pos.x + pos.y * self.mapWidth] or Stack:empty()
 end
 
 function Game:addCity(data)
