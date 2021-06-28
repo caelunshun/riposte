@@ -190,7 +190,13 @@ namespace rip {
                     }
 
                     for (int i = 0; i < 10; i++) { // DEBUG - LUA CLIENT
-                        Unit warrior(game.getRegistry().getUnit("warrior"), warriorPos, player.getID());
+                        std::shared_ptr<UnitKind> kind;
+                        if (i % 2 == 0) {
+                            kind = game.getRegistry().getUnit("warrior");
+                        } else {
+                            kind = game.getRegistry().getUnit("axeman");
+                        }
+                        Unit warrior(kind, warriorPos, player.getID());
                         game.addUnit(std::move(warrior));
                     }
 

@@ -4,7 +4,7 @@ local dume = require("dume")
 local style = require("ui/style")
 local Vector = require("brinevector")
 
-function Unit:new(data)
+function Unit:new(data, game)
     data.kind = registry.unitKinds[data.kindID]
     if data.kind == nil then print("received invalid unit kind " .. data.kindID .. "!") end
 
@@ -18,6 +18,9 @@ function Unit:new(data)
     })
 
     data.pos = Vector(data.pos.x, data.pos.y)
+
+    data.owner = game.players[data.ownerID]
+    if data.owner == nil then error("invalid unit owner ID") end
 
     setmetatable(data, self)
     self.__index = self

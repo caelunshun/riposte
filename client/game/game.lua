@@ -73,7 +73,7 @@ function Game:addUnit(data)
         end
     end
 
-    self.units[data.id] = Unit:new(data)
+    self.units[data.id] = Unit:new(data, self)
 
     local stackIndex = data.pos.x + data.pos.y * self.mapWidth
     local stack = self.stacksByPos[stackIndex]

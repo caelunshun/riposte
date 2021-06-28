@@ -68,6 +68,7 @@ function Hud:handleEvent(event)
                 self:selectUnit(unit)
                 return true
             else
+                self.selectedStack = nil
                 return self:clearSelection()
             end
         elseif event.mouse == dume.Mouse.Right then
@@ -104,11 +105,14 @@ function Hud:handleEvent(event)
 end
 
 function Hud:selectUnit(unit)
+    if unit.owner ~= self.game.thePlayer then return end
+    if self.selectedStack ~= nil and self.selectedStack.pos ~= unit.pos then
+        self:clearSelection()
+    end
+
     if self.selectedStack == nil or #self.selectedUnits == 0 then
         self.selectedStack = self.game:getStackAtPos(unit.pos)
     end
-
-    assert(self.selectedStack.pos == unit.pos)
 
     self.selectedUnits[#self.selectedUnits + 1] = unit
     unit.isSelected = true
@@ -359,45 +363,47 @@ function UnitStackWindow:rebuild()
 
     if self.hud.selectedStack ~= nil then
         for _, unit in ipairs(self.hud.selectedStack.units) do
-            local image = Image:new("icon/unit_head/" .. unit.kind.id, 35)
+            if unit.owner == self.game.thePlayer then
+                local image = Image:new("icon/unit_head/" .. unit.kind.id, 35)
 
-            local container = Container:new(image)
-            table.insert(container.classes, "unitHeadContainer")
-            if unit.isSelected then table.insert(container.classes, "unitHeadContainerSelected") end
+                local container = Container:new(image)
+                table.insert(container.classes, "unitHeadContainer")
+                if unit.isSelected then table.insert(container.classes, "unitHeadContainerSelected") end
 
-            local clickable = Clickable:new(container, function(mods)
-                if not mods.shift then
-                    self.hud:clearSelection()
-                end
+                local clickable = Clickable:new(container, function(mods)
+                    if not mods.shift then
+                        self.hud:clearSelection()
+                    end
 
-                local affectedUnits = {}
-                if mods.alt then
-                    -- Affect all units in the stack.
-                    affectedUnits = self.hud.selectedStack.units
-                elseif mods.control then
-                    -- Affect all units in the stack with the same kind as the clicked one.
-                    for _, u in ipairs(self.hud.selectedStack.units) do
-                        if unit.kind == u.kind then
-                            affectedUnits[#affectedUnits + 1] = u
+                    local affectedUnits = {}
+                    if mods.alt then
+                        -- Affect all units in the stack.
+                        affectedUnits = self.hud.selectedStack.units
+                    elseif mods.control then
+                        -- Affect all units in the stack with the same kind as the clicked one.
+                        for _, u in ipairs(self.hud.selectedStack.units) do
+                            if unit.kind == u.kind then
+                                affectedUnits[#affectedUnits + 1] = u
+                            end
+                        end
+                    else
+                        -- Affect only the clicked unit.
+                        affectedUnits[1] = unit
+                    end
+
+                    if unit.isSelected then
+                        for _, u in ipairs(affectedUnits) do
+                            self.hud:deselectUnit(u)
+                        end
+                    else
+                        for _, u in ipairs(affectedUnits) do
+                            self.hud:selectUnit(u)
                         end
                     end
-                else
-                    -- Affect only the clicked unit.
-                    affectedUnits[1] = unit
-                end
+                end)
 
-                if unit.isSelected then
-                    for _, u in ipairs(affectedUnits) do
-                        self.hud:deselectUnit(u)
-                    end
-                else
-                    for _, u in ipairs(affectedUnits) do
-                        self.hud:selectUnit(u)
-                    end
-                end
-            end)
-
-            root:addFixedChild(clickable)
+                root:addFixedChild(clickable)
+            end
         end
     end
 
