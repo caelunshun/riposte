@@ -653,5 +653,70 @@
     "path": "sound/event/combat_victory.wav",
     "id": "sound/event/combat_victory",
     "loader": "sound"
+  },
+  {
+    "path": "icon/flag/america.png",
+    "id": "icon/flag/america",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/aztec.png",
+    "id": "icon/flag/aztec",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/britain.png",
+    "id": "icon/flag/britain",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/canada.png",
+    "id": "icon/flag/canada",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/dutch.png",
+    "id": "icon/flag/dutch",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/egypt.png",
+    "id": "icon/flag/egypt",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/greece.png",
+    "id": "icon/flag/greece",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/holy_rome.jpg",
+    "id": "icon/flag/holy_rome",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/india.png",
+    "id": "icon/flag/india",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/japan.png",
+    "id": "icon/flag/japan",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/korea.png",
+    "id": "icon/flag/korea",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/rome.jpg",
+    "id": "icon/flag/rome",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/america.png",
+    "id": "icon/flag/america",
+    "loader": "image"
   }
 ]
