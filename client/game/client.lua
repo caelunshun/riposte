@@ -48,6 +48,8 @@ function Client:handleUpdateGlobalData(packet)
 
     self.game:setTurn(packet.turn)
     self.game:setEra(packet.era)
+
+    self.game.eventBus:trigger("globalDataUpdated", nil)
 end
 
 function Client:handleUpdateMap(packet)

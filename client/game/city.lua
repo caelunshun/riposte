@@ -28,7 +28,7 @@ function City:updateData(data, game)
         table.insert(self.buildings, building)
     end
 
-    self.populationText = cv:parseTextMarkup("@size{14}{@color{rgb(0,0,0)}{%pop}}", style.defaultTextStyle, {pop=tostring(self.population)})
+    self.populationText = cv:parseTextMarkup("@size{14}{@color{rgb(0,0,0)}{%pop}}", style.default.text.defaultTextStyle, {pop=tostring(self.population)})
     self.populationParagraph = cv:createParagraph(self.populationText, {
         alignH = dume.Align.Center,
         alignV = dume.Align.Start,
@@ -37,7 +37,7 @@ function City:updateData(data, game)
         maxDimensions = Vector(20, math.huge)
     })
 
-    self.cityNameText = cv:parseTextMarkup("@size{10}{@color{rgb(255,255,255)}{%name}}", style.defaultTextStyle, {name=self.name})
+    self.cityNameText = cv:parseTextMarkup("@size{10}{@color{rgb(255,255,255)}{%name}}", style.default.text.defaultTextStyle, {name=self.name})
     self.cityNameParagraph = cv:createParagraph(self.cityNameText, {
         alignH = dume.Align.Center,
         alignV = dume.Align.Start,
@@ -102,14 +102,14 @@ function City:renderBubble(cv)
         local progress = self.buildTask.progress / self.buildTask.cost
         local projectedProgress = (self.buildTask.progress + self.yield.hammers) / self.buildTask.cost
         renderProgressBar(cv, Vector(0, 20), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
-            style.productionProgressBar.progressColor, style.productionProgressBar.positivePredictedProgressColor)
+            style.productionProgressBar.default.progressColor, style.default.productionProgressBar.positivePredictedProgressColor)
     end
 
     -- Population growth population bar
     local progress = self.storedFood / self.foodNeededForGrowth
     local projectedProgress = (self.storedFood + self.yield.food - self.consumedFood) / self.foodNeededForGrowth
     renderProgressBar(cv, Vector(0, 10), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
-        style.populationProgressBar.progressColor, style.populationProgressBar.positivePredictedProgressColor)
+        style.default.populationProgressBar.progressColor, style.default.populationProgressBar.positivePredictedProgressColor)
 
     -- Left circle
     local radius = 10
@@ -123,7 +123,7 @@ function City:renderBubble(cv)
 
     -- Right circle
     cv:beginPath()
-    cv:circle(Vector(radius - 5 + bubbleWidth, radius + 10), radius)
+    cv:circle(Vector(-radius + 5 + bubbleWidth, radius + 10), radius)
     cv:solidColor(buildCircleColor)
     cv:fill()
     cv:solidColor(black)

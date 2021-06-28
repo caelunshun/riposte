@@ -170,6 +170,12 @@ int main() {
         (*lua)["cursorPos"] = lua->create_table_with("x", cursorX, "y", cursorY);
     }
 
+    // force shutdown with a segfault. a bug in Dume causes
+    // the program to hang the entire system
+    // on shutdown and resize, so this is a temporary hack.
+    int *x = nullptr;
+    *x += 1;
+
     glfwDestroyWindow(window);
     glfwTerminate();
 }

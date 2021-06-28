@@ -8,7 +8,7 @@ function Unit:new(data)
     data.kind = registry.unitKinds[data.kindID]
     if data.kind == nil then print("received invalid unit kind " .. data.kindID .. "!") end
 
-    data.nameText = cv:parseTextMarkup("@bold{@size{14}{@color{rgb(0,0,0)}{%name}}}", style.defaultTextStyle, {name=data.kind.name})
+    data.nameText = cv:parseTextMarkup("@bold{@size{14}{@color{rgb(0,0,0)}{%name}}}", style.default.text.defaultTextStyle, {name=data.kind.name})
     data.nameParagraph = cv:createParagraph(data.nameText, {
         alignH = dume.Align.Center,
         alignV = dume.Align.Start,

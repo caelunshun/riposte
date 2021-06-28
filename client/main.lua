@@ -13,8 +13,7 @@ local Vector = require("brinevector")
 
 local json = require("lunajson")
 
-local ui = dume.UI:new(cv)
-ui.style = uiStyle
+ui = dume.UI:new(cv, uiStyle)
 buildMainMenu(ui)
 
 -- The registry stores data loaded from JSON assets,
@@ -62,10 +61,10 @@ local client = nil
 local cursorPos = Vector(0, 0)
 
 function enterGame(bridge)
-    game = Game:new()
-    client = Client:new(game, bridge)
     -- Clear the UI to get rid of the menu.
     for windowName, _ in pairs(ui.windows) do ui:deleteWindow(windowName) end
+    game = Game:new()
+    client = Client:new(game, bridge)
 end
 
 local time = 0
@@ -79,7 +78,6 @@ function render(dt)
         if client ~= nil then
             client:handleReceivedPackets()
         end
-        ui:render()
 
         if game ~= nil then
             game.view:tick(dt, cursorPos)
@@ -87,6 +85,7 @@ function render(dt)
             game.hud:render(cv, time)
         end
 
+        ui:render()
         cv:drawSprite("icon/cursor", cursorPos, 25)
     end)
 end

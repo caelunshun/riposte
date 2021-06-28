@@ -12,6 +12,7 @@ local Game = {}
 local dume = require("dume")
 local Vector = require("brinevector")
 
+local EventBus = require("game/event")
 local Hud = require("game/ui/main_hud")
 local View = require("game/view")
 local City = require("game/city")
@@ -30,6 +31,8 @@ function Game:new()
         citiesByPos = {},
 
         cheatMode = false,
+
+        eventBus = EventBus:new(),
     }
 
     setmetatable(o, self)
@@ -79,6 +82,8 @@ function Game:addUnit(data)
     if data.ownerID == 0 then
         self.view.center = Vector(data.pos.x * 100 + 50, data.pos.y * 100 + 50)
     end
+
+    self.eventBus:trigger("unitUpdated", self.units[data.id])
 end
 
 function Game:isUnitAlive(unit)
@@ -95,6 +100,8 @@ function Game:addCity(data)
     city:updateData(data, self)
 
     self.citiesByPos[city.pos.x + city.pos.y * self.mapWidth] = city
+
+    self.eventBus:trigger("cityUpdated", city)
 end
 
 function Game:getCityAtPos(pos)

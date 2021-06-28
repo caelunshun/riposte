@@ -3,14 +3,23 @@ local Hud = {}
 local dume = require("dume")
 local Vector = require("brinevector")
 
+local Flex = require("widget/flex")
+local Text = require("widget/text")
+local Button = require("widget/button")
+local Container = require("widget/container")
+local Tooltip = require("widget/tooltip")
+
 function Hud:new(game)
     local o = {
         selectedUnits = {},
         stagedPath = nil,
         game = game,
     }
+    game.eventBus:registerHandler("unitUpdated", function(unit) o:onUnitUpdated(unit) end)
+    game.eventBus:registerHandler("globalDataUpdated", function() o:rebuildBottomBar()  end)
     setmetatable(o, self)
     self.__index = self
+    o:rebuildBottomBar()
     return o
 end
 
@@ -64,6 +73,29 @@ function Hud:render(cv, time)
         cv:stroke()
     end
     cv:resetTransform()
+end
+
+function Hud:rebuildBottomBar()
+    local root = Flex:row()
+
+    local turnText = Text:new("@size{20}{Turn %turn\n%era Era}", {turn=tostring(self.game.turn),era=self.game.era})
+    root:addFixedChild(turnText)
+
+    local nextTurn = Button:new(Text:new("Next Turn"), function()
+        print("Next turn!")
+    end)
+    root:addFixedChild(nextTurn)
+
+    local container = Container:new(root)
+    container.fillParent = true
+
+    local height = 100
+    local size = Vector(self.game.view.size.x, height)
+    ui:createWindow("hudBottomBar", Vector(0, self.game.view.size.y - height), size, container)
+end
+
+function Hud:onUnitUpdated(unit)
+    if unit == self.selectedUnits[1] then self:rebuildBottomBar() end
 end
 
 return Hud
