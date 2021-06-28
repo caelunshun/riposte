@@ -183,7 +183,7 @@ function ScoreWindow:new(game, hud)
 end
 
 function ScoreWindow:rebuild()
-    local scores = Flex:column()
+    local scores = Flex:column(6)
 
     local players = {}
     for _, player in pairs(self.game.players) do
@@ -192,10 +192,20 @@ function ScoreWindow:rebuild()
     table.sort(players, function(a, b) return a.score > b.score end)
 
     for _, player in ipairs(players) do
-        local text = Text:new("%score: @color{%col}{%playerName}", {
+        local bracketA = ""
+        local bracketB = ""
+
+        if player == self.game.thePlayer then
+            bracketA = "["
+            bracketB = "]"
+        end
+
+        local text = Text:new("%score:    %bracketA@color{%col}{%playerName}%bracketB", {
             score = tostring(player.score),
             col = dumeColorToString(player.civ.color),
             playerName = player.username,
+            bracketA = bracketA,
+            bracketB = bracketB,
         })
         scores:addFixedChild(text)
     end
