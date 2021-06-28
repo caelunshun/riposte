@@ -715,8 +715,8 @@
     "loader": "image"
   },
   {
-    "path": "icon/flag/america.png",
-    "id": "icon/flag/america",
+    "path": "icon/flag/china.png",
+    "id": "icon/flag/china",
     "loader": "image"
   }
 ]
