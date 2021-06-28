@@ -100,9 +100,9 @@ function handleEvent(event)
             event.offset = Vector(event.offset.x, event.offset.y)
         end
 
-        ui:handleEvent(event)
+        local uiCapturedEvent = ui:handleEvent(event)
 
-        if game ~= nil then
+        if game ~= nil and not uiCapturedEvent then
             game.hud:handleEvent(event)
             game.view:handleEvent(event)
             game:handleEvent(event)
@@ -117,7 +117,7 @@ function resize(newSize)
 end
 
 function callSafe(f)
-    local status, err = pcall(f)
+    local status, err = xpcall(f, debug.traceback)
     if not status then print("LUA ERROR: " .. err) end
 end
 

@@ -169,9 +169,11 @@ namespace rip {
                 }
 
                 if (game.getCityAtLocation(pos) == nullptr) {
+                    // DEBUG - LUA CLIENT
                     // Unit settler(game.getRegistry().getUnits().at(0), pos, player.getID());
                     // game.addUnit(std::move(settler));
 
+                    // DEBUG - LUA CLIENT
                     player.createCity(pos, game);
 
                     glm::uvec2 warriorPos;
@@ -186,8 +188,11 @@ namespace rip {
                             return false;
                         }
                     }
-                    Unit warrior(game.getRegistry().getUnit("warrior"), warriorPos, player.getID());
-                    game.addUnit(std::move(warrior));
+
+                    for (int i = 0; i < 10; i++) { // DEBUG - LUA CLIENT
+                        Unit warrior(game.getRegistry().getUnit("warrior"), warriorPos, player.getID());
+                        game.addUnit(std::move(warrior));
+                    }
 
                     positions.push_back(pos);
 

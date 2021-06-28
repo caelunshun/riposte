@@ -10,6 +10,7 @@ local Container = require("widget/container")
 local Tooltip = require("widget/tooltip")
 local Image = require("widget/image")
 local Padding = require("widget/padding")
+local Clickable = require("widget/clickable")
 
 local style = require("ui/style")
 
@@ -17,10 +18,12 @@ local BottomControlWindow = {}
 local UnitDisplayWindow = {}
 local TurnIndicatorWindow = {}
 local ScoreWindow = {}
+local UnitStackWindow = {}
 
 function Hud:new(game)
     local o = {
         selectedUnits = {},
+        selectedStack = nil,
         stagedPath = nil,
         game = game,
     }
@@ -30,6 +33,7 @@ function Hud:new(game)
         UnitDisplayWindow:new(game, o),
         TurnIndicatorWindow:new(game, o),
         ScoreWindow:new(game, o),
+        UnitStackWindow:new(game, o),
     }
 
     game.eventBus:registerHandler("globalDataUpdated", function()
@@ -53,24 +57,59 @@ function Hud:handleEvent(event)
 
         if event.action == dume.Action.Press
                 and event.mouse == dume.Mouse.Left then
-            -- Attempt to select a unit.
-            local unit = self.game:getStackAtPos(clickedPos).units[1]
+            -- Attempt to select a unit at the top of the stack.
+            local stack = self.game:getStackAtPos(clickedPos)
+            local unit = stack.units[1]
             if unit ~= nil then
-                self.selectedUnits = { unit }
-                self.game.eventBus:trigger("selectedUnitsUpdated", nil)
+                self:selectUnit(unit)
                 return true
             else
-                local deselected = #self.selectedUnits ~= 0
-                self.selectedUnits = {}
-                if deselected then
-                    self.game.eventBus:trigger("selectedUnitsUpdated", nil)
-                end
-                return deselected
+                return self:clearSelection()
             end
         end
     end
 
     return false
+end
+
+function Hud:selectUnit(unit)
+    if self.selectedStack == nil then
+        self.selectedStack = self.game:getStackAtPos(unit.pos)
+    end
+
+    assert(self.selectedStack.pos == unit.pos)
+
+    self.selectedUnits[#self.selectedUnits + 1] = unit
+    unit.isSelected = true
+    self.game.eventBus:trigger("selectedUnitsUpdated", nil)
+end
+
+function Hud:deselectUnit(unit)
+    unit.isSelected = false
+    for i, u in ipairs(self.selectedUnits) do
+        if unit == u then
+            table.remove(self.selectedUnits, i)
+            self.game.eventBus:trigger("selectedUnitsUpdated", nil)
+            break
+        end
+    end
+
+    if #self.selectedUnits == 0 then
+        self.selectedStack = nil
+    end
+end
+
+function Hud:clearSelection()
+    local didDeselect = #self.selectedUnits > 0
+    for _, unit in ipairs(self.selectedUnits) do
+        unit.isSelected = false
+    end
+    self.selectedUnits = {}
+    self.selectedStack = nil
+    if didDeselect then
+        self.game.eventBus:trigger("selectedUnitsUpdated", nil)
+    end
+    return didDeselect
 end
 
 local spinningColor = dume.rgb(255, 255, 255, 200)
@@ -137,13 +176,35 @@ end
 function UnitDisplayWindow:rebuild()
     local root = Flex:column(10)
 
-    local unit = self.hud.selectedUnits[1]
-    if unit ~= nil then
+    local units = self.hud.selectedUnits
+    if #units == 1 then
+        -- Single unit; display specific information
+        local unit = units[1]
         local header = Text:new("@size{20}{%unitName}", {unitName=unit.kind.name})
         table.insert(header.classes, "highlightedText")
         root:addFixedChild(header)
         root:addFixedChild(Text:new("Strength: %strength", {strength=tostring(unit.strength)}))
         root:addFixedChild(Text:new("Movement: %movement", {movement=tostring(unit.movementLeft)}))
+    elseif #units ~= 0 then
+        -- Multiple units; display generic info (# of each unit kind in the stack)
+        local header = Text:new("@size{20}{Unit Stack (%count)}", {count=tostring(#units)})
+        table.insert(header.classes, "highlightedText")
+        root:addFixedChild(header)
+
+        local unitKindCounts = {}
+        for _, unit in ipairs(units) do
+            unitKindCounts[unit.kind.id] = (unitKindCounts[unit.kind.id] or 0) + 1
+        end
+
+        for kindID, count in pairs(unitKindCounts) do
+            local kind = registry.unitKinds[kindID]
+            local text = Text:new("%bullet %kind (%count)", {
+                kind = kind.name,
+                count = tostring(count),
+                bullet = "•",
+            })
+            root:addFixedChild(text)
+        end
     end
 
     local container = Container:new(Padding:new(root, 20))
@@ -216,6 +277,50 @@ function ScoreWindow:rebuild()
 
     local size = Vector(200, 175)
     ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container)
+end
+
+function UnitStackWindow:new(game, hud)
+    local o = { game = game, hud = hud }
+    setmetatable(o, self)
+    self.__index = self
+
+    game.eventBus:registerHandler("selectedUnitsUpdated", function()
+        o:rebuild()
+    end)
+
+    return o
+end
+
+function UnitStackWindow:rebuild()
+    local root = Flex:row()
+
+    root:setCrossAlign(dume.Align.End)
+
+    if self.hud.selectedStack ~= nil then
+        for _, unit in ipairs(self.hud.selectedStack.units) do
+            local image = Image:new("icon/unit_head/" .. unit.kind.id, 35)
+
+            local container = Container:new(image)
+            table.insert(container.classes, "unitHeadContainer")
+            if unit.isSelected then table.insert(container.classes, "unitHeadContainerSelected") end
+
+            local clickable = Clickable:new(container, function(mods)
+                if not mods.shift then
+                    self.hud:clearSelection()
+                end
+                if unit.isSelected then
+                    self.hud:deselectUnit(unit)
+                else
+                    self.hud:selectUnit(unit)
+                end
+            end)
+
+            root:addFixedChild(clickable)
+        end
+    end
+
+    local size = Vector(cv:getWidth() - unitDisplayWindowWidth - turnIndicatorWindowWidth - 200, 100)
+    ui:createWindow("unitStack", Vector(unitDisplayWindowWidth + 100, cv:getHeight() - 120 - size.y), size, root)
 end
 
 function dumeColorToString(color)

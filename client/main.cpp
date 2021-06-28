@@ -173,6 +173,7 @@ int main() {
     // force shutdown with a segfault. a bug in Dume causes
     // the program to hang the entire system
     // on shutdown and resize, so this is a temporary hack.
+    // See: https://github.com/gfx-rs/wgpu/issues/1570
     int *x = nullptr;
     *x += 1;
 

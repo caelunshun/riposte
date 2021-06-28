@@ -56,6 +56,14 @@ return {
             borderColor = dume.rgb(65, 65, 65),
             borderRadius = 0,
         },
+        unitHeadContainer = {
+            backgroundColor = dume.rgb(80, 80, 80),
+            borderColor = dume.rgb(0, 0, 0),
+        },
+        unitHeadContainerSelected = {
+            borderColor = dume.rgb(255, 205, 0),
+            borderWidth = 2,
+        },
         researchProgressBar = researchProgressBar,
         populationProgressBar = populationProgressBar,
         productionProgressBar = productionProgressBar,
