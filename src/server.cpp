@@ -11,7 +11,6 @@
 #include "worker.h"
 #include "city.h"
 #include "ship.h"
-#include <riposte.pb.h>
 #include <thread>
 
 #define SEND(packet, anyservername)  { AnyServer _anyServer; _anyServer.mutable_##anyservername()->CopyFrom(packet); send(std::move(_anyServer)); }
@@ -213,8 +212,45 @@ namespace rip {
         }
     }
 
-    void Connection::update(Game &game) {
+    void Connection::handleClientInfo(Game &game, const ClientInfo &packet) {
+        game.getPlayer(playerID).setUsername(packet.username());
+    }
 
+    void Connection::handleComputePath(Game &game, const ComputePath &packet) {
+        auto &unitKind = game.getRegistry().getUnit(packet.unitkindid());
+        auto path = computeShortestPath(game, glm::uvec2(packet.from().x(), packet.from().y()), glm::uvec2(packet.to().x(), packet.to().y()),
+                                        game.getPlayer(playerID).getVisibilityMap(), *unitKind);
+
+        PathComputed response;
+        response.set_requestid(packet.requestid());
+        if (path.has_value()) {
+            writePath(*path, *response.mutable_path());
+        }
+        SEND(response, pathcomputed);
+    }
+
+    void Connection::handlePacket(Game &game, AnyClient &packet) {
+        if (packet.has_clientinfo()) {
+            handleClientInfo(game, packet.clientinfo());
+        } else if (packet.has_computepath()) {
+            handleComputePath(game, packet.computepath());
+        }
+    }
+
+    void Connection::update(Game &game) {
+        while (true) {
+            auto packetData = bridge->pollReceivedPacket();
+            if (!packetData.has_value()) break;
+
+            // Parse the packet.
+            AnyClient packet;
+            if (!packet.ParseFromString(*packetData)) {
+                std::cout << "received malformed packet!" << std::endl;
+                continue;
+            }
+
+            handlePacket(game, packet);
+        }
     }
 
     Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)

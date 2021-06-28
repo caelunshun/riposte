@@ -1,6 +1,8 @@
 #define SOL_ALL_SAFETIES_ON 1
 #define SOL_LUAJIT 1
 
+#include <server.h>
+
 #include <dume.h>
 #include <sol/sol.hpp>
 
@@ -9,7 +11,6 @@
 #include <tech.h>
 #include <audio.h>
 #include <bridge.h>
-#include <server.h>
 
 #include <memory>
 #include <thread>
@@ -75,6 +76,7 @@ namespace rip {
 
         auto bridge_type = lua.new_usertype<Bridge>("Bridge");
         bridge_type["pollReceivedPacket"] = &Bridge::pollReceivedPacket;
+        bridge_type["sendPacket"] = &Bridge::sendPacket;
     }
 }
 

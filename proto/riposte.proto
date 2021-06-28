@@ -53,7 +53,7 @@ message Pos {
 message AnyClient {
   oneof packet {
     ClientInfo clientInfo = 1;
-
+    ComputePath computePath = 2;
   }
 }
 
@@ -322,7 +322,7 @@ message UpdatePlayer {
 }
 
 message PathComputed {
-  int32 pathID = 1;
+  int32 requestID = 1;
   Path path = 2;
 }
 
@@ -346,10 +346,10 @@ message SetWorkerTask {
 }
 
 message ComputePath {
-  int32 unitID = 1;
-  Pos from = 2;
-  Pos to = 3;
-  int32 pathID = 4;
+  Pos from = 1;
+  Pos to = 2;
+  string unitKindID = 3;
+  int32 requestID = 4;
 }
 
 message SetEconomySettings {

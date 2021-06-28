@@ -65,6 +65,7 @@ function enterGame(bridge)
     for windowName, _ in pairs(ui.windows) do ui:deleteWindow(windowName) end
     game = Game:new()
     client = Client:new(game, bridge)
+    game.client = client
 end
 
 local time = 0

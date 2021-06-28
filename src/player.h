@@ -134,6 +134,8 @@ namespace rip {
          const Leader &getLeader() const;
          CityId getCapital() const;
 
+         void setUsername(std::string username);
+
          void registerCity(CityId id);
          void removeCity(CityId, Game &game);
 

@@ -489,6 +489,7 @@ class AnyClient final :
   }
   enum PacketCase {
     kClientInfo = 1,
+    kComputePath = 2,
     PACKET_NOT_SET = 0,
   };
 
@@ -569,6 +570,7 @@ class AnyClient final :
 
   enum : int {
     kClientInfoFieldNumber = 1,
+    kComputePathFieldNumber = 2,
   };
   // .ClientInfo clientInfo = 1;
   bool has_clientinfo() const;
@@ -588,12 +590,31 @@ class AnyClient final :
       ::ClientInfo* clientinfo);
   ::ClientInfo* unsafe_arena_release_clientinfo();
 
+  // .ComputePath computePath = 2;
+  bool has_computepath() const;
+  private:
+  bool _internal_has_computepath() const;
+  public:
+  void clear_computepath();
+  const ::ComputePath& computepath() const;
+  PROTOBUF_MUST_USE_RESULT ::ComputePath* release_computepath();
+  ::ComputePath* mutable_computepath();
+  void set_allocated_computepath(::ComputePath* computepath);
+  private:
+  const ::ComputePath& _internal_computepath() const;
+  ::ComputePath* _internal_mutable_computepath();
+  public:
+  void unsafe_arena_set_allocated_computepath(
+      ::ComputePath* computepath);
+  ::ComputePath* unsafe_arena_release_computepath();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyClient)
  private:
   class _Internal;
   void set_has_clientinfo();
+  void set_has_computepath();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -605,6 +626,7 @@ class AnyClient final :
     constexpr PacketUnion() : _constinit_{} {}
       ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
     ::ClientInfo* clientinfo_;
+    ::ComputePath* computepath_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -6193,7 +6215,7 @@ class PathComputed final :
 
   enum : int {
     kPathFieldNumber = 2,
-    kPathIDFieldNumber = 1,
+    kRequestIDFieldNumber = 1,
   };
   // .Path path = 2;
   bool has_path() const;
@@ -6213,13 +6235,13 @@ class PathComputed final :
       ::Path* path);
   ::Path* unsafe_arena_release_path();
 
-  // int32 pathID = 1;
-  void clear_pathid();
-  ::PROTOBUF_NAMESPACE_ID::int32 pathid() const;
-  void set_pathid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  // int32 requestID = 1;
+  void clear_requestid();
+  ::PROTOBUF_NAMESPACE_ID::int32 requestid() const;
+  void set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_pathid() const;
-  void _internal_set_pathid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_requestid() const;
+  void _internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // @@protoc_insertion_point(class_scope:PathComputed)
@@ -6230,7 +6252,7 @@ class PathComputed final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::Path* path_;
-  ::PROTOBUF_NAMESPACE_ID::int32 pathid_;
+  ::PROTOBUF_NAMESPACE_ID::int32 requestid_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -6828,12 +6850,26 @@ class ComputePath final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kFromFieldNumber = 2,
-    kToFieldNumber = 3,
-    kUnitIDFieldNumber = 1,
-    kPathIDFieldNumber = 4,
+    kUnitKindIDFieldNumber = 3,
+    kFromFieldNumber = 1,
+    kToFieldNumber = 2,
+    kRequestIDFieldNumber = 4,
   };
-  // .Pos from = 2;
+  // string unitKindID = 3;
+  void clear_unitkindid();
+  const std::string& unitkindid() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_unitkindid(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_unitkindid();
+  PROTOBUF_MUST_USE_RESULT std::string* release_unitkindid();
+  void set_allocated_unitkindid(std::string* unitkindid);
+  private:
+  const std::string& _internal_unitkindid() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_unitkindid(const std::string& value);
+  std::string* _internal_mutable_unitkindid();
+  public:
+
+  // .Pos from = 1;
   bool has_from() const;
   private:
   bool _internal_has_from() const;
@@ -6851,7 +6887,7 @@ class ComputePath final :
       ::Pos* from);
   ::Pos* unsafe_arena_release_from();
 
-  // .Pos to = 3;
+  // .Pos to = 2;
   bool has_to() const;
   private:
   bool _internal_has_to() const;
@@ -6869,22 +6905,13 @@ class ComputePath final :
       ::Pos* to);
   ::Pos* unsafe_arena_release_to();
 
-  // int32 unitID = 1;
-  void clear_unitid();
-  ::PROTOBUF_NAMESPACE_ID::int32 unitid() const;
-  void set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  // int32 requestID = 4;
+  void clear_requestid();
+  ::PROTOBUF_NAMESPACE_ID::int32 requestid() const;
+  void set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
   private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_unitid() const;
-  void _internal_set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
-  // int32 pathID = 4;
-  void clear_pathid();
-  ::PROTOBUF_NAMESPACE_ID::int32 pathid() const;
-  void set_pathid(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_pathid() const;
-  void _internal_set_pathid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_requestid() const;
+  void _internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
   // @@protoc_insertion_point(class_scope:ComputePath)
@@ -6894,10 +6921,10 @@ class ComputePath final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr unitkindid_;
   ::Pos* from_;
   ::Pos* to_;
-  ::PROTOBUF_NAMESPACE_ID::int32 unitid_;
-  ::PROTOBUF_NAMESPACE_ID::int32 pathid_;
+  ::PROTOBUF_NAMESPACE_ID::int32 requestid_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -7310,6 +7337,80 @@ inline ::ClientInfo* AnyClient::_internal_mutable_clientinfo() {
 inline ::ClientInfo* AnyClient::mutable_clientinfo() {
   ::ClientInfo* _msg = _internal_mutable_clientinfo();
   // @@protoc_insertion_point(field_mutable:AnyClient.clientInfo)
+  return _msg;
+}
+
+// .ComputePath computePath = 2;
+inline bool AnyClient::_internal_has_computepath() const {
+  return packet_case() == kComputePath;
+}
+inline bool AnyClient::has_computepath() const {
+  return _internal_has_computepath();
+}
+inline void AnyClient::set_has_computepath() {
+  _oneof_case_[0] = kComputePath;
+}
+inline void AnyClient::clear_computepath() {
+  if (_internal_has_computepath()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.computepath_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::ComputePath* AnyClient::release_computepath() {
+  // @@protoc_insertion_point(field_release:AnyClient.computePath)
+  if (_internal_has_computepath()) {
+    clear_has_packet();
+      ::ComputePath* temp = packet_.computepath_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.computepath_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::ComputePath& AnyClient::_internal_computepath() const {
+  return _internal_has_computepath()
+      ? *packet_.computepath_
+      : reinterpret_cast< ::ComputePath&>(::_ComputePath_default_instance_);
+}
+inline const ::ComputePath& AnyClient::computepath() const {
+  // @@protoc_insertion_point(field_get:AnyClient.computePath)
+  return _internal_computepath();
+}
+inline ::ComputePath* AnyClient::unsafe_arena_release_computepath() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.computePath)
+  if (_internal_has_computepath()) {
+    clear_has_packet();
+    ::ComputePath* temp = packet_.computepath_;
+    packet_.computepath_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_computepath(::ComputePath* computepath) {
+  clear_packet();
+  if (computepath) {
+    set_has_computepath();
+    packet_.computepath_ = computepath;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.computePath)
+}
+inline ::ComputePath* AnyClient::_internal_mutable_computepath() {
+  if (!_internal_has_computepath()) {
+    clear_packet();
+    set_has_computepath();
+    packet_.computepath_ = CreateMaybeMessage< ::ComputePath >(GetArenaForAllocation());
+  }
+  return packet_.computepath_;
+}
+inline ::ComputePath* AnyClient::mutable_computepath() {
+  ::ComputePath* _msg = _internal_mutable_computepath();
+  // @@protoc_insertion_point(field_mutable:AnyClient.computePath)
   return _msg;
 }
 
@@ -11802,24 +11903,24 @@ UpdatePlayer::mutable_possibleresearches() {
 
 // PathComputed
 
-// int32 pathID = 1;
-inline void PathComputed::clear_pathid() {
-  pathid_ = 0;
+// int32 requestID = 1;
+inline void PathComputed::clear_requestid() {
+  requestid_ = 0;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 PathComputed::_internal_pathid() const {
-  return pathid_;
+inline ::PROTOBUF_NAMESPACE_ID::int32 PathComputed::_internal_requestid() const {
+  return requestid_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 PathComputed::pathid() const {
-  // @@protoc_insertion_point(field_get:PathComputed.pathID)
-  return _internal_pathid();
+inline ::PROTOBUF_NAMESPACE_ID::int32 PathComputed::requestid() const {
+  // @@protoc_insertion_point(field_get:PathComputed.requestID)
+  return _internal_requestid();
 }
-inline void PathComputed::_internal_set_pathid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void PathComputed::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
   
-  pathid_ = value;
+  requestid_ = value;
 }
-inline void PathComputed::set_pathid(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_pathid(value);
-  // @@protoc_insertion_point(field_set:PathComputed.pathID)
+inline void PathComputed::set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_requestid(value);
+  // @@protoc_insertion_point(field_set:PathComputed.requestID)
 }
 
 // .Path path = 2;
@@ -12258,27 +12359,7 @@ inline void SetWorkerTask::set_allocated_task(::WorkerTask* task) {
 
 // ComputePath
 
-// int32 unitID = 1;
-inline void ComputePath::clear_unitid() {
-  unitid_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 ComputePath::_internal_unitid() const {
-  return unitid_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 ComputePath::unitid() const {
-  // @@protoc_insertion_point(field_get:ComputePath.unitID)
-  return _internal_unitid();
-}
-inline void ComputePath::_internal_set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  unitid_ = value;
-}
-inline void ComputePath::set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_unitid(value);
-  // @@protoc_insertion_point(field_set:ComputePath.unitID)
-}
-
-// .Pos from = 2;
+// .Pos from = 1;
 inline bool ComputePath::_internal_has_from() const {
   return this != internal_default_instance() && from_ != nullptr;
 }
@@ -12368,7 +12449,7 @@ inline void ComputePath::set_allocated_from(::Pos* from) {
   // @@protoc_insertion_point(field_set_allocated:ComputePath.from)
 }
 
-// .Pos to = 3;
+// .Pos to = 2;
 inline bool ComputePath::_internal_has_to() const {
   return this != internal_default_instance() && to_ != nullptr;
 }
@@ -12458,24 +12539,70 @@ inline void ComputePath::set_allocated_to(::Pos* to) {
   // @@protoc_insertion_point(field_set_allocated:ComputePath.to)
 }
 
-// int32 pathID = 4;
-inline void ComputePath::clear_pathid() {
-  pathid_ = 0;
+// string unitKindID = 3;
+inline void ComputePath::clear_unitkindid() {
+  unitkindid_.ClearToEmpty();
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 ComputePath::_internal_pathid() const {
-  return pathid_;
+inline const std::string& ComputePath::unitkindid() const {
+  // @@protoc_insertion_point(field_get:ComputePath.unitKindID)
+  return _internal_unitkindid();
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 ComputePath::pathid() const {
-  // @@protoc_insertion_point(field_get:ComputePath.pathID)
-  return _internal_pathid();
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void ComputePath::set_unitkindid(ArgT0&& arg0, ArgT... args) {
+ 
+ unitkindid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:ComputePath.unitKindID)
 }
-inline void ComputePath::_internal_set_pathid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline std::string* ComputePath::mutable_unitkindid() {
+  std::string* _s = _internal_mutable_unitkindid();
+  // @@protoc_insertion_point(field_mutable:ComputePath.unitKindID)
+  return _s;
+}
+inline const std::string& ComputePath::_internal_unitkindid() const {
+  return unitkindid_.Get();
+}
+inline void ComputePath::_internal_set_unitkindid(const std::string& value) {
   
-  pathid_ = value;
+  unitkindid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
 }
-inline void ComputePath::set_pathid(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_pathid(value);
-  // @@protoc_insertion_point(field_set:ComputePath.pathID)
+inline std::string* ComputePath::_internal_mutable_unitkindid() {
+  
+  return unitkindid_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* ComputePath::release_unitkindid() {
+  // @@protoc_insertion_point(field_release:ComputePath.unitKindID)
+  return unitkindid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void ComputePath::set_allocated_unitkindid(std::string* unitkindid) {
+  if (unitkindid != nullptr) {
+    
+  } else {
+    
+  }
+  unitkindid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), unitkindid,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:ComputePath.unitKindID)
+}
+
+// int32 requestID = 4;
+inline void ComputePath::clear_requestid() {
+  requestid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ComputePath::_internal_requestid() const {
+  return requestid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ComputePath::requestid() const {
+  // @@protoc_insertion_point(field_get:ComputePath.requestID)
+  return _internal_requestid();
+}
+inline void ComputePath::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  requestid_ = value;
+}
+inline void ComputePath::set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_requestid(value);
+  // @@protoc_insertion_point(field_set:ComputePath.requestID)
 }
 
 // -------------------------------------------------------------------

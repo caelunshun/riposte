@@ -187,6 +187,10 @@ namespace rip {
         return techs;
     }
 
+    void Player::setUsername(std::string username) {
+        this->username = std::move(username);
+    }
+
     void Player::recomputeRevenue(Game &game) {
         baseRevenue = 0;
         beakerRevenue = 0;

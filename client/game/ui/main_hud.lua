@@ -66,6 +66,25 @@ function Hud:handleEvent(event)
             else
                 return self:clearSelection()
             end
+        elseif event.mouse == dume.Mouse.Right then
+            if event.action == dume.Action.Press then
+                -- If we have a selected stack, compute the path.
+                if self.selectedStack ~= nil and #self.selectedUnits > 0 then
+                    local from = self.selectedStack.pos
+                    local to = clickedPos
+                    local unitKindID = self.selectedUnits[1].kind.id
+                    local callback = function(path)
+                        if path ~= nil then
+                            self.stagedPath = path
+                            self.hasStagedPath = true
+                        end
+                    end
+                    self.game.client:requestComputePath(callback, from, to, unitKindID)
+                end
+            elseif event.action == dume.Action.Release then
+                self.stagedPath = nil
+                self.hasStagedPath = false
+            end
         end
     end
 
@@ -93,6 +112,11 @@ function Hud:deselectUnit(unit)
             break
         end
     end
+
+    if #self.selectedUnits == 0 then
+        self.stagedPath = nil
+        self.hasStagedPath = false
+    end
 end
 
 function Hud:clearSelection()
@@ -107,10 +131,34 @@ function Hud:clearSelection()
     return didDeselect
 end
 
+local white = dume.rgb(255, 255, 255)
 local spinningColor = dume.rgb(255, 255, 255, 200)
 
-function Hud:render(cv, time)
-    self.game.view:applyZoom(cv)
+function Hud:renderStagedPath(cv)
+    if not self.hasStagedPath then return end
+    if self.stagedPath == nil then return end
+
+    cv:beginPath()
+    local first = true
+    for i=1,#self.stagedPath.positions,2 do
+        local x = self.stagedPath.positions[i]
+        local y = self.stagedPath.positions[i + 1]
+
+        local dst = self.game.view:getScreenOffsetForTilePos(Vector(x, y)) + Vector(50, 50)
+        if first then
+            cv:moveTo(dst)
+            first = false
+        else
+            cv:lineTo(dst)
+        end
+    end
+
+    cv:strokeWidth(5)
+    cv:solidColor(white)
+    cv:stroke()
+end
+
+function Hud:renderSelectionCircle(cv, time)
     for _, unit in ipairs(self.selectedUnits) do
         -- Paint spinning white dashes
         local radius = 50
@@ -134,6 +182,12 @@ function Hud:render(cv, time)
         cv:strokeWidth(4)
         cv:stroke()
     end
+end
+
+function Hud:render(cv, time)
+    self.game.view:applyZoom(cv)
+    self:renderStagedPath(cv)
+    self:renderSelectionCircle(cv, time)
     cv:resetTransform()
 end
 

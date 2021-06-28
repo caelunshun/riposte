@@ -5,6 +5,8 @@
 #ifndef RIPOSTE_SERVER_H
 #define RIPOSTE_SERVER_H
 
+#include <riposte.pb.h>
+
 #include "bridge.h"
 #include "game.h"
 #include "tech.h"
@@ -28,6 +30,10 @@ namespace rip {
         Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID) : bridge(std::move(bridge)), playerID(playerID) {}
 
         void sendGameData(Game &game);
+
+        void handleClientInfo(Game &game, const ClientInfo &packet);
+        void handleComputePath(Game &game, const ComputePath &packet);
+        void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);
     };
