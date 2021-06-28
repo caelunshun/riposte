@@ -162,6 +162,9 @@ end
 function TurnIndicatorWindow:rebuild()
     local root = Flex:row()
 
+    local flag = Image:new("icon/flag/" .. self.game.thePlayer.civ.id, turnIndicatorWindowWidth - 40)
+    root:addFixedChild(flag)
+
     local container = Container:new(Padding:new(root, 20))
     container.fillParent = true
     table.insert(container.classes, "windowContainer")

@@ -152,6 +152,8 @@ message UpdateGlobalData {
   int32 turn = 2;
   // The current era.
   Era era = 3;
+  // The ID of the connected client.
+  int32 playerID = 4;
 }
 
 enum Terrain {

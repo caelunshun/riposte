@@ -2295,6 +2295,7 @@ class UpdateGlobalData final :
     kPlayersFieldNumber = 1,
     kTurnFieldNumber = 2,
     kEraFieldNumber = 3,
+    kPlayerIDFieldNumber = 4,
   };
   // repeated .PlayerInfo players = 1;
   int players_size() const;
@@ -2332,6 +2333,15 @@ class UpdateGlobalData final :
   void _internal_set_era(::Era value);
   public:
 
+  // int32 playerID = 4;
+  void clear_playerid();
+  ::PROTOBUF_NAMESPACE_ID::int32 playerid() const;
+  void set_playerid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_playerid() const;
+  void _internal_set_playerid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
   // @@protoc_insertion_point(class_scope:UpdateGlobalData)
  private:
   class _Internal;
@@ -2342,6 +2352,7 @@ class UpdateGlobalData final :
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::PlayerInfo > players_;
   ::PROTOBUF_NAMESPACE_ID::int32 turn_;
   int era_;
+  ::PROTOBUF_NAMESPACE_ID::int32 playerid_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -8612,6 +8623,26 @@ inline void UpdateGlobalData::_internal_set_era(::Era value) {
 inline void UpdateGlobalData::set_era(::Era value) {
   _internal_set_era(value);
   // @@protoc_insertion_point(field_set:UpdateGlobalData.era)
+}
+
+// int32 playerID = 4;
+inline void UpdateGlobalData::clear_playerid() {
+  playerid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateGlobalData::_internal_playerid() const {
+  return playerid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdateGlobalData::playerid() const {
+  // @@protoc_insertion_point(field_get:UpdateGlobalData.playerID)
+  return _internal_playerid();
+}
+inline void UpdateGlobalData::_internal_set_playerid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  playerid_ = value;
+}
+inline void UpdateGlobalData::set_playerid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_playerid(value);
+  // @@protoc_insertion_point(field_set:UpdateGlobalData.playerID)
 }
 
 // -------------------------------------------------------------------

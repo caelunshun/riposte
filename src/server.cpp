@@ -26,7 +26,7 @@ namespace rip {
         playerInfo.set_isadmin(false); // TODO: permissions
     }
 
-    UpdateGlobalData getUpdateGlobalDataPacket(Game &game) {
+    UpdateGlobalData getUpdateGlobalDataPacket(Game &game, PlayerId thePlayerID) {
         UpdateGlobalData packet;
         packet.set_turn(game.getTurn());
         packet.set_era(static_cast<::Era>(static_cast<int>(game.getEra())));
@@ -35,6 +35,8 @@ namespace rip {
             auto *protoPlayer = packet.add_players();
             setPlayerInfo(player, *protoPlayer);
         }
+
+        packet.set_playerid(thePlayerID.first);
 
         return packet;
     }
@@ -200,7 +202,7 @@ namespace rip {
     }
 
     void Connection::sendGameData(Game &game) {
-        SEND(getUpdateGlobalDataPacket(game), updateglobaldata);
+        SEND(getUpdateGlobalDataPacket(game, playerID), updateglobaldata);
         SEND(getUpdateMapPacket(game, playerID), updatemap);
 
         for (auto &unit : game.getUnits()) {

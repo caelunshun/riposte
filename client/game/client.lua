@@ -48,6 +48,10 @@ function Client:handleUpdateGlobalData(packet)
 
     self.game:setTurn(packet.turn)
     self.game:setEra(packet.era)
+    self.game.thePlayer = self.game.players[packet.playerID]
+    if self.game.thePlayer == nil then
+        error("invalid thePlayer ID")
+    end
 
     self.game.eventBus:trigger("globalDataUpdated", nil)
 end
