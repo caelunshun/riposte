@@ -16,6 +16,7 @@ local style = require("ui/style")
 local BottomControlWindow = {}
 local UnitDisplayWindow = {}
 local TurnIndicatorWindow = {}
+local ScoreWindow = {}
 
 function Hud:new(game)
     local o = {
@@ -28,6 +29,7 @@ function Hud:new(game)
         BottomControlWindow:new(game, o),
         UnitDisplayWindow:new(game, o),
         TurnIndicatorWindow:new(game, o),
+        ScoreWindow:new(game, o),
     }
 
     game.eventBus:registerHandler("globalDataUpdated", function()
@@ -171,6 +173,43 @@ function TurnIndicatorWindow:rebuild()
 
     local size = Vector(turnIndicatorWindowWidth, 150)
     ui:createWindow("turnIndicator", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y), size, container)
+end
+
+function ScoreWindow:new(game, hud)
+    local o = { game = game, hud = hud }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function ScoreWindow:rebuild()
+    local scores = Flex:column()
+
+    local players = {}
+    for _, player in pairs(self.game.players) do
+        players[#players + 1] = player
+    end
+    table.sort(players, function(a, b) return a.score > b.score end)
+
+    for _, player in ipairs(players) do
+        local text = Text:new("%score: @color{%col}{%playerName}", {
+            score = tostring(player.score),
+            col = dumeColorToString(player.civ.color),
+            playerName = player.username,
+        })
+        scores:addFixedChild(text)
+    end
+
+    local container = Container:new(Padding:new(scores, 20))
+    container.fillParent = true
+    table.insert(container.classes, "windowContainer")
+
+    local size = Vector(200, 175)
+    ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container)
+end
+
+function dumeColorToString(color)
+    return string.format("rgba(%d,%d,%d,%d)", color[1], color[2], color[3], color[4])
 end
 
 return Hud
