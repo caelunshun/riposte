@@ -23,7 +23,7 @@ function Stack:addUnit(unit)
     -- Insert at correct sorted position
     local pos = 1
     for i=1,#self.units do
-        if self.units[i].strength < unit.strength then
+        if self.units[i].strength <= unit.strength then
             pos = i
             break
         end
