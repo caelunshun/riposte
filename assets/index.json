@@ -160,6 +160,11 @@
     "loader": "civ"
   },
   {
+    "path": "civ/rome.json",
+    "id": "civ/rome",
+    "loader": "civ"
+  },
+  {
     "path": "font/Merriweather-Regular.ttf",
     "id": "font/merriweather/regular",
     "loader": "font"
