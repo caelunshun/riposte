@@ -25,6 +25,7 @@ function Hud:new(game)
         selectedUnits = {},
         selectedStack = nil,
         stagedPath = nil,
+        stagedPathTarget = nil,
         game = game,
     }
 
@@ -52,9 +53,12 @@ function Hud:rebuildWindows()
 end
 
 function Hud:handleEvent(event)
-    if event.type == dume.EventType.MouseClick then
-        local clickedPos = self.game.view:getTilePosForScreenOffset(event.pos)
+    if event.pos == nil then return end
+    local clickedPos = self.game.view:getTilePosForScreenOffset(event.pos)
 
+    local shouldComputePath = false
+
+    if event.type == dume.EventType.MouseClick then
         if event.action == dume.Action.Press
                 and event.mouse == dume.Mouse.Left then
             -- Attempt to select a unit at the top of the stack.
@@ -70,22 +74,30 @@ function Hud:handleEvent(event)
             if event.action == dume.Action.Press then
                 -- If we have a selected stack, compute the path.
                 if self.selectedStack ~= nil and #self.selectedUnits > 0 then
-                    local from = self.selectedStack.pos
-                    local to = clickedPos
-                    local unitKindID = self.selectedUnits[1].kind.id
-                    local callback = function(path)
-                        if path ~= nil then
-                            self.stagedPath = path
-                            self.hasStagedPath = true
-                        end
-                    end
-                    self.game.client:requestComputePath(callback, from, to, unitKindID)
+                    shouldComputePath = true
                 end
             elseif event.action == dume.Action.Release then
                 self.stagedPath = nil
                 self.hasStagedPath = false
             end
         end
+    elseif event.type == dume.EventType.CursorMove and self.hasStagedPath
+        and clickedPos ~= self.stagedPathTarget then
+            shouldComputePath = true
+    end
+
+    if shouldComputePath and #self.selectedUnits ~= 0 then
+        local from = self.selectedStack.pos
+        local to = clickedPos
+        local unitKindID = self.selectedUnits[1].kind.id
+        local callback = function(path)
+            if path ~= nil then
+                self.stagedPath = path
+                self.hasStagedPath = true
+            end
+        end
+        self.game.client:requestComputePath(callback, from, to, unitKindID)
+        self.stagedPathTarget = to
     end
 
     return false
