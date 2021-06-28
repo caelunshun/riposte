@@ -45,9 +45,9 @@ return {
             },
         },
         windowContainer = {
-            backgroundColor = dume.rgb(45, 45, 45, 192),
+            backgroundColor = dume.rgb(45, 45, 45, 254),
             borderWidth = 1,
-            borderColor = dume.rgb(65, 65, 65),
+            borderColor = dume.rgb(120, 120, 120),
             borderRadius = 0,
         },
         container = {
@@ -66,7 +66,16 @@ return {
         },
         button = {
             minSize = Vector(100, 50)
-        }
+        },
+        highlightedText = {
+            defaultTextStyle = {
+                family = "Merriweather",
+                size = 12,
+                weight = dume.FontWeight.Normal,
+                style = dume.FontStyle.Normal,
+                color = dume.rgb(255, 191, 63),
+            }
+        },
     },
     hovered = {
         hoverableText = {

@@ -119,6 +119,7 @@ namespace rip {
         packet.set_ownerid(unit.getOwner().first);
         packet.set_health(unit.getHealth());
         packet.set_movementleft(unit.getMovementLeft());
+        packet.set_strength(unit.getCombatStrength());
 
         if (unit.hasPath()) {
             writePath(unit.getPath(), *packet.mutable_followingpath());

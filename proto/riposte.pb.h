@@ -5471,6 +5471,7 @@ class UpdateUnit final :
     kMovementLeftFieldNumber = 5,
     kOwnerIDFieldNumber = 3,
     kIdFieldNumber = 8,
+    kStrengthFieldNumber = 9,
   };
   // repeated .Capability capabilities = 7;
   int capabilities_size() const;
@@ -5576,6 +5577,15 @@ class UpdateUnit final :
   void _internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
+  // double strength = 9;
+  void clear_strength();
+  double strength() const;
+  void set_strength(double value);
+  private:
+  double _internal_strength() const;
+  void _internal_set_strength(double value);
+  public:
+
   // @@protoc_insertion_point(class_scope:UpdateUnit)
  private:
   class _Internal;
@@ -5591,6 +5601,7 @@ class UpdateUnit final :
   double movementleft_;
   ::PROTOBUF_NAMESPACE_ID::int32 ownerid_;
   ::PROTOBUF_NAMESPACE_ID::int32 id_;
+  double strength_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -11214,6 +11225,26 @@ inline void UpdateUnit::_internal_set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
 inline void UpdateUnit::set_id(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_id(value);
   // @@protoc_insertion_point(field_set:UpdateUnit.id)
+}
+
+// double strength = 9;
+inline void UpdateUnit::clear_strength() {
+  strength_ = 0;
+}
+inline double UpdateUnit::_internal_strength() const {
+  return strength_;
+}
+inline double UpdateUnit::strength() const {
+  // @@protoc_insertion_point(field_get:UpdateUnit.strength)
+  return _internal_strength();
+}
+inline void UpdateUnit::_internal_set_strength(double value) {
+  
+  strength_ = value;
+}
+inline void UpdateUnit::set_strength(double value) {
+  _internal_set_strength(value);
+  // @@protoc_insertion_point(field_set:UpdateUnit.strength)
 }
 
 // -------------------------------------------------------------------

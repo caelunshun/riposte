@@ -416,7 +416,8 @@ constexpr UpdateUnit::UpdateUnit(
   , health_(0)
   , movementleft_(0)
   , ownerid_(0)
-  , id_(0){}
+  , id_(0)
+  , strength_(0){}
 struct UpdateUnitDefaultTypeInternal {
   constexpr UpdateUnitDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -799,6 +800,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::UpdateUnit, followingpath_),
   PROTOBUF_FIELD_OFFSET(::UpdateUnit, capabilities_),
   PROTOBUF_FIELD_OFFSET(::UpdateUnit, id_),
+  PROTOBUF_FIELD_OFFSET(::UpdateUnit, strength_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::ResearchingTech, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -904,15 +906,15 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 213, -1, sizeof(::CarryUnitsCapability)},
   { 219, -1, sizeof(::Capability)},
   { 228, -1, sizeof(::UpdateUnit)},
-  { 241, -1, sizeof(::ResearchingTech)},
-  { 248, -1, sizeof(::UpdatePlayer)},
-  { 265, -1, sizeof(::PathComputed)},
-  { 272, -1, sizeof(::MoveUnit)},
-  { 279, -1, sizeof(::SetCityBuildTask)},
-  { 286, -1, sizeof(::SetWorkerTask)},
-  { 293, -1, sizeof(::ComputePath)},
-  { 302, -1, sizeof(::SetEconomySettings)},
-  { 308, -1, sizeof(::SetResearch)},
+  { 242, -1, sizeof(::ResearchingTech)},
+  { 249, -1, sizeof(::UpdatePlayer)},
+  { 266, -1, sizeof(::PathComputed)},
+  { 273, -1, sizeof(::MoveUnit)},
+  { 280, -1, sizeof(::SetCityBuildTask)},
+  { 287, -1, sizeof(::SetWorkerTask)},
+  { 294, -1, sizeof(::ComputePath)},
+  { 303, -1, sizeof(::SetEconomySettings)},
+  { 309, -1, sizeof(::SetResearch)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -1017,39 +1019,39 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "ndCity\030\001 \001(\0132\024.FoundCityCapabilityH\000\022#\n\006"
   "worker\030\002 \001(\0132\021.WorkerCapabilityH\000\022+\n\ncar"
   "ryUnits\030\003 \001(\0132\025.CarryUnitsCapabilityH\000B\005"
-  "\n\003cap\"\263\001\n\nUpdateUnit\022\021\n\003pos\030\001 \001(\0132\004.Pos\022"
+  "\n\003cap\"\305\001\n\nUpdateUnit\022\021\n\003pos\030\001 \001(\0132\004.Pos\022"
   "\016\n\006kindID\030\002 \001(\t\022\017\n\007ownerID\030\003 \001(\005\022\016\n\006heal"
   "th\030\004 \001(\001\022\024\n\014movementLeft\030\005 \001(\001\022\034\n\rfollow"
   "ingPath\030\006 \001(\0132\005.Path\022!\n\014capabilities\030\007 \003"
-  "(\0132\013.Capability\022\n\n\002id\030\010 \001(\005\"3\n\017Researchi"
-  "ngTech\022\016\n\006techID\030\001 \001(\t\022\020\n\010progress\030\002 \001(\005"
-  "\"\225\002\n\014UpdatePlayer\022\n\n\002id\030\001 \001(\005\022\020\n\010usernam"
-  "e\030\002 \001(\t\022\023\n\013baseRevenue\030\003 \001(\005\022\025\n\rbeakerRe"
-  "venue\030\004 \001(\005\022\023\n\013goldRevenue\030\005 \001(\005\022\020\n\010expe"
-  "nses\030\006 \001(\005\022\017\n\007netGold\030\007 \001(\005\022\014\n\004gold\030\010 \001("
-  "\005\022)\n\017researchingTech\030\t \001(\0132\020.Researching"
-  "Tech\022\025\n\rcapitalCityID\030\n \001(\005\022\027\n\017unlockedT"
-  "echIDs\030\013 \003(\t\022\032\n\022possibleResearches\030\014 \003(\t"
-  "\"3\n\014PathComputed\022\016\n\006pathID\030\001 \001(\005\022\023\n\004path"
-  "\030\002 \001(\0132\005.Path\"0\n\010MoveUnit\022\016\n\006unitID\030\001 \001("
-  "\005\022\024\n\006newPos\030\002 \001(\0132\004.Pos\"@\n\020SetCityBuildT"
-  "ask\022\016\n\006cityID\030\001 \001(\005\022\034\n\004task\030\002 \001(\0132\016.Buil"
-  "dTaskKind\"<\n\rSetWorkerTask\022\020\n\010workerID\030\001"
-  " \001(\005\022\031\n\004task\030\002 \001(\0132\013.WorkerTask\"S\n\013Compu"
-  "tePath\022\016\n\006unitID\030\001 \001(\005\022\022\n\004from\030\002 \001(\0132\004.P"
-  "os\022\020\n\002to\030\003 \001(\0132\004.Pos\022\016\n\006pathID\030\004 \001(\005\"+\n\022"
-  "SetEconomySettings\022\025\n\rbeakerPercent\030\001 \001("
-  "\005\"\035\n\013SetResearch\022\016\n\006techID\030\001 \001(\t*h\n\003Era\022"
-  "\013\n\007Ancient\020\000\022\r\n\tClassical\020\001\022\014\n\010Medieval\020"
-  "\002\022\017\n\013Renaissance\020\003\022\016\n\nIndustrial\020\004\022\n\n\006Mo"
-  "dern\020\005\022\n\n\006Future\020\006*;\n\007Terrain\022\r\n\tGrassla"
-  "nd\020\000\022\n\n\006Desert\020\001\022\t\n\005Ocean\020\002\022\n\n\006Plains\020\003*"
-  "1\n\nVisibility\022\n\n\006Hidden\020\000\022\n\n\006Fogged\020\001\022\013\n"
-  "\007Visible\020\002b\006proto3"
+  "(\0132\013.Capability\022\n\n\002id\030\010 \001(\005\022\020\n\010strength\030"
+  "\t \001(\001\"3\n\017ResearchingTech\022\016\n\006techID\030\001 \001(\t"
+  "\022\020\n\010progress\030\002 \001(\005\"\225\002\n\014UpdatePlayer\022\n\n\002i"
+  "d\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\023\n\013baseRevenue"
+  "\030\003 \001(\005\022\025\n\rbeakerRevenue\030\004 \001(\005\022\023\n\013goldRev"
+  "enue\030\005 \001(\005\022\020\n\010expenses\030\006 \001(\005\022\017\n\007netGold\030"
+  "\007 \001(\005\022\014\n\004gold\030\010 \001(\005\022)\n\017researchingTech\030\t"
+  " \001(\0132\020.ResearchingTech\022\025\n\rcapitalCityID\030"
+  "\n \001(\005\022\027\n\017unlockedTechIDs\030\013 \003(\t\022\032\n\022possib"
+  "leResearches\030\014 \003(\t\"3\n\014PathComputed\022\016\n\006pa"
+  "thID\030\001 \001(\005\022\023\n\004path\030\002 \001(\0132\005.Path\"0\n\010MoveU"
+  "nit\022\016\n\006unitID\030\001 \001(\005\022\024\n\006newPos\030\002 \001(\0132\004.Po"
+  "s\"@\n\020SetCityBuildTask\022\016\n\006cityID\030\001 \001(\005\022\034\n"
+  "\004task\030\002 \001(\0132\016.BuildTaskKind\"<\n\rSetWorker"
+  "Task\022\020\n\010workerID\030\001 \001(\005\022\031\n\004task\030\002 \001(\0132\013.W"
+  "orkerTask\"S\n\013ComputePath\022\016\n\006unitID\030\001 \001(\005"
+  "\022\022\n\004from\030\002 \001(\0132\004.Pos\022\020\n\002to\030\003 \001(\0132\004.Pos\022\016"
+  "\n\006pathID\030\004 \001(\005\"+\n\022SetEconomySettings\022\025\n\r"
+  "beakerPercent\030\001 \001(\005\"\035\n\013SetResearch\022\016\n\006te"
+  "chID\030\001 \001(\t*h\n\003Era\022\013\n\007Ancient\020\000\022\r\n\tClassi"
+  "cal\020\001\022\014\n\010Medieval\020\002\022\017\n\013Renaissance\020\003\022\016\n\n"
+  "Industrial\020\004\022\n\n\006Modern\020\005\022\n\n\006Future\020\006*;\n\007"
+  "Terrain\022\r\n\tGrassland\020\000\022\n\n\006Desert\020\001\022\t\n\005Oc"
+  "ean\020\002\022\n\n\006Plains\020\003*1\n\nVisibility\022\n\n\006Hidde"
+  "n\020\000\022\n\n\006Fogged\020\001\022\013\n\007Visible\020\002b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_riposte_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_riposte_2eproto = {
-  false, false, 3498, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
+  false, false, 3516, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
   &descriptor_table_riposte_2eproto_once, nullptr, 0, 39,
   schemas, file_default_instances, TableStruct_riposte_2eproto::offsets,
   file_level_metadata_riposte_2eproto, file_level_enum_descriptors_riposte_2eproto, file_level_service_descriptors_riposte_2eproto,
@@ -8873,8 +8875,8 @@ UpdateUnit::UpdateUnit(const UpdateUnit& from)
     followingpath_ = nullptr;
   }
   ::memcpy(&health_, &from.health_,
-    static_cast<size_t>(reinterpret_cast<char*>(&id_) -
-    reinterpret_cast<char*>(&health_)) + sizeof(id_));
+    static_cast<size_t>(reinterpret_cast<char*>(&strength_) -
+    reinterpret_cast<char*>(&health_)) + sizeof(strength_));
   // @@protoc_insertion_point(copy_constructor:UpdateUnit)
 }
 
@@ -8882,8 +8884,8 @@ inline void UpdateUnit::SharedCtor() {
 kindid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&pos_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&id_) -
-    reinterpret_cast<char*>(&pos_)) + sizeof(id_));
+    0, static_cast<size_t>(reinterpret_cast<char*>(&strength_) -
+    reinterpret_cast<char*>(&pos_)) + sizeof(strength_));
 }
 
 UpdateUnit::~UpdateUnit() {
@@ -8927,8 +8929,8 @@ void UpdateUnit::Clear() {
   }
   followingpath_ = nullptr;
   ::memset(&health_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&id_) -
-      reinterpret_cast<char*>(&health_)) + sizeof(id_));
+      reinterpret_cast<char*>(&strength_) -
+      reinterpret_cast<char*>(&health_)) + sizeof(strength_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -8999,6 +9001,13 @@ const char* UpdateUnit::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 64)) {
           id_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // double strength = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 73)) {
+          strength_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr);
+          ptr += sizeof(double);
         } else goto handle_unusual;
         continue;
       default: {
@@ -9088,6 +9097,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(8, this->_internal_id(), target);
   }
 
+  // double strength = 9;
+  if (!(this->_internal_strength() <= 0 && this->_internal_strength() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(9, this->_internal_strength(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -9156,6 +9171,11 @@ size_t UpdateUnit::ByteSizeLong() const {
         this->_internal_id());
   }
 
+  // double strength = 9;
+  if (!(this->_internal_strength() <= 0 && this->_internal_strength() >= 0)) {
+    total_size += 1 + 8;
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -9206,6 +9226,9 @@ void UpdateUnit::MergeFrom(const UpdateUnit& from) {
   if (from._internal_id() != 0) {
     _internal_set_id(from._internal_id());
   }
+  if (!(from._internal_strength() <= 0 && from._internal_strength() >= 0)) {
+    _internal_set_strength(from._internal_strength());
+  }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -9230,8 +9253,8 @@ void UpdateUnit::InternalSwap(UpdateUnit* other) {
       &other->kindid_, other->GetArenaForAllocation()
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(UpdateUnit, id_)
-      + sizeof(UpdateUnit::id_)
+      PROTOBUF_FIELD_OFFSET(UpdateUnit, strength_)
+      + sizeof(UpdateUnit::strength_)
       - PROTOBUF_FIELD_OFFSET(UpdateUnit, pos_)>(
           reinterpret_cast<char*>(&pos_),
           reinterpret_cast<char*>(&other->pos_));

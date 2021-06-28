@@ -8,6 +8,14 @@ local Text = require("widget/text")
 local Button = require("widget/button")
 local Container = require("widget/container")
 local Tooltip = require("widget/tooltip")
+local Image = require("widget/image")
+local Padding = require("widget/padding")
+
+local style = require("ui/style")
+
+local BottomControlWindow = {}
+local UnitDisplayWindow = {}
+local TurnIndicatorWindow = {}
 
 function Hud:new(game)
     local o = {
@@ -15,12 +23,26 @@ function Hud:new(game)
         stagedPath = nil,
         game = game,
     }
-    game.eventBus:registerHandler("unitUpdated", function(unit) o:onUnitUpdated(unit) end)
-    game.eventBus:registerHandler("globalDataUpdated", function() o:rebuildBottomBar()  end)
+
+    o.windows = {
+        BottomControlWindow:new(game, o),
+        UnitDisplayWindow:new(game, o),
+        TurnIndicatorWindow:new(game, o),
+    }
+
+    game.eventBus:registerHandler("globalDataUpdated", function()
+        o:rebuildWindows()
+    end)
+
     setmetatable(o, self)
     self.__index = self
-    o:rebuildBottomBar()
     return o
+end
+
+function Hud:rebuildWindows()
+    for _, window in ipairs(self.windows) do
+        window:rebuild()
+    end
 end
 
 function Hud:handleEvent(event)
@@ -33,10 +55,14 @@ function Hud:handleEvent(event)
             local unit = self.game:getUnitsAtPos(clickedPos)[1]
             if unit ~= nil then
                 self.selectedUnits = { unit }
+                self.game.eventBus:trigger("selectedUnitsUpdated", nil)
                 return true
             else
                 local deselected = #self.selectedUnits ~= 0
                 self.selectedUnits = {}
+                if deselected then
+                    self.game.eventBus:trigger("selectedUnitsUpdated", nil)
+                end
                 return deselected
             end
         end
@@ -75,27 +101,73 @@ function Hud:render(cv, time)
     cv:resetTransform()
 end
 
-function Hud:rebuildBottomBar()
-    local root = Flex:row()
+local unitDisplayWindowWidth = 200
+local turnIndicatorWindowWidth = 200
 
-    local turnText = Text:new("@size{20}{Turn %turn\n%era Era}", {turn=tostring(self.game.turn),era=self.game.era})
-    root:addFixedChild(turnText)
-
-    local nextTurn = Button:new(Text:new("Next Turn"), function()
-        print("Next turn!")
-    end)
-    root:addFixedChild(nextTurn)
-
-    local container = Container:new(root)
-    container.fillParent = true
-
-    local height = 100
-    local size = Vector(self.game.view.size.x, height)
-    ui:createWindow("hudBottomBar", Vector(0, self.game.view.size.y - height), size, container)
+function BottomControlWindow:new(game, hud)
+    local o = { game = game, hud = hud }
+    setmetatable(o, self)
+    self.__index = self
+    return o
 end
 
-function Hud:onUnitUpdated(unit)
-    if unit == self.selectedUnits[1] then self:rebuildBottomBar() end
+function BottomControlWindow:rebuild()
+    local root = Flex:row()
+
+    local container = Container:new(Padding:new(root, 20))
+    container.fillParent = true
+    table.insert(container.classes, "windowContainer")
+
+    local size = Vector(cv:getWidth() - unitDisplayWindowWidth - turnIndicatorWindowWidth, 100)
+    ui:createWindow("bottomControls", Vector(unitDisplayWindowWidth, cv:getHeight() - size.y), size, container)
+end
+
+function UnitDisplayWindow:new(game, hud)
+    local o = { game = game, hud = hud }
+    game.eventBus:registerHandler("selectedUnitsUpdated", function()
+        o:rebuild()
+    end)
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function UnitDisplayWindow:rebuild()
+    local root = Flex:column(10)
+
+    local unit = self.hud.selectedUnits[1]
+    if unit ~= nil then
+        local header = Text:new("@size{20}{%unitName}", {unitName=unit.kind.name})
+        table.insert(header.classes, "highlightedText")
+        root:addFixedChild(header)
+        root:addFixedChild(Text:new("Strength: %strength", {strength=tostring(unit.strength)}))
+        root:addFixedChild(Text:new("Movement: %movement", {movement=tostring(unit.movementLeft)}))
+    end
+
+    local container = Container:new(Padding:new(root, 20))
+    container.fillParent = true
+    table.insert(container.classes, "windowContainer")
+
+    local size = Vector(unitDisplayWindowWidth, 150)
+    ui:createWindow("unitDisplay", Vector(0, cv:getHeight() - size.y), size, container)
+end
+
+function TurnIndicatorWindow:new(game, hud)
+    local o = { game = game, hud = hud }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function TurnIndicatorWindow:rebuild()
+    local root = Flex:row()
+
+    local container = Container:new(Padding:new(root, 20))
+    container.fillParent = true
+    table.insert(container.classes, "windowContainer")
+
+    local size = Vector(turnIndicatorWindowWidth, 150)
+    ui:createWindow("turnIndicator", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y), size, container)
 end
 
 return Hud
