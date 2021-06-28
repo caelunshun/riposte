@@ -48,7 +48,7 @@ function TreeRenderer:renderTile(cv, tile, tilePos, game)
     math.randomseed(seed)
 
     local numTrees = math.random(10, 20)
-    for _=0,numTrees do
+    for _=1,numTrees do
         local scaleX = (math.random() + 1) * 25
         local scaleY = scaleX * self.treeSpriteSize.y / self.treeSpriteSize.x
         local treePos =  Vector(math.random() * 100, math.random() * 100)
@@ -65,10 +65,24 @@ local UnitRenderer = {
 function UnitRenderer:renderTile(cv, tile, tilePos, game)
     -- Render the unit at the top of the stack,
     -- which corresponds to the strongest unit.
-    local unit = game:getStackAtPos(tilePos).units[1]
-    if unit ~= nil then
-        unit:render(cv, game)
+    -- However, if this is the selected stack,
+    -- the unit needs to be selected.
+    local unit = nil
+
+    local stack = game:getStackAtPos(tilePos)
+    if #stack.units == 0 then return end
+
+    if stack == game.hud.selectedStack then
+        for i=1,#stack.units do
+            if stack.units[i].isSelected then
+                unit = stack.units[i]
+                break
+            end
+        end
     end
+    if unit == nil then unit = stack.units[1] end
+
+    unit:render(cv, game)
 end
 
 -- Renders cities.
