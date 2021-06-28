@@ -73,7 +73,7 @@ function Hud:handleEvent(event)
 end
 
 function Hud:selectUnit(unit)
-    if self.selectedStack == nil then
+    if self.selectedStack == nil or #self.selectedUnits == 0 then
         self.selectedStack = self.game:getStackAtPos(unit.pos)
     end
 
@@ -93,10 +93,6 @@ function Hud:deselectUnit(unit)
             break
         end
     end
-
-    if #self.selectedUnits == 0 then
-        self.selectedStack = nil
-    end
 end
 
 function Hud:clearSelection()
@@ -105,7 +101,6 @@ function Hud:clearSelection()
         unit.isSelected = false
     end
     self.selectedUnits = {}
-    self.selectedStack = nil
     if didDeselect then
         self.game.eventBus:trigger("selectedUnitsUpdated", nil)
     end
@@ -308,10 +303,31 @@ function UnitStackWindow:rebuild()
                 if not mods.shift then
                     self.hud:clearSelection()
                 end
-                if unit.isSelected then
-                    self.hud:deselectUnit(unit)
+
+                local affectedUnits = {}
+                if mods.alt then
+                    -- Affect all units in the stack.
+                    affectedUnits = self.hud.selectedStack.units
+                elseif mods.control then
+                    -- Affect all units in the stack with the same kind as the clicked one.
+                    for _, u in ipairs(self.hud.selectedStack.units) do
+                        if unit.kind == u.kind then
+                            affectedUnits[#affectedUnits + 1] = u
+                        end
+                    end
                 else
-                    self.hud:selectUnit(unit)
+                    -- Affect only the clicked unit.
+                    affectedUnits[1] = unit
+                end
+
+                if unit.isSelected then
+                    for _, u in ipairs(affectedUnits) do
+                        self.hud:deselectUnit(u)
+                    end
+                else
+                    for _, u in ipairs(affectedUnits) do
+                        self.hud:selectUnit(u)
+                    end
                 end
             end)
 
