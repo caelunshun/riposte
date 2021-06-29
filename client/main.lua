@@ -68,7 +68,7 @@ function enterGame(bridge)
     game.client = client
 end
 
-local time = 0
+time = 0
 
 function render(dt)
     cursorPos = Vector(_G.cursorPos.x, _G.cursorPos.y)

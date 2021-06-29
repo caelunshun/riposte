@@ -13,9 +13,17 @@ end
 
 -- Updates the unit with data received in an UpdateUnit packet.
 function Unit:updateData(data, game)
+    local newPos = Vector(data.pos.x, data.pos.y)
+    if newPos ~= self.pos and self.pos ~= nil then
+        self.moveStartTime = time
+        self.previousPos = self.pos
+    end
+
     for k, v in pairs(data) do
         self[k] = v
     end
+
+    self.pos = newPos
 
     self.kind = registry.unitKinds[self.kindID]
     if self.kind == nil then print("received invalid unit kind " .. self.kindID .. "!") end
@@ -29,8 +37,6 @@ function Unit:updateData(data, game)
         baseline = dume.Baseline.Top,
     })
 
-    self.pos = Vector(self.pos.x, self.pos.y)
-
     self.owner = game.players[self.ownerID]
     if self.owner == nil then error("invalid unit owner ID") end
 end
@@ -40,6 +46,32 @@ function Unit:getOwner(game)
 end
 
 function Unit:render(cv, game)
+    -- Movement interpolation
+    local translation = Vector(0, 0)
+    if self.moveStartTime ~= nil then
+        -- integral of cosine velocity function for interpolation
+        local timeSinceMove = time - self.moveStartTime
+        local f = 1
+        local vel = 1500
+        local pos = 0
+        if timeSinceMove <= f then
+            pos = vel * -math.cos(timeSinceMove * f * math.pi) + vel
+        else
+            pos = (vel * -math.cos(f * f / 2 * math.pi) + vel) + vel * (timeSinceMove - f)
+        end
+
+        local posA = Vector(0, 0)
+        local posB = (self.pos - self.previousPos) % Vector(100, 100)
+        local dist = (posB - posA).length
+
+        pos = math.clamp(pos, 0, dist)
+
+        local ray = (posA - posB).normalized
+        translation = -(posB + (ray * pos))
+    end
+
+    cv:translate(translation)
+
     -- Unit icon
     local spriteID = "texture/unit/" .. self.kind.id
     local size = 60
@@ -54,6 +86,8 @@ function Unit:render(cv, game)
     cv:rect(Vector(70, 35), Vector(20, 30))
     cv:solidColor(owner.civ.color)
     cv:fill()
+
+    cv:translate(-translation)
 end
 
 -- Attempts to move the unit.

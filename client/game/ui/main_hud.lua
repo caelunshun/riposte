@@ -68,7 +68,7 @@ function Hud:handleEvent(event)
             local stack = self.game:getStackAtPos(clickedPos)
             local unit = stack.units[1]
             if unit ~= nil then
-g                self:selectUnitGroup(self.selectionGroups:popGroup(self.selectionGroups:getUnitGroup(unit), clickedPos))
+                self:selectUnitGroup(self.selectionGroups:popGroup(self.selectionGroups:getUnitGroup(unit), clickedPos))
                 return true
             elseif #self.selectedUnits > 0 then
                 self.selectedStack = nil
