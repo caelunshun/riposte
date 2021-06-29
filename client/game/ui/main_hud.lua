@@ -33,6 +33,7 @@ function Hud:new(game)
         selectionGroups = SelectionGroups:new(game),
         readyForNextTurn = false,
         tasks = TaskSequence:new(),
+        timeSinceLastSelect = nil,
     }
 
     o.windows = {
@@ -279,7 +280,24 @@ function Hud:renderNextTurnPrompt(cv, time)
     cv:drawParagraph(paragraph, Vector(0, cv:getHeight() - 150))
 end
 
-function Hud:render(cv, time)
+-- Automatically selects the next available unit group.
+function Hud:doAutoSelect()
+    self.tasks:enqueue(coroutine.create(function()
+        self:selectUnitGroup(self.selectionGroups:popNextGroup())
+    end))
+end
+
+function Hud:render(cv, time, dt)
+    if #self.selectedUnits > 0 then
+        self.timeSinceLastSelect = nil
+    else
+        self.timeSinceLastSelect = (self.timeSinceLastSelect or 0) + dt
+    end
+
+    if self.timeSinceLastSelect ~= nil and self.timeSinceLastSelect > 0.5 then
+        self:doAutoSelect()
+    end
+
     self.tasks:tick()
 
     self.game.view:applyZoom(cv)

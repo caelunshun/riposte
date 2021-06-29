@@ -87,7 +87,7 @@ function render(dt)
         if game ~= nil then
             game.view:tick(dt, cursorPos)
             Renderer:render(cv, game)
-            game.hud:render(cv, time)
+            game.hud:render(cv, time, dt)
         end
 
         ui:render()
