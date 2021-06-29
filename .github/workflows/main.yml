@@ -87,7 +87,7 @@ jobs:
       - name: Prepare build
         run: |
             sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
-            mkdir cmake-build-release
+            mkdir -p cmake-build-release
             cd cmake-build-release
             conan install ..
             cmake .. -DCMAKE_BUILD_TYPE=Release
