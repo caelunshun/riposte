@@ -72,7 +72,8 @@ function Hud:handleEvent(event)
 
     if event.type == dume.EventType.MouseClick then
         if event.action == dume.Action.Press
-                and event.mouse == dume.Mouse.Left then
+                and event.mouse == dume.Mouse.Left
+                and not (self.selectedStack ~= nil and self.selectedStack.pos == clickedPos) then
             -- Attempt to select a unit at the top of the stack.
             local stack = self.game:getStackAtPos(clickedPos)
             local unit = stack.units[1]
