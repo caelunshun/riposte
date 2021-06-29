@@ -54,6 +54,7 @@ message AnyClient {
   oneof packet {
     ClientInfo clientInfo = 1;
     ComputePath computePath = 2;
+    MoveUnit moveUnit = 3;
   }
 }
 

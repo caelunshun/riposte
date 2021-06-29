@@ -38,7 +38,15 @@ function Client:requestComputePath(callback, from, to, unitKindID)
     self.computedPathCallbacks[requestID] = callback
 end
 
+function Client:moveUnit(unit, newPos)
+    self:sendPacket("moveUnit", {
+        unitID = unit.id,
+        newPos = { x = newPos.x, y = newPos.y },
+    })
+end
+
 function Client:sendPacket(packetKind, packet)
+    print("Sending packet: " .. packetKind)
     local p = {
         [packetKind] = packet,
     }

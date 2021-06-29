@@ -62,7 +62,7 @@ function SelectionGroups:getUnitGroup(unit)
     return self.unitToGroup[unit.id]
 end
 
-function SelectionGroups:popGroup(group)
+function SelectionGroups:popGroup(group, expectedPos)
     local removed = false
     for i, g in ipairs(self.groups) do
         if g == group then
@@ -71,13 +71,14 @@ function SelectionGroups:popGroup(group)
             break
         end
     end
-    assert(removed)
 
     for _, unit in ipairs(group) do
-        self.unitToGroup[unit.id] = nil
+        if self.unitToGroup[unit.id] == group then
+            self.unitToGroup[unit.id] = nil
+        end
     end
 
-    self:splitGroup(group)
+    self:splitGroup(group, expectedPos)
     if #group == 0 then return self:popNextGroup() end
     return group
 end
@@ -85,8 +86,8 @@ end
 -- Removes units from the given group
 -- whose positions are not the same as the group's
 -- position.
-function SelectionGroups:splitGroup(group)
-    local pos = group[1].pos
+function SelectionGroups:splitGroup(group, expectedPos)
+    local pos = expectedPos or group[1].pos
     local toRemove = {}
     for i, unit in ipairs(group) do
         if unit.pos ~= pos then
@@ -96,7 +97,7 @@ function SelectionGroups:splitGroup(group)
 
     local newGroup = {}
     for j, i in ipairs(toRemove) do
-        table.insert(newGroup, table.remove(group, i - j))
+        table.insert(newGroup, table.remove(group, i - (j - 1)))
     end
 
     self:createGroup(newGroup)

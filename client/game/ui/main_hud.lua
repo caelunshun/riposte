@@ -68,7 +68,7 @@ function Hud:handleEvent(event)
             local stack = self.game:getStackAtPos(clickedPos)
             local unit = stack.units[1]
             if unit ~= nil then
-                self:selectUnitGroup(self.selectionGroups:popGroup(self.selectionGroups:getUnitGroup(unit)))
+g                self:selectUnitGroup(self.selectionGroups:popGroup(self.selectionGroups:getUnitGroup(unit), clickedPos))
                 return true
             elseif #self.selectedUnits > 0 then
                 self.selectedStack = nil
@@ -83,6 +83,13 @@ function Hud:handleEvent(event)
                     shouldComputePath = true
                 end
             elseif event.action == dume.Action.Release then
+                if self.stagedPath ~= nil and self.hasStagedPath then
+                    for _, unit in ipairs(self.selectedUnits) do
+                        unit:moveTo(Vector(self.stagedPath.positions[3], self.stagedPath.positions[4]))
+                    end
+                    self:clearSelection()
+                end
+
                 self.stagedPath = nil
                 self.hasStagedPath = false
             end

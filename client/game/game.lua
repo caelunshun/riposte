@@ -67,27 +67,29 @@ end
 function Game:addUnit(data)
     local existingUnit = self.units[data.id]
     if existingUnit ~= nil then
-        local stack = self:getStackAtPos(data.pos)
+        local stack = self:getStackAtPos(existingUnit.pos)
         if stack ~= nil then
             stack:removeUnit(existingUnit)
         end
     end
 
-    self.units[data.id] = Unit:new(data, self)
+    local unit = existingUnit or Unit:new(self)
+    unit:updateData(data, self)
+    self.units[unit.id] = unit
 
-    local stackIndex = data.pos.x + data.pos.y * self.mapWidth
+    local stackIndex = unit.pos.x + unit.pos.y * self.mapWidth
     local stack = self.stacksByPos[stackIndex]
-    if stack == nil then self.stacksByPos[stackIndex] = Stack:new(data.pos); stack = self.stacksByPos[stackIndex] end
-    stack:addUnit(self.units[data.id])
-
-    if data.ownerID == 0 then
-        self.view.center = Vector(data.pos.x * 100 + 50, data.pos.y * 100 + 50)
-    end
+    if stack == nil then self.stacksByPos[stackIndex] = Stack:new(unit.pos); stack = self.stacksByPos[stackIndex] end
+    stack:addUnit(unit)
 
     if existingUnit == nil then
-        self.eventBus:trigger("unitCreated", self.units[data.id])
+        self.eventBus:trigger("unitCreated", unit)
+
+        if unit.ownerID == self.thePlayer.id then
+            self.view.center = Vector(unit.pos.x * 100 + 50, unit.pos.y * 100 + 50)
+        end
     end
-    self.eventBus:trigger("unitUpdated", self.units[data.id])
+    self.eventBus:trigger("unitUpdated", unit)
 end
 
 function Game:isUnitAlive(unit)

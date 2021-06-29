@@ -13,6 +13,7 @@
 #include "ship.h"
 #include <nuklear.h>
 #include <iostream>
+#include "server.h"
 
 namespace rip {
      FoundCityCapability::FoundCityCapability(UnitId unitID) : Capability(unitID) {}
@@ -297,5 +298,7 @@ namespace rip {
         }
 
         inCombat = false;
+
+        game.getServer().broadcastUnitUpdate(*this);
     }
 }

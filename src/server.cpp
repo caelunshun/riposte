@@ -13,7 +13,9 @@
 #include "ship.h"
 #include <thread>
 
-#define SEND(packet, anyservername)  { AnyServer _anyServer; _anyServer.mutable_##anyservername()->CopyFrom(packet); send(std::move(_anyServer)); }
+#define PACKET(packet, anyservername) AnyServer _anyServer; _anyServer.mutable_##anyservername()->CopyFrom(packet);
+#define SEND(packet, anyservername)  { PACKET(packet, anyservername); send(_anyServer); }
+#define BROADCAST(packet, anyservername) { PACKET(packet, anyservername); for (auto &connection : connections) { connection.send(_anyServer); }}
 
 namespace rip {
     void setPlayerInfo(const Player &player, PlayerInfo &playerInfo) {
@@ -229,11 +231,17 @@ namespace rip {
         SEND(response, pathcomputed);
     }
 
+    void Connection::handleMoveUnit(Game &game, const MoveUnit &packet) {
+        game.getUnit({packet.unitid(), 0}).moveTo(glm::uvec2(packet.newpos().x(), packet.newpos().y()), game, true);
+    }
+
     void Connection::handlePacket(Game &game, AnyClient &packet) {
         if (packet.has_clientinfo()) {
             handleClientInfo(game, packet.clientinfo());
         } else if (packet.has_computepath()) {
             handleComputePath(game, packet.computepath());
+        } else if (packet.has_moveunit()) {
+            handleMoveUnit(game, packet.moveunit());
         }
     }
 
@@ -270,5 +278,10 @@ namespace rip {
 
             std::this_thread::sleep_for(std::chrono::milliseconds(15));
         }
+    }
+
+    void Server::broadcastUnitUpdate(Unit &unit) {
+        auto packet = getUpdateUnitPacket(game, unit);
+        BROADCAST(packet, updateunit);
     }
 }

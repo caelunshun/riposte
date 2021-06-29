@@ -490,6 +490,7 @@ class AnyClient final :
   enum PacketCase {
     kClientInfo = 1,
     kComputePath = 2,
+    kMoveUnit = 3,
     PACKET_NOT_SET = 0,
   };
 
@@ -571,6 +572,7 @@ class AnyClient final :
   enum : int {
     kClientInfoFieldNumber = 1,
     kComputePathFieldNumber = 2,
+    kMoveUnitFieldNumber = 3,
   };
   // .ClientInfo clientInfo = 1;
   bool has_clientinfo() const;
@@ -608,6 +610,24 @@ class AnyClient final :
       ::ComputePath* computepath);
   ::ComputePath* unsafe_arena_release_computepath();
 
+  // .MoveUnit moveUnit = 3;
+  bool has_moveunit() const;
+  private:
+  bool _internal_has_moveunit() const;
+  public:
+  void clear_moveunit();
+  const ::MoveUnit& moveunit() const;
+  PROTOBUF_MUST_USE_RESULT ::MoveUnit* release_moveunit();
+  ::MoveUnit* mutable_moveunit();
+  void set_allocated_moveunit(::MoveUnit* moveunit);
+  private:
+  const ::MoveUnit& _internal_moveunit() const;
+  ::MoveUnit* _internal_mutable_moveunit();
+  public:
+  void unsafe_arena_set_allocated_moveunit(
+      ::MoveUnit* moveunit);
+  ::MoveUnit* unsafe_arena_release_moveunit();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyClient)
@@ -615,6 +635,7 @@ class AnyClient final :
   class _Internal;
   void set_has_clientinfo();
   void set_has_computepath();
+  void set_has_moveunit();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -627,6 +648,7 @@ class AnyClient final :
       ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
     ::ClientInfo* clientinfo_;
     ::ComputePath* computepath_;
+    ::MoveUnit* moveunit_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -7411,6 +7433,80 @@ inline ::ComputePath* AnyClient::_internal_mutable_computepath() {
 inline ::ComputePath* AnyClient::mutable_computepath() {
   ::ComputePath* _msg = _internal_mutable_computepath();
   // @@protoc_insertion_point(field_mutable:AnyClient.computePath)
+  return _msg;
+}
+
+// .MoveUnit moveUnit = 3;
+inline bool AnyClient::_internal_has_moveunit() const {
+  return packet_case() == kMoveUnit;
+}
+inline bool AnyClient::has_moveunit() const {
+  return _internal_has_moveunit();
+}
+inline void AnyClient::set_has_moveunit() {
+  _oneof_case_[0] = kMoveUnit;
+}
+inline void AnyClient::clear_moveunit() {
+  if (_internal_has_moveunit()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.moveunit_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::MoveUnit* AnyClient::release_moveunit() {
+  // @@protoc_insertion_point(field_release:AnyClient.moveUnit)
+  if (_internal_has_moveunit()) {
+    clear_has_packet();
+      ::MoveUnit* temp = packet_.moveunit_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.moveunit_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::MoveUnit& AnyClient::_internal_moveunit() const {
+  return _internal_has_moveunit()
+      ? *packet_.moveunit_
+      : reinterpret_cast< ::MoveUnit&>(::_MoveUnit_default_instance_);
+}
+inline const ::MoveUnit& AnyClient::moveunit() const {
+  // @@protoc_insertion_point(field_get:AnyClient.moveUnit)
+  return _internal_moveunit();
+}
+inline ::MoveUnit* AnyClient::unsafe_arena_release_moveunit() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.moveUnit)
+  if (_internal_has_moveunit()) {
+    clear_has_packet();
+    ::MoveUnit* temp = packet_.moveunit_;
+    packet_.moveunit_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_moveunit(::MoveUnit* moveunit) {
+  clear_packet();
+  if (moveunit) {
+    set_has_moveunit();
+    packet_.moveunit_ = moveunit;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.moveUnit)
+}
+inline ::MoveUnit* AnyClient::_internal_mutable_moveunit() {
+  if (!_internal_has_moveunit()) {
+    clear_packet();
+    set_has_moveunit();
+    packet_.moveunit_ = CreateMaybeMessage< ::MoveUnit >(GetArenaForAllocation());
+  }
+  return packet_.moveunit_;
+}
+inline ::MoveUnit* AnyClient::mutable_moveunit() {
+  ::MoveUnit* _msg = _internal_mutable_moveunit();
+  // @@protoc_insertion_point(field_mutable:AnyClient.moveUnit)
   return _msg;
 }
 

@@ -19,20 +19,21 @@ namespace rip {
         // ID of the player using this connection.
         PlayerId playerID;
 
+    public:
+        Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID) : bridge(std::move(bridge)), playerID(playerID) {}
+
         template<typename T>
-        void send(T packet) {
+        void send(T &packet) {
             std::string data;
             packet.SerializeToString(&data);
             bridge->sendPacket(std::move(data));
         }
 
-    public:
-        Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID) : bridge(std::move(bridge)), playerID(playerID) {}
-
         void sendGameData(Game &game);
 
         void handleClientInfo(Game &game, const ClientInfo &packet);
         void handleComputePath(Game &game, const ComputePath &packet);
+        void handleMoveUnit(Game &game, const MoveUnit &packet);
         void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);
@@ -42,14 +43,16 @@ namespace rip {
     //
     // Wraps a Game and handles connections by sending/handling packets.
     class Server {
-        Game game;
-
         std::vector<Connection> connections;
 
     public:
+        Game game;
+
         Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree);
 
         void addConnection(std::unique_ptr<Bridge> bridge);
+
+        void broadcastUnitUpdate(Unit &unit);
 
         void run();
     };

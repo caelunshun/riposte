@@ -2,6 +2,7 @@
 // Created by Caelum van Ispelen on 5/11/21.
 //
 
+#include "server.h"
 #include "game.h"
 #include "culture.h"
 #include "city.h"
@@ -60,6 +61,8 @@ namespace rip {
         bool inTurnEnd = false;
 
         std::shared_ptr<ScriptEngine> scriptEngine;
+
+        std::shared_ptr<Server> server;
 
         _impl(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry)
         : theMap(static_cast<size_t>(mapWidth) * mapHeight),
@@ -480,6 +483,14 @@ namespace rip {
 
     ScriptEngine &Game::getScriptEngine() {
         return *impl->scriptEngine;
+    }
+
+    Server &Game::getServer() {
+        return *impl->server;
+    }
+
+    void Game::setServer(std::shared_ptr<Server> server) {
+        impl->server = server;
     }
 
     // EVENTS

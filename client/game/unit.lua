@@ -4,12 +4,24 @@ local dume = require("dume")
 local style = require("ui/style")
 local Vector = require("brinevector")
 
-function Unit:new(data, game)
-    data.kind = registry.unitKinds[data.kindID]
-    if data.kind == nil then print("received invalid unit kind " .. data.kindID .. "!") end
+function Unit:new(game)
+    local o = { game = game }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
 
-    data.nameText = cv:parseTextMarkup("@bold{@size{14}{@color{rgb(0,0,0)}{%name}}}", style.default.text.defaultTextStyle, {name=data.kind.name})
-    data.nameParagraph = cv:createParagraph(data.nameText, {
+-- Updates the unit with data received in an UpdateUnit packet.
+function Unit:updateData(data, game)
+    for k, v in pairs(data) do
+        self[k] = v
+    end
+
+    self.kind = registry.unitKinds[self.kindID]
+    if self.kind == nil then print("received invalid unit kind " .. self.kindID .. "!") end
+
+    self.nameText = cv:parseTextMarkup("@bold{@size{14}{@color{rgb(0,0,0)}{%name}}}", style.default.text.defaultTextStyle, {name=self.kind.name})
+    self.nameParagraph = cv:createParagraph(self.nameText, {
         alignH = dume.Align.Center,
         alignV = dume.Align.Start,
         lineBreaks = false,
@@ -17,14 +29,10 @@ function Unit:new(data, game)
         baseline = dume.Baseline.Top,
     })
 
-    data.pos = Vector(data.pos.x, data.pos.y)
+    self.pos = Vector(self.pos.x, self.pos.y)
 
-    data.owner = game.players[data.ownerID]
-    if data.owner == nil then error("invalid unit owner ID") end
-
-    setmetatable(data, self)
-    self.__index = self
-    return data
+    self.owner = game.players[self.ownerID]
+    if self.owner == nil then error("invalid unit owner ID") end
 end
 
 function Unit:getOwner(game)
@@ -46,6 +54,14 @@ function Unit:render(cv, game)
     cv:rect(Vector(70, 35), Vector(20, 30))
     cv:solidColor(owner.civ.color)
     cv:fill()
+end
+
+-- Attempts to move the unit.
+--
+-- Note that the position update is delayed until
+-- we receive a response packet from the server.
+function Unit:moveTo(newPos)
+    self.game.client:moveUnit(self, newPos)
 end
 
 return Unit

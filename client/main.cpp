@@ -63,11 +63,12 @@ namespace rip {
     void makeLuaClientBindings(sol::state &lua, std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree) {
         lua["createSingleplayerGame"] = [=]() {
             auto bridges = newLocalBridgePair();
-            Server server(registry, techTree);
-            server.addConnection(std::move(bridges.first));
+            auto server = std::make_shared<Server>(registry, techTree);
+            server->game.setServer(server);
+            server->addConnection(std::move(bridges.first));
 
             auto serverThread = std::thread([server = std::move(server)] () mutable {
-                server.run();
+                server->run();
             });
             serverThread.detach();
 

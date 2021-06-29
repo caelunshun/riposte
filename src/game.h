@@ -30,6 +30,7 @@ namespace rip {
     class Stack;
     class Event;
     class ScriptEngine;
+    class Server;
 
     class Game {
         class _impl;
@@ -37,6 +38,8 @@ namespace rip {
 
     public:
         Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry);
+
+        void setServer(std::shared_ptr<Server> server);
 
         ~Game();
 
@@ -137,6 +140,8 @@ namespace rip {
 
         void onWarDeclared(Player &declarer, Player &declared);
         void onDialogueOpened(Player &with);
+
+        Server &getServer();
     };
 }
 
