@@ -31,6 +31,7 @@ function Hud:new(game)
         game = game,
         selectionGroups = SelectionGroups:new(game),
         deselectionTime = 0,
+        readyForNextTurn = false,
     }
 
     o.windows = {
@@ -57,6 +58,12 @@ function Hud:rebuildWindows()
 end
 
 function Hud:handleEvent(event)
+    if event.type == dume.EventType.Key and event.action == dume.Action.Release
+            and event.key == dume.Key.Enter and self.readyForNextTurn then
+        self.game.client:endTurn()
+        self.readyForNextTurn = false
+    end
+    
     if event.pos == nil then return end
     local clickedPos = self.game.view:getTilePosForScreenOffset(event.pos)
 
@@ -234,16 +241,43 @@ function Hud:renderSelectionCircle(cv, time)
     end
 end
 
+function Hud:renderNextTurnPrompt(cv, time)
+    local size = Vector(cv:getWidth(), cv:getHeight())
+
+    -- animate alpha
+    local alpha = math.floor((math.cos(time * math.pi) + 1) / 2 * 255)
+    local text = cv:parseTextMarkup("@color{%color}{@size{18}{Press <ENTER> to end turn....}}", style.default.text.defaultTextStyle, {
+        color = dumeColorToString(dume.rgb(255, 255, 255, alpha)),
+    })
+    local paragraph = cv:createParagraph(text, {
+        alignH = dume.Align.Center,
+        alignV = dume.Align.Start,
+        baseline = dume.Baseline.Middle,
+        lineBreaks = false,
+        maxDimensions = size,
+    })
+
+    cv:drawParagraph(paragraph, Vector(0, cv:getHeight() - 150))
+end
+
 function Hud:render(cv, time)
     if self.deselectionTime ~= nil and time - self.deselectionTime >= 0.5 and #self.selectedUnits == 0 then
-        self:selectUnitGroup(self.selectionGroups:popNextGroup())
+        local group = self.selectionGroups:popNextGroup()
+        self.readyForNextTurn = (group == nil)
+        self:selectUnitGroup(group)
         self.deselectionTime = nil
     end
 
     self.game.view:applyZoom(cv)
+
     self:renderStagedPath(cv)
     self:renderSelectionCircle(cv, time)
+
     cv:resetTransform()
+
+    if self.readyForNextTurn then
+        self:renderNextTurnPrompt(cv, time)
+    end
 end
 
 local unitDisplayWindowWidth = 200

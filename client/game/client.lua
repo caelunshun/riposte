@@ -45,6 +45,10 @@ function Client:moveUnit(unit, newPos)
     })
 end
 
+function Client:endTurn()
+    self:sendPacket("endTurn", {})
+end
+
 function Client:sendPacket(packetKind, packet)
     print("Sending packet: " .. packetKind)
     local p = {

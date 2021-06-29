@@ -47,7 +47,7 @@ struct TableStruct_riposte_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[39]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[40]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -84,6 +84,9 @@ extern ClientInfoDefaultTypeInternal _ClientInfo_default_instance_;
 class ComputePath;
 struct ComputePathDefaultTypeInternal;
 extern ComputePathDefaultTypeInternal _ComputePath_default_instance_;
+class EndTurn;
+struct EndTurnDefaultTypeInternal;
+extern EndTurnDefaultTypeInternal _EndTurn_default_instance_;
 class FoundCityCapability;
 struct FoundCityCapabilityDefaultTypeInternal;
 extern FoundCityCapabilityDefaultTypeInternal _FoundCityCapability_default_instance_;
@@ -182,6 +185,7 @@ template<> ::Capability* Arena::CreateMaybeMessage<::Capability>(Arena*);
 template<> ::CarryUnitsCapability* Arena::CreateMaybeMessage<::CarryUnitsCapability>(Arena*);
 template<> ::ClientInfo* Arena::CreateMaybeMessage<::ClientInfo>(Arena*);
 template<> ::ComputePath* Arena::CreateMaybeMessage<::ComputePath>(Arena*);
+template<> ::EndTurn* Arena::CreateMaybeMessage<::EndTurn>(Arena*);
 template<> ::FoundCityCapability* Arena::CreateMaybeMessage<::FoundCityCapability>(Arena*);
 template<> ::Improvement* Arena::CreateMaybeMessage<::Improvement>(Arena*);
 template<> ::KickPlayer* Arena::CreateMaybeMessage<::KickPlayer>(Arena*);
@@ -491,6 +495,7 @@ class AnyClient final :
     kClientInfo = 1,
     kComputePath = 2,
     kMoveUnit = 3,
+    kEndTurn = 4,
     PACKET_NOT_SET = 0,
   };
 
@@ -573,6 +578,7 @@ class AnyClient final :
     kClientInfoFieldNumber = 1,
     kComputePathFieldNumber = 2,
     kMoveUnitFieldNumber = 3,
+    kEndTurnFieldNumber = 4,
   };
   // .ClientInfo clientInfo = 1;
   bool has_clientinfo() const;
@@ -628,6 +634,24 @@ class AnyClient final :
       ::MoveUnit* moveunit);
   ::MoveUnit* unsafe_arena_release_moveunit();
 
+  // .EndTurn endTurn = 4;
+  bool has_endturn() const;
+  private:
+  bool _internal_has_endturn() const;
+  public:
+  void clear_endturn();
+  const ::EndTurn& endturn() const;
+  PROTOBUF_MUST_USE_RESULT ::EndTurn* release_endturn();
+  ::EndTurn* mutable_endturn();
+  void set_allocated_endturn(::EndTurn* endturn);
+  private:
+  const ::EndTurn& _internal_endturn() const;
+  ::EndTurn* _internal_mutable_endturn();
+  public:
+  void unsafe_arena_set_allocated_endturn(
+      ::EndTurn* endturn);
+  ::EndTurn* unsafe_arena_release_endturn();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyClient)
@@ -636,6 +660,7 @@ class AnyClient final :
   void set_has_clientinfo();
   void set_has_computepath();
   void set_has_moveunit();
+  void set_has_endturn();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -649,6 +674,7 @@ class AnyClient final :
     ::ClientInfo* clientinfo_;
     ::ComputePath* computepath_;
     ::MoveUnit* moveunit_;
+    ::EndTurn* endturn_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -7233,6 +7259,132 @@ class SetResearch final :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
+// -------------------------------------------------------------------
+
+class EndTurn final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:EndTurn) */ {
+ public:
+  inline EndTurn() : EndTurn(nullptr) {}
+  ~EndTurn() override;
+  explicit constexpr EndTurn(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  EndTurn(const EndTurn& from);
+  EndTurn(EndTurn&& from) noexcept
+    : EndTurn() {
+    *this = ::std::move(from);
+  }
+
+  inline EndTurn& operator=(const EndTurn& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline EndTurn& operator=(EndTurn&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const EndTurn& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const EndTurn* internal_default_instance() {
+    return reinterpret_cast<const EndTurn*>(
+               &_EndTurn_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    39;
+
+  friend void swap(EndTurn& a, EndTurn& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(EndTurn* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(EndTurn* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline EndTurn* New() const final {
+    return new EndTurn();
+  }
+
+  EndTurn* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<EndTurn>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const EndTurn& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const EndTurn& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(EndTurn* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "EndTurn";
+  }
+  protected:
+  explicit EndTurn(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:EndTurn)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
 // ===================================================================
 
 
@@ -7507,6 +7659,80 @@ inline ::MoveUnit* AnyClient::_internal_mutable_moveunit() {
 inline ::MoveUnit* AnyClient::mutable_moveunit() {
   ::MoveUnit* _msg = _internal_mutable_moveunit();
   // @@protoc_insertion_point(field_mutable:AnyClient.moveUnit)
+  return _msg;
+}
+
+// .EndTurn endTurn = 4;
+inline bool AnyClient::_internal_has_endturn() const {
+  return packet_case() == kEndTurn;
+}
+inline bool AnyClient::has_endturn() const {
+  return _internal_has_endturn();
+}
+inline void AnyClient::set_has_endturn() {
+  _oneof_case_[0] = kEndTurn;
+}
+inline void AnyClient::clear_endturn() {
+  if (_internal_has_endturn()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.endturn_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::EndTurn* AnyClient::release_endturn() {
+  // @@protoc_insertion_point(field_release:AnyClient.endTurn)
+  if (_internal_has_endturn()) {
+    clear_has_packet();
+      ::EndTurn* temp = packet_.endturn_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.endturn_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::EndTurn& AnyClient::_internal_endturn() const {
+  return _internal_has_endturn()
+      ? *packet_.endturn_
+      : reinterpret_cast< ::EndTurn&>(::_EndTurn_default_instance_);
+}
+inline const ::EndTurn& AnyClient::endturn() const {
+  // @@protoc_insertion_point(field_get:AnyClient.endTurn)
+  return _internal_endturn();
+}
+inline ::EndTurn* AnyClient::unsafe_arena_release_endturn() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.endTurn)
+  if (_internal_has_endturn()) {
+    clear_has_packet();
+    ::EndTurn* temp = packet_.endturn_;
+    packet_.endturn_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_endturn(::EndTurn* endturn) {
+  clear_packet();
+  if (endturn) {
+    set_has_endturn();
+    packet_.endturn_ = endturn;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.endTurn)
+}
+inline ::EndTurn* AnyClient::_internal_mutable_endturn() {
+  if (!_internal_has_endturn()) {
+    clear_packet();
+    set_has_endturn();
+    packet_.endturn_ = CreateMaybeMessage< ::EndTurn >(GetArenaForAllocation());
+  }
+  return packet_.endturn_;
+}
+inline ::EndTurn* AnyClient::mutable_endturn() {
+  ::EndTurn* _msg = _internal_mutable_endturn();
+  // @@protoc_insertion_point(field_mutable:AnyClient.endTurn)
   return _msg;
 }
 
@@ -12775,9 +13001,15 @@ inline void SetResearch::set_allocated_techid(std::string* techid) {
   // @@protoc_insertion_point(field_set_allocated:SetResearch.techID)
 }
 
+// -------------------------------------------------------------------
+
+// EndTurn
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

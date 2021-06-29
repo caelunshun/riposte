@@ -20,6 +20,9 @@ namespace rip {
         PlayerId playerID;
 
     public:
+        // Whether the player has ended their current turn.
+        bool endedTurn = false;
+
         Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID) : bridge(std::move(bridge)), playerID(playerID) {}
 
         template<typename T>

@@ -55,6 +55,7 @@ message AnyClient {
     ClientInfo clientInfo = 1;
     ComputePath computePath = 2;
     MoveUnit moveUnit = 3;
+    EndTurn endTurn = 4;
   }
 }
 
@@ -359,4 +360,8 @@ message SetEconomySettings {
 
 message SetResearch {
   string techID = 1;
+}
+
+message EndTurn {
+
 }

@@ -242,6 +242,8 @@ namespace rip {
             handleComputePath(game, packet.computepath());
         } else if (packet.has_moveunit()) {
             handleMoveUnit(game, packet.moveunit());
+        } else if (packet.has_endturn()) {
+            endedTurn = true;
         }
     }
 
@@ -274,6 +276,22 @@ namespace rip {
         while (!connections.empty()) {
             for (auto &connection : connections) {
                 connection.update(game);
+            }
+
+            bool haveAllTurnsEnded = true;
+            for (auto &connection : connections) {
+                if (!connection.endedTurn) {
+                    haveAllTurnsEnded = false;
+                    break;
+                }
+            }
+
+            if (haveAllTurnsEnded) {
+                game.advanceTurn();
+                for (auto &connection : connections) {
+                    connection.endedTurn = false;
+                    connection.sendGameData(game);
+                }
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(15));

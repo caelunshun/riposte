@@ -102,7 +102,7 @@ function City:renderBubble(cv)
         local progress = self.buildTask.progress / self.buildTask.cost
         local projectedProgress = (self.buildTask.progress + self.yield.hammers) / self.buildTask.cost
         renderProgressBar(cv, Vector(0, 20), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
-            style.productionProgressBar.default.progressColor, style.default.productionProgressBar.positivePredictedProgressColor)
+            style.default.productionProgressBar.progressColor, style.default.productionProgressBar.positivePredictedProgressColor)
     end
 
     -- Population growth population bar
