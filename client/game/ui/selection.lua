@@ -43,11 +43,29 @@ function SelectionGroups:createGroup(units)
 end
 
 -- Pops the next group to be selected.
+-- This method will skip groups containing only
+-- units that cannot move this turn.
 --
 -- If there is no available selection, then we return nil.
 function SelectionGroups:popNextGroup()
-    if #self.groups == 0 then return nil end
-    local group = self.groups[1]
+    local group = nil
+    local i = 1
+    while i <= #self.groups do
+        group = self.groups[i]
+
+        local valid = false
+        for _, unit in ipairs(group) do
+            if unit.movementLeft > 0.1 then
+                valid = true
+            end
+        end
+
+        if valid then break end
+
+        i = i + 1
+    end
+
+    if group == nil or i > #self.groups then return nil end
 
     if #group == 0 then
         table.remove(self.groups, 1)

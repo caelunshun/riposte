@@ -400,7 +400,7 @@ function UnitStackWindow:rebuild()
 
     root:setCrossAlign(dume.Align.End)
 
-    if self.hud.selectedStack ~= nil then
+    if self.hud.selectedStack ~= nil and #self.hud.selectedUnits > 0 then
         for _, unit in ipairs(self.hud.selectedStack.units) do
             if unit.owner == self.game.thePlayer then
                 local image = Image:new("icon/unit_head/" .. unit.kind.id, 35)
