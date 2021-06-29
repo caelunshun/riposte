@@ -35,6 +35,7 @@ set(SOURCES ${NANOVG_SOURCES} proto/riposte.pb.cc client/main.cpp src/ripmath.h 
 
 add_executable(riposte ${SOURCES})
 
+set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "" FORCE)
 add_subdirectory(external/FastNoise2)
 
 corrosion_import_crate(MANIFEST_PATH crodio/Cargo.toml)

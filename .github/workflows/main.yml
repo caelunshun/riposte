@@ -1,0 +1,117 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+    
+  pull_request:
+    branches: [ master ]
+    
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: recursive
+
+      - name: Install Conan
+        run: |
+           pwd
+           pip3 install wheel setuptools
+           pip3 install conan
+           export PATH=$PATH:/home/runner/.local/bin
+           echo $PATH
+           sudo ln -s ~/.local/bin/conan /usr/local/bin/conan
+           conan --version
+           ls
+           
+           # Caching
+
+        # Work around https://github.com/actions/cache/issues/403 by using GNU tar
+        # instead of BSD tar.
+      - name: Install GNU tar
+        if: matrix.os == 'macos-10.15'
+        run: |
+          brew install gnu-tar
+          echo PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH" >> $GITHUB_ENV
+          
+      - name: Cache cargo registry
+        uses: actions/cache@v2
+        with:
+          path: ~/.cargo/registry
+          key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-registry-
+      - name: Cache cargo index
+        uses: actions/cache@v2
+        with:
+          path: ~/.cargo/git
+          key: ${{ runner.os }}-cargo-index-${{ hashFiles('**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-cargo-index-
+            
+      - name: Cache build
+        uses: actions/cache@v2
+        with:
+          path: cmake-build-release
+          key: ${{ runner.os }}-cmake-build
+           
+      - name: Cache protobuf library
+        id: cache-protobuf
+        uses: actions/cache@v1
+        with:
+          path: protobuf
+          key: ${{ runner.os }}-protobuf
+          
+      - name: Build protobuf library
+        if: steps.cache-protobuf.outputs.cache-hit != 'true'
+        run: |
+           git clone https://github.com/protocolbuffers/protobuf.git
+           cd protobuf
+           git submodule update --init --recursive
+           ./autogen.sh
+           ./autogen.sh
+           ./configure
+           make -j2
+           
+      - name: Install protobuf library
+        run: |
+           cd protobuf
+           sudo make install
+           sudo ldconfig
+           
+      - name: Prepare build
+        run: |
+            sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
+            mkdir -p cmake-build-release
+            cd cmake-build-release
+            conan install ..
+            cmake .. -DCMAKE_BUILD_TYPE=Release
+            cd ..
+      
+      - name: Build
+        run: cd cmake-build-release && cmake --build . --target riposte
+        
+      - name: Update Rust
+        run: rustup update
+        
+      - name: Build riposte-bundler
+        run: |
+            cd bundler
+            cargo build --release
+            cd ..
+            
+      - name: Bundle
+        run: bundler/target/release/riposte-bundler
+        
+      - name: Upload bundle artifact
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: cmake-build-release/riposte.tar.zst
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
