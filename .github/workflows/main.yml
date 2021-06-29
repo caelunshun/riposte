@@ -55,7 +55,7 @@ jobs:
            
       - name: Prepare build
         run: |
-            sudo apt install libgl-dev libglu1-mesa-dev libsdl2-dev libsdl2-2.0-0 -y
+            sudo apt install libgl-dev libglu1-mesa-dev -y
             mkdir cmake-build-release
             cd cmake-build-release
             conan install ..
