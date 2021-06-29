@@ -126,15 +126,36 @@ function Hud:computePath(from, to)
     end))
 end
 
+function Hud:moveGroupAlongPath(units, path, successCallback, failureCallback)
+    self.tasks:enqueue(coroutine.create(function()
+        local success = self.game.client:moveUnitsAlongPath(units, path)
+        if success then
+            -- Consume the part of the path that we followed.
+            while #path.positions >= 2 and Vector(path.positions[1], path.positions[2]) ~= units[1].pos do
+                table.remove(path.positions, 1)
+                table.remove(path.positions, 1)
+            end
+
+            print("LENGTH: " .. #path.positions)
+            for i=1,#path.positions,2 do
+                print(path.positions[i], path.positions[i + 1])
+            end
+
+            units.followingPath = path
+
+            if successCallback ~= nil then successCallback() end
+        else
+            if failureCallback ~= nil then failureCallback() end
+        end
+    end))
+end
+
 -- Enqueues a task that moves the current selection along the currently staged path.
 -- After the task finishes, the selection is cleared if moving the units was successful.
 function Hud:moveSelectionAlongStagedPath()
-    self.tasks:enqueue(coroutine.create(function()
-        local success = self.game.client:moveUnitsAlongPath(self.selectedUnits, self.stagedPath)
-        if success then
-            self:clearSelection()
-        end
-    end))
+    self:moveGroupAlongPath(self.selectedUnits, self.stagedPath, function()
+        self:clearSelection()
+    end)
 end
 
 function Hud:selectUnitGroup(group)
@@ -188,8 +209,8 @@ function Hud:deselectUnit(unit)
     end))
 end
 
-function Hud:clearSelectionNow(usingPath)
-    self.selectionGroups:createGroup(self.selectedUnits, usingPath)
+function Hud:clearSelectionNow()
+    self.selectionGroups:createGroup(self.selectedUnits)
 
     local didDeselect = #self.selectedUnits > 0
     for _, unit in ipairs(self.selectedUnits) do
@@ -202,9 +223,9 @@ function Hud:clearSelectionNow(usingPath)
     return didDeselect
 end
 
-function Hud:clearSelection(usingPath)
+function Hud:clearSelection()
     self.tasks:enqueue(coroutine.create(function()
-        self:clearSelectionNow(usingPath)
+        self:clearSelectionNow()
     end))
 end
 
@@ -283,7 +304,22 @@ end
 -- Automatically selects the next available unit group.
 function Hud:doAutoSelect()
     self.tasks:enqueue(coroutine.create(function()
-        self:selectUnitGroup(self.selectionGroups:popNextGroup())
+        local group = self.selectionGroups:popNextGroup()
+
+        if group == nil then
+            self.readyForNextTurn = true
+            return
+        end
+
+        if group.followingPath ~= nil then
+            self:moveGroupAlongPath(group, group.followingPath, function()
+                self.selectionGroups:createGroup(group)
+            end, function()
+                self:selectUnitGroup(group)
+            end)
+        else
+            self:selectUnitGroup(group)
+        end
     end))
 end
 

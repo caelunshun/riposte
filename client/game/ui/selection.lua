@@ -27,10 +27,9 @@ end
 -- Creates a new group containing the given units.
 --
 -- Any units already in a group are removed from their current group.
-function SelectionGroups:createGroup(units, usingPath)
+function SelectionGroups:createGroup(units)
     if #units == 0 then return end
 
-    units.usingPath = usingPath
     self.groups[#self.groups + 1] = units
 
     for _, unit in ipairs(units) do
@@ -54,10 +53,11 @@ function SelectionGroups:popNextGroup()
     while i <= #self.groups do
         group = self.groups[i]
 
-        local valid = false
+        local valid = true
         for _, unit in ipairs(group) do
-            if unit.movementLeft > 0.1 then
-                valid = true
+            if unit.movementLeft < 0.1 then
+                valid = false
+                break
             end
         end
 
