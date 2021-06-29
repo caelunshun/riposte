@@ -30,6 +30,7 @@ function Hud:new(game)
         stagedPathTarget = nil,
         game = game,
         selectionGroups = SelectionGroups:new(game),
+        deselectionTime = 0,
     }
 
     o.windows = {
@@ -73,7 +74,7 @@ function Hud:handleEvent(event)
             elseif #self.selectedUnits > 0 then
                 self.selectedStack = nil
                 local result = self:clearSelection()
-                self:selectUnitGroup(self.selectionGroups:popNextGroup())
+                self.deselectionTime = time
                 return result
             end
         elseif event.mouse == dume.Mouse.Right then
@@ -118,6 +119,7 @@ end
 
 function Hud:selectUnitGroup(group)
     if group == nil then return end
+    self.deselectionTime = nil
 
     for _, unit in ipairs(group) do
         if unit.owner ~= self.game.thePlayer then return end
@@ -158,12 +160,14 @@ function Hud:deselectUnit(unit)
     if #self.selectedUnits == 0 then
         self.stagedPath = nil
         self.hasStagedPath = false
+        self.deselectionTime = time
     end
 
     self.selectionGroups:createGroup({unit})
 end
 
 function Hud:clearSelection()
+    self.deselectionTime = time
     self.selectionGroups:createGroup(self.selectedUnits)
 
     local didDeselect = #self.selectedUnits > 0
@@ -231,6 +235,11 @@ function Hud:renderSelectionCircle(cv, time)
 end
 
 function Hud:render(cv, time)
+    if self.deselectionTime ~= nil and time - self.deselectionTime >= 0.5 and #self.selectedUnits == 0 then
+        self:selectUnitGroup(self.selectionGroups:popNextGroup())
+        self.deselectionTime = nil
+    end
+
     self.game.view:applyZoom(cv)
     self:renderStagedPath(cv)
     self:renderSelectionCircle(cv, time)
