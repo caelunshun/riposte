@@ -14,56 +14,100 @@ function Client:new(game, bridge)
         game = game,
         bridge = bridge,
 
-        nextPathRequestID = 0,
-        computedPathCallbacks = {},
+        nextRequestID = 1,
+        responseCallbacks = {},
     }
     setmetatable(o, self)
     self.__index = self
     return o
 end
 
--- `callback` is invoked when the server responds
--- with the computed path.
--- `callback` takes a `Path` parameter.
--- The parameter may be nil if no valid path could be found.
-function Client:requestComputePath(callback, from, to, unitKindID)
-    local requestID = self.nextPathRequestID
-    self.nextPathRequestID = self.nextPathRequestID + 1
+-- Requests that the server compute the shortest path the given unit
+-- can take between two points.
+--
+-- Must be called from within a coroutine. When the server responds, this
+-- function returns the computed path, which may be nil if no possible path
+-- exists.
+function Client:requestComputePath(from, to, unitKindID)
+    local thread = coroutine.running()
     self:sendPacket("computePath", {
         from = { x = from.x, y = from.y },
         to = { x = to.x, y = to.y },
         unitKindID = unitKindID,
         requestID = requestID,
-    })
-    self.computedPathCallbacks[requestID] = callback
+    }, function(packet)
+        callSafe(thread, packet)
+    end)
+
+    local packet = coroutine.yield()
+    return packet.path
 end
 
-function Client:moveUnit(unit, newPos)
-    self:sendPacket("moveUnit", {
-        unitID = unit.id,
-        newPos = { x = newPos.x, y = newPos.y },
-    })
+-- Moves the given units along a path.
+-- Returns whether moving was successful.
+-- Must be called from within a coroutine.
+function Client:moveUnitsAlongPath(units, path)
+    local unitIDs = {}
+    for _, unit in ipairs(units) do
+        unitIDs[#unitIDs + 1] = unit.id
+    end
+    assert(path.positions ~= nil)
+
+    local thread = coroutine.running()
+    self:sendPacket("moveUnits", {
+        unitIDs = unitIDs,
+        pathToFollow = path,
+    }, function(response)
+        callSafe(thread, response)
+    end)
+
+    local response = coroutine.yield()
+    assert(response.success ~= nil)
+    return response.success
 end
 
 function Client:endTurn()
     self:sendPacket("endTurn", {})
 end
 
-function Client:sendPacket(packetKind, packet)
+function Client:sendPacket(packetKind, packet, callback)
     print("Sending packet: " .. packetKind)
+    local requestID = self.nextRequestID
+    self.nextRequestID = self.nextRequestID + 1
     local p = {
         [packetKind] = packet,
+        requestID = requestID,
     }
     local data = pb.encode("AnyClient", p)
     self.bridge:sendPacket(data)
+
+    if callback ~= nil then
+        self.responseCallbacks[requestID] = callback
+    end
 end
 
 function Client:handleReceivedPackets()
     local packet = self.bridge:pollReceivedPacket()
     while packet ~= nil do
         local decodedPacket = pb.decode("AnyServer", packet)
-        for k, _ in pairs(decodedPacket) do print("Received packet: " .. k) end
+
+        local packetType = nil
+        for k, v in pairs(decodedPacket) do
+            if k ~= "requestID" then
+                packetType = k
+                print("Received packet: " .. packetType)
+                break
+            end
+        end
+
         self:handlePacket(decodedPacket)
+
+        local callback = self.responseCallbacks[decodedPacket.requestID]
+        if callback ~= nil then
+            callback(decodedPacket[packetType])
+            self.responseCallbacks[decodedPacket.requestID] = nil
+        end
+
         packet = self.bridge:pollReceivedPacket()
     end
 end
@@ -78,10 +122,6 @@ function Client:handlePacket(packet)
         self:handleUpdateUnit(packet.updateUnit)
     elseif packet.updateCity ~= nil then
         self:handleUpdateCity(packet.updateCity)
-    elseif packet.pathComputed ~= nil then
-        self:handleComputedPath(packet.pathComputed)
-    else
-        error("unhandled packet")
     end
 end
 
@@ -113,14 +153,6 @@ end
 
 function Client:handleUpdateCity(packet)
     self.game:addCity(packet)
-end
-
-function Client:handleComputedPath(packet)
-    local callback = self.computedPathCallbacks[packet.requestID]
-    if callback ~= nil then
-        callback(packet.path)
-        self.computedPathCallbacks[packet.requestID] = nil
-    end
 end
 
 return Client

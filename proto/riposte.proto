@@ -51,26 +51,32 @@ message Pos {
 
 // Any packet sent by the client.
 message AnyClient {
+  int32 requestID = 1;
   oneof packet {
-    ClientInfo clientInfo = 1;
-    ComputePath computePath = 2;
-    MoveUnit moveUnit = 3;
-    EndTurn endTurn = 4;
+    ClientInfo clientInfo = 2;
+    ComputePath computePath = 3;
+    MoveUnits moveUnits = 4;
+    EndTurn endTurn = 5;
   }
 }
 
 // Any packet sent by the server.
 message AnyServer {
+  // Corresponds to the requestID of the packet
+  // the server is responding to, if any.
+  // Otherwise, always equal to zero.
+  int32 requestID = 1;
   oneof packet {
-    ServerInfo serverInfo = 1;
-    StartGame startGame = 2;
-    LobbyError lobbyError = 3;
-    UpdateGlobalData updateGlobalData = 4;
-    UpdateMap updateMap = 5;
-    UpdateCity updateCity = 6;
-    UpdateUnit updateUnit = 7;
-    UpdatePlayer updatePlayer = 8;
-    PathComputed pathComputed = 9;
+    ServerInfo serverInfo = 2;
+    StartGame startGame = 3;
+    LobbyError lobbyError = 4;
+    UpdateGlobalData updateGlobalData = 5;
+    UpdateMap updateMap = 6;
+    UpdateCity updateCity = 7;
+    UpdateUnit updateUnit = 8;
+    UpdatePlayer updatePlayer = 9;
+    PathComputed pathComputed = 10;
+    ConfirmMoveUnits confirmMoveUnits = 11;
   }
 }
 
@@ -324,17 +330,26 @@ message UpdatePlayer {
 }
 
 message PathComputed {
-  int32 requestID = 1;
-  Path path = 2;
+  Path path = 1;
+}
+
+// Response to MoveUnits.
+message ConfirmMoveUnits {
+  // Whether the units were moved at least one tile.
+  bool success = 1;
 }
 
 // ---------------------
 // CLIENT
 // ---------------------
 
-message MoveUnit {
-  int32 unitID = 1;
-  Pos newPos = 2;
+// Moves multiple units along a path.
+// The units will all go to the same destination.
+//
+// Response: ConfirmMoveUnits
+message MoveUnits {
+  repeated int32 unitIDs = 1;
+  Path pathToFollow = 2;
 }
 
 message SetCityBuildTask {
@@ -351,7 +366,6 @@ message ComputePath {
   Pos from = 1;
   Pos to = 2;
   string unitKindID = 3;
-  int32 requestID = 4;
 }
 
 message SetEconomySettings {

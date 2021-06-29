@@ -8,6 +8,10 @@ local Game = require("game/game")
 local Client = require("game/client")
 local Renderer = require("game/renderer")
 
+local Scheduler = require("scheduler")
+
+scheduler = Scheduler:new()
+
 local dume = require("dume")
 local Vector = require("brinevector")
 
@@ -117,8 +121,14 @@ function resize(newSize)
     end)
 end
 
-function callSafe(f)
-    local status, err = xpcall(f, debug.traceback)
+function callSafe(f, arg)
+    local status, err
+    assert(f ~= nil)
+    if type(f) == "function" then
+        status, err = xpcall(f, debug.traceback)
+    elseif type(f) == "thread" then
+        status, err = coroutine.resume(f, arg)
+    end
     if not status then print("LUA ERROR: " .. err) end
 end
 

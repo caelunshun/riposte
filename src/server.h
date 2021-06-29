@@ -19,6 +19,8 @@ namespace rip {
         // ID of the player using this connection.
         PlayerId playerID;
 
+        uint32_t currentRequestID = 0;
+
     public:
         // Whether the player has ended their current turn.
         bool endedTurn = false;
@@ -36,7 +38,7 @@ namespace rip {
 
         void handleClientInfo(Game &game, const ClientInfo &packet);
         void handleComputePath(Game &game, const ComputePath &packet);
-        void handleMoveUnit(Game &game, const MoveUnit &packet);
+        void handleMoveUnits(Game &game, const MoveUnits &packet);
         void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);

@@ -47,7 +47,7 @@ struct TableStruct_riposte_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[40]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[41]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -84,6 +84,9 @@ extern ClientInfoDefaultTypeInternal _ClientInfo_default_instance_;
 class ComputePath;
 struct ComputePathDefaultTypeInternal;
 extern ComputePathDefaultTypeInternal _ComputePath_default_instance_;
+class ConfirmMoveUnits;
+struct ConfirmMoveUnitsDefaultTypeInternal;
+extern ConfirmMoveUnitsDefaultTypeInternal _ConfirmMoveUnits_default_instance_;
 class EndTurn;
 struct EndTurnDefaultTypeInternal;
 extern EndTurnDefaultTypeInternal _EndTurn_default_instance_;
@@ -99,9 +102,9 @@ extern KickPlayerDefaultTypeInternal _KickPlayer_default_instance_;
 class LobbyError;
 struct LobbyErrorDefaultTypeInternal;
 extern LobbyErrorDefaultTypeInternal _LobbyError_default_instance_;
-class MoveUnit;
-struct MoveUnitDefaultTypeInternal;
-extern MoveUnitDefaultTypeInternal _MoveUnit_default_instance_;
+class MoveUnits;
+struct MoveUnitsDefaultTypeInternal;
+extern MoveUnitsDefaultTypeInternal _MoveUnits_default_instance_;
 class Path;
 struct PathDefaultTypeInternal;
 extern PathDefaultTypeInternal _Path_default_instance_;
@@ -185,12 +188,13 @@ template<> ::Capability* Arena::CreateMaybeMessage<::Capability>(Arena*);
 template<> ::CarryUnitsCapability* Arena::CreateMaybeMessage<::CarryUnitsCapability>(Arena*);
 template<> ::ClientInfo* Arena::CreateMaybeMessage<::ClientInfo>(Arena*);
 template<> ::ComputePath* Arena::CreateMaybeMessage<::ComputePath>(Arena*);
+template<> ::ConfirmMoveUnits* Arena::CreateMaybeMessage<::ConfirmMoveUnits>(Arena*);
 template<> ::EndTurn* Arena::CreateMaybeMessage<::EndTurn>(Arena*);
 template<> ::FoundCityCapability* Arena::CreateMaybeMessage<::FoundCityCapability>(Arena*);
 template<> ::Improvement* Arena::CreateMaybeMessage<::Improvement>(Arena*);
 template<> ::KickPlayer* Arena::CreateMaybeMessage<::KickPlayer>(Arena*);
 template<> ::LobbyError* Arena::CreateMaybeMessage<::LobbyError>(Arena*);
-template<> ::MoveUnit* Arena::CreateMaybeMessage<::MoveUnit>(Arena*);
+template<> ::MoveUnits* Arena::CreateMaybeMessage<::MoveUnits>(Arena*);
 template<> ::Path* Arena::CreateMaybeMessage<::Path>(Arena*);
 template<> ::PathComputed* Arena::CreateMaybeMessage<::PathComputed>(Arena*);
 template<> ::PlayerInfo* Arena::CreateMaybeMessage<::PlayerInfo>(Arena*);
@@ -492,10 +496,10 @@ class AnyClient final :
     return *internal_default_instance();
   }
   enum PacketCase {
-    kClientInfo = 1,
-    kComputePath = 2,
-    kMoveUnit = 3,
-    kEndTurn = 4,
+    kClientInfo = 2,
+    kComputePath = 3,
+    kMoveUnits = 4,
+    kEndTurn = 5,
     PACKET_NOT_SET = 0,
   };
 
@@ -575,12 +579,22 @@ class AnyClient final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kClientInfoFieldNumber = 1,
-    kComputePathFieldNumber = 2,
-    kMoveUnitFieldNumber = 3,
-    kEndTurnFieldNumber = 4,
+    kRequestIDFieldNumber = 1,
+    kClientInfoFieldNumber = 2,
+    kComputePathFieldNumber = 3,
+    kMoveUnitsFieldNumber = 4,
+    kEndTurnFieldNumber = 5,
   };
-  // .ClientInfo clientInfo = 1;
+  // int32 requestID = 1;
+  void clear_requestid();
+  ::PROTOBUF_NAMESPACE_ID::int32 requestid() const;
+  void set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_requestid() const;
+  void _internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // .ClientInfo clientInfo = 2;
   bool has_clientinfo() const;
   private:
   bool _internal_has_clientinfo() const;
@@ -598,7 +612,7 @@ class AnyClient final :
       ::ClientInfo* clientinfo);
   ::ClientInfo* unsafe_arena_release_clientinfo();
 
-  // .ComputePath computePath = 2;
+  // .ComputePath computePath = 3;
   bool has_computepath() const;
   private:
   bool _internal_has_computepath() const;
@@ -616,25 +630,25 @@ class AnyClient final :
       ::ComputePath* computepath);
   ::ComputePath* unsafe_arena_release_computepath();
 
-  // .MoveUnit moveUnit = 3;
-  bool has_moveunit() const;
+  // .MoveUnits moveUnits = 4;
+  bool has_moveunits() const;
   private:
-  bool _internal_has_moveunit() const;
+  bool _internal_has_moveunits() const;
   public:
-  void clear_moveunit();
-  const ::MoveUnit& moveunit() const;
-  PROTOBUF_MUST_USE_RESULT ::MoveUnit* release_moveunit();
-  ::MoveUnit* mutable_moveunit();
-  void set_allocated_moveunit(::MoveUnit* moveunit);
+  void clear_moveunits();
+  const ::MoveUnits& moveunits() const;
+  PROTOBUF_MUST_USE_RESULT ::MoveUnits* release_moveunits();
+  ::MoveUnits* mutable_moveunits();
+  void set_allocated_moveunits(::MoveUnits* moveunits);
   private:
-  const ::MoveUnit& _internal_moveunit() const;
-  ::MoveUnit* _internal_mutable_moveunit();
+  const ::MoveUnits& _internal_moveunits() const;
+  ::MoveUnits* _internal_mutable_moveunits();
   public:
-  void unsafe_arena_set_allocated_moveunit(
-      ::MoveUnit* moveunit);
-  ::MoveUnit* unsafe_arena_release_moveunit();
+  void unsafe_arena_set_allocated_moveunits(
+      ::MoveUnits* moveunits);
+  ::MoveUnits* unsafe_arena_release_moveunits();
 
-  // .EndTurn endTurn = 4;
+  // .EndTurn endTurn = 5;
   bool has_endturn() const;
   private:
   bool _internal_has_endturn() const;
@@ -659,7 +673,7 @@ class AnyClient final :
   class _Internal;
   void set_has_clientinfo();
   void set_has_computepath();
-  void set_has_moveunit();
+  void set_has_moveunits();
   void set_has_endturn();
 
   inline bool has_packet() const;
@@ -668,12 +682,13 @@ class AnyClient final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 requestid_;
   union PacketUnion {
     constexpr PacketUnion() : _constinit_{} {}
       ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
     ::ClientInfo* clientinfo_;
     ::ComputePath* computepath_;
-    ::MoveUnit* moveunit_;
+    ::MoveUnits* moveunits_;
     ::EndTurn* endturn_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -723,15 +738,16 @@ class AnyServer final :
     return *internal_default_instance();
   }
   enum PacketCase {
-    kServerInfo = 1,
-    kStartGame = 2,
-    kLobbyError = 3,
-    kUpdateGlobalData = 4,
-    kUpdateMap = 5,
-    kUpdateCity = 6,
-    kUpdateUnit = 7,
-    kUpdatePlayer = 8,
-    kPathComputed = 9,
+    kServerInfo = 2,
+    kStartGame = 3,
+    kLobbyError = 4,
+    kUpdateGlobalData = 5,
+    kUpdateMap = 6,
+    kUpdateCity = 7,
+    kUpdateUnit = 8,
+    kUpdatePlayer = 9,
+    kPathComputed = 10,
+    kConfirmMoveUnits = 11,
     PACKET_NOT_SET = 0,
   };
 
@@ -811,17 +827,28 @@ class AnyServer final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kServerInfoFieldNumber = 1,
-    kStartGameFieldNumber = 2,
-    kLobbyErrorFieldNumber = 3,
-    kUpdateGlobalDataFieldNumber = 4,
-    kUpdateMapFieldNumber = 5,
-    kUpdateCityFieldNumber = 6,
-    kUpdateUnitFieldNumber = 7,
-    kUpdatePlayerFieldNumber = 8,
-    kPathComputedFieldNumber = 9,
+    kRequestIDFieldNumber = 1,
+    kServerInfoFieldNumber = 2,
+    kStartGameFieldNumber = 3,
+    kLobbyErrorFieldNumber = 4,
+    kUpdateGlobalDataFieldNumber = 5,
+    kUpdateMapFieldNumber = 6,
+    kUpdateCityFieldNumber = 7,
+    kUpdateUnitFieldNumber = 8,
+    kUpdatePlayerFieldNumber = 9,
+    kPathComputedFieldNumber = 10,
+    kConfirmMoveUnitsFieldNumber = 11,
   };
-  // .ServerInfo serverInfo = 1;
+  // int32 requestID = 1;
+  void clear_requestid();
+  ::PROTOBUF_NAMESPACE_ID::int32 requestid() const;
+  void set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_requestid() const;
+  void _internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // .ServerInfo serverInfo = 2;
   bool has_serverinfo() const;
   private:
   bool _internal_has_serverinfo() const;
@@ -839,7 +866,7 @@ class AnyServer final :
       ::ServerInfo* serverinfo);
   ::ServerInfo* unsafe_arena_release_serverinfo();
 
-  // .StartGame startGame = 2;
+  // .StartGame startGame = 3;
   bool has_startgame() const;
   private:
   bool _internal_has_startgame() const;
@@ -857,7 +884,7 @@ class AnyServer final :
       ::StartGame* startgame);
   ::StartGame* unsafe_arena_release_startgame();
 
-  // .LobbyError lobbyError = 3;
+  // .LobbyError lobbyError = 4;
   bool has_lobbyerror() const;
   private:
   bool _internal_has_lobbyerror() const;
@@ -875,7 +902,7 @@ class AnyServer final :
       ::LobbyError* lobbyerror);
   ::LobbyError* unsafe_arena_release_lobbyerror();
 
-  // .UpdateGlobalData updateGlobalData = 4;
+  // .UpdateGlobalData updateGlobalData = 5;
   bool has_updateglobaldata() const;
   private:
   bool _internal_has_updateglobaldata() const;
@@ -893,7 +920,7 @@ class AnyServer final :
       ::UpdateGlobalData* updateglobaldata);
   ::UpdateGlobalData* unsafe_arena_release_updateglobaldata();
 
-  // .UpdateMap updateMap = 5;
+  // .UpdateMap updateMap = 6;
   bool has_updatemap() const;
   private:
   bool _internal_has_updatemap() const;
@@ -911,7 +938,7 @@ class AnyServer final :
       ::UpdateMap* updatemap);
   ::UpdateMap* unsafe_arena_release_updatemap();
 
-  // .UpdateCity updateCity = 6;
+  // .UpdateCity updateCity = 7;
   bool has_updatecity() const;
   private:
   bool _internal_has_updatecity() const;
@@ -929,7 +956,7 @@ class AnyServer final :
       ::UpdateCity* updatecity);
   ::UpdateCity* unsafe_arena_release_updatecity();
 
-  // .UpdateUnit updateUnit = 7;
+  // .UpdateUnit updateUnit = 8;
   bool has_updateunit() const;
   private:
   bool _internal_has_updateunit() const;
@@ -947,7 +974,7 @@ class AnyServer final :
       ::UpdateUnit* updateunit);
   ::UpdateUnit* unsafe_arena_release_updateunit();
 
-  // .UpdatePlayer updatePlayer = 8;
+  // .UpdatePlayer updatePlayer = 9;
   bool has_updateplayer() const;
   private:
   bool _internal_has_updateplayer() const;
@@ -965,7 +992,7 @@ class AnyServer final :
       ::UpdatePlayer* updateplayer);
   ::UpdatePlayer* unsafe_arena_release_updateplayer();
 
-  // .PathComputed pathComputed = 9;
+  // .PathComputed pathComputed = 10;
   bool has_pathcomputed() const;
   private:
   bool _internal_has_pathcomputed() const;
@@ -983,6 +1010,24 @@ class AnyServer final :
       ::PathComputed* pathcomputed);
   ::PathComputed* unsafe_arena_release_pathcomputed();
 
+  // .ConfirmMoveUnits confirmMoveUnits = 11;
+  bool has_confirmmoveunits() const;
+  private:
+  bool _internal_has_confirmmoveunits() const;
+  public:
+  void clear_confirmmoveunits();
+  const ::ConfirmMoveUnits& confirmmoveunits() const;
+  PROTOBUF_MUST_USE_RESULT ::ConfirmMoveUnits* release_confirmmoveunits();
+  ::ConfirmMoveUnits* mutable_confirmmoveunits();
+  void set_allocated_confirmmoveunits(::ConfirmMoveUnits* confirmmoveunits);
+  private:
+  const ::ConfirmMoveUnits& _internal_confirmmoveunits() const;
+  ::ConfirmMoveUnits* _internal_mutable_confirmmoveunits();
+  public:
+  void unsafe_arena_set_allocated_confirmmoveunits(
+      ::ConfirmMoveUnits* confirmmoveunits);
+  ::ConfirmMoveUnits* unsafe_arena_release_confirmmoveunits();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyServer)
@@ -997,6 +1042,7 @@ class AnyServer final :
   void set_has_updateunit();
   void set_has_updateplayer();
   void set_has_pathcomputed();
+  void set_has_confirmmoveunits();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -1004,6 +1050,7 @@ class AnyServer final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 requestid_;
   union PacketUnion {
     constexpr PacketUnion() : _constinit_{} {}
       ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized _constinit_;
@@ -1016,6 +1063,7 @@ class AnyServer final :
     ::UpdateUnit* updateunit_;
     ::UpdatePlayer* updateplayer_;
     ::PathComputed* pathcomputed_;
+    ::ConfirmMoveUnits* confirmmoveunits_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -6262,10 +6310,9 @@ class PathComputed final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kPathFieldNumber = 2,
-    kRequestIDFieldNumber = 1,
+    kPathFieldNumber = 1,
   };
-  // .Path path = 2;
+  // .Path path = 1;
   bool has_path() const;
   private:
   bool _internal_has_path() const;
@@ -6283,15 +6330,6 @@ class PathComputed final :
       ::Path* path);
   ::Path* unsafe_arena_release_path();
 
-  // int32 requestID = 1;
-  void clear_requestid();
-  ::PROTOBUF_NAMESPACE_ID::int32 requestid() const;
-  void set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_requestid() const;
-  void _internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
   // @@protoc_insertion_point(class_scope:PathComputed)
  private:
   class _Internal;
@@ -6300,30 +6338,29 @@ class PathComputed final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::Path* path_;
-  ::PROTOBUF_NAMESPACE_ID::int32 requestid_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
 // -------------------------------------------------------------------
 
-class MoveUnit final :
-    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:MoveUnit) */ {
+class ConfirmMoveUnits final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:ConfirmMoveUnits) */ {
  public:
-  inline MoveUnit() : MoveUnit(nullptr) {}
-  ~MoveUnit() override;
-  explicit constexpr MoveUnit(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+  inline ConfirmMoveUnits() : ConfirmMoveUnits(nullptr) {}
+  ~ConfirmMoveUnits() override;
+  explicit constexpr ConfirmMoveUnits(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
 
-  MoveUnit(const MoveUnit& from);
-  MoveUnit(MoveUnit&& from) noexcept
-    : MoveUnit() {
+  ConfirmMoveUnits(const ConfirmMoveUnits& from);
+  ConfirmMoveUnits(ConfirmMoveUnits&& from) noexcept
+    : ConfirmMoveUnits() {
     *this = ::std::move(from);
   }
 
-  inline MoveUnit& operator=(const MoveUnit& from) {
+  inline ConfirmMoveUnits& operator=(const ConfirmMoveUnits& from) {
     CopyFrom(from);
     return *this;
   }
-  inline MoveUnit& operator=(MoveUnit&& from) noexcept {
+  inline ConfirmMoveUnits& operator=(ConfirmMoveUnits&& from) noexcept {
     if (this == &from) return *this;
     if (GetOwningArena() == from.GetOwningArena()) {
       InternalSwap(&from);
@@ -6342,20 +6379,20 @@ class MoveUnit final :
   static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
     return default_instance().GetMetadata().reflection;
   }
-  static const MoveUnit& default_instance() {
+  static const ConfirmMoveUnits& default_instance() {
     return *internal_default_instance();
   }
-  static inline const MoveUnit* internal_default_instance() {
-    return reinterpret_cast<const MoveUnit*>(
-               &_MoveUnit_default_instance_);
+  static inline const ConfirmMoveUnits* internal_default_instance() {
+    return reinterpret_cast<const ConfirmMoveUnits*>(
+               &_ConfirmMoveUnits_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
     33;
 
-  friend void swap(MoveUnit& a, MoveUnit& b) {
+  friend void swap(ConfirmMoveUnits& a, ConfirmMoveUnits& b) {
     a.Swap(&b);
   }
-  inline void Swap(MoveUnit* other) {
+  inline void Swap(ConfirmMoveUnits* other) {
     if (other == this) return;
     if (GetOwningArena() == other->GetOwningArena()) {
       InternalSwap(other);
@@ -6363,7 +6400,7 @@ class MoveUnit final :
       ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
     }
   }
-  void UnsafeArenaSwap(MoveUnit* other) {
+  void UnsafeArenaSwap(ConfirmMoveUnits* other) {
     if (other == this) return;
     GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
     InternalSwap(other);
@@ -6371,17 +6408,17 @@ class MoveUnit final :
 
   // implements Message ----------------------------------------------
 
-  inline MoveUnit* New() const final {
-    return new MoveUnit();
+  inline ConfirmMoveUnits* New() const final {
+    return new ConfirmMoveUnits();
   }
 
-  MoveUnit* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
-    return CreateMaybeMessage<MoveUnit>(arena);
+  ConfirmMoveUnits* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<ConfirmMoveUnits>(arena);
   }
   using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
-  void CopyFrom(const MoveUnit& from);
+  void CopyFrom(const ConfirmMoveUnits& from);
   using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
-  void MergeFrom(const MoveUnit& from);
+  void MergeFrom(const ConfirmMoveUnits& from);
   private:
   static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
   public:
@@ -6398,13 +6435,13 @@ class MoveUnit final :
   void SharedCtor();
   void SharedDtor();
   void SetCachedSize(int size) const final;
-  void InternalSwap(MoveUnit* other);
+  void InternalSwap(ConfirmMoveUnits* other);
   friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
   static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
-    return "MoveUnit";
+    return "ConfirmMoveUnits";
   }
   protected:
-  explicit MoveUnit(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+  explicit ConfirmMoveUnits(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                        bool is_message_owned = false);
   private:
   static void ArenaDtor(void* object);
@@ -6421,45 +6458,198 @@ class MoveUnit final :
   // accessors -------------------------------------------------------
 
   enum : int {
-    kNewPosFieldNumber = 2,
-    kUnitIDFieldNumber = 1,
+    kSuccessFieldNumber = 1,
   };
-  // .Pos newPos = 2;
-  bool has_newpos() const;
+  // bool success = 1;
+  void clear_success();
+  bool success() const;
+  void set_success(bool value);
   private:
-  bool _internal_has_newpos() const;
-  public:
-  void clear_newpos();
-  const ::Pos& newpos() const;
-  PROTOBUF_MUST_USE_RESULT ::Pos* release_newpos();
-  ::Pos* mutable_newpos();
-  void set_allocated_newpos(::Pos* newpos);
-  private:
-  const ::Pos& _internal_newpos() const;
-  ::Pos* _internal_mutable_newpos();
-  public:
-  void unsafe_arena_set_allocated_newpos(
-      ::Pos* newpos);
-  ::Pos* unsafe_arena_release_newpos();
-
-  // int32 unitID = 1;
-  void clear_unitid();
-  ::PROTOBUF_NAMESPACE_ID::int32 unitid() const;
-  void set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_unitid() const;
-  void _internal_set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  bool _internal_success() const;
+  void _internal_set_success(bool value);
   public:
 
-  // @@protoc_insertion_point(class_scope:MoveUnit)
+  // @@protoc_insertion_point(class_scope:ConfirmMoveUnits)
  private:
   class _Internal;
 
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
-  ::Pos* newpos_;
-  ::PROTOBUF_NAMESPACE_ID::int32 unitid_;
+  bool success_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
+// -------------------------------------------------------------------
+
+class MoveUnits final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:MoveUnits) */ {
+ public:
+  inline MoveUnits() : MoveUnits(nullptr) {}
+  ~MoveUnits() override;
+  explicit constexpr MoveUnits(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  MoveUnits(const MoveUnits& from);
+  MoveUnits(MoveUnits&& from) noexcept
+    : MoveUnits() {
+    *this = ::std::move(from);
+  }
+
+  inline MoveUnits& operator=(const MoveUnits& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline MoveUnits& operator=(MoveUnits&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const MoveUnits& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const MoveUnits* internal_default_instance() {
+    return reinterpret_cast<const MoveUnits*>(
+               &_MoveUnits_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    34;
+
+  friend void swap(MoveUnits& a, MoveUnits& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(MoveUnits* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(MoveUnits* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline MoveUnits* New() const final {
+    return new MoveUnits();
+  }
+
+  MoveUnits* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<MoveUnits>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const MoveUnits& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const MoveUnits& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(MoveUnits* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "MoveUnits";
+  }
+  protected:
+  explicit MoveUnits(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kUnitIDsFieldNumber = 1,
+    kPathToFollowFieldNumber = 2,
+  };
+  // repeated int32 unitIDs = 1;
+  int unitids_size() const;
+  private:
+  int _internal_unitids_size() const;
+  public:
+  void clear_unitids();
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_unitids(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      _internal_unitids() const;
+  void _internal_add_unitids(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      _internal_mutable_unitids();
+  public:
+  ::PROTOBUF_NAMESPACE_ID::int32 unitids(int index) const;
+  void set_unitids(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
+  void add_unitids(::PROTOBUF_NAMESPACE_ID::int32 value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      unitids() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      mutable_unitids();
+
+  // .Path pathToFollow = 2;
+  bool has_pathtofollow() const;
+  private:
+  bool _internal_has_pathtofollow() const;
+  public:
+  void clear_pathtofollow();
+  const ::Path& pathtofollow() const;
+  PROTOBUF_MUST_USE_RESULT ::Path* release_pathtofollow();
+  ::Path* mutable_pathtofollow();
+  void set_allocated_pathtofollow(::Path* pathtofollow);
+  private:
+  const ::Path& _internal_pathtofollow() const;
+  ::Path* _internal_mutable_pathtofollow();
+  public:
+  void unsafe_arena_set_allocated_pathtofollow(
+      ::Path* pathtofollow);
+  ::Path* unsafe_arena_release_pathtofollow();
+
+  // @@protoc_insertion_point(class_scope:MoveUnits)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > unitids_;
+  mutable std::atomic<int> _unitids_cached_byte_size_;
+  ::Path* pathtofollow_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -6509,7 +6699,7 @@ class SetCityBuildTask final :
                &_SetCityBuildTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    34;
+    35;
 
   friend void swap(SetCityBuildTask& a, SetCityBuildTask& b) {
     a.Swap(&b);
@@ -6668,7 +6858,7 @@ class SetWorkerTask final :
                &_SetWorkerTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    35;
+    36;
 
   friend void swap(SetWorkerTask& a, SetWorkerTask& b) {
     a.Swap(&b);
@@ -6827,7 +7017,7 @@ class ComputePath final :
                &_ComputePath_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    36;
+    37;
 
   friend void swap(ComputePath& a, ComputePath& b) {
     a.Swap(&b);
@@ -6901,7 +7091,6 @@ class ComputePath final :
     kUnitKindIDFieldNumber = 3,
     kFromFieldNumber = 1,
     kToFieldNumber = 2,
-    kRequestIDFieldNumber = 4,
   };
   // string unitKindID = 3;
   void clear_unitkindid();
@@ -6953,15 +7142,6 @@ class ComputePath final :
       ::Pos* to);
   ::Pos* unsafe_arena_release_to();
 
-  // int32 requestID = 4;
-  void clear_requestid();
-  ::PROTOBUF_NAMESPACE_ID::int32 requestid() const;
-  void set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
-  private:
-  ::PROTOBUF_NAMESPACE_ID::int32 _internal_requestid() const;
-  void _internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value);
-  public:
-
   // @@protoc_insertion_point(class_scope:ComputePath)
  private:
   class _Internal;
@@ -6972,7 +7152,6 @@ class ComputePath final :
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr unitkindid_;
   ::Pos* from_;
   ::Pos* to_;
-  ::PROTOBUF_NAMESPACE_ID::int32 requestid_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -7022,7 +7201,7 @@ class SetEconomySettings final :
                &_SetEconomySettings_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    37;
+    38;
 
   friend void swap(SetEconomySettings& a, SetEconomySettings& b) {
     a.Swap(&b);
@@ -7161,7 +7340,7 @@ class SetResearch final :
                &_SetResearch_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    38;
+    39;
 
   friend void swap(SetResearch& a, SetResearch& b) {
     a.Swap(&b);
@@ -7305,7 +7484,7 @@ class EndTurn final :
                &_EndTurn_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    39;
+    40;
 
   friend void swap(EndTurn& a, EndTurn& b) {
     a.Swap(&b);
@@ -7440,7 +7619,27 @@ inline void Pos::set_y(::PROTOBUF_NAMESPACE_ID::uint32 value) {
 
 // AnyClient
 
-// .ClientInfo clientInfo = 1;
+// int32 requestID = 1;
+inline void AnyClient::clear_requestid() {
+  requestid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 AnyClient::_internal_requestid() const {
+  return requestid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 AnyClient::requestid() const {
+  // @@protoc_insertion_point(field_get:AnyClient.requestID)
+  return _internal_requestid();
+}
+inline void AnyClient::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  requestid_ = value;
+}
+inline void AnyClient::set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_requestid(value);
+  // @@protoc_insertion_point(field_set:AnyClient.requestID)
+}
+
+// .ClientInfo clientInfo = 2;
 inline bool AnyClient::_internal_has_clientinfo() const {
   return packet_case() == kClientInfo;
 }
@@ -7514,7 +7713,7 @@ inline ::ClientInfo* AnyClient::mutable_clientinfo() {
   return _msg;
 }
 
-// .ComputePath computePath = 2;
+// .ComputePath computePath = 3;
 inline bool AnyClient::_internal_has_computepath() const {
   return packet_case() == kComputePath;
 }
@@ -7588,81 +7787,81 @@ inline ::ComputePath* AnyClient::mutable_computepath() {
   return _msg;
 }
 
-// .MoveUnit moveUnit = 3;
-inline bool AnyClient::_internal_has_moveunit() const {
-  return packet_case() == kMoveUnit;
+// .MoveUnits moveUnits = 4;
+inline bool AnyClient::_internal_has_moveunits() const {
+  return packet_case() == kMoveUnits;
 }
-inline bool AnyClient::has_moveunit() const {
-  return _internal_has_moveunit();
+inline bool AnyClient::has_moveunits() const {
+  return _internal_has_moveunits();
 }
-inline void AnyClient::set_has_moveunit() {
-  _oneof_case_[0] = kMoveUnit;
+inline void AnyClient::set_has_moveunits() {
+  _oneof_case_[0] = kMoveUnits;
 }
-inline void AnyClient::clear_moveunit() {
-  if (_internal_has_moveunit()) {
+inline void AnyClient::clear_moveunits() {
+  if (_internal_has_moveunits()) {
     if (GetArenaForAllocation() == nullptr) {
-      delete packet_.moveunit_;
+      delete packet_.moveunits_;
     }
     clear_has_packet();
   }
 }
-inline ::MoveUnit* AnyClient::release_moveunit() {
-  // @@protoc_insertion_point(field_release:AnyClient.moveUnit)
-  if (_internal_has_moveunit()) {
+inline ::MoveUnits* AnyClient::release_moveunits() {
+  // @@protoc_insertion_point(field_release:AnyClient.moveUnits)
+  if (_internal_has_moveunits()) {
     clear_has_packet();
-      ::MoveUnit* temp = packet_.moveunit_;
+      ::MoveUnits* temp = packet_.moveunits_;
     if (GetArenaForAllocation() != nullptr) {
       temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
     }
-    packet_.moveunit_ = nullptr;
+    packet_.moveunits_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline const ::MoveUnit& AnyClient::_internal_moveunit() const {
-  return _internal_has_moveunit()
-      ? *packet_.moveunit_
-      : reinterpret_cast< ::MoveUnit&>(::_MoveUnit_default_instance_);
+inline const ::MoveUnits& AnyClient::_internal_moveunits() const {
+  return _internal_has_moveunits()
+      ? *packet_.moveunits_
+      : reinterpret_cast< ::MoveUnits&>(::_MoveUnits_default_instance_);
 }
-inline const ::MoveUnit& AnyClient::moveunit() const {
-  // @@protoc_insertion_point(field_get:AnyClient.moveUnit)
-  return _internal_moveunit();
+inline const ::MoveUnits& AnyClient::moveunits() const {
+  // @@protoc_insertion_point(field_get:AnyClient.moveUnits)
+  return _internal_moveunits();
 }
-inline ::MoveUnit* AnyClient::unsafe_arena_release_moveunit() {
-  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.moveUnit)
-  if (_internal_has_moveunit()) {
+inline ::MoveUnits* AnyClient::unsafe_arena_release_moveunits() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.moveUnits)
+  if (_internal_has_moveunits()) {
     clear_has_packet();
-    ::MoveUnit* temp = packet_.moveunit_;
-    packet_.moveunit_ = nullptr;
+    ::MoveUnits* temp = packet_.moveunits_;
+    packet_.moveunits_ = nullptr;
     return temp;
   } else {
     return nullptr;
   }
 }
-inline void AnyClient::unsafe_arena_set_allocated_moveunit(::MoveUnit* moveunit) {
+inline void AnyClient::unsafe_arena_set_allocated_moveunits(::MoveUnits* moveunits) {
   clear_packet();
-  if (moveunit) {
-    set_has_moveunit();
-    packet_.moveunit_ = moveunit;
+  if (moveunits) {
+    set_has_moveunits();
+    packet_.moveunits_ = moveunits;
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.moveUnit)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.moveUnits)
 }
-inline ::MoveUnit* AnyClient::_internal_mutable_moveunit() {
-  if (!_internal_has_moveunit()) {
+inline ::MoveUnits* AnyClient::_internal_mutable_moveunits() {
+  if (!_internal_has_moveunits()) {
     clear_packet();
-    set_has_moveunit();
-    packet_.moveunit_ = CreateMaybeMessage< ::MoveUnit >(GetArenaForAllocation());
+    set_has_moveunits();
+    packet_.moveunits_ = CreateMaybeMessage< ::MoveUnits >(GetArenaForAllocation());
   }
-  return packet_.moveunit_;
+  return packet_.moveunits_;
 }
-inline ::MoveUnit* AnyClient::mutable_moveunit() {
-  ::MoveUnit* _msg = _internal_mutable_moveunit();
-  // @@protoc_insertion_point(field_mutable:AnyClient.moveUnit)
+inline ::MoveUnits* AnyClient::mutable_moveunits() {
+  ::MoveUnits* _msg = _internal_mutable_moveunits();
+  // @@protoc_insertion_point(field_mutable:AnyClient.moveUnits)
   return _msg;
 }
 
-// .EndTurn endTurn = 4;
+// .EndTurn endTurn = 5;
 inline bool AnyClient::_internal_has_endturn() const {
   return packet_case() == kEndTurn;
 }
@@ -7749,7 +7948,27 @@ inline AnyClient::PacketCase AnyClient::packet_case() const {
 
 // AnyServer
 
-// .ServerInfo serverInfo = 1;
+// int32 requestID = 1;
+inline void AnyServer::clear_requestid() {
+  requestid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 AnyServer::_internal_requestid() const {
+  return requestid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 AnyServer::requestid() const {
+  // @@protoc_insertion_point(field_get:AnyServer.requestID)
+  return _internal_requestid();
+}
+inline void AnyServer::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  requestid_ = value;
+}
+inline void AnyServer::set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_requestid(value);
+  // @@protoc_insertion_point(field_set:AnyServer.requestID)
+}
+
+// .ServerInfo serverInfo = 2;
 inline bool AnyServer::_internal_has_serverinfo() const {
   return packet_case() == kServerInfo;
 }
@@ -7823,7 +8042,7 @@ inline ::ServerInfo* AnyServer::mutable_serverinfo() {
   return _msg;
 }
 
-// .StartGame startGame = 2;
+// .StartGame startGame = 3;
 inline bool AnyServer::_internal_has_startgame() const {
   return packet_case() == kStartGame;
 }
@@ -7897,7 +8116,7 @@ inline ::StartGame* AnyServer::mutable_startgame() {
   return _msg;
 }
 
-// .LobbyError lobbyError = 3;
+// .LobbyError lobbyError = 4;
 inline bool AnyServer::_internal_has_lobbyerror() const {
   return packet_case() == kLobbyError;
 }
@@ -7971,7 +8190,7 @@ inline ::LobbyError* AnyServer::mutable_lobbyerror() {
   return _msg;
 }
 
-// .UpdateGlobalData updateGlobalData = 4;
+// .UpdateGlobalData updateGlobalData = 5;
 inline bool AnyServer::_internal_has_updateglobaldata() const {
   return packet_case() == kUpdateGlobalData;
 }
@@ -8045,7 +8264,7 @@ inline ::UpdateGlobalData* AnyServer::mutable_updateglobaldata() {
   return _msg;
 }
 
-// .UpdateMap updateMap = 5;
+// .UpdateMap updateMap = 6;
 inline bool AnyServer::_internal_has_updatemap() const {
   return packet_case() == kUpdateMap;
 }
@@ -8119,7 +8338,7 @@ inline ::UpdateMap* AnyServer::mutable_updatemap() {
   return _msg;
 }
 
-// .UpdateCity updateCity = 6;
+// .UpdateCity updateCity = 7;
 inline bool AnyServer::_internal_has_updatecity() const {
   return packet_case() == kUpdateCity;
 }
@@ -8193,7 +8412,7 @@ inline ::UpdateCity* AnyServer::mutable_updatecity() {
   return _msg;
 }
 
-// .UpdateUnit updateUnit = 7;
+// .UpdateUnit updateUnit = 8;
 inline bool AnyServer::_internal_has_updateunit() const {
   return packet_case() == kUpdateUnit;
 }
@@ -8267,7 +8486,7 @@ inline ::UpdateUnit* AnyServer::mutable_updateunit() {
   return _msg;
 }
 
-// .UpdatePlayer updatePlayer = 8;
+// .UpdatePlayer updatePlayer = 9;
 inline bool AnyServer::_internal_has_updateplayer() const {
   return packet_case() == kUpdatePlayer;
 }
@@ -8341,7 +8560,7 @@ inline ::UpdatePlayer* AnyServer::mutable_updateplayer() {
   return _msg;
 }
 
-// .PathComputed pathComputed = 9;
+// .PathComputed pathComputed = 10;
 inline bool AnyServer::_internal_has_pathcomputed() const {
   return packet_case() == kPathComputed;
 }
@@ -8412,6 +8631,80 @@ inline ::PathComputed* AnyServer::_internal_mutable_pathcomputed() {
 inline ::PathComputed* AnyServer::mutable_pathcomputed() {
   ::PathComputed* _msg = _internal_mutable_pathcomputed();
   // @@protoc_insertion_point(field_mutable:AnyServer.pathComputed)
+  return _msg;
+}
+
+// .ConfirmMoveUnits confirmMoveUnits = 11;
+inline bool AnyServer::_internal_has_confirmmoveunits() const {
+  return packet_case() == kConfirmMoveUnits;
+}
+inline bool AnyServer::has_confirmmoveunits() const {
+  return _internal_has_confirmmoveunits();
+}
+inline void AnyServer::set_has_confirmmoveunits() {
+  _oneof_case_[0] = kConfirmMoveUnits;
+}
+inline void AnyServer::clear_confirmmoveunits() {
+  if (_internal_has_confirmmoveunits()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.confirmmoveunits_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::ConfirmMoveUnits* AnyServer::release_confirmmoveunits() {
+  // @@protoc_insertion_point(field_release:AnyServer.confirmMoveUnits)
+  if (_internal_has_confirmmoveunits()) {
+    clear_has_packet();
+      ::ConfirmMoveUnits* temp = packet_.confirmmoveunits_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.confirmmoveunits_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::ConfirmMoveUnits& AnyServer::_internal_confirmmoveunits() const {
+  return _internal_has_confirmmoveunits()
+      ? *packet_.confirmmoveunits_
+      : reinterpret_cast< ::ConfirmMoveUnits&>(::_ConfirmMoveUnits_default_instance_);
+}
+inline const ::ConfirmMoveUnits& AnyServer::confirmmoveunits() const {
+  // @@protoc_insertion_point(field_get:AnyServer.confirmMoveUnits)
+  return _internal_confirmmoveunits();
+}
+inline ::ConfirmMoveUnits* AnyServer::unsafe_arena_release_confirmmoveunits() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyServer.confirmMoveUnits)
+  if (_internal_has_confirmmoveunits()) {
+    clear_has_packet();
+    ::ConfirmMoveUnits* temp = packet_.confirmmoveunits_;
+    packet_.confirmmoveunits_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyServer::unsafe_arena_set_allocated_confirmmoveunits(::ConfirmMoveUnits* confirmmoveunits) {
+  clear_packet();
+  if (confirmmoveunits) {
+    set_has_confirmmoveunits();
+    packet_.confirmmoveunits_ = confirmmoveunits;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyServer.confirmMoveUnits)
+}
+inline ::ConfirmMoveUnits* AnyServer::_internal_mutable_confirmmoveunits() {
+  if (!_internal_has_confirmmoveunits()) {
+    clear_packet();
+    set_has_confirmmoveunits();
+    packet_.confirmmoveunits_ = CreateMaybeMessage< ::ConfirmMoveUnits >(GetArenaForAllocation());
+  }
+  return packet_.confirmmoveunits_;
+}
+inline ::ConfirmMoveUnits* AnyServer::mutable_confirmmoveunits() {
+  ::ConfirmMoveUnits* _msg = _internal_mutable_confirmmoveunits();
+  // @@protoc_insertion_point(field_mutable:AnyServer.confirmMoveUnits)
   return _msg;
 }
 
@@ -12225,27 +12518,7 @@ UpdatePlayer::mutable_possibleresearches() {
 
 // PathComputed
 
-// int32 requestID = 1;
-inline void PathComputed::clear_requestid() {
-  requestid_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 PathComputed::_internal_requestid() const {
-  return requestid_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 PathComputed::requestid() const {
-  // @@protoc_insertion_point(field_get:PathComputed.requestID)
-  return _internal_requestid();
-}
-inline void PathComputed::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  requestid_ = value;
-}
-inline void PathComputed::set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_requestid(value);
-  // @@protoc_insertion_point(field_set:PathComputed.requestID)
-}
-
-// .Path path = 2;
+// .Path path = 1;
 inline bool PathComputed::_internal_has_path() const {
   return this != internal_default_instance() && path_ != nullptr;
 }
@@ -12337,67 +12610,118 @@ inline void PathComputed::set_allocated_path(::Path* path) {
 
 // -------------------------------------------------------------------
 
-// MoveUnit
+// ConfirmMoveUnits
 
-// int32 unitID = 1;
-inline void MoveUnit::clear_unitid() {
-  unitid_ = 0;
+// bool success = 1;
+inline void ConfirmMoveUnits::clear_success() {
+  success_ = false;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 MoveUnit::_internal_unitid() const {
-  return unitid_;
+inline bool ConfirmMoveUnits::_internal_success() const {
+  return success_;
 }
-inline ::PROTOBUF_NAMESPACE_ID::int32 MoveUnit::unitid() const {
-  // @@protoc_insertion_point(field_get:MoveUnit.unitID)
-  return _internal_unitid();
+inline bool ConfirmMoveUnits::success() const {
+  // @@protoc_insertion_point(field_get:ConfirmMoveUnits.success)
+  return _internal_success();
 }
-inline void MoveUnit::_internal_set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+inline void ConfirmMoveUnits::_internal_set_success(bool value) {
   
-  unitid_ = value;
+  success_ = value;
 }
-inline void MoveUnit::set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_unitid(value);
-  // @@protoc_insertion_point(field_set:MoveUnit.unitID)
+inline void ConfirmMoveUnits::set_success(bool value) {
+  _internal_set_success(value);
+  // @@protoc_insertion_point(field_set:ConfirmMoveUnits.success)
 }
 
-// .Pos newPos = 2;
-inline bool MoveUnit::_internal_has_newpos() const {
-  return this != internal_default_instance() && newpos_ != nullptr;
+// -------------------------------------------------------------------
+
+// MoveUnits
+
+// repeated int32 unitIDs = 1;
+inline int MoveUnits::_internal_unitids_size() const {
+  return unitids_.size();
 }
-inline bool MoveUnit::has_newpos() const {
-  return _internal_has_newpos();
+inline int MoveUnits::unitids_size() const {
+  return _internal_unitids_size();
 }
-inline void MoveUnit::clear_newpos() {
-  if (GetArenaForAllocation() == nullptr && newpos_ != nullptr) {
-    delete newpos_;
+inline void MoveUnits::clear_unitids() {
+  unitids_.Clear();
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 MoveUnits::_internal_unitids(int index) const {
+  return unitids_.Get(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 MoveUnits::unitids(int index) const {
+  // @@protoc_insertion_point(field_get:MoveUnits.unitIDs)
+  return _internal_unitids(index);
+}
+inline void MoveUnits::set_unitids(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  unitids_.Set(index, value);
+  // @@protoc_insertion_point(field_set:MoveUnits.unitIDs)
+}
+inline void MoveUnits::_internal_add_unitids(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  unitids_.Add(value);
+}
+inline void MoveUnits::add_unitids(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_unitids(value);
+  // @@protoc_insertion_point(field_add:MoveUnits.unitIDs)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+MoveUnits::_internal_unitids() const {
+  return unitids_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+MoveUnits::unitids() const {
+  // @@protoc_insertion_point(field_list:MoveUnits.unitIDs)
+  return _internal_unitids();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+MoveUnits::_internal_mutable_unitids() {
+  return &unitids_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+MoveUnits::mutable_unitids() {
+  // @@protoc_insertion_point(field_mutable_list:MoveUnits.unitIDs)
+  return _internal_mutable_unitids();
+}
+
+// .Path pathToFollow = 2;
+inline bool MoveUnits::_internal_has_pathtofollow() const {
+  return this != internal_default_instance() && pathtofollow_ != nullptr;
+}
+inline bool MoveUnits::has_pathtofollow() const {
+  return _internal_has_pathtofollow();
+}
+inline void MoveUnits::clear_pathtofollow() {
+  if (GetArenaForAllocation() == nullptr && pathtofollow_ != nullptr) {
+    delete pathtofollow_;
   }
-  newpos_ = nullptr;
+  pathtofollow_ = nullptr;
 }
-inline const ::Pos& MoveUnit::_internal_newpos() const {
-  const ::Pos* p = newpos_;
-  return p != nullptr ? *p : reinterpret_cast<const ::Pos&>(
-      ::_Pos_default_instance_);
+inline const ::Path& MoveUnits::_internal_pathtofollow() const {
+  const ::Path* p = pathtofollow_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Path&>(
+      ::_Path_default_instance_);
 }
-inline const ::Pos& MoveUnit::newpos() const {
-  // @@protoc_insertion_point(field_get:MoveUnit.newPos)
-  return _internal_newpos();
+inline const ::Path& MoveUnits::pathtofollow() const {
+  // @@protoc_insertion_point(field_get:MoveUnits.pathToFollow)
+  return _internal_pathtofollow();
 }
-inline void MoveUnit::unsafe_arena_set_allocated_newpos(
-    ::Pos* newpos) {
+inline void MoveUnits::unsafe_arena_set_allocated_pathtofollow(
+    ::Path* pathtofollow) {
   if (GetArenaForAllocation() == nullptr) {
-    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(newpos_);
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(pathtofollow_);
   }
-  newpos_ = newpos;
-  if (newpos) {
+  pathtofollow_ = pathtofollow;
+  if (pathtofollow) {
     
   } else {
     
   }
-  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:MoveUnit.newPos)
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:MoveUnits.pathToFollow)
 }
-inline ::Pos* MoveUnit::release_newpos() {
+inline ::Path* MoveUnits::release_pathtofollow() {
   
-  ::Pos* temp = newpos_;
-  newpos_ = nullptr;
+  ::Path* temp = pathtofollow_;
+  pathtofollow_ = nullptr;
 #ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
   auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
   temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
@@ -12409,44 +12733,44 @@ inline ::Pos* MoveUnit::release_newpos() {
 #endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
   return temp;
 }
-inline ::Pos* MoveUnit::unsafe_arena_release_newpos() {
-  // @@protoc_insertion_point(field_release:MoveUnit.newPos)
+inline ::Path* MoveUnits::unsafe_arena_release_pathtofollow() {
+  // @@protoc_insertion_point(field_release:MoveUnits.pathToFollow)
   
-  ::Pos* temp = newpos_;
-  newpos_ = nullptr;
+  ::Path* temp = pathtofollow_;
+  pathtofollow_ = nullptr;
   return temp;
 }
-inline ::Pos* MoveUnit::_internal_mutable_newpos() {
+inline ::Path* MoveUnits::_internal_mutable_pathtofollow() {
   
-  if (newpos_ == nullptr) {
-    auto* p = CreateMaybeMessage<::Pos>(GetArenaForAllocation());
-    newpos_ = p;
+  if (pathtofollow_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Path>(GetArenaForAllocation());
+    pathtofollow_ = p;
   }
-  return newpos_;
+  return pathtofollow_;
 }
-inline ::Pos* MoveUnit::mutable_newpos() {
-  ::Pos* _msg = _internal_mutable_newpos();
-  // @@protoc_insertion_point(field_mutable:MoveUnit.newPos)
+inline ::Path* MoveUnits::mutable_pathtofollow() {
+  ::Path* _msg = _internal_mutable_pathtofollow();
+  // @@protoc_insertion_point(field_mutable:MoveUnits.pathToFollow)
   return _msg;
 }
-inline void MoveUnit::set_allocated_newpos(::Pos* newpos) {
+inline void MoveUnits::set_allocated_pathtofollow(::Path* pathtofollow) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
   if (message_arena == nullptr) {
-    delete newpos_;
+    delete pathtofollow_;
   }
-  if (newpos) {
+  if (pathtofollow) {
     ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
-        ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::Pos>::GetOwningArena(newpos);
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::Path>::GetOwningArena(pathtofollow);
     if (message_arena != submessage_arena) {
-      newpos = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
-          message_arena, newpos, submessage_arena);
+      pathtofollow = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, pathtofollow, submessage_arena);
     }
     
   } else {
     
   }
-  newpos_ = newpos;
-  // @@protoc_insertion_point(field_set_allocated:MoveUnit.newPos)
+  pathtofollow_ = pathtofollow;
+  // @@protoc_insertion_point(field_set_allocated:MoveUnits.pathToFollow)
 }
 
 // -------------------------------------------------------------------
@@ -12907,26 +13231,6 @@ inline void ComputePath::set_allocated_unitkindid(std::string* unitkindid) {
   // @@protoc_insertion_point(field_set_allocated:ComputePath.unitKindID)
 }
 
-// int32 requestID = 4;
-inline void ComputePath::clear_requestid() {
-  requestid_ = 0;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 ComputePath::_internal_requestid() const {
-  return requestid_;
-}
-inline ::PROTOBUF_NAMESPACE_ID::int32 ComputePath::requestid() const {
-  // @@protoc_insertion_point(field_get:ComputePath.requestID)
-  return _internal_requestid();
-}
-inline void ComputePath::_internal_set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  
-  requestid_ = value;
-}
-inline void ComputePath::set_requestid(::PROTOBUF_NAMESPACE_ID::int32 value) {
-  _internal_set_requestid(value);
-  // @@protoc_insertion_point(field_set:ComputePath.requestID)
-}
-
 // -------------------------------------------------------------------
 
 // SetEconomySettings
@@ -13008,6 +13312,8 @@ inline void SetResearch::set_allocated_techid(std::string* techid) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

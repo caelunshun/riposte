@@ -13,9 +13,9 @@
 #include "ship.h"
 #include <thread>
 
-#define PACKET(packet, anyservername) AnyServer _anyServer; _anyServer.mutable_##anyservername()->CopyFrom(packet);
-#define SEND(packet, anyservername)  { PACKET(packet, anyservername); send(_anyServer); }
-#define BROADCAST(packet, anyservername) { PACKET(packet, anyservername); for (auto &connection : connections) { connection.send(_anyServer); }}
+#define PACKET(packet, anyservername, id) AnyServer _anyServer; _anyServer.set_requestid(id); _anyServer.mutable_##anyservername()->CopyFrom(packet);
+#define SEND(packet, anyservername, id)  { PACKET(packet, anyservername, id); send(_anyServer); }
+#define BROADCAST(packet, anyservername, id) { PACKET(packet, anyservername, id); for (auto &connection : connections) { connection.send(_anyServer); }}
 
 namespace rip {
     void setPlayerInfo(const Player &player, PlayerInfo &playerInfo) {
@@ -203,14 +203,14 @@ namespace rip {
     }
 
     void Connection::sendGameData(Game &game) {
-        SEND(getUpdateGlobalDataPacket(game, playerID), updateglobaldata);
-        SEND(getUpdateMapPacket(game, playerID), updatemap);
+        SEND(getUpdateGlobalDataPacket(game, playerID), updateglobaldata, 0);
+        SEND(getUpdateMapPacket(game, playerID), updatemap, 0);
 
         for (auto &unit : game.getUnits()) {
-            SEND(getUpdateUnitPacket(game, unit), updateunit);
+            SEND(getUpdateUnitPacket(game, unit), updateunit, 0);
         }
         for (auto &city : game.getCities()) {
-            SEND(getUpdateCityPacket(game, city), updatecity);
+            SEND(getUpdateCityPacket(game, city), updatecity, 0);
         }
     }
 
@@ -224,24 +224,62 @@ namespace rip {
                                         game.getPlayer(playerID).getVisibilityMap(), *unitKind);
 
         PathComputed response;
-        response.set_requestid(packet.requestid());
         if (path.has_value()) {
             writePath(*path, *response.mutable_path());
         }
-        SEND(response, pathcomputed);
+        SEND(response, pathcomputed, currentRequestID);
     }
 
-    void Connection::handleMoveUnit(Game &game, const MoveUnit &packet) {
-        game.getUnit({packet.unitid(), 0}).moveTo(glm::uvec2(packet.newpos().x(), packet.newpos().y()), game, true);
+    void Connection::handleMoveUnits(Game &game, const MoveUnits &packet) {
+        bool success = false;
+
+        std::deque<glm::uvec2> path(packet.pathtofollow().positions_size() / 2);
+        for (int i = 0; i < packet.pathtofollow().positions_size() / 2; i++) {
+            path[i] = glm::uvec2(packet.pathtofollow().positions(i * 2), packet.pathtofollow().positions(i * 2 + 1));
+        }
+
+        while (!path.empty()) {
+            auto targetPos = path[0];
+            path.pop_front();
+
+            bool possible = true;
+            bool skip = false;
+            for (const auto unitID : packet.unitids()) {
+                auto &unit = game.getUnit({unitID, 0});
+                if (unit.getPos() == targetPos) {
+                    skip = true;
+                    break;
+                }
+                if (!unit.canMove(targetPos, game)) {
+                    possible = false;
+                    break;
+                }
+            }
+
+            if (skip) continue;
+
+            if (!possible) break;
+
+            success = true;
+            for (const auto unitID : packet.unitids()) {
+                auto &unit = game.getUnit({unitID, 0});
+                unit.moveTo(targetPos, game, true);
+            }
+        }
+
+        ConfirmMoveUnits response;
+        response.set_success(success);
+        SEND(response, confirmmoveunits, currentRequestID);
     }
 
     void Connection::handlePacket(Game &game, AnyClient &packet) {
+        currentRequestID = packet.requestid();
         if (packet.has_clientinfo()) {
             handleClientInfo(game, packet.clientinfo());
         } else if (packet.has_computepath()) {
             handleComputePath(game, packet.computepath());
-        } else if (packet.has_moveunit()) {
-            handleMoveUnit(game, packet.moveunit());
+        } else if (packet.has_moveunits()) {
+            handleMoveUnits(game, packet.moveunits());
         } else if (packet.has_endturn()) {
             endedTurn = true;
         }
@@ -300,6 +338,6 @@ namespace rip {
 
     void Server::broadcastUnitUpdate(Unit &unit) {
         auto packet = getUpdateUnitPacket(game, unit);
-        BROADCAST(packet, updateunit);
+        BROADCAST(packet, updateunit, 0);
     }
 }

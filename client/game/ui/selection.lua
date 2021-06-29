@@ -27,9 +27,10 @@ end
 -- Creates a new group containing the given units.
 --
 -- Any units already in a group are removed from their current group.
-function SelectionGroups:createGroup(units)
+function SelectionGroups:createGroup(units, usingPath)
     if #units == 0 then return end
 
+    units.usingPath = usingPath
     self.groups[#self.groups + 1] = units
 
     for _, unit in ipairs(units) do

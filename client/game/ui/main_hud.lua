@@ -14,6 +14,7 @@ local Clickable = require("widget/clickable")
 
 local style = require("ui/style")
 
+local TaskSequence = require("task_sequence")
 local SelectionGroups = require("game/ui/selection")
 
 local BottomControlWindow = {}
@@ -30,8 +31,8 @@ function Hud:new(game)
         stagedPathTarget = nil,
         game = game,
         selectionGroups = SelectionGroups:new(game),
-        deselectionTime = 0,
         readyForNextTurn = false,
+        tasks = TaskSequence:new(),
     }
 
     o.windows = {
@@ -63,7 +64,7 @@ function Hud:handleEvent(event)
         self.game.client:endTurn()
         self.readyForNextTurn = false
     end
-    
+
     if event.pos == nil then return end
     local clickedPos = self.game.view:getTilePosForScreenOffset(event.pos)
 
@@ -81,7 +82,6 @@ function Hud:handleEvent(event)
             elseif #self.selectedUnits > 0 then
                 self.selectedStack = nil
                 local result = self:clearSelection()
-                self.deselectionTime = time
                 return result
             end
         elseif event.mouse == dume.Mouse.Right then
@@ -92,10 +92,7 @@ function Hud:handleEvent(event)
                 end
             elseif event.action == dume.Action.Release then
                 if self.stagedPath ~= nil and self.hasStagedPath then
-                    for _, unit in ipairs(self.selectedUnits) do
-                        unit:moveTo(Vector(self.stagedPath.positions[3], self.stagedPath.positions[4]))
-                    end
-                    self:clearSelection()
+                    self:moveSelectionAlongStagedPath()
                 end
 
                 self.stagedPath = nil
@@ -108,46 +105,61 @@ function Hud:handleEvent(event)
     end
 
     if shouldComputePath and #self.selectedUnits ~= 0 then
-        local from = self.selectedStack.pos
-        local to = clickedPos
-        local unitKindID = self.selectedUnits[1].kind.id
-        local callback = function(path)
-            if path ~= nil then
-                self.stagedPath = path
-                self.hasStagedPath = true
-            end
-        end
-        self.game.client:requestComputePath(callback, from, to, unitKindID)
-        self.stagedPathTarget = to
+        self:computePath(self.selectedStack.pos, clickedPos)
     end
 
     return false
 end
 
-function Hud:selectUnitGroup(group)
-    if group == nil then return end
-    self.deselectionTime = nil
+-- Enqueues a task that computes a path between the given points.
+function Hud:computePath(from, to)
+    self.stagedPathTarget = to
 
-    for _, unit in ipairs(group) do
-        if unit.owner ~= self.game.thePlayer then return end
-        if self.selectedStack ~= nil and self.selectedStack.pos ~= unit.pos then
+    local unitKindID = self.selectedUnits[1].kind.id
+
+    self.tasks:enqueue(coroutine.create(function()
+        local path = self.game.client:requestComputePath(from, to, unitKindID)
+        self.stagedPath = path
+        self.hasStagedPath = true
+    end))
+end
+
+-- Enqueues a task that moves the current selection along the currently staged path.
+-- After the task finishes, the selection is cleared if moving the units was successful.
+function Hud:moveSelectionAlongStagedPath()
+    self.tasks:enqueue(coroutine.create(function()
+        local success = self.game.client:moveUnitsAlongPath(self.selectedUnits, self.stagedPath)
+        if success then
             self:clearSelection()
         end
+    end))
+end
 
-        if self.selectedStack == nil or #self.selectedUnits == 0 then
-            self.selectedStack = self.game:getStackAtPos(unit.pos)
+function Hud:selectUnitGroup(group)
+    self.tasks:enqueue(coroutine.create(function()
+        if group == nil then return end
+
+        for _, unit in ipairs(group) do
+            if unit.owner ~= self.game.thePlayer then return end
+            if self.selectedStack ~= nil and self.selectedStack.pos ~= unit.pos then
+                self:clearSelectionNow()
+            end
+
+            if self.selectedStack == nil or #self.selectedUnits == 0 then
+                self.selectedStack = self.game:getStackAtPos(unit.pos)
+            end
+
+            -- don't duplicate selected units
+            for i=1,#self.selectedUnits do
+                if self.selectedUnits[i] == unit then return end
+            end
+
+            self.selectedUnits[#self.selectedUnits + 1] = unit
+            unit.isSelected = true
         end
 
-        -- don't duplicate selected units
-        for i=1,#self.selectedUnits do
-            if self.selectedUnits[i] == unit then return end
-        end
-
-        self.selectedUnits[#self.selectedUnits + 1] = unit
-        unit.isSelected = true
-    end
-
-    self.game.eventBus:trigger("selectedUnitsUpdated", nil)
+        self.game.eventBus:trigger("selectedUnitsUpdated", nil)
+    end))
 end
 
 function Hud:selectUnit(unit)
@@ -155,27 +167,27 @@ function Hud:selectUnit(unit)
 end
 
 function Hud:deselectUnit(unit)
-    unit.isSelected = false
-    for i, u in ipairs(self.selectedUnits) do
-        if unit == u then
-            table.remove(self.selectedUnits, i)
-            self.game.eventBus:trigger("selectedUnitsUpdated", nil)
-            break
+    self.tasks:enqueue(coroutine.create(function()
+        unit.isSelected = false
+        for i, u in ipairs(self.selectedUnits) do
+            if unit == u then
+                table.remove(self.selectedUnits, i)
+                self.game.eventBus:trigger("selectedUnitsUpdated", nil)
+                break
+            end
         end
-    end
 
-    if #self.selectedUnits == 0 then
-        self.stagedPath = nil
-        self.hasStagedPath = false
-        self.deselectionTime = time
-    end
+        if #self.selectedUnits == 0 then
+            self.stagedPath = nil
+            self.hasStagedPath = false
+        end
 
-    self.selectionGroups:createGroup({unit})
+        self.selectionGroups:createGroup({unit})
+    end))
 end
 
-function Hud:clearSelection()
-    self.deselectionTime = time
-    self.selectionGroups:createGroup(self.selectedUnits)
+function Hud:clearSelectionNow(usingPath)
+    self.selectionGroups:createGroup(self.selectedUnits, usingPath)
 
     local didDeselect = #self.selectedUnits > 0
     for _, unit in ipairs(self.selectedUnits) do
@@ -186,6 +198,12 @@ function Hud:clearSelection()
         self.game.eventBus:trigger("selectedUnitsUpdated", nil)
     end
     return didDeselect
+end
+
+function Hud:clearSelection(usingPath)
+    self.tasks:enqueue(coroutine.create(function()
+        self:clearSelectionNow(usingPath)
+    end))
 end
 
 local white = dume.rgb(255, 255, 255)
@@ -261,12 +279,7 @@ function Hud:renderNextTurnPrompt(cv, time)
 end
 
 function Hud:render(cv, time)
-    if self.deselectionTime ~= nil and time - self.deselectionTime >= 0.5 and #self.selectedUnits == 0 then
-        local group = self.selectionGroups:popNextGroup()
-        self.readyForNextTurn = (group == nil)
-        self:selectUnitGroup(group)
-        self.deselectionTime = nil
-    end
+    self.tasks:tick()
 
     self.game.view:applyZoom(cv)
 
@@ -469,9 +482,7 @@ function UnitStackWindow:rebuild()
                             self.hud:deselectUnit(u)
                         end
                     else
-                        for _, u in ipairs(affectedUnits) do
-                            self.hud:selectUnit(u)
-                        end
+                        self.hud:selectUnitGroup(affectedUnits)
                     end
                 end)
 
