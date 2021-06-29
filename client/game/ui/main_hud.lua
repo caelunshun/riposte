@@ -14,6 +14,8 @@ local Clickable = require("widget/clickable")
 
 local style = require("ui/style")
 
+local SelectionGroups = require("game/ui/selection")
+
 local BottomControlWindow = {}
 local UnitDisplayWindow = {}
 local TurnIndicatorWindow = {}
@@ -27,6 +29,7 @@ function Hud:new(game)
         stagedPath = nil,
         stagedPathTarget = nil,
         game = game,
+        selectionGroups = SelectionGroups:new(game),
     }
 
     o.windows = {
@@ -65,11 +68,13 @@ function Hud:handleEvent(event)
             local stack = self.game:getStackAtPos(clickedPos)
             local unit = stack.units[1]
             if unit ~= nil then
-                self:selectUnit(unit)
+                self:selectUnitGroup(self.selectionGroups:popGroup(self.selectionGroups:getUnitGroup(unit)))
                 return true
-            else
+            elseif #self.selectedUnits > 0 then
                 self.selectedStack = nil
-                return self:clearSelection()
+                local result = self:clearSelection()
+                self:selectUnitGroup(self.selectionGroups:popNextGroup())
+                return result
             end
         elseif event.mouse == dume.Mouse.Right then
             if event.action == dume.Action.Press then
@@ -104,19 +109,33 @@ function Hud:handleEvent(event)
     return false
 end
 
-function Hud:selectUnit(unit)
-    if unit.owner ~= self.game.thePlayer then return end
-    if self.selectedStack ~= nil and self.selectedStack.pos ~= unit.pos then
-        self:clearSelection()
+function Hud:selectUnitGroup(group)
+    if group == nil then return end
+
+    for _, unit in ipairs(group) do
+        if unit.owner ~= self.game.thePlayer then return end
+        if self.selectedStack ~= nil and self.selectedStack.pos ~= unit.pos then
+            self:clearSelection()
+        end
+
+        if self.selectedStack == nil or #self.selectedUnits == 0 then
+            self.selectedStack = self.game:getStackAtPos(unit.pos)
+        end
+
+        -- don't duplicate selected units
+        for i=1,#self.selectedUnits do
+            if self.selectedUnits[i] == unit then return end
+        end
+
+        self.selectedUnits[#self.selectedUnits + 1] = unit
+        unit.isSelected = true
     end
 
-    if self.selectedStack == nil or #self.selectedUnits == 0 then
-        self.selectedStack = self.game:getStackAtPos(unit.pos)
-    end
-
-    self.selectedUnits[#self.selectedUnits + 1] = unit
-    unit.isSelected = true
     self.game.eventBus:trigger("selectedUnitsUpdated", nil)
+end
+
+function Hud:selectUnit(unit)
+    self:selectUnitGroup({unit})
 end
 
 function Hud:deselectUnit(unit)
@@ -133,9 +152,13 @@ function Hud:deselectUnit(unit)
         self.stagedPath = nil
         self.hasStagedPath = false
     end
+
+    self.selectionGroups:createGroup({unit})
 end
 
 function Hud:clearSelection()
+    self.selectionGroups:createGroup(self.selectedUnits)
+
     local didDeselect = #self.selectedUnits > 0
     for _, unit in ipairs(self.selectedUnits) do
         unit.isSelected = false

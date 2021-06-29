@@ -84,6 +84,9 @@ function Game:addUnit(data)
         self.view.center = Vector(data.pos.x * 100 + 50, data.pos.y * 100 + 50)
     end
 
+    if existingUnit == nil then
+        self.eventBus:trigger("unitCreated", self.units[data.id])
+    end
     self.eventBus:trigger("unitUpdated", self.units[data.id])
 end
 
