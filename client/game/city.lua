@@ -74,6 +74,28 @@ function City:estimateTurnsToBuild(buildTask)
     )
 end
 
+local function drawFivePointStar(cv, center, outerRadius, innerRadius)
+    local angleStep = math.pi * 2 / 5
+
+    for i=1,5 do
+        local outerTheta = angleStep * (i - 1) - math.pi / 2
+        local innerTheta = angleStep * (i - 1 / 2) - math.pi / 2
+
+        local outerPos = Vector(math.cos(outerTheta), math.sin(outerTheta)) * outerRadius + center
+        local innerPos = Vector(math.cos(innerTheta), math.sin(innerTheta)) * innerRadius + center
+
+        if i == 1 then
+            cv:moveTo(outerPos)
+        else
+            cv:lineTo(outerPos)
+        end
+        cv:lineTo(innerPos)
+    end
+
+    -- close the path
+    cv:lineTo(center - Vector(0, outerRadius))
+end
+
 local numHouses = 3
 local housePositions = {
     Vector(20, 25),
@@ -138,10 +160,16 @@ function City:renderBubble(cv)
     renderProgressBar(cv, Vector(0, 10), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
         style.default.populationProgressBar.progressColor, style.default.populationProgressBar.positivePredictedProgressColor)
 
-    -- Left circle
+    -- Left circle, or five-point start if this is the capital
     local radius = 10
+    local center = Vector(radius - 5, radius + 10)
+
     cv:beginPath()
-    cv:circle(Vector(radius - 5, radius + 10), radius)
+    if self.isCapital then
+        drawFivePointStar(cv, center, 18, 8)
+    else
+        cv:circle(center, radius)
+    end
     cv:solidColor(populationCircleColor)
     cv:fill()
     cv:solidColor(black)

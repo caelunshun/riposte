@@ -4164,6 +4164,7 @@ class UpdateCity final :
     kStoredFoodFieldNumber = 11,
     kFoodNeededForGrowthFieldNumber = 12,
     kConsumedFoodFieldNumber = 13,
+    kIsCapitalFieldNumber = 14,
   };
   // repeated string buildingNames = 9;
   int buildingnames_size() const;
@@ -4329,6 +4330,15 @@ class UpdateCity final :
   void _internal_set_consumedfood(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
+  // bool isCapital = 14;
+  void clear_iscapital();
+  bool iscapital() const;
+  void set_iscapital(bool value);
+  private:
+  bool _internal_iscapital() const;
+  void _internal_set_iscapital(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:UpdateCity)
  private:
   class _Internal;
@@ -4349,6 +4359,7 @@ class UpdateCity final :
   ::PROTOBUF_NAMESPACE_ID::int32 storedfood_;
   ::PROTOBUF_NAMESPACE_ID::int32 foodneededforgrowth_;
   ::PROTOBUF_NAMESPACE_ID::int32 consumedfood_;
+  bool iscapital_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -12090,6 +12101,26 @@ inline void UpdateCity::_internal_set_consumedfood(::PROTOBUF_NAMESPACE_ID::int3
 inline void UpdateCity::set_consumedfood(::PROTOBUF_NAMESPACE_ID::int32 value) {
   _internal_set_consumedfood(value);
   // @@protoc_insertion_point(field_set:UpdateCity.consumedFood)
+}
+
+// bool isCapital = 14;
+inline void UpdateCity::clear_iscapital() {
+  iscapital_ = false;
+}
+inline bool UpdateCity::_internal_iscapital() const {
+  return iscapital_;
+}
+inline bool UpdateCity::iscapital() const {
+  // @@protoc_insertion_point(field_get:UpdateCity.isCapital)
+  return _internal_iscapital();
+}
+inline void UpdateCity::_internal_set_iscapital(bool value) {
+  
+  iscapital_ = value;
+}
+inline void UpdateCity::set_iscapital(bool value) {
+  _internal_set_iscapital(value);
+  // @@protoc_insertion_point(field_set:UpdateCity.isCapital)
 }
 
 // -------------------------------------------------------------------

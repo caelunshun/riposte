@@ -198,6 +198,7 @@ namespace rip {
         packet.set_storedfood(city.getStoredFood());
         packet.set_foodneededforgrowth(city.getFoodNeededForGrowth());
         packet.set_consumedfood(city.getConsumedFood());
+        packet.set_iscapital(city.isCapital());
 
         return packet;
     }

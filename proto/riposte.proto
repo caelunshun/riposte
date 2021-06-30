@@ -253,6 +253,7 @@ message UpdateCity {
   int32 storedFood = 11;
   int32 foodNeededForGrowth = 12;
   int32 consumedFood = 13;
+  bool isCapital = 14;
 }
 
 message Path {

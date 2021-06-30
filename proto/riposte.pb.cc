@@ -300,7 +300,8 @@ constexpr UpdateCity::UpdateCity(
   , population_(0)
   , storedfood_(0)
   , foodneededforgrowth_(0)
-  , consumedfood_(0){}
+  , consumedfood_(0)
+  , iscapital_(false){}
 struct UpdateCityDefaultTypeInternal {
   constexpr UpdateCityDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -819,6 +820,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::UpdateCity, storedfood_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, foodneededforgrowth_),
   PROTOBUF_FIELD_OFFSET(::UpdateCity, consumedfood_),
+  PROTOBUF_FIELD_OFFSET(::UpdateCity, iscapital_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Path, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -1015,30 +1017,30 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 154, -1, sizeof(::BuildTaskKind)},
   { 162, -1, sizeof(::BuildTask)},
   { 170, -1, sizeof(::UpdateCity)},
-  { 188, -1, sizeof(::Path)},
-  { 194, -1, sizeof(::FoundCityCapability)},
-  { 199, -1, sizeof(::WorkerTaskImprovement)},
-  { 205, -1, sizeof(::WorkerTaskKind)},
-  { 212, -1, sizeof(::WorkerTask)},
-  { 220, -1, sizeof(::WorkerCapability)},
-  { 227, -1, sizeof(::CarryUnitsCapability)},
-  { 233, -1, sizeof(::Capability)},
-  { 242, -1, sizeof(::UpdateUnit)},
-  { 256, -1, sizeof(::ResearchingTech)},
-  { 263, -1, sizeof(::UpdatePlayer)},
-  { 280, -1, sizeof(::PathComputed)},
-  { 286, -1, sizeof(::ConfirmMoveUnits)},
-  { 292, -1, sizeof(::PossibleCityBuildTasks)},
-  { 298, -1, sizeof(::PossibleTechs)},
-  { 304, -1, sizeof(::MoveUnits)},
-  { 311, -1, sizeof(::SetCityBuildTask)},
-  { 318, -1, sizeof(::SetWorkerTask)},
-  { 325, -1, sizeof(::ComputePath)},
-  { 333, -1, sizeof(::SetEconomySettings)},
-  { 339, -1, sizeof(::SetResearch)},
-  { 345, -1, sizeof(::EndTurn)},
-  { 350, -1, sizeof(::GetBuildTasks)},
-  { 356, -1, sizeof(::GetPossibleTechs)},
+  { 189, -1, sizeof(::Path)},
+  { 195, -1, sizeof(::FoundCityCapability)},
+  { 200, -1, sizeof(::WorkerTaskImprovement)},
+  { 206, -1, sizeof(::WorkerTaskKind)},
+  { 213, -1, sizeof(::WorkerTask)},
+  { 221, -1, sizeof(::WorkerCapability)},
+  { 228, -1, sizeof(::CarryUnitsCapability)},
+  { 234, -1, sizeof(::Capability)},
+  { 243, -1, sizeof(::UpdateUnit)},
+  { 257, -1, sizeof(::ResearchingTech)},
+  { 264, -1, sizeof(::UpdatePlayer)},
+  { 281, -1, sizeof(::PathComputed)},
+  { 287, -1, sizeof(::ConfirmMoveUnits)},
+  { 293, -1, sizeof(::PossibleCityBuildTasks)},
+  { 299, -1, sizeof(::PossibleTechs)},
+  { 305, -1, sizeof(::MoveUnits)},
+  { 312, -1, sizeof(::SetCityBuildTask)},
+  { 319, -1, sizeof(::SetWorkerTask)},
+  { 326, -1, sizeof(::ComputePath)},
+  { 334, -1, sizeof(::SetEconomySettings)},
+  { 340, -1, sizeof(::SetResearch)},
+  { 346, -1, sizeof(::EndTurn)},
+  { 351, -1, sizeof(::GetBuildTasks)},
+  { 357, -1, sizeof(::GetPossibleTechs)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -1141,65 +1143,65 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "\001 \001(\0132\016.UnitBuildTaskH\000\022&\n\010building\030\002 \001("
   "\0132\022.BuildingBuildTaskH\000B\006\n\004task\"I\n\tBuild"
   "Task\022\034\n\004kind\030\001 \001(\0132\016.BuildTaskKind\022\020\n\010pr"
-  "ogress\030\002 \001(\005\022\014\n\004cost\030\003 \001(\005\"\232\002\n\nUpdateCit"
+  "ogress\030\002 \001(\005\022\014\n\004cost\030\003 \001(\005\"\255\002\n\nUpdateCit"
   "y\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\014\n\004name\030\002 \001(\t\022\017\n\007ow"
   "nerID\030\003 \001(\005\022\035\n\tbuildTask\030\004 \001(\0132\n.BuildTa"
   "sk\022\025\n\005yield\030\005 \001(\0132\006.Yield\022\017\n\007culture\030\006 \001"
   "(\005\022\025\n\rcultureNeeded\030\007 \001(\005\022\n\n\002id\030\010 \001(\005\022\025\n"
   "\rbuildingNames\030\t \003(\t\022\022\n\npopulation\030\n \001(\005"
   "\022\022\n\nstoredFood\030\013 \001(\005\022\033\n\023foodNeededForGro"
-  "wth\030\014 \001(\005\022\024\n\014consumedFood\030\r \001(\005\"\031\n\004Path\022"
-  "\021\n\tpositions\030\001 \003(\r\"\025\n\023FoundCityCapabilit"
-  "y\".\n\025WorkerTaskImprovement\022\025\n\rimprovemen"
-  "tID\030\001 \001(\t\"L\n\016WorkerTaskKind\0222\n\020buildImpr"
-  "ovement\030\001 \001(\0132\026.WorkerTaskImprovementH\000B"
-  "\006\n\004kind\"L\n\nWorkerTask\022\014\n\004name\030\001 \001(\t\022\021\n\tt"
-  "urnsLeft\030\002 \001(\005\022\035\n\004kind\030\003 \001(\0132\017.WorkerTas"
-  "kKind\"X\n\020WorkerCapability\022 \n\013currentTask"
-  "\030\001 \001(\0132\013.WorkerTask\022\"\n\rpossibleTasks\030\002 \003"
-  "(\0132\013.WorkerTask\"/\n\024CarryUnitsCapability\022"
-  "\027\n\017carryingUnitIDs\030\001 \003(\005\"\220\001\n\nCapability\022"
-  ")\n\tfoundCity\030\001 \001(\0132\024.FoundCityCapability"
-  "H\000\022#\n\006worker\030\002 \001(\0132\021.WorkerCapabilityH\000\022"
-  "+\n\ncarryUnits\030\003 \001(\0132\025.CarryUnitsCapabili"
-  "tyH\000B\005\n\003cap\"\305\001\n\nUpdateUnit\022\021\n\003pos\030\001 \001(\0132"
-  "\004.Pos\022\016\n\006kindID\030\002 \001(\t\022\017\n\007ownerID\030\003 \001(\005\022\016"
-  "\n\006health\030\004 \001(\001\022\024\n\014movementLeft\030\005 \001(\001\022\034\n\r"
-  "followingPath\030\006 \001(\0132\005.Path\022!\n\014capabiliti"
-  "es\030\007 \003(\0132\013.Capability\022\n\n\002id\030\010 \001(\005\022\020\n\010str"
-  "ength\030\t \001(\001\"3\n\017ResearchingTech\022\016\n\006techID"
-  "\030\001 \001(\t\022\020\n\010progress\030\002 \001(\005\"\220\002\n\014UpdatePlaye"
-  "r\022\n\n\002id\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\023\n\013baseR"
-  "evenue\030\003 \001(\005\022\025\n\rbeakerRevenue\030\004 \001(\005\022\023\n\013g"
-  "oldRevenue\030\005 \001(\005\022\020\n\010expenses\030\006 \001(\005\022\017\n\007ne"
-  "tGold\030\007 \001(\005\022\014\n\004gold\030\010 \001(\005\022)\n\017researching"
-  "Tech\030\t \001(\0132\020.ResearchingTech\022\025\n\rcapitalC"
-  "ityID\030\n \001(\005\022\027\n\017unlockedTechIDs\030\013 \003(\t\022\025\n\r"
-  "beakerPercent\030\014 \001(\005\"#\n\014PathComputed\022\023\n\004p"
-  "ath\030\001 \001(\0132\005.Path\"#\n\020ConfirmMoveUnits\022\017\n\007"
-  "success\030\001 \001(\010\"3\n\026PossibleCityBuildTasks\022"
-  "\031\n\005tasks\030\001 \003(\0132\n.BuildTask\"\036\n\rPossibleTe"
-  "chs\022\r\n\005techs\030\001 \003(\t\"9\n\tMoveUnits\022\017\n\007unitI"
-  "Ds\030\001 \003(\005\022\033\n\014pathToFollow\030\002 \001(\0132\005.Path\"@\n"
-  "\020SetCityBuildTask\022\016\n\006cityID\030\001 \001(\005\022\034\n\004tas"
-  "k\030\002 \001(\0132\016.BuildTaskKind\"<\n\rSetWorkerTask"
-  "\022\020\n\010workerID\030\001 \001(\005\022\031\n\004task\030\002 \001(\0132\013.Worke"
-  "rTask\"G\n\013ComputePath\022\022\n\004from\030\001 \001(\0132\004.Pos"
-  "\022\020\n\002to\030\002 \001(\0132\004.Pos\022\022\n\nunitKindID\030\003 \001(\t\"+"
-  "\n\022SetEconomySettings\022\025\n\rbeakerPercent\030\001 "
-  "\001(\005\"\035\n\013SetResearch\022\016\n\006techID\030\001 \001(\t\"\t\n\007En"
-  "dTurn\"\037\n\rGetBuildTasks\022\016\n\006cityID\030\001 \001(\005\"\022"
-  "\n\020GetPossibleTechs*h\n\003Era\022\013\n\007Ancient\020\000\022\r"
-  "\n\tClassical\020\001\022\014\n\010Medieval\020\002\022\017\n\013Renaissan"
-  "ce\020\003\022\016\n\nIndustrial\020\004\022\n\n\006Modern\020\005\022\n\n\006Futu"
-  "re\020\006*;\n\007Terrain\022\r\n\tGrassland\020\000\022\n\n\006Desert"
-  "\020\001\022\t\n\005Ocean\020\002\022\n\n\006Plains\020\003*1\n\nVisibility\022"
-  "\n\n\006Hidden\020\000\022\n\n\006Fogged\020\001\022\013\n\007Visible\020\002b\006pr"
-  "oto3"
+  "wth\030\014 \001(\005\022\024\n\014consumedFood\030\r \001(\005\022\021\n\tisCap"
+  "ital\030\016 \001(\010\"\031\n\004Path\022\021\n\tpositions\030\001 \003(\r\"\025\n"
+  "\023FoundCityCapability\".\n\025WorkerTaskImprov"
+  "ement\022\025\n\rimprovementID\030\001 \001(\t\"L\n\016WorkerTa"
+  "skKind\0222\n\020buildImprovement\030\001 \001(\0132\026.Worke"
+  "rTaskImprovementH\000B\006\n\004kind\"L\n\nWorkerTask"
+  "\022\014\n\004name\030\001 \001(\t\022\021\n\tturnsLeft\030\002 \001(\005\022\035\n\004kin"
+  "d\030\003 \001(\0132\017.WorkerTaskKind\"X\n\020WorkerCapabi"
+  "lity\022 \n\013currentTask\030\001 \001(\0132\013.WorkerTask\022\""
+  "\n\rpossibleTasks\030\002 \003(\0132\013.WorkerTask\"/\n\024Ca"
+  "rryUnitsCapability\022\027\n\017carryingUnitIDs\030\001 "
+  "\003(\005\"\220\001\n\nCapability\022)\n\tfoundCity\030\001 \001(\0132\024."
+  "FoundCityCapabilityH\000\022#\n\006worker\030\002 \001(\0132\021."
+  "WorkerCapabilityH\000\022+\n\ncarryUnits\030\003 \001(\0132\025"
+  ".CarryUnitsCapabilityH\000B\005\n\003cap\"\305\001\n\nUpdat"
+  "eUnit\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\016\n\006kindID\030\002 \001(\t"
+  "\022\017\n\007ownerID\030\003 \001(\005\022\016\n\006health\030\004 \001(\001\022\024\n\014mov"
+  "ementLeft\030\005 \001(\001\022\034\n\rfollowingPath\030\006 \001(\0132\005"
+  ".Path\022!\n\014capabilities\030\007 \003(\0132\013.Capability"
+  "\022\n\n\002id\030\010 \001(\005\022\020\n\010strength\030\t \001(\001\"3\n\017Resear"
+  "chingTech\022\016\n\006techID\030\001 \001(\t\022\020\n\010progress\030\002 "
+  "\001(\005\"\220\002\n\014UpdatePlayer\022\n\n\002id\030\001 \001(\005\022\020\n\010user"
+  "name\030\002 \001(\t\022\023\n\013baseRevenue\030\003 \001(\005\022\025\n\rbeake"
+  "rRevenue\030\004 \001(\005\022\023\n\013goldRevenue\030\005 \001(\005\022\020\n\010e"
+  "xpenses\030\006 \001(\005\022\017\n\007netGold\030\007 \001(\005\022\014\n\004gold\030\010"
+  " \001(\005\022)\n\017researchingTech\030\t \001(\0132\020.Research"
+  "ingTech\022\025\n\rcapitalCityID\030\n \001(\005\022\027\n\017unlock"
+  "edTechIDs\030\013 \003(\t\022\025\n\rbeakerPercent\030\014 \001(\005\"#"
+  "\n\014PathComputed\022\023\n\004path\030\001 \001(\0132\005.Path\"#\n\020C"
+  "onfirmMoveUnits\022\017\n\007success\030\001 \001(\010\"3\n\026Poss"
+  "ibleCityBuildTasks\022\031\n\005tasks\030\001 \003(\0132\n.Buil"
+  "dTask\"\036\n\rPossibleTechs\022\r\n\005techs\030\001 \003(\t\"9\n"
+  "\tMoveUnits\022\017\n\007unitIDs\030\001 \003(\005\022\033\n\014pathToFol"
+  "low\030\002 \001(\0132\005.Path\"@\n\020SetCityBuildTask\022\016\n\006"
+  "cityID\030\001 \001(\005\022\034\n\004task\030\002 \001(\0132\016.BuildTaskKi"
+  "nd\"<\n\rSetWorkerTask\022\020\n\010workerID\030\001 \001(\005\022\031\n"
+  "\004task\030\002 \001(\0132\013.WorkerTask\"G\n\013ComputePath\022"
+  "\022\n\004from\030\001 \001(\0132\004.Pos\022\020\n\002to\030\002 \001(\0132\004.Pos\022\022\n"
+  "\nunitKindID\030\003 \001(\t\"+\n\022SetEconomySettings\022"
+  "\025\n\rbeakerPercent\030\001 \001(\005\"\035\n\013SetResearch\022\016\n"
+  "\006techID\030\001 \001(\t\"\t\n\007EndTurn\"\037\n\rGetBuildTask"
+  "s\022\016\n\006cityID\030\001 \001(\005\"\022\n\020GetPossibleTechs*h\n"
+  "\003Era\022\013\n\007Ancient\020\000\022\r\n\tClassical\020\001\022\014\n\010Medi"
+  "eval\020\002\022\017\n\013Renaissance\020\003\022\016\n\nIndustrial\020\004\022"
+  "\n\n\006Modern\020\005\022\n\n\006Future\020\006*;\n\007Terrain\022\r\n\tGr"
+  "assland\020\000\022\n\n\006Desert\020\001\022\t\n\005Ocean\020\002\022\n\n\006Plai"
+  "ns\020\003*1\n\nVisibility\022\n\n\006Hidden\020\000\022\n\n\006Fogged"
+  "\020\001\022\013\n\007Visible\020\002b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_riposte_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_riposte_2eproto = {
-  false, false, 4204, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
+  false, false, 4223, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
   &descriptor_table_riposte_2eproto_once, nullptr, 0, 45,
   schemas, file_default_instances, TableStruct_riposte_2eproto::offsets,
   file_level_metadata_riposte_2eproto, file_level_enum_descriptors_riposte_2eproto, file_level_service_descriptors_riposte_2eproto,
@@ -7307,8 +7309,8 @@ UpdateCity::UpdateCity(const UpdateCity& from)
     yield_ = nullptr;
   }
   ::memcpy(&ownerid_, &from.ownerid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&consumedfood_) -
-    reinterpret_cast<char*>(&ownerid_)) + sizeof(consumedfood_));
+    static_cast<size_t>(reinterpret_cast<char*>(&iscapital_) -
+    reinterpret_cast<char*>(&ownerid_)) + sizeof(iscapital_));
   // @@protoc_insertion_point(copy_constructor:UpdateCity)
 }
 
@@ -7316,8 +7318,8 @@ inline void UpdateCity::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&pos_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&consumedfood_) -
-    reinterpret_cast<char*>(&pos_)) + sizeof(consumedfood_));
+    0, static_cast<size_t>(reinterpret_cast<char*>(&iscapital_) -
+    reinterpret_cast<char*>(&pos_)) + sizeof(iscapital_));
 }
 
 UpdateCity::~UpdateCity() {
@@ -7366,8 +7368,8 @@ void UpdateCity::Clear() {
   }
   yield_ = nullptr;
   ::memset(&ownerid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&consumedfood_) -
-      reinterpret_cast<char*>(&ownerid_)) + sizeof(consumedfood_));
+      reinterpret_cast<char*>(&iscapital_) -
+      reinterpret_cast<char*>(&ownerid_)) + sizeof(iscapital_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -7474,6 +7476,13 @@ const char* UpdateCity::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
       case 13:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 104)) {
           consumedfood_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // bool isCapital = 14;
+      case 14:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 112)) {
+          iscapital_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -7598,6 +7607,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(13, this->_internal_consumedfood(), target);
   }
 
+  // bool isCapital = 14;
+  if (this->_internal_iscapital() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(14, this->_internal_iscapital(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -7706,6 +7721,11 @@ size_t UpdateCity::ByteSizeLong() const {
         this->_internal_consumedfood());
   }
 
+  // bool isCapital = 14;
+  if (this->_internal_iscapital() != 0) {
+    total_size += 1 + 1;
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -7771,6 +7791,9 @@ void UpdateCity::MergeFrom(const UpdateCity& from) {
   if (from._internal_consumedfood() != 0) {
     _internal_set_consumedfood(from._internal_consumedfood());
   }
+  if (from._internal_iscapital() != 0) {
+    _internal_set_iscapital(from._internal_iscapital());
+  }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -7795,8 +7818,8 @@ void UpdateCity::InternalSwap(UpdateCity* other) {
       &other->name_, other->GetArenaForAllocation()
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(UpdateCity, consumedfood_)
-      + sizeof(UpdateCity::consumedfood_)
+      PROTOBUF_FIELD_OFFSET(UpdateCity, iscapital_)
+      + sizeof(UpdateCity::iscapital_)
       - PROTOBUF_FIELD_OFFSET(UpdateCity, pos_)>(
           reinterpret_cast<char*>(&pos_),
           reinterpret_cast<char*>(&other->pos_));
