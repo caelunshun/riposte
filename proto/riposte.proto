@@ -61,6 +61,7 @@ message AnyClient {
     SetCityBuildTask setCityBuildTask = 7;
     SetResearch setResearch = 8;
     GetPossibleTechs getPossibleTechs = 9;
+    SetEconomySettings setEconomySettings = 10;
   }
 }
 
@@ -332,6 +333,8 @@ message UpdatePlayer {
   int32 capitalCityID = 10;
 
   repeated string unlockedTechIDs = 11;
+
+  int32 beakerPercent = 12;
 }
 
 message PathComputed {

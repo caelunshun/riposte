@@ -38,7 +38,7 @@ return {
         text = {
             defaultTextStyle = {
                 family = "Merriweather",
-                size = 12,
+                size = 14,
                 weight = dume.FontWeight.Normal,
                 style = dume.FontStyle.Normal,
                 color = dume.rgb(255, 255, 255),
@@ -89,7 +89,7 @@ return {
             grabbedBarColor = dume.rgb(80, 80, 80),
         },
         button = {
-            minSize = Vector(100, 50)
+            minSize = Vector(20, 20),
         },
         highlightedText = {
             defaultTextStyle = {
@@ -110,7 +110,20 @@ return {
                 style = dume.FontStyle.Normal,
                 color = dume.rgb(255, 191, 63),
             }
+        },
+        button = {
+            backgroundColor = dume.rgb(80, 80, 80, 128),
+            borderWidth = 1,
+            borderColor = dume.rgb(90, 90, 90),
+            borderRadius = 0,
         }
     },
-    pressed = {},
+    pressed = {
+        button = {
+            backgroundColor = dume.rgb(90, 90, 90, 128),
+            borderWidth = 1,
+            borderColor = dume.rgb(110, 110, 110),
+            borderRadius = 0,
+        }
+    },
 }

@@ -43,6 +43,7 @@ namespace rip {
         void handleSetBuildTask(Game &game, const SetCityBuildTask &packet);
         void handleSetResearch(Game &game, const SetResearch &packet);
         void handleGetPossibleTechs(Game &game, const GetPossibleTechs &packet);
+        void handleSetEconomySettings(Game &game, const SetEconomySettings &packet);
         void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);

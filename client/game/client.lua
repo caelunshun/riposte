@@ -99,6 +99,12 @@ function Client:setCityBuildTask(city, buildTaskKind)
     })
 end
 
+function Client:setEconomySettings(beakerPercent)
+    self:sendPacket("setEconomySettings", {
+        beakerPercent = beakerPercent,
+    })
+end
+
 function Client:endTurn()
     self:sendPacket("endTurn", {})
 end

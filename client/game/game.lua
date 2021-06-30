@@ -53,7 +53,9 @@ function Game:getVisibility(pos)
 end
 
 function Game:updatePlayer(playerdata)
-    self.players[playerdata.id] = Player:new(playerdata)
+    local player = self.players[playerdata.id] or Player:new(playerdata)
+    self.players[player.id] = player
+    player:updateData(playerdata)
 end
 
 function Game:setTurn(turn)

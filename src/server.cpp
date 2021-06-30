@@ -214,6 +214,7 @@ namespace rip {
         packet.set_expenses(player.getExpenses());
         packet.set_netgold(player.getNetGold());
         packet.set_gold(player.getGold());
+        packet.set_beakerpercent(player.getSciencePercent());
 
         if (player.getResearchingTech().has_value()) {
             auto *tech = packet.mutable_researchingtech();
@@ -348,6 +349,14 @@ namespace rip {
         SEND(response, possibletechs, currentRequestID);
     }
 
+    void Connection::handleSetEconomySettings(Game &game, const SetEconomySettings &packet) {
+        auto &player = game.getPlayer(playerID);
+        player.setSciencePercent(packet.beakerpercent(), game);
+
+        auto response = getUpdatePlayerPacket(game, player);
+        SEND(response, updateplayer, currentRequestID);
+    }
+
     void Connection::handlePacket(Game &game, AnyClient &packet) {
         currentRequestID = packet.requestid();
         if (packet.has_clientinfo()) {
@@ -366,6 +375,8 @@ namespace rip {
             handleSetResearch(game, packet.setresearch());
         } else if (packet.has_getpossibletechs()) {
             handleGetPossibleTechs(game, packet.getpossibletechs());
+        } else if (packet.has_seteconomysettings()) {
+            handleSetEconomySettings(game, packet.seteconomysettings());
         }
     }
 

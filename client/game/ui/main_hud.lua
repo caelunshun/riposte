@@ -26,6 +26,7 @@ local TurnIndicatorWindow = {}
 local ScoreWindow = {}
 local UnitStackWindow = {}
 local ResearchBar = {}
+local EconomyWindow = {}
 
 function Hud:new(game)
     local o = {
@@ -48,6 +49,7 @@ function Hud:new(game)
         ScoreWindow:new(game, o),
         UnitStackWindow:new(game, o),
         ResearchBar:new(game, o),
+        EconomyWindow:new(game, o),
     }
 
     game.eventBus:registerHandler("globalDataUpdated", function()
@@ -625,6 +627,84 @@ function ResearchBar:rebuild()
     table.insert(root.classes, "researchProgressBar")
 
     ui:createWindow("researchBar", Vector(cv:getWidth() / 2 - size.x / 2, 1), size, root)
+end
+
+function EconomyWindow:new(game, hud)
+    local o = {
+        game = game,
+        hud = hud,
+    }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function EconomyWindow:rebuild()
+    local root = Flex:column(10)
+
+    local positiveColor = dume.rgb(68, 194, 113)
+    local negativeColor = dume.rgb(231, 60, 62)
+
+    -- Gold
+    local delta, deltaColor
+    local netGold = self.game.thePlayer.netGold
+    if netGold >= 0 then
+        delta = string.format("+%d", netGold)
+        deltaColor = positiveColor
+    else
+        delta = tostring(netGold)
+        deltaColor = negativeColor
+    end
+    local goldText = Text:new("@icon{gold}: %gold @color{%deltaColor}{(%delta / turn)}", {
+        gold = self.game.thePlayer.gold,
+        delta = delta,
+        deltaColor = dumeColorToString(deltaColor),
+    })
+    root:addFixedChild(goldText)
+
+    local expenses = Text:new("@color{%negativeColor}{Expenses: } %expenses", {
+        expenses = self.game.thePlayer.expenses,
+        negativeColor = dumeColorToString(negativeColor),
+    })
+    root:addFixedChild(expenses)
+
+    local revenue = Text:new("@color{%positiveColor}{Revenue: } %revenue", {
+        revenue = self.game.thePlayer.baseRevenue,
+        positiveColor = dumeColorToString(positiveColor),
+    })
+    root:addFixedChild(revenue)
+
+    -- Research slider
+    local slider = Flex:row()
+
+    local percentText = Text:new("@icon{beaker}: %beakerPercent%percent", {
+        beakerPercent = self.game.thePlayer.beakerPercent,
+        percent = "%",
+    })
+    slider:addFixedChild(percentText)
+
+    local plus = Button:new(Text:new("+", {}, {baseline=dume.Baseline.Middle}), function()
+        self.game.client:setEconomySettings(self.game.thePlayer.beakerPercent + 10)
+    end)
+    slider:addFixedChild(plus)
+    local minus = Button:new(Text:new("-", {}, {baseline=dume.Baseline.Middle}), function()
+        self.game.client:setEconomySettings(self.game.thePlayer.beakerPercent - 10)
+    end)
+    slider:addFixedChild(minus)
+
+    local outputText = Text:new("(+%beakerRevenue / turn)", {
+        beakerRevenue = self.game.thePlayer.beakerRevenue,
+    })
+    slider:addFixedChild(outputText)
+
+    root:addFixedChild(slider)
+
+    local container = Container:new(Padding:new(root, 20))
+    container.fillParent = true
+    table.insert(container.classes, "windowContainer")
+
+    local size = Vector(275, 150)
+    ui:createWindow("economy", Vector(0, 0), size, container)
 end
 
 function dumeColorToString(color)

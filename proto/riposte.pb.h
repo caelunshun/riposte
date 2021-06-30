@@ -520,6 +520,7 @@ class AnyClient final :
     kSetCityBuildTask = 7,
     kSetResearch = 8,
     kGetPossibleTechs = 9,
+    kSetEconomySettings = 10,
     PACKET_NOT_SET = 0,
   };
 
@@ -608,6 +609,7 @@ class AnyClient final :
     kSetCityBuildTaskFieldNumber = 7,
     kSetResearchFieldNumber = 8,
     kGetPossibleTechsFieldNumber = 9,
+    kSetEconomySettingsFieldNumber = 10,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -762,6 +764,24 @@ class AnyClient final :
       ::GetPossibleTechs* getpossibletechs);
   ::GetPossibleTechs* unsafe_arena_release_getpossibletechs();
 
+  // .SetEconomySettings setEconomySettings = 10;
+  bool has_seteconomysettings() const;
+  private:
+  bool _internal_has_seteconomysettings() const;
+  public:
+  void clear_seteconomysettings();
+  const ::SetEconomySettings& seteconomysettings() const;
+  PROTOBUF_MUST_USE_RESULT ::SetEconomySettings* release_seteconomysettings();
+  ::SetEconomySettings* mutable_seteconomysettings();
+  void set_allocated_seteconomysettings(::SetEconomySettings* seteconomysettings);
+  private:
+  const ::SetEconomySettings& _internal_seteconomysettings() const;
+  ::SetEconomySettings* _internal_mutable_seteconomysettings();
+  public:
+  void unsafe_arena_set_allocated_seteconomysettings(
+      ::SetEconomySettings* seteconomysettings);
+  ::SetEconomySettings* unsafe_arena_release_seteconomysettings();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyClient)
@@ -775,6 +795,7 @@ class AnyClient final :
   void set_has_setcitybuildtask();
   void set_has_setresearch();
   void set_has_getpossibletechs();
+  void set_has_seteconomysettings();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -794,6 +815,7 @@ class AnyClient final :
     ::SetCityBuildTask* setcitybuildtask_;
     ::SetResearch* setresearch_;
     ::GetPossibleTechs* getpossibletechs_;
+    ::SetEconomySettings* seteconomysettings_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -6165,6 +6187,7 @@ class UpdatePlayer final :
     kNetGoldFieldNumber = 7,
     kGoldFieldNumber = 8,
     kCapitalCityIDFieldNumber = 10,
+    kBeakerPercentFieldNumber = 12,
   };
   // repeated string unlockedTechIDs = 11;
   int unlockedtechids_size() const;
@@ -6294,6 +6317,15 @@ class UpdatePlayer final :
   void _internal_set_capitalcityid(::PROTOBUF_NAMESPACE_ID::int32 value);
   public:
 
+  // int32 beakerPercent = 12;
+  void clear_beakerpercent();
+  ::PROTOBUF_NAMESPACE_ID::int32 beakerpercent() const;
+  void set_beakerpercent(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_beakerpercent() const;
+  void _internal_set_beakerpercent(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
   // @@protoc_insertion_point(class_scope:UpdatePlayer)
  private:
   class _Internal;
@@ -6312,6 +6344,7 @@ class UpdatePlayer final :
   ::PROTOBUF_NAMESPACE_ID::int32 netgold_;
   ::PROTOBUF_NAMESPACE_ID::int32 gold_;
   ::PROTOBUF_NAMESPACE_ID::int32 capitalcityid_;
+  ::PROTOBUF_NAMESPACE_ID::int32 beakerpercent_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -8917,6 +8950,80 @@ inline ::GetPossibleTechs* AnyClient::_internal_mutable_getpossibletechs() {
 inline ::GetPossibleTechs* AnyClient::mutable_getpossibletechs() {
   ::GetPossibleTechs* _msg = _internal_mutable_getpossibletechs();
   // @@protoc_insertion_point(field_mutable:AnyClient.getPossibleTechs)
+  return _msg;
+}
+
+// .SetEconomySettings setEconomySettings = 10;
+inline bool AnyClient::_internal_has_seteconomysettings() const {
+  return packet_case() == kSetEconomySettings;
+}
+inline bool AnyClient::has_seteconomysettings() const {
+  return _internal_has_seteconomysettings();
+}
+inline void AnyClient::set_has_seteconomysettings() {
+  _oneof_case_[0] = kSetEconomySettings;
+}
+inline void AnyClient::clear_seteconomysettings() {
+  if (_internal_has_seteconomysettings()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.seteconomysettings_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::SetEconomySettings* AnyClient::release_seteconomysettings() {
+  // @@protoc_insertion_point(field_release:AnyClient.setEconomySettings)
+  if (_internal_has_seteconomysettings()) {
+    clear_has_packet();
+      ::SetEconomySettings* temp = packet_.seteconomysettings_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.seteconomysettings_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::SetEconomySettings& AnyClient::_internal_seteconomysettings() const {
+  return _internal_has_seteconomysettings()
+      ? *packet_.seteconomysettings_
+      : reinterpret_cast< ::SetEconomySettings&>(::_SetEconomySettings_default_instance_);
+}
+inline const ::SetEconomySettings& AnyClient::seteconomysettings() const {
+  // @@protoc_insertion_point(field_get:AnyClient.setEconomySettings)
+  return _internal_seteconomysettings();
+}
+inline ::SetEconomySettings* AnyClient::unsafe_arena_release_seteconomysettings() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.setEconomySettings)
+  if (_internal_has_seteconomysettings()) {
+    clear_has_packet();
+    ::SetEconomySettings* temp = packet_.seteconomysettings_;
+    packet_.seteconomysettings_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_seteconomysettings(::SetEconomySettings* seteconomysettings) {
+  clear_packet();
+  if (seteconomysettings) {
+    set_has_seteconomysettings();
+    packet_.seteconomysettings_ = seteconomysettings;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.setEconomySettings)
+}
+inline ::SetEconomySettings* AnyClient::_internal_mutable_seteconomysettings() {
+  if (!_internal_has_seteconomysettings()) {
+    clear_packet();
+    set_has_seteconomysettings();
+    packet_.seteconomysettings_ = CreateMaybeMessage< ::SetEconomySettings >(GetArenaForAllocation());
+  }
+  return packet_.seteconomysettings_;
+}
+inline ::SetEconomySettings* AnyClient::mutable_seteconomysettings() {
+  ::SetEconomySettings* _msg = _internal_mutable_seteconomysettings();
+  // @@protoc_insertion_point(field_mutable:AnyClient.setEconomySettings)
   return _msg;
 }
 
@@ -13570,6 +13677,26 @@ inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string>*
 UpdatePlayer::mutable_unlockedtechids() {
   // @@protoc_insertion_point(field_mutable_list:UpdatePlayer.unlockedTechIDs)
   return &unlockedtechids_;
+}
+
+// int32 beakerPercent = 12;
+inline void UpdatePlayer::clear_beakerpercent() {
+  beakerpercent_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdatePlayer::_internal_beakerpercent() const {
+  return beakerpercent_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdatePlayer::beakerpercent() const {
+  // @@protoc_insertion_point(field_get:UpdatePlayer.beakerPercent)
+  return _internal_beakerpercent();
+}
+inline void UpdatePlayer::_internal_set_beakerpercent(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  beakerpercent_ = value;
+}
+inline void UpdatePlayer::set_beakerpercent(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_beakerpercent(value);
+  // @@protoc_insertion_point(field_set:UpdatePlayer.beakerPercent)
 }
 
 // -------------------------------------------------------------------

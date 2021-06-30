@@ -14,6 +14,8 @@ local Image = require("widget/image")
 local Padding = require("widget/padding")
 local Clickable = require("widget/clickable")
 
+local style = require("ui/style")
+
 -- Asks the user what to build in a city.
 local CityBuildPrompt = {}
 
@@ -52,15 +54,15 @@ function CityBuildPrompt:build()
             vars = { name = self.city.previousBuildTask.kind.building.buildingName }
         end
 
-        title = "You have constructed a %name in %city. What would you like to work on next?"
+        title = "You have constructed a @color{%highlight}{%name} in %city. What would you like to work on next?"
     else
         vars = {}
         title = "What would you like to work on in %city?"
     end
     vars.city = self.city.name
+    vars.highlight = dumeColorToString(style.default.highlightedText.defaultTextStyle.color)
 
     local titleText = Text:new("@size{16}{" .. title .. "}", vars)
-    table.insert(titleText.classes, "highlightedText")
     root:addFixedChild(titleText)
 
     for _, possibleTask in ipairs(self.possibleTasks) do
@@ -264,7 +266,7 @@ function ResearchPrompt:build()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(400, 400)
-    ui:createWindow("researchPrompt", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2), size, container)
+    ui:createWindow("researchPrompt", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2 - 200), size, container)
 end
 
 -- A queue of prompts to display at the start
