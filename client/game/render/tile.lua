@@ -141,6 +141,84 @@ function YieldRenderer:renderTile(cv, tile)
     end
 end
 
+local adjacentOffsets = {
+    Vector(1, 0),
+    Vector(-1, 0),
+    Vector(0, 1),
+    Vector(0, -1),
+}
+
+local adjacentBorderInfos = {
+    {
+        start = Vector(100, 0),
+        ending = Vector(100, 100),
+        crossDir = Vector(-1, 0),
+        mainDir = Vector(0, 1),
+    },
+    {
+        start = Vector(0, 0),
+        ending = Vector(0, 100),
+        crossDir = Vector(1, 0),
+        mainDir = Vector(0, 1),
+    },
+    {
+        start = Vector(0, 100),
+        ending = Vector(100, 100),
+        crossDir = Vector(0, -1),
+        mainDir = Vector(1, 0),
+    },
+    {
+        start = Vector(0, 0),
+        ending = Vector(100, 0),
+        crossDir = Vector(0, 1),
+        mainDir = Vector(1, 0),
+    }
+}
+
+-- Renders cultural borders when a tile is adjacent to a tile
+-- with a different owner.
+local CultureBorderRenderer = {}
+
+function CultureBorderRenderer:renderTile(cv, tile, tilePos, game)
+    if not tile.hasOwner then return end
+
+    local ownerID = tile.ownerID
+    local owner = game.players[ownerID]
+
+    local width = 3
+    cv:strokeWidth(width)
+
+    -- Check adjacent tiles and, if they have different owners,
+    -- paint borders along those edges.
+    for i=1,#adjacentOffsets do
+        local offset = adjacentOffsets[i]
+        local adjacentTilePos = tilePos + offset
+        local adjacentTile = game:getTile(adjacentTilePos)
+        if adjacentTile ~= nil and (adjacentTile.ownerID ~= ownerID or not adjacentTile.hasOwner) then
+            -- Paint the border.
+            local borderInfo = adjacentBorderInfos[i]
+
+            cv:beginPath()
+            cv:moveTo(borderInfo.start)
+            cv:lineTo(borderInfo.ending)
+
+            local color = owner.civ.color
+            cv:solidColor(color)
+            cv:stroke()
+
+            -- Gradient to indicate the direction of the border.
+            local colorA = dume.rgb(color[1], color[2], color[3], 130)
+            local colorB = dume.rgb(color[1], color[2], color[3], 0)
+            local gradientStart = borderInfo.start
+            local gradientEnd = borderInfo.start + borderInfo.crossDir * 30
+            cv:linearGradient(gradientStart, gradientEnd, colorA, colorB)
+            cv:beginPath()
+            cv:rect(borderInfo.start, (borderInfo.mainDir * 100) + (borderInfo.crossDir * 30))
+            cv:fill()
+        end
+    end
+end
+
 -- Adds a fog layer on top of tiles that are fogged.
 local FogRenderer = {}
 local fogColor = dume.rgb(50, 50, 50, 150)
@@ -165,6 +243,7 @@ local TileRenderer = {
         CityRenderer,
         YieldRenderer,
         UnitRenderer,
+        CultureBorderRenderer,
         FogRenderer,
     }
 }
