@@ -53,6 +53,18 @@ function City:updateData(data, game)
         lineBreaks = false,
         maxDimensions = Vector(100, math.huge)
     })
+
+    if self.buildTask ~= nil and self.buildTask.kind.building ~= nil then
+        local c = string.sub(self.buildTask.kind.building.buildingName, 1, 1)
+        local text = cv:parseTextMarkup("@bold{@size{18}{@color{rgb(0, 0, 0)}{%c}}}", style.default.text.defaultTextStyle, {c=c})
+        self.buildTaskParagraph = cv:createParagraph(text, {
+            alignH = dume.Align.Center,
+            alignV = dume.Align.Center,
+            baseline = dume.Baseline.Top,
+            lineBreaks = false,
+            maxDimensions = Vector(20, 20)
+        })
+    end
 end
 
 function City:estimateTurnsToBuild(buildTask)
@@ -148,7 +160,16 @@ function City:renderBubble(cv)
     -- Left circle text (population)
     cv:drawParagraph(self.populationParagraph, Vector(-5, 20))
 
-    -- TODO right circle text
+    -- Right circle overlay, depending on the build task:
+    -- * unit - unit head icon
+    -- * building - first letter of building name (TODO: we should have icons for these)
+    if self.buildTask ~= nil then
+        if self.buildTask.kind.unit ~= nil then
+            cv:drawSprite("icon/unit_head/" .. self.buildTask.kind.unit.unitKindID, Vector(-radius * 2 + 5 + bubbleWidth, 10), radius * 2)
+        else
+            cv:drawParagraph(self.buildTaskParagraph, Vector(-radius * 2 + 5 + bubbleWidth, 10))
+        end
+    end
 
     -- City name
     cv:drawParagraph(self.cityNameParagraph, Vector(0, 20))

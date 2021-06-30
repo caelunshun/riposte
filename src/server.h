@@ -60,6 +60,7 @@ namespace rip {
         void addConnection(std::unique_ptr<Bridge> bridge);
 
         void broadcastUnitUpdate(Unit &unit);
+        void broadcastCityUpdate(City &city);
 
         void run();
     };

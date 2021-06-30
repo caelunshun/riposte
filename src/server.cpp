@@ -296,7 +296,11 @@ namespace rip {
                     );
         }
 
-        game.getCity({packet.cityid(), 0}).setBuildTask(std::move(task));
+        auto &city = game.getCity({packet.cityid(), 0});
+        city.setBuildTask(std::move(task));
+
+        auto response = getUpdateCityPacket(game, city);
+        SEND(response, updatecity, currentRequestID);
     }
 
     void Connection::handlePacket(Game &game, AnyClient &packet) {
@@ -370,5 +374,10 @@ namespace rip {
     void Server::broadcastUnitUpdate(Unit &unit) {
         auto packet = getUpdateUnitPacket(game, unit);
         BROADCAST(packet, updateunit, 0);
+    }
+
+    void Server::broadcastCityUpdate(City &city) {
+        auto packet = getUpdateCityPacket(game, city);
+        BROADCAST(packet, updatecity, 0);
     }
 }
