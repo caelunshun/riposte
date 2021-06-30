@@ -189,12 +189,8 @@ namespace rip {
                         }
                     }
 
-                    for (int i = 0; i < 10; i++) { // DEBUG - LUA CLIENT
-                        std::shared_ptr<UnitKind> kind = game.getRegistry().getUnits()[
-                                rng.u32(0, game.getRegistry().getUnits().size())];
-                        Unit warrior(kind, warriorPos, player.getID());
-                        game.addUnit(std::move(warrior));
-                    }
+                    Unit warrior(game.getRegistry().getUnit("warrior"), warriorPos, player.getID());
+                    game.addUnit(std::move(warrior));
 
                     positions.push_back(pos);
 

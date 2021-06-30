@@ -47,7 +47,7 @@ struct TableStruct_riposte_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[41]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[43]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -93,6 +93,9 @@ extern EndTurnDefaultTypeInternal _EndTurn_default_instance_;
 class FoundCityCapability;
 struct FoundCityCapabilityDefaultTypeInternal;
 extern FoundCityCapabilityDefaultTypeInternal _FoundCityCapability_default_instance_;
+class GetBuildTasks;
+struct GetBuildTasksDefaultTypeInternal;
+extern GetBuildTasksDefaultTypeInternal _GetBuildTasks_default_instance_;
 class Improvement;
 struct ImprovementDefaultTypeInternal;
 extern ImprovementDefaultTypeInternal _Improvement_default_instance_;
@@ -117,6 +120,9 @@ extern PlayerInfoDefaultTypeInternal _PlayerInfo_default_instance_;
 class Pos;
 struct PosDefaultTypeInternal;
 extern PosDefaultTypeInternal _Pos_default_instance_;
+class PossibleCityBuildTasks;
+struct PossibleCityBuildTasksDefaultTypeInternal;
+extern PossibleCityBuildTasksDefaultTypeInternal _PossibleCityBuildTasks_default_instance_;
 class ResearchingTech;
 struct ResearchingTechDefaultTypeInternal;
 extern ResearchingTechDefaultTypeInternal _ResearchingTech_default_instance_;
@@ -191,6 +197,7 @@ template<> ::ComputePath* Arena::CreateMaybeMessage<::ComputePath>(Arena*);
 template<> ::ConfirmMoveUnits* Arena::CreateMaybeMessage<::ConfirmMoveUnits>(Arena*);
 template<> ::EndTurn* Arena::CreateMaybeMessage<::EndTurn>(Arena*);
 template<> ::FoundCityCapability* Arena::CreateMaybeMessage<::FoundCityCapability>(Arena*);
+template<> ::GetBuildTasks* Arena::CreateMaybeMessage<::GetBuildTasks>(Arena*);
 template<> ::Improvement* Arena::CreateMaybeMessage<::Improvement>(Arena*);
 template<> ::KickPlayer* Arena::CreateMaybeMessage<::KickPlayer>(Arena*);
 template<> ::LobbyError* Arena::CreateMaybeMessage<::LobbyError>(Arena*);
@@ -199,6 +206,7 @@ template<> ::Path* Arena::CreateMaybeMessage<::Path>(Arena*);
 template<> ::PathComputed* Arena::CreateMaybeMessage<::PathComputed>(Arena*);
 template<> ::PlayerInfo* Arena::CreateMaybeMessage<::PlayerInfo>(Arena*);
 template<> ::Pos* Arena::CreateMaybeMessage<::Pos>(Arena*);
+template<> ::PossibleCityBuildTasks* Arena::CreateMaybeMessage<::PossibleCityBuildTasks>(Arena*);
 template<> ::ResearchingTech* Arena::CreateMaybeMessage<::ResearchingTech>(Arena*);
 template<> ::ServerInfo* Arena::CreateMaybeMessage<::ServerInfo>(Arena*);
 template<> ::SetCityBuildTask* Arena::CreateMaybeMessage<::SetCityBuildTask>(Arena*);
@@ -500,6 +508,8 @@ class AnyClient final :
     kComputePath = 3,
     kMoveUnits = 4,
     kEndTurn = 5,
+    kGetBuildTasks = 6,
+    kSetCityBuildTask = 7,
     PACKET_NOT_SET = 0,
   };
 
@@ -584,6 +594,8 @@ class AnyClient final :
     kComputePathFieldNumber = 3,
     kMoveUnitsFieldNumber = 4,
     kEndTurnFieldNumber = 5,
+    kGetBuildTasksFieldNumber = 6,
+    kSetCityBuildTaskFieldNumber = 7,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -666,6 +678,42 @@ class AnyClient final :
       ::EndTurn* endturn);
   ::EndTurn* unsafe_arena_release_endturn();
 
+  // .GetBuildTasks getBuildTasks = 6;
+  bool has_getbuildtasks() const;
+  private:
+  bool _internal_has_getbuildtasks() const;
+  public:
+  void clear_getbuildtasks();
+  const ::GetBuildTasks& getbuildtasks() const;
+  PROTOBUF_MUST_USE_RESULT ::GetBuildTasks* release_getbuildtasks();
+  ::GetBuildTasks* mutable_getbuildtasks();
+  void set_allocated_getbuildtasks(::GetBuildTasks* getbuildtasks);
+  private:
+  const ::GetBuildTasks& _internal_getbuildtasks() const;
+  ::GetBuildTasks* _internal_mutable_getbuildtasks();
+  public:
+  void unsafe_arena_set_allocated_getbuildtasks(
+      ::GetBuildTasks* getbuildtasks);
+  ::GetBuildTasks* unsafe_arena_release_getbuildtasks();
+
+  // .SetCityBuildTask setCityBuildTask = 7;
+  bool has_setcitybuildtask() const;
+  private:
+  bool _internal_has_setcitybuildtask() const;
+  public:
+  void clear_setcitybuildtask();
+  const ::SetCityBuildTask& setcitybuildtask() const;
+  PROTOBUF_MUST_USE_RESULT ::SetCityBuildTask* release_setcitybuildtask();
+  ::SetCityBuildTask* mutable_setcitybuildtask();
+  void set_allocated_setcitybuildtask(::SetCityBuildTask* setcitybuildtask);
+  private:
+  const ::SetCityBuildTask& _internal_setcitybuildtask() const;
+  ::SetCityBuildTask* _internal_mutable_setcitybuildtask();
+  public:
+  void unsafe_arena_set_allocated_setcitybuildtask(
+      ::SetCityBuildTask* setcitybuildtask);
+  ::SetCityBuildTask* unsafe_arena_release_setcitybuildtask();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyClient)
@@ -675,6 +723,8 @@ class AnyClient final :
   void set_has_computepath();
   void set_has_moveunits();
   void set_has_endturn();
+  void set_has_getbuildtasks();
+  void set_has_setcitybuildtask();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -690,6 +740,8 @@ class AnyClient final :
     ::ComputePath* computepath_;
     ::MoveUnits* moveunits_;
     ::EndTurn* endturn_;
+    ::GetBuildTasks* getbuildtasks_;
+    ::SetCityBuildTask* setcitybuildtask_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -748,6 +800,7 @@ class AnyServer final :
     kUpdatePlayer = 9,
     kPathComputed = 10,
     kConfirmMoveUnits = 11,
+    kPossibleCityBuildTasks = 12,
     PACKET_NOT_SET = 0,
   };
 
@@ -838,6 +891,7 @@ class AnyServer final :
     kUpdatePlayerFieldNumber = 9,
     kPathComputedFieldNumber = 10,
     kConfirmMoveUnitsFieldNumber = 11,
+    kPossibleCityBuildTasksFieldNumber = 12,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -1028,6 +1082,24 @@ class AnyServer final :
       ::ConfirmMoveUnits* confirmmoveunits);
   ::ConfirmMoveUnits* unsafe_arena_release_confirmmoveunits();
 
+  // .PossibleCityBuildTasks possibleCityBuildTasks = 12;
+  bool has_possiblecitybuildtasks() const;
+  private:
+  bool _internal_has_possiblecitybuildtasks() const;
+  public:
+  void clear_possiblecitybuildtasks();
+  const ::PossibleCityBuildTasks& possiblecitybuildtasks() const;
+  PROTOBUF_MUST_USE_RESULT ::PossibleCityBuildTasks* release_possiblecitybuildtasks();
+  ::PossibleCityBuildTasks* mutable_possiblecitybuildtasks();
+  void set_allocated_possiblecitybuildtasks(::PossibleCityBuildTasks* possiblecitybuildtasks);
+  private:
+  const ::PossibleCityBuildTasks& _internal_possiblecitybuildtasks() const;
+  ::PossibleCityBuildTasks* _internal_mutable_possiblecitybuildtasks();
+  public:
+  void unsafe_arena_set_allocated_possiblecitybuildtasks(
+      ::PossibleCityBuildTasks* possiblecitybuildtasks);
+  ::PossibleCityBuildTasks* unsafe_arena_release_possiblecitybuildtasks();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyServer)
@@ -1043,6 +1115,7 @@ class AnyServer final :
   void set_has_updateplayer();
   void set_has_pathcomputed();
   void set_has_confirmmoveunits();
+  void set_has_possiblecitybuildtasks();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -1064,6 +1137,7 @@ class AnyServer final :
     ::UpdatePlayer* updateplayer_;
     ::PathComputed* pathcomputed_;
     ::ConfirmMoveUnits* confirmmoveunits_;
+    ::PossibleCityBuildTasks* possiblecitybuildtasks_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -6482,6 +6556,154 @@ class ConfirmMoveUnits final :
 };
 // -------------------------------------------------------------------
 
+class PossibleCityBuildTasks final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:PossibleCityBuildTasks) */ {
+ public:
+  inline PossibleCityBuildTasks() : PossibleCityBuildTasks(nullptr) {}
+  ~PossibleCityBuildTasks() override;
+  explicit constexpr PossibleCityBuildTasks(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  PossibleCityBuildTasks(const PossibleCityBuildTasks& from);
+  PossibleCityBuildTasks(PossibleCityBuildTasks&& from) noexcept
+    : PossibleCityBuildTasks() {
+    *this = ::std::move(from);
+  }
+
+  inline PossibleCityBuildTasks& operator=(const PossibleCityBuildTasks& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline PossibleCityBuildTasks& operator=(PossibleCityBuildTasks&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const PossibleCityBuildTasks& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const PossibleCityBuildTasks* internal_default_instance() {
+    return reinterpret_cast<const PossibleCityBuildTasks*>(
+               &_PossibleCityBuildTasks_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    34;
+
+  friend void swap(PossibleCityBuildTasks& a, PossibleCityBuildTasks& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(PossibleCityBuildTasks* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(PossibleCityBuildTasks* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline PossibleCityBuildTasks* New() const final {
+    return new PossibleCityBuildTasks();
+  }
+
+  PossibleCityBuildTasks* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<PossibleCityBuildTasks>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const PossibleCityBuildTasks& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const PossibleCityBuildTasks& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(PossibleCityBuildTasks* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "PossibleCityBuildTasks";
+  }
+  protected:
+  explicit PossibleCityBuildTasks(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTasksFieldNumber = 1,
+  };
+  // repeated .BuildTask tasks = 1;
+  int tasks_size() const;
+  private:
+  int _internal_tasks_size() const;
+  public:
+  void clear_tasks();
+  ::BuildTask* mutable_tasks(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::BuildTask >*
+      mutable_tasks();
+  private:
+  const ::BuildTask& _internal_tasks(int index) const;
+  ::BuildTask* _internal_add_tasks();
+  public:
+  const ::BuildTask& tasks(int index) const;
+  ::BuildTask* add_tasks();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::BuildTask >&
+      tasks() const;
+
+  // @@protoc_insertion_point(class_scope:PossibleCityBuildTasks)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::BuildTask > tasks_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
+// -------------------------------------------------------------------
+
 class MoveUnits final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:MoveUnits) */ {
  public:
@@ -6526,7 +6748,7 @@ class MoveUnits final :
                &_MoveUnits_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    34;
+    35;
 
   friend void swap(MoveUnits& a, MoveUnits& b) {
     a.Swap(&b);
@@ -6699,7 +6921,7 @@ class SetCityBuildTask final :
                &_SetCityBuildTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    35;
+    36;
 
   friend void swap(SetCityBuildTask& a, SetCityBuildTask& b) {
     a.Swap(&b);
@@ -6858,7 +7080,7 @@ class SetWorkerTask final :
                &_SetWorkerTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    36;
+    37;
 
   friend void swap(SetWorkerTask& a, SetWorkerTask& b) {
     a.Swap(&b);
@@ -7017,7 +7239,7 @@ class ComputePath final :
                &_ComputePath_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    37;
+    38;
 
   friend void swap(ComputePath& a, ComputePath& b) {
     a.Swap(&b);
@@ -7201,7 +7423,7 @@ class SetEconomySettings final :
                &_SetEconomySettings_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    38;
+    39;
 
   friend void swap(SetEconomySettings& a, SetEconomySettings& b) {
     a.Swap(&b);
@@ -7340,7 +7562,7 @@ class SetResearch final :
                &_SetResearch_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    39;
+    40;
 
   friend void swap(SetResearch& a, SetResearch& b) {
     a.Swap(&b);
@@ -7484,7 +7706,7 @@ class EndTurn final :
                &_EndTurn_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    40;
+    41;
 
   friend void swap(EndTurn& a, EndTurn& b) {
     a.Swap(&b);
@@ -7561,6 +7783,145 @@ class EndTurn final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
+// -------------------------------------------------------------------
+
+class GetBuildTasks final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:GetBuildTasks) */ {
+ public:
+  inline GetBuildTasks() : GetBuildTasks(nullptr) {}
+  ~GetBuildTasks() override;
+  explicit constexpr GetBuildTasks(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  GetBuildTasks(const GetBuildTasks& from);
+  GetBuildTasks(GetBuildTasks&& from) noexcept
+    : GetBuildTasks() {
+    *this = ::std::move(from);
+  }
+
+  inline GetBuildTasks& operator=(const GetBuildTasks& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline GetBuildTasks& operator=(GetBuildTasks&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const GetBuildTasks& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const GetBuildTasks* internal_default_instance() {
+    return reinterpret_cast<const GetBuildTasks*>(
+               &_GetBuildTasks_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    42;
+
+  friend void swap(GetBuildTasks& a, GetBuildTasks& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(GetBuildTasks* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(GetBuildTasks* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline GetBuildTasks* New() const final {
+    return new GetBuildTasks();
+  }
+
+  GetBuildTasks* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<GetBuildTasks>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const GetBuildTasks& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const GetBuildTasks& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(GetBuildTasks* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "GetBuildTasks";
+  }
+  protected:
+  explicit GetBuildTasks(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kCityIDFieldNumber = 1,
+  };
+  // int32 cityID = 1;
+  void clear_cityid();
+  ::PROTOBUF_NAMESPACE_ID::int32 cityid() const;
+  void set_cityid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_cityid() const;
+  void _internal_set_cityid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:GetBuildTasks)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 cityid_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -7932,6 +8293,154 @@ inline ::EndTurn* AnyClient::_internal_mutable_endturn() {
 inline ::EndTurn* AnyClient::mutable_endturn() {
   ::EndTurn* _msg = _internal_mutable_endturn();
   // @@protoc_insertion_point(field_mutable:AnyClient.endTurn)
+  return _msg;
+}
+
+// .GetBuildTasks getBuildTasks = 6;
+inline bool AnyClient::_internal_has_getbuildtasks() const {
+  return packet_case() == kGetBuildTasks;
+}
+inline bool AnyClient::has_getbuildtasks() const {
+  return _internal_has_getbuildtasks();
+}
+inline void AnyClient::set_has_getbuildtasks() {
+  _oneof_case_[0] = kGetBuildTasks;
+}
+inline void AnyClient::clear_getbuildtasks() {
+  if (_internal_has_getbuildtasks()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.getbuildtasks_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::GetBuildTasks* AnyClient::release_getbuildtasks() {
+  // @@protoc_insertion_point(field_release:AnyClient.getBuildTasks)
+  if (_internal_has_getbuildtasks()) {
+    clear_has_packet();
+      ::GetBuildTasks* temp = packet_.getbuildtasks_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.getbuildtasks_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::GetBuildTasks& AnyClient::_internal_getbuildtasks() const {
+  return _internal_has_getbuildtasks()
+      ? *packet_.getbuildtasks_
+      : reinterpret_cast< ::GetBuildTasks&>(::_GetBuildTasks_default_instance_);
+}
+inline const ::GetBuildTasks& AnyClient::getbuildtasks() const {
+  // @@protoc_insertion_point(field_get:AnyClient.getBuildTasks)
+  return _internal_getbuildtasks();
+}
+inline ::GetBuildTasks* AnyClient::unsafe_arena_release_getbuildtasks() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.getBuildTasks)
+  if (_internal_has_getbuildtasks()) {
+    clear_has_packet();
+    ::GetBuildTasks* temp = packet_.getbuildtasks_;
+    packet_.getbuildtasks_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_getbuildtasks(::GetBuildTasks* getbuildtasks) {
+  clear_packet();
+  if (getbuildtasks) {
+    set_has_getbuildtasks();
+    packet_.getbuildtasks_ = getbuildtasks;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.getBuildTasks)
+}
+inline ::GetBuildTasks* AnyClient::_internal_mutable_getbuildtasks() {
+  if (!_internal_has_getbuildtasks()) {
+    clear_packet();
+    set_has_getbuildtasks();
+    packet_.getbuildtasks_ = CreateMaybeMessage< ::GetBuildTasks >(GetArenaForAllocation());
+  }
+  return packet_.getbuildtasks_;
+}
+inline ::GetBuildTasks* AnyClient::mutable_getbuildtasks() {
+  ::GetBuildTasks* _msg = _internal_mutable_getbuildtasks();
+  // @@protoc_insertion_point(field_mutable:AnyClient.getBuildTasks)
+  return _msg;
+}
+
+// .SetCityBuildTask setCityBuildTask = 7;
+inline bool AnyClient::_internal_has_setcitybuildtask() const {
+  return packet_case() == kSetCityBuildTask;
+}
+inline bool AnyClient::has_setcitybuildtask() const {
+  return _internal_has_setcitybuildtask();
+}
+inline void AnyClient::set_has_setcitybuildtask() {
+  _oneof_case_[0] = kSetCityBuildTask;
+}
+inline void AnyClient::clear_setcitybuildtask() {
+  if (_internal_has_setcitybuildtask()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.setcitybuildtask_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::SetCityBuildTask* AnyClient::release_setcitybuildtask() {
+  // @@protoc_insertion_point(field_release:AnyClient.setCityBuildTask)
+  if (_internal_has_setcitybuildtask()) {
+    clear_has_packet();
+      ::SetCityBuildTask* temp = packet_.setcitybuildtask_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.setcitybuildtask_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::SetCityBuildTask& AnyClient::_internal_setcitybuildtask() const {
+  return _internal_has_setcitybuildtask()
+      ? *packet_.setcitybuildtask_
+      : reinterpret_cast< ::SetCityBuildTask&>(::_SetCityBuildTask_default_instance_);
+}
+inline const ::SetCityBuildTask& AnyClient::setcitybuildtask() const {
+  // @@protoc_insertion_point(field_get:AnyClient.setCityBuildTask)
+  return _internal_setcitybuildtask();
+}
+inline ::SetCityBuildTask* AnyClient::unsafe_arena_release_setcitybuildtask() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.setCityBuildTask)
+  if (_internal_has_setcitybuildtask()) {
+    clear_has_packet();
+    ::SetCityBuildTask* temp = packet_.setcitybuildtask_;
+    packet_.setcitybuildtask_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_setcitybuildtask(::SetCityBuildTask* setcitybuildtask) {
+  clear_packet();
+  if (setcitybuildtask) {
+    set_has_setcitybuildtask();
+    packet_.setcitybuildtask_ = setcitybuildtask;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.setCityBuildTask)
+}
+inline ::SetCityBuildTask* AnyClient::_internal_mutable_setcitybuildtask() {
+  if (!_internal_has_setcitybuildtask()) {
+    clear_packet();
+    set_has_setcitybuildtask();
+    packet_.setcitybuildtask_ = CreateMaybeMessage< ::SetCityBuildTask >(GetArenaForAllocation());
+  }
+  return packet_.setcitybuildtask_;
+}
+inline ::SetCityBuildTask* AnyClient::mutable_setcitybuildtask() {
+  ::SetCityBuildTask* _msg = _internal_mutable_setcitybuildtask();
+  // @@protoc_insertion_point(field_mutable:AnyClient.setCityBuildTask)
   return _msg;
 }
 
@@ -8705,6 +9214,80 @@ inline ::ConfirmMoveUnits* AnyServer::_internal_mutable_confirmmoveunits() {
 inline ::ConfirmMoveUnits* AnyServer::mutable_confirmmoveunits() {
   ::ConfirmMoveUnits* _msg = _internal_mutable_confirmmoveunits();
   // @@protoc_insertion_point(field_mutable:AnyServer.confirmMoveUnits)
+  return _msg;
+}
+
+// .PossibleCityBuildTasks possibleCityBuildTasks = 12;
+inline bool AnyServer::_internal_has_possiblecitybuildtasks() const {
+  return packet_case() == kPossibleCityBuildTasks;
+}
+inline bool AnyServer::has_possiblecitybuildtasks() const {
+  return _internal_has_possiblecitybuildtasks();
+}
+inline void AnyServer::set_has_possiblecitybuildtasks() {
+  _oneof_case_[0] = kPossibleCityBuildTasks;
+}
+inline void AnyServer::clear_possiblecitybuildtasks() {
+  if (_internal_has_possiblecitybuildtasks()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.possiblecitybuildtasks_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::PossibleCityBuildTasks* AnyServer::release_possiblecitybuildtasks() {
+  // @@protoc_insertion_point(field_release:AnyServer.possibleCityBuildTasks)
+  if (_internal_has_possiblecitybuildtasks()) {
+    clear_has_packet();
+      ::PossibleCityBuildTasks* temp = packet_.possiblecitybuildtasks_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.possiblecitybuildtasks_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::PossibleCityBuildTasks& AnyServer::_internal_possiblecitybuildtasks() const {
+  return _internal_has_possiblecitybuildtasks()
+      ? *packet_.possiblecitybuildtasks_
+      : reinterpret_cast< ::PossibleCityBuildTasks&>(::_PossibleCityBuildTasks_default_instance_);
+}
+inline const ::PossibleCityBuildTasks& AnyServer::possiblecitybuildtasks() const {
+  // @@protoc_insertion_point(field_get:AnyServer.possibleCityBuildTasks)
+  return _internal_possiblecitybuildtasks();
+}
+inline ::PossibleCityBuildTasks* AnyServer::unsafe_arena_release_possiblecitybuildtasks() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyServer.possibleCityBuildTasks)
+  if (_internal_has_possiblecitybuildtasks()) {
+    clear_has_packet();
+    ::PossibleCityBuildTasks* temp = packet_.possiblecitybuildtasks_;
+    packet_.possiblecitybuildtasks_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyServer::unsafe_arena_set_allocated_possiblecitybuildtasks(::PossibleCityBuildTasks* possiblecitybuildtasks) {
+  clear_packet();
+  if (possiblecitybuildtasks) {
+    set_has_possiblecitybuildtasks();
+    packet_.possiblecitybuildtasks_ = possiblecitybuildtasks;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyServer.possibleCityBuildTasks)
+}
+inline ::PossibleCityBuildTasks* AnyServer::_internal_mutable_possiblecitybuildtasks() {
+  if (!_internal_has_possiblecitybuildtasks()) {
+    clear_packet();
+    set_has_possiblecitybuildtasks();
+    packet_.possiblecitybuildtasks_ = CreateMaybeMessage< ::PossibleCityBuildTasks >(GetArenaForAllocation());
+  }
+  return packet_.possiblecitybuildtasks_;
+}
+inline ::PossibleCityBuildTasks* AnyServer::mutable_possiblecitybuildtasks() {
+  ::PossibleCityBuildTasks* _msg = _internal_mutable_possiblecitybuildtasks();
+  // @@protoc_insertion_point(field_mutable:AnyServer.possibleCityBuildTasks)
   return _msg;
 }
 
@@ -12634,6 +13217,50 @@ inline void ConfirmMoveUnits::set_success(bool value) {
 
 // -------------------------------------------------------------------
 
+// PossibleCityBuildTasks
+
+// repeated .BuildTask tasks = 1;
+inline int PossibleCityBuildTasks::_internal_tasks_size() const {
+  return tasks_.size();
+}
+inline int PossibleCityBuildTasks::tasks_size() const {
+  return _internal_tasks_size();
+}
+inline void PossibleCityBuildTasks::clear_tasks() {
+  tasks_.Clear();
+}
+inline ::BuildTask* PossibleCityBuildTasks::mutable_tasks(int index) {
+  // @@protoc_insertion_point(field_mutable:PossibleCityBuildTasks.tasks)
+  return tasks_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::BuildTask >*
+PossibleCityBuildTasks::mutable_tasks() {
+  // @@protoc_insertion_point(field_mutable_list:PossibleCityBuildTasks.tasks)
+  return &tasks_;
+}
+inline const ::BuildTask& PossibleCityBuildTasks::_internal_tasks(int index) const {
+  return tasks_.Get(index);
+}
+inline const ::BuildTask& PossibleCityBuildTasks::tasks(int index) const {
+  // @@protoc_insertion_point(field_get:PossibleCityBuildTasks.tasks)
+  return _internal_tasks(index);
+}
+inline ::BuildTask* PossibleCityBuildTasks::_internal_add_tasks() {
+  return tasks_.Add();
+}
+inline ::BuildTask* PossibleCityBuildTasks::add_tasks() {
+  ::BuildTask* _add = _internal_add_tasks();
+  // @@protoc_insertion_point(field_add:PossibleCityBuildTasks.tasks)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::BuildTask >&
+PossibleCityBuildTasks::tasks() const {
+  // @@protoc_insertion_point(field_list:PossibleCityBuildTasks.tasks)
+  return tasks_;
+}
+
+// -------------------------------------------------------------------
+
 // MoveUnits
 
 // repeated int32 unitIDs = 1;
@@ -13309,9 +13936,37 @@ inline void SetResearch::set_allocated_techid(std::string* techid) {
 
 // EndTurn
 
+// -------------------------------------------------------------------
+
+// GetBuildTasks
+
+// int32 cityID = 1;
+inline void GetBuildTasks::clear_cityid() {
+  cityid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 GetBuildTasks::_internal_cityid() const {
+  return cityid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 GetBuildTasks::cityid() const {
+  // @@protoc_insertion_point(field_get:GetBuildTasks.cityID)
+  return _internal_cityid();
+}
+inline void GetBuildTasks::_internal_set_cityid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  cityid_ = value;
+}
+inline void GetBuildTasks::set_cityid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_cityid(value);
+  // @@protoc_insertion_point(field_set:GetBuildTasks.cityID)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

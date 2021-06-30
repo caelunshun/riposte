@@ -17,6 +17,8 @@ local style = require("ui/style")
 local TaskSequence = require("task_sequence")
 local SelectionGroups = require("game/ui/selection")
 
+local prompts = require("game/ui/prompts")
+
 local BottomControlWindow = {}
 local UnitDisplayWindow = {}
 local TurnIndicatorWindow = {}
@@ -34,6 +36,7 @@ function Hud:new(game)
         readyForNextTurn = false,
         tasks = TaskSequence:new(),
         timeSinceLastSelect = nil,
+        promptQueue = prompts.PromptQueue:new(),
     }
 
     o.windows = {
@@ -46,6 +49,10 @@ function Hud:new(game)
 
     game.eventBus:registerHandler("globalDataUpdated", function()
         o:rebuildWindows()
+    end)
+
+    game.eventBus:registerHandler("cityUpdated", function(city)
+        o:onCityUpdated(city)
     end)
 
     setmetatable(o, self)
@@ -321,6 +328,8 @@ function Hud:doAutoSelect()
 end
 
 function Hud:render(cv, time, dt)
+    self.promptQueue:tick()
+
     if #self.selectedUnits > 0 then
         self.timeSinceLastSelect = nil
     else
@@ -342,6 +351,16 @@ function Hud:render(cv, time, dt)
 
     if self.readyForNextTurn then
         self:renderNextTurnPrompt(cv, time)
+    end
+end
+
+function Hud:onCityUpdated(city)
+    if city.owner == self.game.thePlayer and city.buildTask == nil and self.game.turn ~= 0 then
+        -- Prompt the user to set the new build task.
+        local co = coroutine.create(function()
+            self.promptQueue:push(prompts.CityBuildPrompt:new(self.game, city))
+        end)
+        callSafe(co)
     end
 end
 

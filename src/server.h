@@ -39,6 +39,8 @@ namespace rip {
         void handleClientInfo(Game &game, const ClientInfo &packet);
         void handleComputePath(Game &game, const ComputePath &packet);
         void handleMoveUnits(Game &game, const MoveUnits &packet);
+        void handleGetBuildTasks(Game &game, const GetBuildTasks &packet);
+        void handleSetBuildTask(Game &game, const SetCityBuildTask &packet);
         void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);

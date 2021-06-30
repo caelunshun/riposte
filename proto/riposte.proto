@@ -57,6 +57,8 @@ message AnyClient {
     ComputePath computePath = 3;
     MoveUnits moveUnits = 4;
     EndTurn endTurn = 5;
+    GetBuildTasks getBuildTasks = 6;
+    SetCityBuildTask setCityBuildTask = 7;
   }
 }
 
@@ -77,6 +79,7 @@ message AnyServer {
     UpdatePlayer updatePlayer = 9;
     PathComputed pathComputed = 10;
     ConfirmMoveUnits confirmMoveUnits = 11;
+    PossibleCityBuildTasks possibleCityBuildTasks = 12;
   }
 }
 
@@ -339,6 +342,10 @@ message ConfirmMoveUnits {
   bool success = 1;
 }
 
+message PossibleCityBuildTasks {
+  repeated BuildTask tasks = 1;
+}
+
 // ---------------------
 // CLIENT
 // ---------------------
@@ -378,4 +385,8 @@ message SetResearch {
 
 message EndTurn {
 
+}
+
+message GetBuildTasks {
+  int32 cityID = 1;
 }

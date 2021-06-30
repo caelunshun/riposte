@@ -14,6 +14,14 @@ end
 -- Updates the city with data received from the server
 -- in an UpdateCity packet.
 function City:updateData(data, game)
+    if self.buildTask ~= nil and data.buildTask == nil then
+        self.previousBuildTask = self.buildTask
+    end
+
+    if data.buildTask == nil then
+        self.buildTask = nil
+    end
+
     for k, v in pairs(data) do
         self[k] = v
     end
@@ -45,6 +53,13 @@ function City:updateData(data, game)
         lineBreaks = false,
         maxDimensions = Vector(100, math.huge)
     })
+end
+
+function City:estimateTurnsToBuild(buildTask)
+    return math.ceil(
+            (buildTask.cost - buildTask.progress)
+            / self.yield.hammers
+    )
 end
 
 local numHouses = 3

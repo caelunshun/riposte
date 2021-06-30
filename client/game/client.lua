@@ -66,6 +66,25 @@ function Client:moveUnitsAlongPath(units, path)
     return response.success
 end
 
+-- Requests a list of the possible build tasks for the given city.
+-- Must be called from a coroutine.
+function Client:getPossibleBuildTasks(city)
+    local thread = coroutine.running()
+    self:sendPacket("getBuildTasks", {
+        cityID = city.id,
+    }, function(response)
+        coroutine.resume(thread, response.tasks)
+    end)
+    return coroutine.yield()
+end
+
+function Client:setCityBuildTask(city, buildTaskKind)
+    self:sendPacket("setCityBuildTask", {
+        cityID = city.id,
+        task = buildTaskKind,
+    })
+end
+
 function Client:endTurn()
     self:sendPacket("endTurn", {})
 end

@@ -272,6 +272,33 @@ namespace rip {
         SEND(response, confirmmoveunits, currentRequestID);
     }
 
+    void Connection::handleGetBuildTasks(Game &game, const GetBuildTasks &packet) {
+        PossibleCityBuildTasks response;
+
+        auto &city = game.getCity({packet.cityid(), 0});
+        for (const auto &task : city.getPossibleBuildTasks(game)) {
+            writeBuildTask(*task, *response.add_tasks());
+        }
+
+        SEND(response, possiblecitybuildtasks, currentRequestID);
+    }
+
+    void Connection::handleSetBuildTask(Game &game, const SetCityBuildTask &packet) {
+        std::unique_ptr<BuildTask> task;
+
+        if (packet.task().has_unit()) {
+            task = std::make_unique<UnitBuildTask>(
+                    game.getRegistry().getUnit(packet.task().unit().unitkindid())
+                    );
+        } else {
+            task = std::make_unique<BuildingBuildTask>(
+                    game.getRegistry().getBuilding(packet.task().building().buildingname())
+                    );
+        }
+
+        game.getCity({packet.cityid(), 0}).setBuildTask(std::move(task));
+    }
+
     void Connection::handlePacket(Game &game, AnyClient &packet) {
         currentRequestID = packet.requestid();
         if (packet.has_clientinfo()) {
@@ -282,6 +309,10 @@ namespace rip {
             handleMoveUnits(game, packet.moveunits());
         } else if (packet.has_endturn()) {
             endedTurn = true;
+        } else if (packet.has_getbuildtasks()) {
+            handleGetBuildTasks(game, packet.getbuildtasks());
+        } else if (packet.has_setcitybuildtask()) {
+            handleSetBuildTask(game, packet.setcitybuildtask());
         }
     }
 
