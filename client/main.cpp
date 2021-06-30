@@ -81,15 +81,19 @@ namespace rip {
     }
 }
 
+CControlFlow invokeFunction(void *function, Event event) {
+    auto &f = *((std::function<CControlFlow(Event)>*) function);
+    return f(event);
+}
+
 int main() {
-    glfwInit();
-    GLFWwindow *window = glfwCreateWindow(windowWidth, windowHeight, "Riposte", nullptr, nullptr);
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-#ifdef __APPLE__
-    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-#endif
+    EventLoop *eventLoop = winit_event_loop_new();
+    WindowOptions options = {
+            .title = "Riposte",
+            .width = windowWidth,
+            .height = windowHeight,
+    };
+    Window *window = winit_window_new(&options, eventLoop);
 
     auto canvas = std::make_shared<dume::Canvas>(window);
 
@@ -102,7 +106,7 @@ int main() {
             sol::lib::jit, sol::lib::math,
             sol::lib::os, sol::lib::package,
             sol::lib::table, sol::lib::utf8
-            );
+    );
 
     dume::makeLuaBindings(*lua);
     (*lua)["cv"] = canvas;
@@ -131,8 +135,6 @@ int main() {
     sol::function handleEventFunction = (*lua)["handleEvent"];
     sol::function resizeFunction = (*lua)["resize"];
 
-    canvas->setGlfwCallbacks(canvas, lua, handleEventFunction, resizeFunction);
-
     // Load registry data into Lua.
     sol::function loadFunction = (*lua)["loadDataFile"];
     auto luaAssets = std::make_shared<rip::Assets>();
@@ -143,43 +145,42 @@ int main() {
     luaAssets->addLoader("tech", std::make_unique<rip::DataIntoLuaLoader>(loadFunction, "techs"));
     luaAssets->loadAssetsDir("assets", true); // skip non-data assets like images, etc.
 
-    auto lastTime = glfwGetTime();
-    while (!glfwWindowShouldClose(window)) {
-        const auto currentTime = glfwGetTime();
-        const auto dt = currentTime - lastTime;
+    auto lastTime = winit_get_time();
 
-        lastTime = currentTime;
+    int width = windowWidth, height = windowHeight;
+    double cursorX = 0, cursorY = 0;
 
-        glfwPollEvents();
-        renderFunction.call<void>(dt);
+    winit_window_grab_cursor(window, true);
 
-        canvas->render();
+    std::function callbackFunction([&](Event event) {
+        if (event.kind == EventKind::RedrawRequested) {
+            const auto currentTime = winit_get_time();
+            const auto dt = currentTime - lastTime;
 
-        int width, height;
-        glfwGetWindowSize(window, &width, &height);
+            lastTime = currentTime;
 
-        double cursorX, cursorY;
-        glfwGetCursorPos(window, &cursorX, &cursorY);
+            renderFunction.call<void>(dt);
+            canvas->render();
+        } else {
+            canvas->handleEvent(event, *lua, handleEventFunction);
+        }
 
-        bool shouldFixCursor = (cursorX < 0 || cursorY < 0 || cursorX > width || cursorY > height);
-
-        cursorX = std::clamp(cursorX, 0.0, (double) width);
-        cursorY = std::clamp(cursorY, 0.0, (double) height);
-
-        if (shouldFixCursor) {
-            glfwSetCursorPos(window, cursorX, cursorY);
+        if (event.kind == EventKind::CursorMove) {
+            cursorX = event.data.cursor_pos[0];
+            cursorY = event.data.cursor_pos[1];
+        } else if (event.kind == EventKind::Resized) {
+            width = event.data.new_size[0];
+            height = event.data.new_size[1];
         }
 
         (*lua)["cursorPos"] = lua->create_table_with("x", cursorX, "y", cursorY);
-    }
 
-    // force shutdown with a segfault. a bug in Dume causes
-    // the program to hang the entire system
-    // on shutdown and resize, so this is a temporary hack.
-    // See: https://github.com/gfx-rs/wgpu/issues/1570
-    int *x = nullptr;
-    *x += 1;
+        if (event.kind == EventKind::CloseRequested) {
+            return CControlFlow::Exit;
+        } else {
+            return CControlFlow::Poll;
+        }
+    });
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    winit_event_loop_run(eventLoop, &invokeFunction, (void *) (&callbackFunction));
 }
