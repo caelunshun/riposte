@@ -25,6 +25,19 @@ function CityBuildPrompt:new(game, city)
     return o
 end
 
+local function createTooltip(lines, vars, child)
+    local tooltipString = ""
+    for _, line in ipairs(lines) do
+        tooltipString = tooltipString .. line .. "\n"
+    end
+    local tooltipText = Text:new(tooltipString, vars)
+    table.insert(tooltipText.classes, "tooltipText")
+    local tooltipContainer = Container:new(Padding:new(tooltipText, 10))
+    table.insert(tooltipContainer.classes, "tooltipContainer")
+    local tooltip = Tooltip:new(child, tooltipContainer)
+    return tooltip
+end
+
 function CityBuildPrompt:build()
     local root = Flex:column(10)
 
@@ -133,16 +146,7 @@ function CityBuildPrompt:build()
             }
         end
 
-        local tooltipString = ""
-        for _, line in ipairs(lines) do
-            tooltipString = tooltipString .. line .. "\n"
-        end
-        local tooltipText = Text:new(tooltipString, tooltipVars)
-        table.insert(tooltipText.classes, "tooltipText")
-        local tooltipContainer = Container:new(Padding:new(tooltipText, 10))
-        table.insert(tooltipContainer.classes, "tooltipContainer")
-        local tooltip = Tooltip:new(wrapper, tooltipContainer)
-
+        local tooltip = createTooltip(lines, tooltipVars, wrapper)
         root:addFixedChild(tooltip)
     end
 
@@ -193,7 +197,66 @@ function ResearchPrompt:build()
             self.finished = true
         end)
 
-        root:addFixedChild(wrapper)
+        -- Tooltip
+        local vars = {
+            cost = tostring(tech.cost),
+            name = tech.name,
+            bullet = "•"
+        }
+
+        local lines = {
+            "%name",
+            "%cost @icon{beaker}",
+        }
+
+        -- TODO/PERF: we could precompute this data instead of searching
+        -- the entire registry.
+
+        for _, unit in pairs(registry.unitKinds) do
+            if type(unit) == "table" then
+                for _, t in ipairs(unit.techs) do
+                    if t == tech.name then
+                        lines[#lines + 1] = "%bullet Can train " .. article(unit.name) .. " " .. unit.name
+                    end
+                end
+            end
+        end
+
+        for _, building in pairs(registry.buildings) do
+            if type(building) == "table" then
+                for _, t in ipairs(building.techs) do
+                    if t == tech.name then
+                        lines[#lines + 1] = "%bullet Can build " .. article(building.name) .. " " .. building.name
+                    end
+                end
+            end
+        end
+
+        for _, improvement in ipairs(tech.unlocksImprovements or {}) do
+            lines[#lines + 1] = "%bullet Can build " .. article(improvement) .. " " .. improvement
+        end
+
+        for _, resource in pairs(registry.resources) do
+            if type(resource) == "table" then
+                if resource.revealedBy == tech.name then
+                    lines[#lines + 1] = "%bullet Reveals " .. resource.name
+                end
+            end
+        end
+
+        for _, t in pairs(registry.techs) do
+            if type(t) == "table" then
+                for _, prerequisite in ipairs(t.prerequisites or {}) do
+                    if prerequisite == tech.name then
+                        lines[#lines + 1] = "%bullet Leads to " .. t.name
+                        break
+                    end
+                end
+            end
+        end
+
+        local tooltip = createTooltip(lines, vars, wrapper)
+        root:addFixedChild(tooltip)
     end
 
     local container = Container:new(Padding:new(root, 20))
@@ -238,6 +301,27 @@ end
 -- nullable
 function PromptQueue:getCurrentPrompt()
     return self.prompts[1]
+end
+
+-- Returns the indefinite article to use before the
+-- given noun: either `a` or `an` depending on whether
+-- the noun starts with a vowel.
+function article(noun)
+    local firstChar = string.sub(noun, 1, 1)
+
+    local vowels = {
+        a = true,
+        e = true,
+        i = true,
+        o = true,
+        u = true,
+    }
+
+    if vowels[firstChar] then
+        return "an"
+    else
+        return "a"
+    end
 end
 
 return {
