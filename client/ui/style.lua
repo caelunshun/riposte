@@ -44,6 +44,15 @@ return {
                 color = dume.rgb(255, 255, 255),
             },
         },
+        tooltipText = {
+            defaultTextStyle = {
+                family = "Merriweather",
+                size = 15,
+                weight = dume.FontWeight.Normal,
+                style = dume.FontStyle.Normal,
+                color = dume.rgb(255, 255, 255),
+            }
+        },
         windowContainer = {
             backgroundColor = dume.rgb(45, 45, 45, 254),
             borderWidth = 1,
@@ -55,6 +64,13 @@ return {
             borderWidth = 1,
             borderColor = dume.rgb(65, 65, 65),
             borderRadius = 0,
+        },
+        tooltipContainer = {
+            backgroundColor = dume.rgb(50, 50, 50, 254),
+            borderWidth = 1,
+            borderColor = dume.rgb(120, 120, 120),
+            borderRadius = 0,
+            minSize = Vector(300, 150),
         },
         unitHeadContainer = {
             backgroundColor = dume.rgb(80, 80, 80),

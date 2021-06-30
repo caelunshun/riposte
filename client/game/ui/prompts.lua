@@ -70,7 +70,80 @@ function CityBuildPrompt:build()
             ui:deleteWindow("cityBuildPrompt")
         end)
 
-        root:addFixedChild(wrapper)
+        local lines
+        local tooltipVars
+        if possibleTask.kind.unit ~= nil then
+            local unitKind = registry.unitKinds[possibleTask.kind.unit.unitKindID]
+
+            tooltipVars = {
+                name = unitKind.name,
+                cost = unitKind.cost,
+                movement = unitKind.movement,
+                strength = unitKind.strength,
+                bullet = "•",
+                percent = "%",
+                carryUnitsCapacity = unitKind.carryUnitsCapacity,
+                category = unitKind.category,
+            }
+
+            lines = {
+                "%name (%category units)",
+                "%cost @icon{hammer}",
+                "Movement: %movement",
+                "Strength: %strength"
+            }
+
+            for _, capability in ipairs(unitKind.capabilities or {}) do
+                if capability == "found_city" then
+                    lines[#lines + 1] = "%bullet Can found a city"
+                elseif capability == "do_work" then
+                    lines[#lines + 1] = "%bullet Can improve terrain"
+                elseif capability == "carry_units" then
+                    lines[#lines + 1] = "%bullet Can ferry units (capacity: %carryUnitsCapacity)"
+                end
+            end
+
+            for _, bonus in ipairs(unitKind.combatBonuses or {}) do
+                local line = "%bullet +" .. tostring(bonus.bonusPercent) .. "%percent "
+                if bonus.onlyOnDefense then
+                    line = line .. "defense "
+                elseif bonus.onlyOnAttack then
+                    line = line .. "attack "
+                end
+
+                if bonus.type == "againstUnit" then
+                    line = line .. " against " .. registry.unitKinds[bonus.unit].name
+                elseif bonus.type == "againstUnitCategory" then
+                    line = line .. " against " .. bonus.category .. " units"
+                else
+                    line = line .. " when in city"
+                end
+
+                lines[#lines + 1] = line
+            end
+        else
+            local building = registry.buildings[possibleTask.kind.building.buildingName]
+            lines = {
+                "%name",
+                "%cost @icon{hammer}"
+            }
+            tooltipVars = {
+                name = building.name,
+                cost = building.cost,
+            }
+        end
+
+        local tooltipString = ""
+        for _, line in ipairs(lines) do
+            tooltipString = tooltipString .. line .. "\n"
+        end
+        local tooltipText = Text:new(tooltipString, tooltipVars)
+        table.insert(tooltipText.classes, "tooltipText")
+        local tooltipContainer = Container:new(Padding:new(tooltipText, 10))
+        table.insert(tooltipContainer.classes, "tooltipContainer")
+        local tooltip = Tooltip:new(wrapper, tooltipContainer)
+
+        root:addFixedChild(tooltip)
     end
 
     local container = Container:new(Padding:new(root, 20))

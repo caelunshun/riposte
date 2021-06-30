@@ -73,7 +73,7 @@ function Client:getPossibleBuildTasks(city)
     self:sendPacket("getBuildTasks", {
         cityID = city.id,
     }, function(response)
-        coroutine.resume(thread, response.tasks)
+        callSafe(thread, response.tasks)
     end)
     return coroutine.yield()
 end

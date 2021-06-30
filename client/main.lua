@@ -1,5 +1,5 @@
 package.path = "client/?.lua;external/dume/ui/?.lua;external/lunajson/src/?.lua;external/lua-protobuf/?.lua"
-package.cpath = "cmake-build-release/lib/lib?.so;cmake-build-debug/lib/lib?.so"
+package.cpath = "cmake-build-release/lib/lib?.so;cmake-build-debug/lib/lib?.so;cmake-build-relwithdebinfo/lib/lib?.so"
 jit.on()
 
 local buildMainMenu = require("ui/main_menu")
