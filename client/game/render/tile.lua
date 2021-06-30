@@ -60,9 +60,12 @@ end
 -- Renders resources.
 local ResourceRenderer = {}
 
-function ResourceRenderer:renderTile(cv, tile)
+function ResourceRenderer:renderTile(cv, tile, tilePos, game)
     if tile.resourceID ~= nil and #tile.resourceID > 0 then
-        cv:drawSprite("texture/resource/" .. tile.resourceID, Vector(0, 0), 100)
+        local resource = registry.resources[tile.resourceID]
+        if game.thePlayer:isTechUnlocked(resource.revealedBy) then
+            cv:drawSprite("texture/resource/" .. tile.resourceID, Vector(0, 0), 100)
+        end
     end
 end
 

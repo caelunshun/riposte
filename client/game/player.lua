@@ -15,6 +15,15 @@ function Player:updateData(newData)
     end
 
     if newData.researchingTech == nil then self.researchingTech = nil end
+
+    self.unlockedTechIDs = {}
+    for _, tech in ipairs(newData.unlockedTechIDs or {}) do
+        self.unlockedTechIDs[tech] = true
+    end
+end
+
+function Player:isTechUnlocked(techID)
+    return self.unlockedTechIDs[techID] == true
 end
 
 function Player:estimateResearchTurns(tech, progress)
