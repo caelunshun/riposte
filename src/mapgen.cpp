@@ -189,8 +189,9 @@ namespace rip {
                         }
                     }
 
-                    Unit warrior(game.getRegistry().getUnit("warrior"), warriorPos, player.getID());
-                    game.addUnit(std::move(warrior));
+                    // DEBUG - LUA CLIENT
+                    // Unit warrior(game.getRegistry().getUnit("warrior"), warriorPos, player.getID());
+                    // game.addUnit(std::move(warrior));
 
                     positions.push_back(pos);
 

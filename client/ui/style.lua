@@ -4,8 +4,8 @@ local dume = require("dume")
 local Vector = require("brinevector")
 
 local researchProgressBar = {
-    backgroundColor = dume.rgb(0, 0, 0),
-    borderColor = dume.rgb(30, 30, 30),
+    backgroundColor = dume.rgb(100, 100, 100, 150),
+    borderColor = dume.rgb(0, 0, 0),
     borderRadius = 0,
     borderWidth = 1,
     progressColor = dume.rgb(108, 198, 74),

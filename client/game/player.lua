@@ -15,8 +15,8 @@ function Player:updateData(newData)
     end
 end
 
-function Player:estimateResearchTurns(tech)
-    return math.ceil(tech.cost / self.beakerRevenue)
+function Player:estimateResearchTurns(tech, progress)
+    return math.ceil((tech.cost - (progress or 0)) / self.beakerRevenue)
 end
 
 return Player

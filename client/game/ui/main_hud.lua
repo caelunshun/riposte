@@ -11,6 +11,7 @@ local Tooltip = require("widget/tooltip")
 local Image = require("widget/image")
 local Padding = require("widget/padding")
 local Clickable = require("widget/clickable")
+local ProgressBar = require("widget/progress_bar")
 
 local style = require("ui/style")
 
@@ -24,6 +25,7 @@ local UnitDisplayWindow = {}
 local TurnIndicatorWindow = {}
 local ScoreWindow = {}
 local UnitStackWindow = {}
+local ResearchBar = {}
 
 function Hud:new(game)
     local o = {
@@ -45,6 +47,7 @@ function Hud:new(game)
         TurnIndicatorWindow:new(game, o),
         ScoreWindow:new(game, o),
         UnitStackWindow:new(game, o),
+        ResearchBar:new(game, o),
     }
 
     game.eventBus:registerHandler("globalDataUpdated", function()
@@ -57,6 +60,7 @@ function Hud:new(game)
 
     game.eventBus:registerHandler("thePlayerUpdated", function()
         o:onThePlayerUpdated()
+        o:rebuildWindows()
     end)
 
     setmetatable(o, self)
@@ -577,6 +581,50 @@ function UnitStackWindow:rebuild()
 
     local size = Vector(cv:getWidth() - unitDisplayWindowWidth - turnIndicatorWindowWidth - 200, 100)
     ui:createWindow("unitStack", Vector(unitDisplayWindowWidth + 100, cv:getHeight() - 120 - size.y), size, root)
+end
+
+function ResearchBar:new(game, hud)
+    local o = {
+        game = game,
+        hud = hud,
+    }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function ResearchBar:rebuild()
+    local size = Vector(400, 30)
+
+    local progress = 0
+    local predictedProgress = 0
+
+    local text = "Research: None"
+
+    local research = self.game.thePlayer.researchingTech
+    if research ~= nil then
+        local tech = registry.techs[research.techID]
+        local cost = tech.cost
+        progress = research.progress / cost
+        predictedProgress = (research.progress + self.game.thePlayer.beakerRevenue) / cost
+
+        local turns = self.game.thePlayer:estimateResearchTurns(tech, research.progress)
+        text = "Research: " .. research.techID .. " (" .. tostring(turns) .. ")"
+    end
+
+    local child = Text:new("@size{15}{" .. text .. "}", {}, {
+        alignH = dume.Align.Center,
+        alignV = dume.Align.Center,
+    })
+
+    local root = ProgressBar:new(size, function()
+        return progress
+    end, function()
+        return predictedProgress
+    end, child)
+    table.insert(root.classes, "researchProgressBar")
+
+    ui:createWindow("researchBar", Vector(cv:getWidth() / 2 - size.x / 2, 1), size, root)
 end
 
 function dumeColorToString(color)
