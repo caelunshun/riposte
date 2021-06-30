@@ -157,6 +157,53 @@ end
 -- Asks the user what to research.
 local ResearchPrompt = {}
 
+function ResearchPrompt:new(game)
+    local possibleTechNames = game.client:getPossibleTechs()
+    local possibleTechs = {}
+    for _, techName in ipairs(possibleTechNames) do
+        possibleTechs[#possibleTechs + 1] = registry.techs[techName] or error("received invalid tech " .. techName)
+    end
+    local o = {
+        game = game,
+        possibleTechs = possibleTechs,
+    }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function ResearchPrompt:build()
+    local root = Flex:column(10)
+
+    local title = Text:new("@size{16}{What would you like to research next?}")
+    table.insert(title.classes, "highlightedText")
+    root:addFixedChild(title)
+
+    for _, tech in ipairs(self.possibleTechs) do
+        local entry = Text:new("@size{16}{%bullet %name    (%duration)}", {
+            bullet = "•",
+            name = tech.name,
+            duration = self.game.thePlayer:estimateResearchTurns(tech),
+        })
+        table.insert(entry.classes, "hoverableText")
+
+        local wrapper = Clickable:new(entry, function()
+            self.game.client:setResearch(tech)
+            ui:deleteWindow("researchPrompt")
+            self.finished = true
+        end)
+
+        root:addFixedChild(wrapper)
+    end
+
+    local container = Container:new(Padding:new(root, 20))
+    container.fillParent = true
+    table.insert(container.classes, "windowContainer")
+
+    local size = Vector(400, 400)
+    ui:createWindow("researchPrompt", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2), size, container)
+end
+
 -- A queue of prompts to display at the start
 -- of the turn.
 local PromptQueue = {}

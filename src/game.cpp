@@ -64,14 +64,17 @@ namespace rip {
 
         std::shared_ptr<Server> server;
 
-        _impl(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry)
+        std::shared_ptr<TechTree> techTree;
+
+        _impl(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)
         : theMap(static_cast<size_t>(mapWidth) * mapHeight),
         workedTiles(static_cast<size_t>(mapWidth) * mapHeight),
         mapWidth(mapWidth),
         mapHeight(mapHeight),
         registry(std::move(registry)),
         cultureMap(mapWidth, mapHeight),
-        cursor() {}
+        cursor(),
+        techTree(techTree) {}
     };
 
     void Game::advanceTurn() {
@@ -116,8 +119,8 @@ namespace rip {
         return std::optional<UnitId>();
     }
 
-    Game::Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry)
-    : impl(std::make_unique<Game::_impl>(mapWidth, mapHeight, registry)) {
+    Game::Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)
+    : impl(std::make_unique<Game::_impl>(mapWidth, mapHeight, registry, techTree)) {
 
     }
 
@@ -491,6 +494,10 @@ namespace rip {
 
     void Game::setServer(std::shared_ptr<Server> server) {
         impl->server = server;
+    }
+
+    const TechTree &Game::getTechTree() const {
+        return *impl->techTree;
     }
 
     // EVENTS

@@ -41,6 +41,8 @@ namespace rip {
         void handleMoveUnits(Game &game, const MoveUnits &packet);
         void handleGetBuildTasks(Game &game, const GetBuildTasks &packet);
         void handleSetBuildTask(Game &game, const SetCityBuildTask &packet);
+        void handleSetResearch(Game &game, const SetResearch &packet);
+        void handleGetPossibleTechs(Game &game, const GetPossibleTechs &packet);
         void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);

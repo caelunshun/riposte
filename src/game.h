@@ -31,13 +31,14 @@ namespace rip {
     class Event;
     class ScriptEngine;
     class Server;
+    class TechTree;
 
     class Game {
         class _impl;
         std::unique_ptr<_impl> impl;
 
     public:
-        Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry);
+        Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree);
 
         void setServer(std::shared_ptr<Server> server);
 
@@ -142,6 +143,8 @@ namespace rip {
         void onDialogueOpened(Player &with);
 
         Server &getServer();
+
+        const TechTree &getTechTree() const;
     };
 }
 

@@ -377,7 +377,7 @@ namespace rip {
     Game MapGenerator::generate(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry,
                                 const std::shared_ptr<TechTree> &techTree) {
         while (true) {
-            Game game(mapWidth, mapHeight, registry);
+            Game game(mapWidth, mapHeight, registry, techTree);
             if (tryGenerate(game, rng, techTree)) {
                 return game;
             }

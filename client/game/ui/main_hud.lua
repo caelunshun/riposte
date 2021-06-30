@@ -55,6 +55,10 @@ function Hud:new(game)
         o:onCityUpdated(city)
     end)
 
+    game.eventBus:registerHandler("thePlayerUpdated", function()
+        o:onThePlayerUpdated()
+    end)
+
     setmetatable(o, self)
     self.__index = self
     return o
@@ -359,6 +363,15 @@ function Hud:onCityUpdated(city)
         -- Prompt the user to set the new build task.
         local co = coroutine.create(function()
             self.promptQueue:push(prompts.CityBuildPrompt:new(self.game, city))
+        end)
+        callSafe(co)
+    end
+end
+
+function Hud:onThePlayerUpdated()
+    if self.game.thePlayer.researchingTech == nil and self.game.turn ~= 0 then
+        local co = coroutine.create(function()
+            self.promptQueue:push(prompts.ResearchPrompt:new(self.game))
         end)
         callSafe(co)
     end

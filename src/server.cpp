@@ -202,8 +202,35 @@ namespace rip {
         return packet;
     }
 
+    UpdatePlayer getUpdatePlayerPacket(Game &game, Player &player) {
+        UpdatePlayer packet;
+
+        packet.set_id(player.getID().first);
+        packet.set_username(player.getUsername());
+
+        packet.set_baserevenue(player.getBaseRevenue());
+        packet.set_beakerrevenue(player.getBeakerRevenue());
+        packet.set_goldrevenue(player.getGoldRevenue());
+        packet.set_expenses(player.getExpenses());
+        packet.set_netgold(player.getNetGold());
+        packet.set_gold(player.getGold());
+
+        if (player.getResearchingTech().has_value()) {
+            auto *tech = packet.mutable_researchingtech();
+            tech->set_techid(player.getResearchingTech()->tech->name);
+            tech->set_progress(player.getResearchingTech()->beakersAccumulated);
+        }
+
+        for (const auto &tech : player.getTechs().getUnlockedTechs()) {
+            packet.add_unlockedtechids(tech->name);
+        }
+
+        return packet;
+    }
+
     void Connection::sendGameData(Game &game) {
         SEND(getUpdateGlobalDataPacket(game, playerID), updateglobaldata, 0);
+        SEND(getUpdatePlayerPacket(game, game.getPlayer(playerID)), updateplayer, 0);
         SEND(getUpdateMapPacket(game, playerID), updatemap, 0);
 
         for (auto &unit : game.getUnits()) {
@@ -303,6 +330,24 @@ namespace rip {
         SEND(response, updatecity, currentRequestID);
     }
 
+    void Connection::handleSetResearch(Game &game, const SetResearch &packet) {
+        auto tech = game.getTechTree().getTechs().at(packet.techid());
+        game.getPlayer(playerID).setResearchingTech(tech);
+
+        auto response = getUpdatePlayerPacket(game, game.getPlayer(playerID));
+        SEND(response, updateplayer, currentRequestID);
+    }
+
+    void Connection::handleGetPossibleTechs(Game &game, const GetPossibleTechs &packet) {
+        PossibleTechs response;
+
+        for (const auto &tech : game.getPlayer(playerID).getTechs().getPossibleResearches()) {
+            response.add_techs(tech->name);
+        }
+
+        SEND(response, possibletechs, currentRequestID);
+    }
+
     void Connection::handlePacket(Game &game, AnyClient &packet) {
         currentRequestID = packet.requestid();
         if (packet.has_clientinfo()) {
@@ -317,6 +362,10 @@ namespace rip {
             handleGetBuildTasks(game, packet.getbuildtasks());
         } else if (packet.has_setcitybuildtask()) {
             handleSetBuildTask(game, packet.setcitybuildtask());
+        } else if (packet.has_setresearch()) {
+            handleSetResearch(game, packet.setresearch());
+        } else if (packet.has_getpossibletechs()) {
+            handleGetPossibleTechs(game, packet.getpossibletechs());
         }
     }
 

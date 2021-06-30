@@ -59,6 +59,8 @@ message AnyClient {
     EndTurn endTurn = 5;
     GetBuildTasks getBuildTasks = 6;
     SetCityBuildTask setCityBuildTask = 7;
+    SetResearch setResearch = 8;
+    GetPossibleTechs getPossibleTechs = 9;
   }
 }
 
@@ -80,6 +82,7 @@ message AnyServer {
     PathComputed pathComputed = 10;
     ConfirmMoveUnits confirmMoveUnits = 11;
     PossibleCityBuildTasks possibleCityBuildTasks = 12;
+    PossibleTechs possibleTechs = 13;
   }
 }
 
@@ -329,7 +332,6 @@ message UpdatePlayer {
   int32 capitalCityID = 10;
 
   repeated string unlockedTechIDs = 11;
-  repeated string possibleResearches = 12;
 }
 
 message PathComputed {
@@ -344,6 +346,10 @@ message ConfirmMoveUnits {
 
 message PossibleCityBuildTasks {
   repeated BuildTask tasks = 1;
+}
+
+message PossibleTechs {
+  repeated string techs = 1;
 }
 
 // ---------------------
@@ -389,4 +395,8 @@ message EndTurn {
 
 message GetBuildTasks {
   int32 cityID = 1;
+}
+
+message GetPossibleTechs {
+
 }

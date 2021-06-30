@@ -78,6 +78,20 @@ function Client:getPossibleBuildTasks(city)
     return coroutine.yield()
 end
 
+-- Requests a list of the possible researchable techs for our player.
+-- Must be called from a coroutine.
+function Client:getPossibleTechs()
+    local thread = coroutine.running()
+    self:sendPacket("getPossibleTechs", {}, function(response)
+        callSafe(thread, response.techs)
+    end)
+    return coroutine.yield()
+end
+
+function Client:setResearch(tech)
+    self:sendPacket("setResearch", { techID = tech.name })
+end
+
 function Client:setCityBuildTask(city, buildTaskKind)
     self:sendPacket("setCityBuildTask", {
         cityID = city.id,
@@ -141,6 +155,8 @@ function Client:handlePacket(packet)
         self:handleUpdateUnit(packet.updateUnit)
     elseif packet.updateCity ~= nil then
         self:handleUpdateCity(packet.updateCity)
+    elseif packet.updatePlayer ~= nil then
+        self:handleUpdatePlayer(packet.updatePlayer)
     end
 end
 
@@ -172,6 +188,10 @@ end
 
 function Client:handleUpdateCity(packet)
     self.game:addCity(packet)
+end
+
+function Client:handleUpdatePlayer(packet)
+    self.game:updateThePlayer(packet)
 end
 
 return Client

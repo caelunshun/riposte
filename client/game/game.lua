@@ -121,4 +121,9 @@ function Game:handleEvent(event)
     end
 end
 
+function Game:updateThePlayer(packet)
+    self.thePlayer:updateData(packet)
+    self.eventBus:trigger("thePlayerUpdated")
+end
+
 return Game

@@ -9,4 +9,14 @@ function Player:new(data)
     return data
 end
 
+function Player:updateData(newData)
+    for k, v in pairs(newData) do
+        self[k] = v
+    end
+end
+
+function Player:estimateResearchTurns(tech)
+    return math.ceil(tech.cost / self.beakerRevenue)
+end
+
 return Player
