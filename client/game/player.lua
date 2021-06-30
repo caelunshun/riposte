@@ -13,6 +13,8 @@ function Player:updateData(newData)
     for k, v in pairs(newData) do
         self[k] = v
     end
+
+    if newData.researchingTech == nil then self.researchingTech = nil end
 end
 
 function Player:estimateResearchTurns(tech, progress)

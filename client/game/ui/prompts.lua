@@ -319,7 +319,7 @@ function article(noun)
         u = true,
     }
 
-    if vowels[firstChar] then
+    if vowels[string.lower(firstChar)] then
         return "an"
     else
         return "a"
