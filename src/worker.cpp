@@ -59,6 +59,7 @@ namespace rip {
                         !game.getPlayer(unit.getOwner()).getTechs().isImprovementUnlocked(downcasted->getImprovement().getName())
                         || !downcasted->getImprovement().isCompatible(game.getTile(unit.getPos()))
                         || (downcasted->getImprovement().getName() != "Road" && game.getCultureMap().getTileOwner(unit.getPos()) != unit.getOwner())
+                        || game.getCityAtLocation(unit.getPos()) != nullptr
                         ) {
                     tasks.erase(tasks.begin() + i);
                 }
@@ -111,7 +112,7 @@ namespace rip {
         return "Build " + improvement->getName();
     }
 
-    std::string BuildImprovementTask::getPresentParticiple() {
+    std::string BuildImprovementTask::getPresentParticiple() const {
         return "Building " + improvement->getName();
     }
 

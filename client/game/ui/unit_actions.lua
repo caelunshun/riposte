@@ -35,5 +35,17 @@ return function(row, units, game, hud)
             table.insert(foundCity.classes, "unitActionButton")
             row:addFixedChild(foundCity)
         end
+
+        local workerCap = unit:getCapability("worker")
+        if workerCap ~= nil then
+            for _, possibleTask in ipairs(workerCap.possibleTasks) do
+                local taskWidget = Button:new(Text:new("@size{20}{%taskName}", {taskName=possibleTask.name}), function()
+                    game.client:setWorkerTask(unit, possibleTask)
+                    hud:clearSelection()
+                end)
+                table.insert(taskWidget.classes, "unitActionButton")
+                row:addFixedChild(taskWidget)
+            end
+        end
     end
 end

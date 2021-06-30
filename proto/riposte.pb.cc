@@ -363,6 +363,7 @@ PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT WorkerTaskKindDefaultTypeIntern
 constexpr WorkerTask::WorkerTask(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : name_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
+  , presentparticiple_(&::PROTOBUF_NAMESPACE_ID::internal::fixed_address_empty_string)
   , kind_(nullptr)
   , turnsleft_(0){}
 struct WorkerTaskDefaultTypeInternal {
@@ -682,6 +683,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   PROTOBUF_FIELD_OFFSET(::AnyClient, packet_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::AnyServer, _internal_metadata_),
@@ -883,6 +885,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::WorkerTask, name_),
   PROTOBUF_FIELD_OFFSET(::WorkerTask, turnsleft_),
   PROTOBUF_FIELD_OFFSET(::WorkerTask, kind_),
+  PROTOBUF_FIELD_OFFSET(::WorkerTask, presentparticiple_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::WorkerCapability, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -1041,51 +1044,51 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Pos)},
   { 7, -1, sizeof(::AnyClient)},
-  { 24, -1, sizeof(::AnyServer)},
-  { 44, -1, sizeof(::ClientInfo)},
-  { 50, -1, sizeof(::ServerInfo)},
-  { 57, -1, sizeof(::KickPlayer)},
-  { 64, -1, sizeof(::SetLeader)},
-  { 71, -1, sizeof(::AdminStartGame)},
-  { 76, -1, sizeof(::LobbyError)},
-  { 82, -1, sizeof(::StartGame)},
-  { 87, -1, sizeof(::PlayerInfo)},
-  { 98, -1, sizeof(::UpdateGlobalData)},
-  { 107, -1, sizeof(::Improvement)},
-  { 114, -1, sizeof(::Yield)},
-  { 122, -1, sizeof(::Tile)},
-  { 136, -1, sizeof(::UpdateMap)},
-  { 145, -1, sizeof(::UnitBuildTask)},
-  { 151, -1, sizeof(::BuildingBuildTask)},
-  { 157, -1, sizeof(::BuildTaskKind)},
-  { 165, -1, sizeof(::BuildTask)},
-  { 173, -1, sizeof(::UpdateCity)},
-  { 192, -1, sizeof(::Path)},
-  { 198, -1, sizeof(::FoundCityCapability)},
-  { 203, -1, sizeof(::WorkerTaskImprovement)},
-  { 209, -1, sizeof(::WorkerTaskKind)},
-  { 216, -1, sizeof(::WorkerTask)},
-  { 224, -1, sizeof(::WorkerCapability)},
-  { 231, -1, sizeof(::CarryUnitsCapability)},
-  { 237, -1, sizeof(::Capability)},
-  { 246, -1, sizeof(::UpdateUnit)},
-  { 260, -1, sizeof(::ResearchingTech)},
-  { 267, -1, sizeof(::UpdatePlayer)},
-  { 284, -1, sizeof(::PathComputed)},
-  { 290, -1, sizeof(::ConfirmMoveUnits)},
-  { 296, -1, sizeof(::PossibleCityBuildTasks)},
-  { 302, -1, sizeof(::PossibleTechs)},
-  { 308, -1, sizeof(::DeleteUnit)},
-  { 314, -1, sizeof(::MoveUnits)},
-  { 321, -1, sizeof(::SetCityBuildTask)},
-  { 328, -1, sizeof(::SetWorkerTask)},
-  { 335, -1, sizeof(::ComputePath)},
-  { 343, -1, sizeof(::SetEconomySettings)},
-  { 349, -1, sizeof(::SetResearch)},
-  { 355, -1, sizeof(::EndTurn)},
-  { 360, -1, sizeof(::GetBuildTasks)},
-  { 366, -1, sizeof(::GetPossibleTechs)},
-  { 371, -1, sizeof(::DoUnitAction)},
+  { 25, -1, sizeof(::AnyServer)},
+  { 45, -1, sizeof(::ClientInfo)},
+  { 51, -1, sizeof(::ServerInfo)},
+  { 58, -1, sizeof(::KickPlayer)},
+  { 65, -1, sizeof(::SetLeader)},
+  { 72, -1, sizeof(::AdminStartGame)},
+  { 77, -1, sizeof(::LobbyError)},
+  { 83, -1, sizeof(::StartGame)},
+  { 88, -1, sizeof(::PlayerInfo)},
+  { 99, -1, sizeof(::UpdateGlobalData)},
+  { 108, -1, sizeof(::Improvement)},
+  { 115, -1, sizeof(::Yield)},
+  { 123, -1, sizeof(::Tile)},
+  { 137, -1, sizeof(::UpdateMap)},
+  { 146, -1, sizeof(::UnitBuildTask)},
+  { 152, -1, sizeof(::BuildingBuildTask)},
+  { 158, -1, sizeof(::BuildTaskKind)},
+  { 166, -1, sizeof(::BuildTask)},
+  { 174, -1, sizeof(::UpdateCity)},
+  { 193, -1, sizeof(::Path)},
+  { 199, -1, sizeof(::FoundCityCapability)},
+  { 204, -1, sizeof(::WorkerTaskImprovement)},
+  { 210, -1, sizeof(::WorkerTaskKind)},
+  { 217, -1, sizeof(::WorkerTask)},
+  { 226, -1, sizeof(::WorkerCapability)},
+  { 233, -1, sizeof(::CarryUnitsCapability)},
+  { 239, -1, sizeof(::Capability)},
+  { 248, -1, sizeof(::UpdateUnit)},
+  { 262, -1, sizeof(::ResearchingTech)},
+  { 269, -1, sizeof(::UpdatePlayer)},
+  { 286, -1, sizeof(::PathComputed)},
+  { 292, -1, sizeof(::ConfirmMoveUnits)},
+  { 298, -1, sizeof(::PossibleCityBuildTasks)},
+  { 304, -1, sizeof(::PossibleTechs)},
+  { 310, -1, sizeof(::DeleteUnit)},
+  { 316, -1, sizeof(::MoveUnits)},
+  { 323, -1, sizeof(::SetCityBuildTask)},
+  { 330, -1, sizeof(::SetWorkerTask)},
+  { 337, -1, sizeof(::ComputePath)},
+  { 345, -1, sizeof(::SetEconomySettings)},
+  { 351, -1, sizeof(::SetResearch)},
+  { 357, -1, sizeof(::EndTurn)},
+  { 362, -1, sizeof(::GetBuildTasks)},
+  { 368, -1, sizeof(::GetPossibleTechs)},
+  { 373, -1, sizeof(::DoUnitAction)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -1140,7 +1143,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
 
 const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\rriposte.proto\"\033\n\003Pos\022\t\n\001x\030\001 \001(\r\022\t\n\001y\030\002"
-  " \001(\r\"\264\003\n\tAnyClient\022\021\n\trequestID\030\001 \001(\005\022!\n"
+  " \001(\r\"\335\003\n\tAnyClient\022\021\n\trequestID\030\001 \001(\005\022!\n"
   "\nclientInfo\030\002 \001(\0132\013.ClientInfoH\000\022#\n\013comp"
   "utePath\030\003 \001(\0132\014.ComputePathH\000\022\037\n\tmoveUni"
   "ts\030\004 \001(\0132\n.MoveUnitsH\000\022\033\n\007endTurn\030\005 \001(\0132"
@@ -1150,112 +1153,114 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "2\014.SetResearchH\000\022-\n\020getPossibleTechs\030\t \001"
   "(\0132\021.GetPossibleTechsH\000\0221\n\022setEconomySet"
   "tings\030\n \001(\0132\023.SetEconomySettingsH\000\022%\n\014do"
-  "UnitAction\030\013 \001(\0132\r.DoUnitActionH\000B\010\n\006pac"
-  "ket\"\251\004\n\tAnyServer\022\021\n\trequestID\030\001 \001(\005\022!\n\n"
-  "serverInfo\030\002 \001(\0132\013.ServerInfoH\000\022\037\n\tstart"
-  "Game\030\003 \001(\0132\n.StartGameH\000\022!\n\nlobbyError\030\004"
-  " \001(\0132\013.LobbyErrorH\000\022-\n\020updateGlobalData\030"
-  "\005 \001(\0132\021.UpdateGlobalDataH\000\022\037\n\tupdateMap\030"
-  "\006 \001(\0132\n.UpdateMapH\000\022!\n\nupdateCity\030\007 \001(\0132"
-  "\013.UpdateCityH\000\022!\n\nupdateUnit\030\010 \001(\0132\013.Upd"
-  "ateUnitH\000\022%\n\014updatePlayer\030\t \001(\0132\r.Update"
-  "PlayerH\000\022%\n\014pathComputed\030\n \001(\0132\r.PathCom"
-  "putedH\000\022-\n\020confirmMoveUnits\030\013 \001(\0132\021.Conf"
-  "irmMoveUnitsH\000\0229\n\026possibleCityBuildTasks"
-  "\030\014 \001(\0132\027.PossibleCityBuildTasksH\000\022\'\n\rpos"
-  "sibleTechs\030\r \001(\0132\016.PossibleTechsH\000\022!\n\nde"
-  "leteUnit\030\016 \001(\0132\013.DeleteUnitH\000B\010\n\006packet\""
-  "\036\n\nClientInfo\022\020\n\010username\030\001 \001(\t\"C\n\nServe"
-  "rInfo\022\020\n\010playerID\030\001 \001(\005\022#\n\016currentPlayer"
-  "s\030\002 \003(\0132\013.PlayerInfo\"(\n\nKickPlayer\022\n\n\002id"
-  "\030\001 \001(\005\022\016\n\006reason\030\002 \001(\t\"*\n\tSetLeader\022\r\n\005c"
-  "ivID\030\001 \001(\t\022\016\n\006leader\030\002 \001(\t\"\020\n\016AdminStart"
-  "Game\"\035\n\nLobbyError\022\017\n\007message\030\001 \001(\t\"\013\n\tS"
-  "tartGame\"m\n\nPlayerInfo\022\020\n\010username\030\001 \001(\t"
-  "\022\r\n\005civID\030\002 \001(\t\022\022\n\nleaderName\030\003 \001(\t\022\r\n\005s"
-  "core\030\004 \001(\005\022\n\n\002id\030\005 \001(\005\022\017\n\007isAdmin\030\006 \001(\010\""
-  "c\n\020UpdateGlobalData\022\034\n\007players\030\001 \003(\0132\013.P"
-  "layerInfo\022\014\n\004turn\030\002 \001(\005\022\021\n\003era\030\003 \001(\0162\004.E"
-  "ra\022\020\n\010playerID\030\004 \001(\005\"/\n\013Improvement\022\n\n\002i"
-  "d\030\001 \001(\t\022\024\n\014cottageLevel\030\002 \001(\t\"8\n\005Yield\022\017"
-  "\n\007hammers\030\001 \001(\005\022\020\n\010commerce\030\002 \001(\005\022\014\n\004foo"
-  "d\030\003 \001(\005\"\307\001\n\004Tile\022\031\n\007terrain\030\001 \001(\0162\010.Terr"
-  "ain\022\020\n\010forested\030\002 \001(\010\022\016\n\006hilled\030\003 \001(\010\022\"\n"
-  "\014improvements\030\004 \003(\0132\014.Improvement\022\025\n\005yie"
-  "ld\030\005 \001(\0132\006.Yield\022\017\n\007ownerID\030\006 \001(\005\022\020\n\010has"
-  "Owner\030\007 \001(\010\022\020\n\010isWorked\030\010 \001(\010\022\022\n\nresourc"
-  "eID\030\t \001(\t\"a\n\tUpdateMap\022\r\n\005width\030\001 \001(\r\022\016\n"
-  "\006height\030\002 \001(\r\022\024\n\005tiles\030\003 \003(\0132\005.Tile\022\037\n\nv"
-  "isibility\030\004 \003(\0162\013.Visibility\"#\n\rUnitBuil"
-  "dTask\022\022\n\nunitKindID\030\001 \001(\t\")\n\021BuildingBui"
-  "ldTask\022\024\n\014buildingName\030\001 \001(\t\"_\n\rBuildTas"
-  "kKind\022\036\n\004unit\030\001 \001(\0132\016.UnitBuildTaskH\000\022&\n"
-  "\010building\030\002 \001(\0132\022.BuildingBuildTaskH\000B\006\n"
-  "\004task\"I\n\tBuildTask\022\034\n\004kind\030\001 \001(\0132\016.Build"
-  "TaskKind\022\020\n\010progress\030\002 \001(\005\022\014\n\004cost\030\003 \001(\005"
-  "\"\255\002\n\nUpdateCity\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\014\n\004na"
-  "me\030\002 \001(\t\022\017\n\007ownerID\030\003 \001(\005\022\035\n\tbuildTask\030\004"
-  " \001(\0132\n.BuildTask\022\025\n\005yield\030\005 \001(\0132\006.Yield\022"
-  "\017\n\007culture\030\006 \001(\005\022\025\n\rcultureNeeded\030\007 \001(\005\022"
-  "\n\n\002id\030\010 \001(\005\022\025\n\rbuildingNames\030\t \003(\t\022\022\n\npo"
-  "pulation\030\n \001(\005\022\022\n\nstoredFood\030\013 \001(\005\022\033\n\023fo"
-  "odNeededForGrowth\030\014 \001(\005\022\024\n\014consumedFood\030"
-  "\r \001(\005\022\021\n\tisCapital\030\016 \001(\010\"\031\n\004Path\022\021\n\tposi"
-  "tions\030\001 \003(\r\"\025\n\023FoundCityCapability\".\n\025Wo"
-  "rkerTaskImprovement\022\025\n\rimprovementID\030\001 \001"
-  "(\t\"L\n\016WorkerTaskKind\0222\n\020buildImprovement"
-  "\030\001 \001(\0132\026.WorkerTaskImprovementH\000B\006\n\004kind"
-  "\"L\n\nWorkerTask\022\014\n\004name\030\001 \001(\t\022\021\n\tturnsLef"
-  "t\030\002 \001(\005\022\035\n\004kind\030\003 \001(\0132\017.WorkerTaskKind\"X"
-  "\n\020WorkerCapability\022 \n\013currentTask\030\001 \001(\0132"
-  "\013.WorkerTask\022\"\n\rpossibleTasks\030\002 \003(\0132\013.Wo"
-  "rkerTask\"/\n\024CarryUnitsCapability\022\027\n\017carr"
-  "yingUnitIDs\030\001 \003(\005\"\220\001\n\nCapability\022)\n\tfoun"
-  "dCity\030\001 \001(\0132\024.FoundCityCapabilityH\000\022#\n\006w"
-  "orker\030\002 \001(\0132\021.WorkerCapabilityH\000\022+\n\ncarr"
-  "yUnits\030\003 \001(\0132\025.CarryUnitsCapabilityH\000B\005\n"
-  "\003cap\"\305\001\n\nUpdateUnit\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\016"
-  "\n\006kindID\030\002 \001(\t\022\017\n\007ownerID\030\003 \001(\005\022\016\n\006healt"
-  "h\030\004 \001(\001\022\024\n\014movementLeft\030\005 \001(\001\022\034\n\rfollowi"
-  "ngPath\030\006 \001(\0132\005.Path\022!\n\014capabilities\030\007 \003("
-  "\0132\013.Capability\022\n\n\002id\030\010 \001(\005\022\020\n\010strength\030\t"
-  " \001(\001\"3\n\017ResearchingTech\022\016\n\006techID\030\001 \001(\t\022"
-  "\020\n\010progress\030\002 \001(\005\"\220\002\n\014UpdatePlayer\022\n\n\002id"
-  "\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\023\n\013baseRevenue\030"
-  "\003 \001(\005\022\025\n\rbeakerRevenue\030\004 \001(\005\022\023\n\013goldReve"
-  "nue\030\005 \001(\005\022\020\n\010expenses\030\006 \001(\005\022\017\n\007netGold\030\007"
-  " \001(\005\022\014\n\004gold\030\010 \001(\005\022)\n\017researchingTech\030\t "
-  "\001(\0132\020.ResearchingTech\022\025\n\rcapitalCityID\030\n"
-  " \001(\005\022\027\n\017unlockedTechIDs\030\013 \003(\t\022\025\n\rbeakerP"
-  "ercent\030\014 \001(\005\"#\n\014PathComputed\022\023\n\004path\030\001 \001"
-  "(\0132\005.Path\"#\n\020ConfirmMoveUnits\022\017\n\007success"
-  "\030\001 \001(\010\"3\n\026PossibleCityBuildTasks\022\031\n\005task"
-  "s\030\001 \003(\0132\n.BuildTask\"\036\n\rPossibleTechs\022\r\n\005"
-  "techs\030\001 \003(\t\"\034\n\nDeleteUnit\022\016\n\006unitID\030\001 \001("
-  "\005\"9\n\tMoveUnits\022\017\n\007unitIDs\030\001 \003(\005\022\033\n\014pathT"
-  "oFollow\030\002 \001(\0132\005.Path\"@\n\020SetCityBuildTask"
-  "\022\016\n\006cityID\030\001 \001(\005\022\034\n\004task\030\002 \001(\0132\016.BuildTa"
-  "skKind\"<\n\rSetWorkerTask\022\020\n\010workerID\030\001 \001("
-  "\005\022\031\n\004task\030\002 \001(\0132\013.WorkerTask\"G\n\013ComputeP"
-  "ath\022\022\n\004from\030\001 \001(\0132\004.Pos\022\020\n\002to\030\002 \001(\0132\004.Po"
-  "s\022\022\n\nunitKindID\030\003 \001(\t\"+\n\022SetEconomySetti"
-  "ngs\022\025\n\rbeakerPercent\030\001 \001(\005\"\035\n\013SetResearc"
-  "h\022\016\n\006techID\030\001 \001(\t\"\t\n\007EndTurn\"\037\n\rGetBuild"
-  "Tasks\022\016\n\006cityID\030\001 \001(\005\"\022\n\020GetPossibleTech"
-  "s\";\n\014DoUnitAction\022\016\n\006unitID\030\001 \001(\005\022\033\n\006act"
-  "ion\030\002 \001(\0162\013.UnitAction*h\n\003Era\022\013\n\007Ancient"
-  "\020\000\022\r\n\tClassical\020\001\022\014\n\010Medieval\020\002\022\017\n\013Renai"
-  "ssance\020\003\022\016\n\nIndustrial\020\004\022\n\n\006Modern\020\005\022\n\n\006"
-  "Future\020\006*;\n\007Terrain\022\r\n\tGrassland\020\000\022\n\n\006De"
-  "sert\020\001\022\t\n\005Ocean\020\002\022\n\n\006Plains\020\003*1\n\nVisibil"
-  "ity\022\n\n\006Hidden\020\000\022\n\n\006Fogged\020\001\022\013\n\007Visible\020\002"
-  "*X\n\nUnitAction\022\010\n\004Kill\020\000\022\013\n\007Fortify\020\001\022\014\n"
-  "\010SkipTurn\020\002\022\026\n\022FortifyUntilHealed\020\003\022\r\n\tF"
-  "oundCity\020\004b\006proto3"
+  "UnitAction\030\013 \001(\0132\r.DoUnitActionH\000\022\'\n\rset"
+  "WorkerTask\030\014 \001(\0132\016.SetWorkerTaskH\000B\010\n\006pa"
+  "cket\"\251\004\n\tAnyServer\022\021\n\trequestID\030\001 \001(\005\022!\n"
+  "\nserverInfo\030\002 \001(\0132\013.ServerInfoH\000\022\037\n\tstar"
+  "tGame\030\003 \001(\0132\n.StartGameH\000\022!\n\nlobbyError\030"
+  "\004 \001(\0132\013.LobbyErrorH\000\022-\n\020updateGlobalData"
+  "\030\005 \001(\0132\021.UpdateGlobalDataH\000\022\037\n\tupdateMap"
+  "\030\006 \001(\0132\n.UpdateMapH\000\022!\n\nupdateCity\030\007 \001(\013"
+  "2\013.UpdateCityH\000\022!\n\nupdateUnit\030\010 \001(\0132\013.Up"
+  "dateUnitH\000\022%\n\014updatePlayer\030\t \001(\0132\r.Updat"
+  "ePlayerH\000\022%\n\014pathComputed\030\n \001(\0132\r.PathCo"
+  "mputedH\000\022-\n\020confirmMoveUnits\030\013 \001(\0132\021.Con"
+  "firmMoveUnitsH\000\0229\n\026possibleCityBuildTask"
+  "s\030\014 \001(\0132\027.PossibleCityBuildTasksH\000\022\'\n\rpo"
+  "ssibleTechs\030\r \001(\0132\016.PossibleTechsH\000\022!\n\nd"
+  "eleteUnit\030\016 \001(\0132\013.DeleteUnitH\000B\010\n\006packet"
+  "\"\036\n\nClientInfo\022\020\n\010username\030\001 \001(\t\"C\n\nServ"
+  "erInfo\022\020\n\010playerID\030\001 \001(\005\022#\n\016currentPlaye"
+  "rs\030\002 \003(\0132\013.PlayerInfo\"(\n\nKickPlayer\022\n\n\002i"
+  "d\030\001 \001(\005\022\016\n\006reason\030\002 \001(\t\"*\n\tSetLeader\022\r\n\005"
+  "civID\030\001 \001(\t\022\016\n\006leader\030\002 \001(\t\"\020\n\016AdminStar"
+  "tGame\"\035\n\nLobbyError\022\017\n\007message\030\001 \001(\t\"\013\n\t"
+  "StartGame\"m\n\nPlayerInfo\022\020\n\010username\030\001 \001("
+  "\t\022\r\n\005civID\030\002 \001(\t\022\022\n\nleaderName\030\003 \001(\t\022\r\n\005"
+  "score\030\004 \001(\005\022\n\n\002id\030\005 \001(\005\022\017\n\007isAdmin\030\006 \001(\010"
+  "\"c\n\020UpdateGlobalData\022\034\n\007players\030\001 \003(\0132\013."
+  "PlayerInfo\022\014\n\004turn\030\002 \001(\005\022\021\n\003era\030\003 \001(\0162\004."
+  "Era\022\020\n\010playerID\030\004 \001(\005\"/\n\013Improvement\022\n\n\002"
+  "id\030\001 \001(\t\022\024\n\014cottageLevel\030\002 \001(\t\"8\n\005Yield\022"
+  "\017\n\007hammers\030\001 \001(\005\022\020\n\010commerce\030\002 \001(\005\022\014\n\004fo"
+  "od\030\003 \001(\005\"\307\001\n\004Tile\022\031\n\007terrain\030\001 \001(\0162\010.Ter"
+  "rain\022\020\n\010forested\030\002 \001(\010\022\016\n\006hilled\030\003 \001(\010\022\""
+  "\n\014improvements\030\004 \003(\0132\014.Improvement\022\025\n\005yi"
+  "eld\030\005 \001(\0132\006.Yield\022\017\n\007ownerID\030\006 \001(\005\022\020\n\010ha"
+  "sOwner\030\007 \001(\010\022\020\n\010isWorked\030\010 \001(\010\022\022\n\nresour"
+  "ceID\030\t \001(\t\"a\n\tUpdateMap\022\r\n\005width\030\001 \001(\r\022\016"
+  "\n\006height\030\002 \001(\r\022\024\n\005tiles\030\003 \003(\0132\005.Tile\022\037\n\n"
+  "visibility\030\004 \003(\0162\013.Visibility\"#\n\rUnitBui"
+  "ldTask\022\022\n\nunitKindID\030\001 \001(\t\")\n\021BuildingBu"
+  "ildTask\022\024\n\014buildingName\030\001 \001(\t\"_\n\rBuildTa"
+  "skKind\022\036\n\004unit\030\001 \001(\0132\016.UnitBuildTaskH\000\022&"
+  "\n\010building\030\002 \001(\0132\022.BuildingBuildTaskH\000B\006"
+  "\n\004task\"I\n\tBuildTask\022\034\n\004kind\030\001 \001(\0132\016.Buil"
+  "dTaskKind\022\020\n\010progress\030\002 \001(\005\022\014\n\004cost\030\003 \001("
+  "\005\"\255\002\n\nUpdateCity\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\014\n\004n"
+  "ame\030\002 \001(\t\022\017\n\007ownerID\030\003 \001(\005\022\035\n\tbuildTask\030"
+  "\004 \001(\0132\n.BuildTask\022\025\n\005yield\030\005 \001(\0132\006.Yield"
+  "\022\017\n\007culture\030\006 \001(\005\022\025\n\rcultureNeeded\030\007 \001(\005"
+  "\022\n\n\002id\030\010 \001(\005\022\025\n\rbuildingNames\030\t \003(\t\022\022\n\np"
+  "opulation\030\n \001(\005\022\022\n\nstoredFood\030\013 \001(\005\022\033\n\023f"
+  "oodNeededForGrowth\030\014 \001(\005\022\024\n\014consumedFood"
+  "\030\r \001(\005\022\021\n\tisCapital\030\016 \001(\010\"\031\n\004Path\022\021\n\tpos"
+  "itions\030\001 \003(\r\"\025\n\023FoundCityCapability\".\n\025W"
+  "orkerTaskImprovement\022\025\n\rimprovementID\030\001 "
+  "\001(\t\"L\n\016WorkerTaskKind\0222\n\020buildImprovemen"
+  "t\030\001 \001(\0132\026.WorkerTaskImprovementH\000B\006\n\004kin"
+  "d\"g\n\nWorkerTask\022\014\n\004name\030\001 \001(\t\022\021\n\tturnsLe"
+  "ft\030\002 \001(\005\022\035\n\004kind\030\003 \001(\0132\017.WorkerTaskKind\022"
+  "\031\n\021presentParticiple\030\004 \001(\t\"X\n\020WorkerCapa"
+  "bility\022 \n\013currentTask\030\001 \001(\0132\013.WorkerTask"
+  "\022\"\n\rpossibleTasks\030\002 \003(\0132\013.WorkerTask\"/\n\024"
+  "CarryUnitsCapability\022\027\n\017carryingUnitIDs\030"
+  "\001 \003(\005\"\220\001\n\nCapability\022)\n\tfoundCity\030\001 \001(\0132"
+  "\024.FoundCityCapabilityH\000\022#\n\006worker\030\002 \001(\0132"
+  "\021.WorkerCapabilityH\000\022+\n\ncarryUnits\030\003 \001(\013"
+  "2\025.CarryUnitsCapabilityH\000B\005\n\003cap\"\305\001\n\nUpd"
+  "ateUnit\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\016\n\006kindID\030\002 \001"
+  "(\t\022\017\n\007ownerID\030\003 \001(\005\022\016\n\006health\030\004 \001(\001\022\024\n\014m"
+  "ovementLeft\030\005 \001(\001\022\034\n\rfollowingPath\030\006 \001(\013"
+  "2\005.Path\022!\n\014capabilities\030\007 \003(\0132\013.Capabili"
+  "ty\022\n\n\002id\030\010 \001(\005\022\020\n\010strength\030\t \001(\001\"3\n\017Rese"
+  "archingTech\022\016\n\006techID\030\001 \001(\t\022\020\n\010progress\030"
+  "\002 \001(\005\"\220\002\n\014UpdatePlayer\022\n\n\002id\030\001 \001(\005\022\020\n\010us"
+  "ername\030\002 \001(\t\022\023\n\013baseRevenue\030\003 \001(\005\022\025\n\rbea"
+  "kerRevenue\030\004 \001(\005\022\023\n\013goldRevenue\030\005 \001(\005\022\020\n"
+  "\010expenses\030\006 \001(\005\022\017\n\007netGold\030\007 \001(\005\022\014\n\004gold"
+  "\030\010 \001(\005\022)\n\017researchingTech\030\t \001(\0132\020.Resear"
+  "chingTech\022\025\n\rcapitalCityID\030\n \001(\005\022\027\n\017unlo"
+  "ckedTechIDs\030\013 \003(\t\022\025\n\rbeakerPercent\030\014 \001(\005"
+  "\"#\n\014PathComputed\022\023\n\004path\030\001 \001(\0132\005.Path\"#\n"
+  "\020ConfirmMoveUnits\022\017\n\007success\030\001 \001(\010\"3\n\026Po"
+  "ssibleCityBuildTasks\022\031\n\005tasks\030\001 \003(\0132\n.Bu"
+  "ildTask\"\036\n\rPossibleTechs\022\r\n\005techs\030\001 \003(\t\""
+  "\034\n\nDeleteUnit\022\016\n\006unitID\030\001 \001(\005\"9\n\tMoveUni"
+  "ts\022\017\n\007unitIDs\030\001 \003(\005\022\033\n\014pathToFollow\030\002 \001("
+  "\0132\005.Path\"@\n\020SetCityBuildTask\022\016\n\006cityID\030\001"
+  " \001(\005\022\034\n\004task\030\002 \001(\0132\016.BuildTaskKind\"<\n\rSe"
+  "tWorkerTask\022\020\n\010workerID\030\001 \001(\005\022\031\n\004task\030\002 "
+  "\001(\0132\013.WorkerTask\"G\n\013ComputePath\022\022\n\004from\030"
+  "\001 \001(\0132\004.Pos\022\020\n\002to\030\002 \001(\0132\004.Pos\022\022\n\nunitKin"
+  "dID\030\003 \001(\t\"+\n\022SetEconomySettings\022\025\n\rbeake"
+  "rPercent\030\001 \001(\005\"\035\n\013SetResearch\022\016\n\006techID\030"
+  "\001 \001(\t\"\t\n\007EndTurn\"\037\n\rGetBuildTasks\022\016\n\006cit"
+  "yID\030\001 \001(\005\"\022\n\020GetPossibleTechs\";\n\014DoUnitA"
+  "ction\022\016\n\006unitID\030\001 \001(\005\022\033\n\006action\030\002 \001(\0162\013."
+  "UnitAction*h\n\003Era\022\013\n\007Ancient\020\000\022\r\n\tClassi"
+  "cal\020\001\022\014\n\010Medieval\020\002\022\017\n\013Renaissance\020\003\022\016\n\n"
+  "Industrial\020\004\022\n\n\006Modern\020\005\022\n\n\006Future\020\006*;\n\007"
+  "Terrain\022\r\n\tGrassland\020\000\022\n\n\006Desert\020\001\022\t\n\005Oc"
+  "ean\020\002\022\n\n\006Plains\020\003*1\n\nVisibility\022\n\n\006Hidde"
+  "n\020\000\022\n\n\006Fogged\020\001\022\013\n\007Visible\020\002*X\n\nUnitActi"
+  "on\022\010\n\004Kill\020\000\022\013\n\007Fortify\020\001\022\014\n\010SkipTurn\020\002\022"
+  "\026\n\022FortifyUntilHealed\020\003\022\r\n\tFoundCity\020\004b\006"
+  "proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_riposte_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_riposte_2eproto = {
-  false, false, 4498, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
+  false, false, 4566, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
   &descriptor_table_riposte_2eproto_once, nullptr, 0, 47,
   schemas, file_default_instances, TableStruct_riposte_2eproto::offsets,
   file_level_metadata_riposte_2eproto, file_level_enum_descriptors_riposte_2eproto, file_level_service_descriptors_riposte_2eproto,
@@ -1568,6 +1573,7 @@ class AnyClient::_Internal {
   static const ::GetPossibleTechs& getpossibletechs(const AnyClient* msg);
   static const ::SetEconomySettings& seteconomysettings(const AnyClient* msg);
   static const ::DoUnitAction& dounitaction(const AnyClient* msg);
+  static const ::SetWorkerTask& setworkertask(const AnyClient* msg);
 };
 
 const ::ClientInfo&
@@ -1609,6 +1615,10 @@ AnyClient::_Internal::seteconomysettings(const AnyClient* msg) {
 const ::DoUnitAction&
 AnyClient::_Internal::dounitaction(const AnyClient* msg) {
   return *msg->packet_.dounitaction_;
+}
+const ::SetWorkerTask&
+AnyClient::_Internal::setworkertask(const AnyClient* msg) {
+  return *msg->packet_.setworkertask_;
 }
 void AnyClient::set_allocated_clientinfo(::ClientInfo* clientinfo) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
@@ -1760,6 +1770,21 @@ void AnyClient::set_allocated_dounitaction(::DoUnitAction* dounitaction) {
   }
   // @@protoc_insertion_point(field_set_allocated:AnyClient.doUnitAction)
 }
+void AnyClient::set_allocated_setworkertask(::SetWorkerTask* setworkertask) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_packet();
+  if (setworkertask) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::SetWorkerTask>::GetOwningArena(setworkertask);
+    if (message_arena != submessage_arena) {
+      setworkertask = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, setworkertask, submessage_arena);
+    }
+    set_has_setworkertask();
+    packet_.setworkertask_ = setworkertask;
+  }
+  // @@protoc_insertion_point(field_set_allocated:AnyClient.setWorkerTask)
+}
 AnyClient::AnyClient(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -1813,6 +1838,10 @@ AnyClient::AnyClient(const AnyClient& from)
     }
     case kDoUnitAction: {
       _internal_mutable_dounitaction()->::DoUnitAction::MergeFrom(from._internal_dounitaction());
+      break;
+    }
+    case kSetWorkerTask: {
+      _internal_mutable_setworkertask()->::SetWorkerTask::MergeFrom(from._internal_setworkertask());
       break;
     }
     case PACKET_NOT_SET: {
@@ -1911,6 +1940,12 @@ void AnyClient::clear_packet() {
     case kDoUnitAction: {
       if (GetArenaForAllocation() == nullptr) {
         delete packet_.dounitaction_;
+      }
+      break;
+    }
+    case kSetWorkerTask: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete packet_.setworkertask_;
       }
       break;
     }
@@ -2013,6 +2048,13 @@ const char* AnyClient::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       case 11:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
           ptr = ctx->ParseMessage(_internal_mutable_dounitaction(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .SetWorkerTask setWorkerTask = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 98)) {
+          ptr = ctx->ParseMessage(_internal_mutable_setworkertask(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -2131,6 +2173,14 @@ failure:
         11, _Internal::dounitaction(this), target, stream);
   }
 
+  // .SetWorkerTask setWorkerTask = 12;
+  if (_internal_has_setworkertask()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        12, _Internal::setworkertask(this), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -2225,6 +2275,13 @@ size_t AnyClient::ByteSizeLong() const {
           *packet_.dounitaction_);
       break;
     }
+    // .SetWorkerTask setWorkerTask = 12;
+    case kSetWorkerTask: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *packet_.setworkertask_);
+      break;
+    }
     case PACKET_NOT_SET: {
       break;
     }
@@ -2299,6 +2356,10 @@ void AnyClient::MergeFrom(const AnyClient& from) {
     }
     case kDoUnitAction: {
       _internal_mutable_dounitaction()->::DoUnitAction::MergeFrom(from._internal_dounitaction());
+      break;
+    }
+    case kSetWorkerTask: {
+      _internal_mutable_setworkertask()->::SetWorkerTask::MergeFrom(from._internal_setworkertask());
       break;
     }
     case PACKET_NOT_SET: {
@@ -8882,6 +8943,11 @@ WorkerTask::WorkerTask(const WorkerTask& from)
     name_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_name(), 
       GetArenaForAllocation());
   }
+  presentparticiple_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  if (!from._internal_presentparticiple().empty()) {
+    presentparticiple_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, from._internal_presentparticiple(), 
+      GetArenaForAllocation());
+  }
   if (from._internal_has_kind()) {
     kind_ = new ::WorkerTaskKind(*from.kind_);
   } else {
@@ -8893,6 +8959,7 @@ WorkerTask::WorkerTask(const WorkerTask& from)
 
 inline void WorkerTask::SharedCtor() {
 name_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+presentparticiple_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&kind_) - reinterpret_cast<char*>(this)),
     0, static_cast<size_t>(reinterpret_cast<char*>(&turnsleft_) -
@@ -8909,6 +8976,7 @@ WorkerTask::~WorkerTask() {
 inline void WorkerTask::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
   name_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
+  presentparticiple_.DestroyNoArena(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
   if (this != internal_default_instance()) delete kind_;
 }
 
@@ -8929,6 +8997,7 @@ void WorkerTask::Clear() {
   (void) cached_has_bits;
 
   name_.ClearToEmpty();
+  presentparticiple_.ClearToEmpty();
   if (GetArenaForAllocation() == nullptr && kind_ != nullptr) {
     delete kind_;
   }
@@ -8963,6 +9032,15 @@ const char* WorkerTask::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
       case 3:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
           ptr = ctx->ParseMessage(_internal_mutable_kind(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // string presentParticiple = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 34)) {
+          auto str = _internal_mutable_presentparticiple();
+          ptr = ::PROTOBUF_NAMESPACE_ID::internal::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(::PROTOBUF_NAMESPACE_ID::internal::VerifyUTF8(str, "WorkerTask.presentParticiple"));
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -9019,6 +9097,16 @@ failure:
         3, _Internal::kind(this), target, stream);
   }
 
+  // string presentParticiple = 4;
+  if (!this->_internal_presentparticiple().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_presentparticiple().data(), static_cast<int>(this->_internal_presentparticiple().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "WorkerTask.presentParticiple");
+    target = stream->WriteStringMaybeAliased(
+        4, this->_internal_presentparticiple(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -9040,6 +9128,13 @@ size_t WorkerTask::ByteSizeLong() const {
     total_size += 1 +
       ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
         this->_internal_name());
+  }
+
+  // string presentParticiple = 4;
+  if (!this->_internal_presentparticiple().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_presentparticiple());
   }
 
   // .WorkerTaskKind kind = 3;
@@ -9087,6 +9182,9 @@ void WorkerTask::MergeFrom(const WorkerTask& from) {
   if (!from._internal_name().empty()) {
     _internal_set_name(from._internal_name());
   }
+  if (!from._internal_presentparticiple().empty()) {
+    _internal_set_presentparticiple(from._internal_presentparticiple());
+  }
   if (from._internal_has_kind()) {
     _internal_mutable_kind()->::WorkerTaskKind::MergeFrom(from._internal_kind());
   }
@@ -9114,6 +9212,11 @@ void WorkerTask::InternalSwap(WorkerTask* other) {
       &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
       &name_, GetArenaForAllocation(),
       &other->name_, other->GetArenaForAllocation()
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(),
+      &presentparticiple_, GetArenaForAllocation(),
+      &other->presentparticiple_, other->GetArenaForAllocation()
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(WorkerTask, turnsleft_)

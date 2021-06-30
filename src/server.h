@@ -45,6 +45,7 @@ namespace rip {
         void handleGetPossibleTechs(Game &game, const GetPossibleTechs &packet);
         void handleSetEconomySettings(Game &game, const SetEconomySettings &packet);
         void handleDoUnitAction(Game &game, const DoUnitAction &packet);
+        void handleSetWorkerTask(Game &game, const SetWorkerTask &packet);
         void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);

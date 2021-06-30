@@ -36,7 +36,7 @@ namespace rip {
         virtual void onFinished(Game &game) = 0;
 
         virtual std::string getName() const = 0;
-        virtual std::string getPresentParticiple() = 0;
+        virtual std::string getPresentParticiple() const = 0;
 
         virtual ~WorkerTask() = default;
     };
@@ -52,7 +52,7 @@ namespace rip {
 
         std::string getName() const override;
 
-        std::string getPresentParticiple() override;
+        std::string getPresentParticiple() const override;
 
         const Improvement &getImprovement() const;
     };

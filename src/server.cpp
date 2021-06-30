@@ -108,6 +108,7 @@ namespace rip {
     void writeWorkerTask(const rip::WorkerTask &task, ::WorkerTask &protoTask) {
         protoTask.set_name(task.getName());
         protoTask.set_turnsleft(task.getRemainingTurns());
+        protoTask.set_presentparticiple(task.getPresentParticiple());
 
         auto *buildImprovement = dynamic_cast<const BuildImprovementTask*>(&task);
         if (buildImprovement) {
@@ -133,7 +134,7 @@ namespace rip {
         }
 
         for (const auto &capability : unit.getCapabilities()) {
-            ::Capability protoCap;
+            auto &protoCap = *packet.add_capabilities();
             const auto *foundCity = dynamic_cast<const FoundCityCapability*>(&*capability);
             const auto *worker = dynamic_cast<const WorkerCapability*>(&*capability);
             const auto *carryUnits = dynamic_cast<const CarryUnitsCapability*>(&*capability);
@@ -388,6 +389,33 @@ namespace rip {
         }
     }
 
+    void Connection::handleSetWorkerTask(Game &game, const SetWorkerTask &packet) {
+        auto &worker = game.getUnit({packet.workerid(), 0});
+        auto *workerCap = worker.getCapability<WorkerCapability>();
+        if (!workerCap) return;
+
+        std::unique_ptr<Improvement> improvement;
+        auto &kind = packet.task().kind().buildimprovement();
+        if (kind.improvementid() == "Cottage") {
+            improvement = std::make_unique<Cottage>(worker.getPos());
+        } else if (kind.improvementid() == "Road") {
+            improvement = std::make_unique<Road>(worker.getPos());
+        } else if (kind.improvementid() == "Farm") {
+            improvement = std::make_unique<Farm>(worker.getPos());
+        } else if (kind.improvementid() == "Pasture") {
+            improvement = std::make_unique<Pasture>(worker.getPos());
+        } else if (kind.improvementid() == "Mine") {
+            improvement = std::make_unique<Mine>(worker.getPos());
+        } else {
+            std::cout << "[server-err] invalid improvement ID " << kind.improvementid() << std::endl;
+            return;
+        }
+
+        workerCap->setTask(std::make_unique<BuildImprovementTask>(improvement->getNumBuildTurns(), worker.getPos(), std::move(improvement)));
+
+        SEND(getUpdateUnitPacket(game, worker), updateunit, currentRequestID);
+    }
+
     void Connection::handlePacket(Game &game, AnyClient &packet) {
         currentRequestID = packet.requestid();
         if (packet.has_clientinfo()) {
@@ -410,6 +438,8 @@ namespace rip {
             handleSetEconomySettings(game, packet.seteconomysettings());
         } else if (packet.has_dounitaction()) {
             handleDoUnitAction(game, packet.dounitaction());
+        } else if (packet.has_setworkertask()) {
+            handleSetWorkerTask(game, packet.setworkertask());
         }
     }
 

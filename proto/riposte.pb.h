@@ -558,6 +558,7 @@ class AnyClient final :
     kGetPossibleTechs = 9,
     kSetEconomySettings = 10,
     kDoUnitAction = 11,
+    kSetWorkerTask = 12,
     PACKET_NOT_SET = 0,
   };
 
@@ -648,6 +649,7 @@ class AnyClient final :
     kGetPossibleTechsFieldNumber = 9,
     kSetEconomySettingsFieldNumber = 10,
     kDoUnitActionFieldNumber = 11,
+    kSetWorkerTaskFieldNumber = 12,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -838,6 +840,24 @@ class AnyClient final :
       ::DoUnitAction* dounitaction);
   ::DoUnitAction* unsafe_arena_release_dounitaction();
 
+  // .SetWorkerTask setWorkerTask = 12;
+  bool has_setworkertask() const;
+  private:
+  bool _internal_has_setworkertask() const;
+  public:
+  void clear_setworkertask();
+  const ::SetWorkerTask& setworkertask() const;
+  PROTOBUF_MUST_USE_RESULT ::SetWorkerTask* release_setworkertask();
+  ::SetWorkerTask* mutable_setworkertask();
+  void set_allocated_setworkertask(::SetWorkerTask* setworkertask);
+  private:
+  const ::SetWorkerTask& _internal_setworkertask() const;
+  ::SetWorkerTask* _internal_mutable_setworkertask();
+  public:
+  void unsafe_arena_set_allocated_setworkertask(
+      ::SetWorkerTask* setworkertask);
+  ::SetWorkerTask* unsafe_arena_release_setworkertask();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyClient)
@@ -853,6 +873,7 @@ class AnyClient final :
   void set_has_getpossibletechs();
   void set_has_seteconomysettings();
   void set_has_dounitaction();
+  void set_has_setworkertask();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -874,6 +895,7 @@ class AnyClient final :
     ::GetPossibleTechs* getpossibletechs_;
     ::SetEconomySettings* seteconomysettings_;
     ::DoUnitAction* dounitaction_;
+    ::SetWorkerTask* setworkertask_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -5165,6 +5187,7 @@ class WorkerTask final :
 
   enum : int {
     kNameFieldNumber = 1,
+    kPresentParticipleFieldNumber = 4,
     kKindFieldNumber = 3,
     kTurnsLeftFieldNumber = 2,
   };
@@ -5180,6 +5203,20 @@ class WorkerTask final :
   const std::string& _internal_name() const;
   inline PROTOBUF_ALWAYS_INLINE void _internal_set_name(const std::string& value);
   std::string* _internal_mutable_name();
+  public:
+
+  // string presentParticiple = 4;
+  void clear_presentparticiple();
+  const std::string& presentparticiple() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_presentparticiple(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_presentparticiple();
+  PROTOBUF_MUST_USE_RESULT std::string* release_presentparticiple();
+  void set_allocated_presentparticiple(std::string* presentparticiple);
+  private:
+  const std::string& _internal_presentparticiple() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_presentparticiple(const std::string& value);
+  std::string* _internal_mutable_presentparticiple();
   public:
 
   // .WorkerTaskKind kind = 3;
@@ -5217,6 +5254,7 @@ class WorkerTask final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr presentparticiple_;
   ::WorkerTaskKind* kind_;
   ::PROTOBUF_NAMESPACE_ID::int32 turnsleft_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -9497,6 +9535,80 @@ inline ::DoUnitAction* AnyClient::mutable_dounitaction() {
   return _msg;
 }
 
+// .SetWorkerTask setWorkerTask = 12;
+inline bool AnyClient::_internal_has_setworkertask() const {
+  return packet_case() == kSetWorkerTask;
+}
+inline bool AnyClient::has_setworkertask() const {
+  return _internal_has_setworkertask();
+}
+inline void AnyClient::set_has_setworkertask() {
+  _oneof_case_[0] = kSetWorkerTask;
+}
+inline void AnyClient::clear_setworkertask() {
+  if (_internal_has_setworkertask()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.setworkertask_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::SetWorkerTask* AnyClient::release_setworkertask() {
+  // @@protoc_insertion_point(field_release:AnyClient.setWorkerTask)
+  if (_internal_has_setworkertask()) {
+    clear_has_packet();
+      ::SetWorkerTask* temp = packet_.setworkertask_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.setworkertask_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::SetWorkerTask& AnyClient::_internal_setworkertask() const {
+  return _internal_has_setworkertask()
+      ? *packet_.setworkertask_
+      : reinterpret_cast< ::SetWorkerTask&>(::_SetWorkerTask_default_instance_);
+}
+inline const ::SetWorkerTask& AnyClient::setworkertask() const {
+  // @@protoc_insertion_point(field_get:AnyClient.setWorkerTask)
+  return _internal_setworkertask();
+}
+inline ::SetWorkerTask* AnyClient::unsafe_arena_release_setworkertask() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.setWorkerTask)
+  if (_internal_has_setworkertask()) {
+    clear_has_packet();
+    ::SetWorkerTask* temp = packet_.setworkertask_;
+    packet_.setworkertask_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_setworkertask(::SetWorkerTask* setworkertask) {
+  clear_packet();
+  if (setworkertask) {
+    set_has_setworkertask();
+    packet_.setworkertask_ = setworkertask;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.setWorkerTask)
+}
+inline ::SetWorkerTask* AnyClient::_internal_mutable_setworkertask() {
+  if (!_internal_has_setworkertask()) {
+    clear_packet();
+    set_has_setworkertask();
+    packet_.setworkertask_ = CreateMaybeMessage< ::SetWorkerTask >(GetArenaForAllocation());
+  }
+  return packet_.setworkertask_;
+}
+inline ::SetWorkerTask* AnyClient::mutable_setworkertask() {
+  ::SetWorkerTask* _msg = _internal_mutable_setworkertask();
+  // @@protoc_insertion_point(field_mutable:AnyClient.setWorkerTask)
+  return _msg;
+}
+
 inline bool AnyClient::has_packet() const {
   return packet_case() != PACKET_NOT_SET;
 }
@@ -13052,6 +13164,52 @@ inline void WorkerTask::set_allocated_kind(::WorkerTaskKind* kind) {
   }
   kind_ = kind;
   // @@protoc_insertion_point(field_set_allocated:WorkerTask.kind)
+}
+
+// string presentParticiple = 4;
+inline void WorkerTask::clear_presentparticiple() {
+  presentparticiple_.ClearToEmpty();
+}
+inline const std::string& WorkerTask::presentparticiple() const {
+  // @@protoc_insertion_point(field_get:WorkerTask.presentParticiple)
+  return _internal_presentparticiple();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void WorkerTask::set_presentparticiple(ArgT0&& arg0, ArgT... args) {
+ 
+ presentparticiple_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:WorkerTask.presentParticiple)
+}
+inline std::string* WorkerTask::mutable_presentparticiple() {
+  std::string* _s = _internal_mutable_presentparticiple();
+  // @@protoc_insertion_point(field_mutable:WorkerTask.presentParticiple)
+  return _s;
+}
+inline const std::string& WorkerTask::_internal_presentparticiple() const {
+  return presentparticiple_.Get();
+}
+inline void WorkerTask::_internal_set_presentparticiple(const std::string& value) {
+  
+  presentparticiple_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* WorkerTask::_internal_mutable_presentparticiple() {
+  
+  return presentparticiple_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* WorkerTask::release_presentparticiple() {
+  // @@protoc_insertion_point(field_release:WorkerTask.presentParticiple)
+  return presentparticiple_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void WorkerTask::set_allocated_presentparticiple(std::string* presentparticiple) {
+  if (presentparticiple != nullptr) {
+    
+  } else {
+    
+  }
+  presentparticiple_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), presentparticiple,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:WorkerTask.presentParticiple)
 }
 
 // -------------------------------------------------------------------

@@ -112,6 +112,13 @@ function Client:doUnitAction(unit, action)
     })
 end
 
+function Client:setWorkerTask(workerUnit, task)
+    self:sendPacket("setWorkerTask", {
+        workerID = workerUnit.id,
+        task = task,
+    })
+end
+
 function Client:endTurn()
     self:sendPacket("endTurn", {})
 end

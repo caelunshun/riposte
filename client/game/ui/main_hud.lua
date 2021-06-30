@@ -450,6 +450,15 @@ function UnitDisplayWindow:rebuild()
         root:addFixedChild(header)
         root:addFixedChild(Text:new("Strength: %strength", {strength=tostring(unit.strength)}))
         root:addFixedChild(Text:new("Movement: %movement", {movement=tostring(unit.movementLeft)}))
+
+        -- Display current worker task, if any
+        local workerCap = unit:getCapability("worker")
+        if workerCap ~= nil and workerCap.currentTask ~= nil then
+            root:addFixedChild(Text:new("%presentParticiple (%turnsLeft)", {
+                presentParticiple = workerCap.currentTask.presentParticiple,
+                turnsLeft = tostring(workerCap.currentTask.turnsLeft),
+            }))
+        end
     elseif #units ~= 0 then
         -- Multiple units; display generic info (# of each unit kind in the stack)
         local header = Text:new("@size{20}{Unit Stack (%count)}", {count=tostring(#units)})

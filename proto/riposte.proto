@@ -63,6 +63,7 @@ message AnyClient {
     GetPossibleTechs getPossibleTechs = 9;
     SetEconomySettings setEconomySettings = 10;
     DoUnitAction doUnitAction = 11;
+    SetWorkerTask setWorkerTask = 12;
   }
 }
 
@@ -282,6 +283,7 @@ message WorkerTask {
   string name = 1;
   int32 turnsLeft = 2;
   WorkerTaskKind kind = 3;
+  string presentParticiple = 4;
 }
 
 message WorkerCapability {

@@ -107,4 +107,12 @@ function Unit:hasCapability(capabilityName)
     return false
 end
 
+function Unit:getCapability(capabilityName)
+    for _, cap in ipairs(self.capabilities) do
+        if cap[capabilityName] ~= nil then
+            return cap[capabilityName]
+        end
+    end
+end
+
 return Unit
