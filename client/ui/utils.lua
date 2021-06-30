@@ -41,4 +41,11 @@ function UiUtils.openConfirmationPrompt(title, confirmationText, negationText, o
     ui:createWindow("confirmation", Vector(cv:getWidth() - size.x - 10, 10), size, container)
 end
 
+function maybeInfinity(x)
+    if x == math.huge then
+        return "∞"
+    else return tostring(x)
+    end
+end
+
 return UiUtils

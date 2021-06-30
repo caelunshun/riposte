@@ -189,7 +189,7 @@ function ResearchPrompt:build()
         local entry = Text:new("@size{16}{%bullet %name    (%duration)}", {
             bullet = "•",
             name = tech.name,
-            duration = self.game.thePlayer:estimateResearchTurns(tech),
+            duration = maybeInfinity(self.game.thePlayer:estimateResearchTurns(tech)),
         })
         table.insert(entry.classes, "hoverableText")
 

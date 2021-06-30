@@ -169,8 +169,10 @@ int main() {
             cursorX = event.data.cursor_pos[0];
             cursorY = event.data.cursor_pos[1];
         } else if (event.kind == EventKind::Resized) {
+            int oldWidth = width, oldHeight = height;
             width = event.data.new_size[0];
             height = event.data.new_size[1];
+            resizeFunction.call<void>(lua->create_table_with("x", oldWidth, "y", oldHeight), lua->create_table_with("x", width, "y", height));
         }
 
         (*lua)["cursorPos"] = lua->create_table_with("x", cursorX, "y", cursorY);

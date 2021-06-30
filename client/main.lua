@@ -115,9 +115,9 @@ function handleEvent(event)
     end)
 end
 
-function resize(newSize)
+function resize(oldSize, newSize)
     callSafe(function()
-        ui:resize(Vector(cv:getWidth(), cv:getHeight()), newSize)
+        ui:resize(oldSize, newSize)
     end)
 end
 

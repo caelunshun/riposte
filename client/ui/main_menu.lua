@@ -55,7 +55,7 @@ local function build(ui)
 
     local root = Image:new("icon/menu", nil, navigator)
 
-    ui:createWindow("mainMenu", Vector(0, 0), Vector(ui.cv:getWidth(), ui.cv:getHeight()), root)
+    ui:createWindow("mainMenu", Vector(0, 0), Vector(ui.cv:getWidth(), ui.cv:getHeight()), root, true)
 end
 
 return build

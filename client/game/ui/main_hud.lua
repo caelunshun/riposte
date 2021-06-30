@@ -425,7 +425,7 @@ function BottomControlWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(cv:getWidth() - unitDisplayWindowWidth - turnIndicatorWindowWidth, 100)
-    ui:createWindow("bottomControls", Vector(unitDisplayWindowWidth, cv:getHeight() - size.y), size, container)
+    ui:createWindow("bottomControls", Vector(unitDisplayWindowWidth, cv:getHeight() - size.y), size, container, true, true)
 end
 
 function UnitDisplayWindow:new(game, hud)
@@ -477,7 +477,7 @@ function UnitDisplayWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(unitDisplayWindowWidth, 150)
-    ui:createWindow("unitDisplay", Vector(0, cv:getHeight() - size.y), size, container)
+    ui:createWindow("unitDisplay", Vector(0, cv:getHeight() - size.y), size, container, false, false)
 end
 
 function TurnIndicatorWindow:new(game, hud)
@@ -498,7 +498,7 @@ function TurnIndicatorWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(turnIndicatorWindowWidth, 150)
-    ui:createWindow("turnIndicator", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y), size, container)
+    ui:createWindow("turnIndicator", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y), size, container, false, true)
 end
 
 function ScoreWindow:new(game, hud)
@@ -541,7 +541,7 @@ function ScoreWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(200, 175)
-    ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container)
+    ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container, false, true)
 end
 
 function UnitStackWindow:new(game, hud)
@@ -606,7 +606,7 @@ function UnitStackWindow:rebuild()
     end
 
     local size = Vector(cv:getWidth() - unitDisplayWindowWidth - turnIndicatorWindowWidth - 200, 100)
-    ui:createWindow("unitStack", Vector(unitDisplayWindowWidth + 100, cv:getHeight() - 120 - size.y), size, root)
+    ui:createWindow("unitStack", Vector(unitDisplayWindowWidth + 100, cv:getHeight() - 120 - size.y), size, root, false, true)
 end
 
 function ResearchBar:new(game, hud)
@@ -635,7 +635,7 @@ function ResearchBar:rebuild()
         predictedProgress = (research.progress + self.game.thePlayer.beakerRevenue) / cost
 
         local turns = self.game.thePlayer:estimateResearchTurns(tech, research.progress)
-        text = "Research: " .. research.techID .. " (" .. tostring(turns) .. ")"
+        text = "Research: " .. research.techID .. " (" .. maybeInfinity(turns) .. ")"
     end
 
     local child = Text:new("@size{15}{" .. text .. "}", {}, {
@@ -729,7 +729,7 @@ function EconomyWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(275, 150)
-    ui:createWindow("economy", Vector(0, 0), size, container)
+    ui:createWindow("economy", Vector(0, 0), size, container, false, false)
 end
 
 function dumeColorToString(color)
