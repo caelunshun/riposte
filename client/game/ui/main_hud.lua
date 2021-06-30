@@ -61,7 +61,7 @@ end
 
 function Hud:handleEvent(event)
     if event.type == dume.EventType.Key and event.action == dume.Action.Release
-            and event.key == dume.Key.Enter and self.readyForNextTurn then
+            and event.key == dume.Key.Return and self.readyForNextTurn then
         self.game.client:endTurn()
         self.readyForNextTurn = false
     end
@@ -134,11 +134,6 @@ function Hud:moveGroupAlongPath(units, path, successCallback, failureCallback)
             while #path.positions >= 2 and Vector(path.positions[1], path.positions[2]) ~= units[1].pos do
                 table.remove(path.positions, 1)
                 table.remove(path.positions, 1)
-            end
-
-            print("LENGTH: " .. #path.positions)
-            for i=1,#path.positions,2 do
-                print(path.positions[i], path.positions[i + 1])
             end
 
             units.followingPath = path
@@ -309,9 +304,11 @@ function Hud:doAutoSelect()
         if group == nil then
             self.readyForNextTurn = true
             return
+        else
+            self.readyForNextTurn = false
         end
 
-        if group.followingPath ~= nil then
+        if group.followingPath ~= nil and #group.followingPath > 0 then
             self:moveGroupAlongPath(group, group.followingPath, function()
                 self.selectionGroups:createGroup(group)
             end, function()
