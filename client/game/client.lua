@@ -105,6 +105,13 @@ function Client:setEconomySettings(beakerPercent)
     })
 end
 
+function Client:doUnitAction(unit, action)
+    self:sendPacket("doUnitAction", {
+        unitID = unit.id,
+        action = action,
+    })
+end
+
 function Client:endTurn()
     self:sendPacket("endTurn", {})
 end
@@ -163,6 +170,8 @@ function Client:handlePacket(packet)
         self:handleUpdateCity(packet.updateCity)
     elseif packet.updatePlayer ~= nil then
         self:handleUpdatePlayer(packet.updatePlayer)
+    elseif packet.deleteUnit ~= nil then
+        self:handleDeleteUnit(packet.deleteUnit)
     end
 end
 
@@ -198,6 +207,10 @@ end
 
 function Client:handleUpdatePlayer(packet)
     self.game:updateThePlayer(packet)
+end
+
+function Client:handleDeleteUnit(packet)
+    self.game:deleteUnit(packet.unitID)
 end
 
 return Client

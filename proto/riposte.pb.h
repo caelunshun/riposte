@@ -47,7 +47,7 @@ struct TableStruct_riposte_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[45]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[47]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -87,6 +87,12 @@ extern ComputePathDefaultTypeInternal _ComputePath_default_instance_;
 class ConfirmMoveUnits;
 struct ConfirmMoveUnitsDefaultTypeInternal;
 extern ConfirmMoveUnitsDefaultTypeInternal _ConfirmMoveUnits_default_instance_;
+class DeleteUnit;
+struct DeleteUnitDefaultTypeInternal;
+extern DeleteUnitDefaultTypeInternal _DeleteUnit_default_instance_;
+class DoUnitAction;
+struct DoUnitActionDefaultTypeInternal;
+extern DoUnitActionDefaultTypeInternal _DoUnitAction_default_instance_;
 class EndTurn;
 struct EndTurnDefaultTypeInternal;
 extern EndTurnDefaultTypeInternal _EndTurn_default_instance_;
@@ -201,6 +207,8 @@ template<> ::CarryUnitsCapability* Arena::CreateMaybeMessage<::CarryUnitsCapabil
 template<> ::ClientInfo* Arena::CreateMaybeMessage<::ClientInfo>(Arena*);
 template<> ::ComputePath* Arena::CreateMaybeMessage<::ComputePath>(Arena*);
 template<> ::ConfirmMoveUnits* Arena::CreateMaybeMessage<::ConfirmMoveUnits>(Arena*);
+template<> ::DeleteUnit* Arena::CreateMaybeMessage<::DeleteUnit>(Arena*);
+template<> ::DoUnitAction* Arena::CreateMaybeMessage<::DoUnitAction>(Arena*);
 template<> ::EndTurn* Arena::CreateMaybeMessage<::EndTurn>(Arena*);
 template<> ::FoundCityCapability* Arena::CreateMaybeMessage<::FoundCityCapability>(Arena*);
 template<> ::GetBuildTasks* Arena::CreateMaybeMessage<::GetBuildTasks>(Arena*);
@@ -319,6 +327,34 @@ inline bool Visibility_Parse(
     ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, Visibility* value) {
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<Visibility>(
     Visibility_descriptor(), name, value);
+}
+enum UnitAction : int {
+  Kill = 0,
+  Fortify = 1,
+  SkipTurn = 2,
+  FortifyUntilHealed = 3,
+  FoundCity = 4,
+  UnitAction_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::min(),
+  UnitAction_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<::PROTOBUF_NAMESPACE_ID::int32>::max()
+};
+bool UnitAction_IsValid(int value);
+constexpr UnitAction UnitAction_MIN = Kill;
+constexpr UnitAction UnitAction_MAX = FoundCity;
+constexpr int UnitAction_ARRAYSIZE = UnitAction_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* UnitAction_descriptor();
+template<typename T>
+inline const std::string& UnitAction_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, UnitAction>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function UnitAction_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    UnitAction_descriptor(), enum_t_value);
+}
+inline bool UnitAction_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, UnitAction* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<UnitAction>(
+    UnitAction_descriptor(), name, value);
 }
 // ===================================================================
 
@@ -521,6 +557,7 @@ class AnyClient final :
     kSetResearch = 8,
     kGetPossibleTechs = 9,
     kSetEconomySettings = 10,
+    kDoUnitAction = 11,
     PACKET_NOT_SET = 0,
   };
 
@@ -610,6 +647,7 @@ class AnyClient final :
     kSetResearchFieldNumber = 8,
     kGetPossibleTechsFieldNumber = 9,
     kSetEconomySettingsFieldNumber = 10,
+    kDoUnitActionFieldNumber = 11,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -782,6 +820,24 @@ class AnyClient final :
       ::SetEconomySettings* seteconomysettings);
   ::SetEconomySettings* unsafe_arena_release_seteconomysettings();
 
+  // .DoUnitAction doUnitAction = 11;
+  bool has_dounitaction() const;
+  private:
+  bool _internal_has_dounitaction() const;
+  public:
+  void clear_dounitaction();
+  const ::DoUnitAction& dounitaction() const;
+  PROTOBUF_MUST_USE_RESULT ::DoUnitAction* release_dounitaction();
+  ::DoUnitAction* mutable_dounitaction();
+  void set_allocated_dounitaction(::DoUnitAction* dounitaction);
+  private:
+  const ::DoUnitAction& _internal_dounitaction() const;
+  ::DoUnitAction* _internal_mutable_dounitaction();
+  public:
+  void unsafe_arena_set_allocated_dounitaction(
+      ::DoUnitAction* dounitaction);
+  ::DoUnitAction* unsafe_arena_release_dounitaction();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyClient)
@@ -796,6 +852,7 @@ class AnyClient final :
   void set_has_setresearch();
   void set_has_getpossibletechs();
   void set_has_seteconomysettings();
+  void set_has_dounitaction();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -816,6 +873,7 @@ class AnyClient final :
     ::SetResearch* setresearch_;
     ::GetPossibleTechs* getpossibletechs_;
     ::SetEconomySettings* seteconomysettings_;
+    ::DoUnitAction* dounitaction_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -876,6 +934,7 @@ class AnyServer final :
     kConfirmMoveUnits = 11,
     kPossibleCityBuildTasks = 12,
     kPossibleTechs = 13,
+    kDeleteUnit = 14,
     PACKET_NOT_SET = 0,
   };
 
@@ -968,6 +1027,7 @@ class AnyServer final :
     kConfirmMoveUnitsFieldNumber = 11,
     kPossibleCityBuildTasksFieldNumber = 12,
     kPossibleTechsFieldNumber = 13,
+    kDeleteUnitFieldNumber = 14,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -1194,6 +1254,24 @@ class AnyServer final :
       ::PossibleTechs* possibletechs);
   ::PossibleTechs* unsafe_arena_release_possibletechs();
 
+  // .DeleteUnit deleteUnit = 14;
+  bool has_deleteunit() const;
+  private:
+  bool _internal_has_deleteunit() const;
+  public:
+  void clear_deleteunit();
+  const ::DeleteUnit& deleteunit() const;
+  PROTOBUF_MUST_USE_RESULT ::DeleteUnit* release_deleteunit();
+  ::DeleteUnit* mutable_deleteunit();
+  void set_allocated_deleteunit(::DeleteUnit* deleteunit);
+  private:
+  const ::DeleteUnit& _internal_deleteunit() const;
+  ::DeleteUnit* _internal_mutable_deleteunit();
+  public:
+  void unsafe_arena_set_allocated_deleteunit(
+      ::DeleteUnit* deleteunit);
+  ::DeleteUnit* unsafe_arena_release_deleteunit();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyServer)
@@ -1211,6 +1289,7 @@ class AnyServer final :
   void set_has_confirmmoveunits();
   void set_has_possiblecitybuildtasks();
   void set_has_possibletechs();
+  void set_has_deleteunit();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -1234,6 +1313,7 @@ class AnyServer final :
     ::ConfirmMoveUnits* confirmmoveunits_;
     ::PossibleCityBuildTasks* possiblecitybuildtasks_;
     ::PossibleTechs* possibletechs_;
+    ::DeleteUnit* deleteunit_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -6950,6 +7030,145 @@ class PossibleTechs final :
 };
 // -------------------------------------------------------------------
 
+class DeleteUnit final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:DeleteUnit) */ {
+ public:
+  inline DeleteUnit() : DeleteUnit(nullptr) {}
+  ~DeleteUnit() override;
+  explicit constexpr DeleteUnit(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  DeleteUnit(const DeleteUnit& from);
+  DeleteUnit(DeleteUnit&& from) noexcept
+    : DeleteUnit() {
+    *this = ::std::move(from);
+  }
+
+  inline DeleteUnit& operator=(const DeleteUnit& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline DeleteUnit& operator=(DeleteUnit&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const DeleteUnit& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const DeleteUnit* internal_default_instance() {
+    return reinterpret_cast<const DeleteUnit*>(
+               &_DeleteUnit_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    36;
+
+  friend void swap(DeleteUnit& a, DeleteUnit& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(DeleteUnit* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(DeleteUnit* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DeleteUnit* New() const final {
+    return new DeleteUnit();
+  }
+
+  DeleteUnit* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<DeleteUnit>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const DeleteUnit& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const DeleteUnit& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DeleteUnit* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "DeleteUnit";
+  }
+  protected:
+  explicit DeleteUnit(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kUnitIDFieldNumber = 1,
+  };
+  // int32 unitID = 1;
+  void clear_unitid();
+  ::PROTOBUF_NAMESPACE_ID::int32 unitid() const;
+  void set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_unitid() const;
+  void _internal_set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:DeleteUnit)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 unitid_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
+// -------------------------------------------------------------------
+
 class MoveUnits final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:MoveUnits) */ {
  public:
@@ -6994,7 +7213,7 @@ class MoveUnits final :
                &_MoveUnits_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    36;
+    37;
 
   friend void swap(MoveUnits& a, MoveUnits& b) {
     a.Swap(&b);
@@ -7167,7 +7386,7 @@ class SetCityBuildTask final :
                &_SetCityBuildTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    37;
+    38;
 
   friend void swap(SetCityBuildTask& a, SetCityBuildTask& b) {
     a.Swap(&b);
@@ -7326,7 +7545,7 @@ class SetWorkerTask final :
                &_SetWorkerTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    38;
+    39;
 
   friend void swap(SetWorkerTask& a, SetWorkerTask& b) {
     a.Swap(&b);
@@ -7485,7 +7704,7 @@ class ComputePath final :
                &_ComputePath_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    39;
+    40;
 
   friend void swap(ComputePath& a, ComputePath& b) {
     a.Swap(&b);
@@ -7669,7 +7888,7 @@ class SetEconomySettings final :
                &_SetEconomySettings_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    40;
+    41;
 
   friend void swap(SetEconomySettings& a, SetEconomySettings& b) {
     a.Swap(&b);
@@ -7808,7 +8027,7 @@ class SetResearch final :
                &_SetResearch_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    41;
+    42;
 
   friend void swap(SetResearch& a, SetResearch& b) {
     a.Swap(&b);
@@ -7952,7 +8171,7 @@ class EndTurn final :
                &_EndTurn_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    42;
+    43;
 
   friend void swap(EndTurn& a, EndTurn& b) {
     a.Swap(&b);
@@ -8078,7 +8297,7 @@ class GetBuildTasks final :
                &_GetBuildTasks_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    43;
+    44;
 
   friend void swap(GetBuildTasks& a, GetBuildTasks& b) {
     a.Swap(&b);
@@ -8217,7 +8436,7 @@ class GetPossibleTechs final :
                &_GetPossibleTechs_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    44;
+    45;
 
   friend void swap(GetPossibleTechs& a, GetPossibleTechs& b) {
     a.Swap(&b);
@@ -8294,6 +8513,156 @@ class GetPossibleTechs final :
   template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
+// -------------------------------------------------------------------
+
+class DoUnitAction final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:DoUnitAction) */ {
+ public:
+  inline DoUnitAction() : DoUnitAction(nullptr) {}
+  ~DoUnitAction() override;
+  explicit constexpr DoUnitAction(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  DoUnitAction(const DoUnitAction& from);
+  DoUnitAction(DoUnitAction&& from) noexcept
+    : DoUnitAction() {
+    *this = ::std::move(from);
+  }
+
+  inline DoUnitAction& operator=(const DoUnitAction& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline DoUnitAction& operator=(DoUnitAction&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const DoUnitAction& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const DoUnitAction* internal_default_instance() {
+    return reinterpret_cast<const DoUnitAction*>(
+               &_DoUnitAction_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    46;
+
+  friend void swap(DoUnitAction& a, DoUnitAction& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(DoUnitAction* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(DoUnitAction* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DoUnitAction* New() const final {
+    return new DoUnitAction();
+  }
+
+  DoUnitAction* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<DoUnitAction>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const DoUnitAction& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const DoUnitAction& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DoUnitAction* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "DoUnitAction";
+  }
+  protected:
+  explicit DoUnitAction(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kUnitIDFieldNumber = 1,
+    kActionFieldNumber = 2,
+  };
+  // int32 unitID = 1;
+  void clear_unitid();
+  ::PROTOBUF_NAMESPACE_ID::int32 unitid() const;
+  void set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_unitid() const;
+  void _internal_set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // .UnitAction action = 2;
+  void clear_action();
+  ::UnitAction action() const;
+  void set_action(::UnitAction value);
+  private:
+  ::UnitAction _internal_action() const;
+  void _internal_set_action(::UnitAction value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:DoUnitAction)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 unitid_;
+  int action_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -9035,6 +9404,80 @@ inline ::SetEconomySettings* AnyClient::_internal_mutable_seteconomysettings() {
 inline ::SetEconomySettings* AnyClient::mutable_seteconomysettings() {
   ::SetEconomySettings* _msg = _internal_mutable_seteconomysettings();
   // @@protoc_insertion_point(field_mutable:AnyClient.setEconomySettings)
+  return _msg;
+}
+
+// .DoUnitAction doUnitAction = 11;
+inline bool AnyClient::_internal_has_dounitaction() const {
+  return packet_case() == kDoUnitAction;
+}
+inline bool AnyClient::has_dounitaction() const {
+  return _internal_has_dounitaction();
+}
+inline void AnyClient::set_has_dounitaction() {
+  _oneof_case_[0] = kDoUnitAction;
+}
+inline void AnyClient::clear_dounitaction() {
+  if (_internal_has_dounitaction()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.dounitaction_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::DoUnitAction* AnyClient::release_dounitaction() {
+  // @@protoc_insertion_point(field_release:AnyClient.doUnitAction)
+  if (_internal_has_dounitaction()) {
+    clear_has_packet();
+      ::DoUnitAction* temp = packet_.dounitaction_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.dounitaction_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::DoUnitAction& AnyClient::_internal_dounitaction() const {
+  return _internal_has_dounitaction()
+      ? *packet_.dounitaction_
+      : reinterpret_cast< ::DoUnitAction&>(::_DoUnitAction_default_instance_);
+}
+inline const ::DoUnitAction& AnyClient::dounitaction() const {
+  // @@protoc_insertion_point(field_get:AnyClient.doUnitAction)
+  return _internal_dounitaction();
+}
+inline ::DoUnitAction* AnyClient::unsafe_arena_release_dounitaction() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.doUnitAction)
+  if (_internal_has_dounitaction()) {
+    clear_has_packet();
+    ::DoUnitAction* temp = packet_.dounitaction_;
+    packet_.dounitaction_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_dounitaction(::DoUnitAction* dounitaction) {
+  clear_packet();
+  if (dounitaction) {
+    set_has_dounitaction();
+    packet_.dounitaction_ = dounitaction;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.doUnitAction)
+}
+inline ::DoUnitAction* AnyClient::_internal_mutable_dounitaction() {
+  if (!_internal_has_dounitaction()) {
+    clear_packet();
+    set_has_dounitaction();
+    packet_.dounitaction_ = CreateMaybeMessage< ::DoUnitAction >(GetArenaForAllocation());
+  }
+  return packet_.dounitaction_;
+}
+inline ::DoUnitAction* AnyClient::mutable_dounitaction() {
+  ::DoUnitAction* _msg = _internal_mutable_dounitaction();
+  // @@protoc_insertion_point(field_mutable:AnyClient.doUnitAction)
   return _msg;
 }
 
@@ -9956,6 +10399,80 @@ inline ::PossibleTechs* AnyServer::_internal_mutable_possibletechs() {
 inline ::PossibleTechs* AnyServer::mutable_possibletechs() {
   ::PossibleTechs* _msg = _internal_mutable_possibletechs();
   // @@protoc_insertion_point(field_mutable:AnyServer.possibleTechs)
+  return _msg;
+}
+
+// .DeleteUnit deleteUnit = 14;
+inline bool AnyServer::_internal_has_deleteunit() const {
+  return packet_case() == kDeleteUnit;
+}
+inline bool AnyServer::has_deleteunit() const {
+  return _internal_has_deleteunit();
+}
+inline void AnyServer::set_has_deleteunit() {
+  _oneof_case_[0] = kDeleteUnit;
+}
+inline void AnyServer::clear_deleteunit() {
+  if (_internal_has_deleteunit()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.deleteunit_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::DeleteUnit* AnyServer::release_deleteunit() {
+  // @@protoc_insertion_point(field_release:AnyServer.deleteUnit)
+  if (_internal_has_deleteunit()) {
+    clear_has_packet();
+      ::DeleteUnit* temp = packet_.deleteunit_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.deleteunit_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::DeleteUnit& AnyServer::_internal_deleteunit() const {
+  return _internal_has_deleteunit()
+      ? *packet_.deleteunit_
+      : reinterpret_cast< ::DeleteUnit&>(::_DeleteUnit_default_instance_);
+}
+inline const ::DeleteUnit& AnyServer::deleteunit() const {
+  // @@protoc_insertion_point(field_get:AnyServer.deleteUnit)
+  return _internal_deleteunit();
+}
+inline ::DeleteUnit* AnyServer::unsafe_arena_release_deleteunit() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyServer.deleteUnit)
+  if (_internal_has_deleteunit()) {
+    clear_has_packet();
+    ::DeleteUnit* temp = packet_.deleteunit_;
+    packet_.deleteunit_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyServer::unsafe_arena_set_allocated_deleteunit(::DeleteUnit* deleteunit) {
+  clear_packet();
+  if (deleteunit) {
+    set_has_deleteunit();
+    packet_.deleteunit_ = deleteunit;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyServer.deleteUnit)
+}
+inline ::DeleteUnit* AnyServer::_internal_mutable_deleteunit() {
+  if (!_internal_has_deleteunit()) {
+    clear_packet();
+    set_has_deleteunit();
+    packet_.deleteunit_ = CreateMaybeMessage< ::DeleteUnit >(GetArenaForAllocation());
+  }
+  return packet_.deleteunit_;
+}
+inline ::DeleteUnit* AnyServer::mutable_deleteunit() {
+  ::DeleteUnit* _msg = _internal_mutable_deleteunit();
+  // @@protoc_insertion_point(field_mutable:AnyServer.deleteUnit)
   return _msg;
 }
 
@@ -13973,6 +14490,30 @@ PossibleTechs::mutable_techs() {
 
 // -------------------------------------------------------------------
 
+// DeleteUnit
+
+// int32 unitID = 1;
+inline void DeleteUnit::clear_unitid() {
+  unitid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 DeleteUnit::_internal_unitid() const {
+  return unitid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 DeleteUnit::unitid() const {
+  // @@protoc_insertion_point(field_get:DeleteUnit.unitID)
+  return _internal_unitid();
+}
+inline void DeleteUnit::_internal_set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  unitid_ = value;
+}
+inline void DeleteUnit::set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_unitid(value);
+  // @@protoc_insertion_point(field_set:DeleteUnit.unitID)
+}
+
+// -------------------------------------------------------------------
+
 // MoveUnits
 
 // repeated int32 unitIDs = 1;
@@ -14676,9 +15217,57 @@ inline void GetBuildTasks::set_cityid(::PROTOBUF_NAMESPACE_ID::int32 value) {
 
 // GetPossibleTechs
 
+// -------------------------------------------------------------------
+
+// DoUnitAction
+
+// int32 unitID = 1;
+inline void DoUnitAction::clear_unitid() {
+  unitid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 DoUnitAction::_internal_unitid() const {
+  return unitid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 DoUnitAction::unitid() const {
+  // @@protoc_insertion_point(field_get:DoUnitAction.unitID)
+  return _internal_unitid();
+}
+inline void DoUnitAction::_internal_set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  unitid_ = value;
+}
+inline void DoUnitAction::set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_unitid(value);
+  // @@protoc_insertion_point(field_set:DoUnitAction.unitID)
+}
+
+// .UnitAction action = 2;
+inline void DoUnitAction::clear_action() {
+  action_ = 0;
+}
+inline ::UnitAction DoUnitAction::_internal_action() const {
+  return static_cast< ::UnitAction >(action_);
+}
+inline ::UnitAction DoUnitAction::action() const {
+  // @@protoc_insertion_point(field_get:DoUnitAction.action)
+  return _internal_action();
+}
+inline void DoUnitAction::_internal_set_action(::UnitAction value) {
+  
+  action_ = value;
+}
+inline void DoUnitAction::set_action(::UnitAction value) {
+  _internal_set_action(value);
+  // @@protoc_insertion_point(field_set:DoUnitAction.action)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
@@ -14787,6 +15376,11 @@ template <> struct is_proto_enum< ::Visibility> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Visibility>() {
   return ::Visibility_descriptor();
+}
+template <> struct is_proto_enum< ::UnitAction> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::UnitAction>() {
+  return ::UnitAction_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

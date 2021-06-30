@@ -91,6 +91,12 @@ return {
         button = {
             minSize = Vector(20, 20),
         },
+        unitActionButton = {
+            minSize = Vector(150, 50),
+        },
+        confirmationButton = {
+            minSize = Vector(100, 20),
+        },
         highlightedText = {
             defaultTextStyle = {
                 family = "Merriweather",
@@ -116,7 +122,7 @@ return {
             borderWidth = 1,
             borderColor = dume.rgb(90, 90, 90),
             borderRadius = 0,
-        }
+        },
     },
     pressed = {
         button = {

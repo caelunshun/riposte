@@ -62,6 +62,7 @@ message AnyClient {
     SetResearch setResearch = 8;
     GetPossibleTechs getPossibleTechs = 9;
     SetEconomySettings setEconomySettings = 10;
+    DoUnitAction doUnitAction = 11;
   }
 }
 
@@ -84,6 +85,7 @@ message AnyServer {
     ConfirmMoveUnits confirmMoveUnits = 11;
     PossibleCityBuildTasks possibleCityBuildTasks = 12;
     PossibleTechs possibleTechs = 13;
+    DeleteUnit deleteUnit = 14;
   }
 }
 
@@ -356,6 +358,10 @@ message PossibleTechs {
   repeated string techs = 1;
 }
 
+message DeleteUnit {
+  int32 unitID = 1;
+}
+
 // ---------------------
 // CLIENT
 // ---------------------
@@ -403,4 +409,17 @@ message GetBuildTasks {
 
 message GetPossibleTechs {
 
+}
+
+enum UnitAction {
+  Kill = 0;
+  Fortify = 1;
+  SkipTurn = 2;
+  FortifyUntilHealed = 3;
+  FoundCity = 4;
+}
+
+message DoUnitAction {
+  int32 unitID = 1;
+  UnitAction action = 2;
 }

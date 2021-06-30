@@ -98,4 +98,13 @@ function Unit:moveTo(newPos)
     self.game.client:moveUnit(self, newPos)
 end
 
+function Unit:hasCapability(capabilityName)
+    for _, cap in ipairs(self.kind.capabilities or {}) do
+        if cap == capabilityName then
+            return true
+        end
+    end
+    return false
+end
+
 return Unit

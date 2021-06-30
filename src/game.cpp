@@ -180,32 +180,11 @@ namespace rip {
         return glm::uvec2(static_cast<uint32_t>(floor(scaled.x)), static_cast<uint32_t>(floor(scaled.y)));
     }
 
-    void Game::tick(GLFWwindow *window, bool hudHasFocus) {
-        impl->dt = glfwGetTime() - impl->lastFrameTime;
-        impl->lastFrameTime = glfwGetTime();
-
-        getCursor().tick(window);
-        getView().tick(impl->dt, getCursor(), hudHasFocus);
-
+    void Game::tick() {
         for (const auto unitID : impl->unitKillQueue) {
             killUnit(unitID);
         }
         impl->unitKillQueue.clear();
-
-        for (int i = impl->ongoingCombats.size() - 1; i >= 0; i--) {
-            auto &combat = impl->ongoingCombats[i];
-
-            if (!getUnits().id_is_valid(combat.getAttacker()) || !getUnits().id_is_valid(combat.getDefender())) {
-                impl->ongoingCombats.erase(impl->ongoingCombats.begin() + i);
-                continue;
-            }
-
-            combat.advance(*this, getDeltaTime());
-            if (combat.isFinished()) {
-                combat.finish(*this);
-                impl->ongoingCombats.erase(impl->ongoingCombats.begin() + i);
-            }
-        }
     }
 
     const rea::versioned_slot_map<City> &Game::getCities() const {
@@ -220,6 +199,7 @@ namespace rip {
         auto id = getCities().insert(std::move(city)).second;
         getCity(id).setID(id);
         getCity(id).onCreated(*this);
+        getServer().broadcastCityUpdate(getCity(id));
         return id;
     }
 
@@ -315,6 +295,8 @@ namespace rip {
             }
             impl->units.erase(id);
         }
+
+        getServer().broadcastUnitDeath(id);
     }
 
     void Game::deferKillUnit(UnitId id) {

@@ -170,11 +170,8 @@ namespace rip {
 
                 if (game.getCityAtLocation(pos) == nullptr) {
                     // DEBUG - LUA CLIENT
-                    // Unit settler(game.getRegistry().getUnits().at(0), pos, player.getID());
-                    // game.addUnit(std::move(settler));
-
-                    // DEBUG - LUA CLIENT
-                    player.createCity(pos, game);
+                    Unit settler(game.getRegistry().getUnits().at(0), pos, player.getID());
+                    game.addUnit(std::move(settler));
 
                     glm::uvec2 warriorPos;
                     auto neighbors = getNeighbors(pos);
@@ -380,6 +377,9 @@ namespace rip {
         while (true) {
             Game game(mapWidth, mapHeight, registry, techTree);
             if (tryGenerate(game, rng, techTree)) {
+                for (auto &player : game.getPlayers()) {
+                    player.recomputeVisibility(game);
+                }
                 return game;
             }
         }

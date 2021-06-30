@@ -72,7 +72,7 @@ namespace rip {
         glm::vec2 getScreenOffset(glm::uvec2 tile) const;
         glm::uvec2 getPosFromScreenOffset(glm::vec2 offset) const;
 
-        void tick(GLFWwindow *window, bool hudHasFocus);
+        void tick();
 
         const rea::versioned_slot_map<City> &getCities() const;
         rea::versioned_slot_map<City> &getCities();

@@ -515,6 +515,18 @@ struct PossibleTechsDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PossibleTechsDefaultTypeInternal _PossibleTechs_default_instance_;
+constexpr DeleteUnit::DeleteUnit(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : unitid_(0){}
+struct DeleteUnitDefaultTypeInternal {
+  constexpr DeleteUnitDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~DeleteUnitDefaultTypeInternal() {}
+  union {
+    DeleteUnit _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT DeleteUnitDefaultTypeInternal _DeleteUnit_default_instance_;
 constexpr MoveUnits::MoveUnits(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : unitids_()
@@ -627,8 +639,22 @@ struct GetPossibleTechsDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT GetPossibleTechsDefaultTypeInternal _GetPossibleTechs_default_instance_;
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_riposte_2eproto[45];
-static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_riposte_2eproto[3];
+constexpr DoUnitAction::DoUnitAction(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : unitid_(0)
+  , action_(0)
+{}
+struct DoUnitActionDefaultTypeInternal {
+  constexpr DoUnitActionDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~DoUnitActionDefaultTypeInternal() {}
+  union {
+    DoUnitAction _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT DoUnitActionDefaultTypeInternal _DoUnitAction_default_instance_;
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_riposte_2eproto[47];
+static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_riposte_2eproto[4];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_riposte_2eproto = nullptr;
 
 const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
@@ -654,6 +680,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   PROTOBUF_FIELD_OFFSET(::AnyClient, packet_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::AnyServer, _internal_metadata_),
@@ -661,6 +688,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::AnyServer, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::AnyServer, requestid_),
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
@@ -938,6 +966,12 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::PossibleTechs, techs_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::DeleteUnit, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::DeleteUnit, unitid_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::MoveUnits, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -994,53 +1028,62 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
   ~0u,  // no _weak_field_map_
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::DoUnitAction, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::DoUnitAction, unitid_),
+  PROTOBUF_FIELD_OFFSET(::DoUnitAction, action_),
 };
 static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, sizeof(::Pos)},
   { 7, -1, sizeof(::AnyClient)},
-  { 23, -1, sizeof(::AnyServer)},
-  { 42, -1, sizeof(::ClientInfo)},
-  { 48, -1, sizeof(::ServerInfo)},
-  { 55, -1, sizeof(::KickPlayer)},
-  { 62, -1, sizeof(::SetLeader)},
-  { 69, -1, sizeof(::AdminStartGame)},
-  { 74, -1, sizeof(::LobbyError)},
-  { 80, -1, sizeof(::StartGame)},
-  { 85, -1, sizeof(::PlayerInfo)},
-  { 96, -1, sizeof(::UpdateGlobalData)},
-  { 105, -1, sizeof(::Improvement)},
-  { 112, -1, sizeof(::Yield)},
-  { 120, -1, sizeof(::Tile)},
-  { 133, -1, sizeof(::UpdateMap)},
-  { 142, -1, sizeof(::UnitBuildTask)},
-  { 148, -1, sizeof(::BuildingBuildTask)},
-  { 154, -1, sizeof(::BuildTaskKind)},
-  { 162, -1, sizeof(::BuildTask)},
-  { 170, -1, sizeof(::UpdateCity)},
-  { 189, -1, sizeof(::Path)},
-  { 195, -1, sizeof(::FoundCityCapability)},
-  { 200, -1, sizeof(::WorkerTaskImprovement)},
-  { 206, -1, sizeof(::WorkerTaskKind)},
-  { 213, -1, sizeof(::WorkerTask)},
-  { 221, -1, sizeof(::WorkerCapability)},
-  { 228, -1, sizeof(::CarryUnitsCapability)},
-  { 234, -1, sizeof(::Capability)},
-  { 243, -1, sizeof(::UpdateUnit)},
-  { 257, -1, sizeof(::ResearchingTech)},
-  { 264, -1, sizeof(::UpdatePlayer)},
-  { 281, -1, sizeof(::PathComputed)},
-  { 287, -1, sizeof(::ConfirmMoveUnits)},
-  { 293, -1, sizeof(::PossibleCityBuildTasks)},
-  { 299, -1, sizeof(::PossibleTechs)},
-  { 305, -1, sizeof(::MoveUnits)},
-  { 312, -1, sizeof(::SetCityBuildTask)},
-  { 319, -1, sizeof(::SetWorkerTask)},
-  { 326, -1, sizeof(::ComputePath)},
-  { 334, -1, sizeof(::SetEconomySettings)},
-  { 340, -1, sizeof(::SetResearch)},
-  { 346, -1, sizeof(::EndTurn)},
-  { 351, -1, sizeof(::GetBuildTasks)},
-  { 357, -1, sizeof(::GetPossibleTechs)},
+  { 24, -1, sizeof(::AnyServer)},
+  { 44, -1, sizeof(::ClientInfo)},
+  { 50, -1, sizeof(::ServerInfo)},
+  { 57, -1, sizeof(::KickPlayer)},
+  { 64, -1, sizeof(::SetLeader)},
+  { 71, -1, sizeof(::AdminStartGame)},
+  { 76, -1, sizeof(::LobbyError)},
+  { 82, -1, sizeof(::StartGame)},
+  { 87, -1, sizeof(::PlayerInfo)},
+  { 98, -1, sizeof(::UpdateGlobalData)},
+  { 107, -1, sizeof(::Improvement)},
+  { 114, -1, sizeof(::Yield)},
+  { 122, -1, sizeof(::Tile)},
+  { 135, -1, sizeof(::UpdateMap)},
+  { 144, -1, sizeof(::UnitBuildTask)},
+  { 150, -1, sizeof(::BuildingBuildTask)},
+  { 156, -1, sizeof(::BuildTaskKind)},
+  { 164, -1, sizeof(::BuildTask)},
+  { 172, -1, sizeof(::UpdateCity)},
+  { 191, -1, sizeof(::Path)},
+  { 197, -1, sizeof(::FoundCityCapability)},
+  { 202, -1, sizeof(::WorkerTaskImprovement)},
+  { 208, -1, sizeof(::WorkerTaskKind)},
+  { 215, -1, sizeof(::WorkerTask)},
+  { 223, -1, sizeof(::WorkerCapability)},
+  { 230, -1, sizeof(::CarryUnitsCapability)},
+  { 236, -1, sizeof(::Capability)},
+  { 245, -1, sizeof(::UpdateUnit)},
+  { 259, -1, sizeof(::ResearchingTech)},
+  { 266, -1, sizeof(::UpdatePlayer)},
+  { 283, -1, sizeof(::PathComputed)},
+  { 289, -1, sizeof(::ConfirmMoveUnits)},
+  { 295, -1, sizeof(::PossibleCityBuildTasks)},
+  { 301, -1, sizeof(::PossibleTechs)},
+  { 307, -1, sizeof(::DeleteUnit)},
+  { 313, -1, sizeof(::MoveUnits)},
+  { 320, -1, sizeof(::SetCityBuildTask)},
+  { 327, -1, sizeof(::SetWorkerTask)},
+  { 334, -1, sizeof(::ComputePath)},
+  { 342, -1, sizeof(::SetEconomySettings)},
+  { 348, -1, sizeof(::SetResearch)},
+  { 354, -1, sizeof(::EndTurn)},
+  { 359, -1, sizeof(::GetBuildTasks)},
+  { 365, -1, sizeof(::GetPossibleTechs)},
+  { 370, -1, sizeof(::DoUnitAction)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -1080,6 +1123,7 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_ConfirmMoveUnits_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_PossibleCityBuildTasks_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_PossibleTechs_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_DeleteUnit_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_MoveUnits_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_SetCityBuildTask_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_SetWorkerTask_default_instance_),
@@ -1089,11 +1133,12 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_EndTurn_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_GetBuildTasks_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_GetPossibleTechs_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_DoUnitAction_default_instance_),
 };
 
 const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
   "\n\rriposte.proto\"\033\n\003Pos\022\t\n\001x\030\001 \001(\r\022\t\n\001y\030\002"
-  " \001(\r\"\215\003\n\tAnyClient\022\021\n\trequestID\030\001 \001(\005\022!\n"
+  " \001(\r\"\264\003\n\tAnyClient\022\021\n\trequestID\030\001 \001(\005\022!\n"
   "\nclientInfo\030\002 \001(\0132\013.ClientInfoH\000\022#\n\013comp"
   "utePath\030\003 \001(\0132\014.ComputePathH\000\022\037\n\tmoveUni"
   "ts\030\004 \001(\0132\n.MoveUnitsH\000\022\033\n\007endTurn\030\005 \001(\0132"
@@ -1102,107 +1147,113 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   ".SetCityBuildTaskH\000\022#\n\013setResearch\030\010 \001(\013"
   "2\014.SetResearchH\000\022-\n\020getPossibleTechs\030\t \001"
   "(\0132\021.GetPossibleTechsH\000\0221\n\022setEconomySet"
-  "tings\030\n \001(\0132\023.SetEconomySettingsH\000B\010\n\006pa"
-  "cket\"\206\004\n\tAnyServer\022\021\n\trequestID\030\001 \001(\005\022!\n"
-  "\nserverInfo\030\002 \001(\0132\013.ServerInfoH\000\022\037\n\tstar"
-  "tGame\030\003 \001(\0132\n.StartGameH\000\022!\n\nlobbyError\030"
-  "\004 \001(\0132\013.LobbyErrorH\000\022-\n\020updateGlobalData"
-  "\030\005 \001(\0132\021.UpdateGlobalDataH\000\022\037\n\tupdateMap"
-  "\030\006 \001(\0132\n.UpdateMapH\000\022!\n\nupdateCity\030\007 \001(\013"
-  "2\013.UpdateCityH\000\022!\n\nupdateUnit\030\010 \001(\0132\013.Up"
-  "dateUnitH\000\022%\n\014updatePlayer\030\t \001(\0132\r.Updat"
-  "ePlayerH\000\022%\n\014pathComputed\030\n \001(\0132\r.PathCo"
-  "mputedH\000\022-\n\020confirmMoveUnits\030\013 \001(\0132\021.Con"
-  "firmMoveUnitsH\000\0229\n\026possibleCityBuildTask"
-  "s\030\014 \001(\0132\027.PossibleCityBuildTasksH\000\022\'\n\rpo"
-  "ssibleTechs\030\r \001(\0132\016.PossibleTechsH\000B\010\n\006p"
-  "acket\"\036\n\nClientInfo\022\020\n\010username\030\001 \001(\t\"C\n"
-  "\nServerInfo\022\020\n\010playerID\030\001 \001(\005\022#\n\016current"
-  "Players\030\002 \003(\0132\013.PlayerInfo\"(\n\nKickPlayer"
-  "\022\n\n\002id\030\001 \001(\005\022\016\n\006reason\030\002 \001(\t\"*\n\tSetLeade"
-  "r\022\r\n\005civID\030\001 \001(\t\022\016\n\006leader\030\002 \001(\t\"\020\n\016Admi"
-  "nStartGame\"\035\n\nLobbyError\022\017\n\007message\030\001 \001("
-  "\t\"\013\n\tStartGame\"m\n\nPlayerInfo\022\020\n\010username"
-  "\030\001 \001(\t\022\r\n\005civID\030\002 \001(\t\022\022\n\nleaderName\030\003 \001("
-  "\t\022\r\n\005score\030\004 \001(\005\022\n\n\002id\030\005 \001(\005\022\017\n\007isAdmin\030"
-  "\006 \001(\010\"c\n\020UpdateGlobalData\022\034\n\007players\030\001 \003"
-  "(\0132\013.PlayerInfo\022\014\n\004turn\030\002 \001(\005\022\021\n\003era\030\003 \001"
-  "(\0162\004.Era\022\020\n\010playerID\030\004 \001(\005\"/\n\013Improvemen"
-  "t\022\n\n\002id\030\001 \001(\t\022\024\n\014cottageLevel\030\002 \001(\t\"8\n\005Y"
-  "ield\022\017\n\007hammers\030\001 \001(\005\022\020\n\010commerce\030\002 \001(\005\022"
-  "\014\n\004food\030\003 \001(\005\"\263\001\n\004Tile\022\031\n\007terrain\030\001 \001(\0162"
-  "\010.Terrain\022\020\n\010forested\030\002 \001(\010\022\016\n\006hilled\030\003 "
-  "\001(\010\022\"\n\014improvements\030\004 \003(\0132\014.Improvement\022"
-  "\025\n\005yield\030\005 \001(\0132\006.Yield\022\017\n\007ownerID\030\006 \001(\005\022"
-  "\020\n\010hasOwner\030\007 \001(\010\022\020\n\010isWorked\030\010 \001(\010\"a\n\tU"
-  "pdateMap\022\r\n\005width\030\001 \001(\r\022\016\n\006height\030\002 \001(\r\022"
-  "\024\n\005tiles\030\003 \003(\0132\005.Tile\022\037\n\nvisibility\030\004 \003("
-  "\0162\013.Visibility\"#\n\rUnitBuildTask\022\022\n\nunitK"
-  "indID\030\001 \001(\t\")\n\021BuildingBuildTask\022\024\n\014buil"
-  "dingName\030\001 \001(\t\"_\n\rBuildTaskKind\022\036\n\004unit\030"
-  "\001 \001(\0132\016.UnitBuildTaskH\000\022&\n\010building\030\002 \001("
-  "\0132\022.BuildingBuildTaskH\000B\006\n\004task\"I\n\tBuild"
-  "Task\022\034\n\004kind\030\001 \001(\0132\016.BuildTaskKind\022\020\n\010pr"
-  "ogress\030\002 \001(\005\022\014\n\004cost\030\003 \001(\005\"\255\002\n\nUpdateCit"
-  "y\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\014\n\004name\030\002 \001(\t\022\017\n\007ow"
-  "nerID\030\003 \001(\005\022\035\n\tbuildTask\030\004 \001(\0132\n.BuildTa"
-  "sk\022\025\n\005yield\030\005 \001(\0132\006.Yield\022\017\n\007culture\030\006 \001"
-  "(\005\022\025\n\rcultureNeeded\030\007 \001(\005\022\n\n\002id\030\010 \001(\005\022\025\n"
-  "\rbuildingNames\030\t \003(\t\022\022\n\npopulation\030\n \001(\005"
-  "\022\022\n\nstoredFood\030\013 \001(\005\022\033\n\023foodNeededForGro"
-  "wth\030\014 \001(\005\022\024\n\014consumedFood\030\r \001(\005\022\021\n\tisCap"
-  "ital\030\016 \001(\010\"\031\n\004Path\022\021\n\tpositions\030\001 \003(\r\"\025\n"
-  "\023FoundCityCapability\".\n\025WorkerTaskImprov"
-  "ement\022\025\n\rimprovementID\030\001 \001(\t\"L\n\016WorkerTa"
-  "skKind\0222\n\020buildImprovement\030\001 \001(\0132\026.Worke"
-  "rTaskImprovementH\000B\006\n\004kind\"L\n\nWorkerTask"
-  "\022\014\n\004name\030\001 \001(\t\022\021\n\tturnsLeft\030\002 \001(\005\022\035\n\004kin"
-  "d\030\003 \001(\0132\017.WorkerTaskKind\"X\n\020WorkerCapabi"
-  "lity\022 \n\013currentTask\030\001 \001(\0132\013.WorkerTask\022\""
-  "\n\rpossibleTasks\030\002 \003(\0132\013.WorkerTask\"/\n\024Ca"
-  "rryUnitsCapability\022\027\n\017carryingUnitIDs\030\001 "
-  "\003(\005\"\220\001\n\nCapability\022)\n\tfoundCity\030\001 \001(\0132\024."
-  "FoundCityCapabilityH\000\022#\n\006worker\030\002 \001(\0132\021."
-  "WorkerCapabilityH\000\022+\n\ncarryUnits\030\003 \001(\0132\025"
-  ".CarryUnitsCapabilityH\000B\005\n\003cap\"\305\001\n\nUpdat"
-  "eUnit\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\016\n\006kindID\030\002 \001(\t"
-  "\022\017\n\007ownerID\030\003 \001(\005\022\016\n\006health\030\004 \001(\001\022\024\n\014mov"
-  "ementLeft\030\005 \001(\001\022\034\n\rfollowingPath\030\006 \001(\0132\005"
-  ".Path\022!\n\014capabilities\030\007 \003(\0132\013.Capability"
-  "\022\n\n\002id\030\010 \001(\005\022\020\n\010strength\030\t \001(\001\"3\n\017Resear"
-  "chingTech\022\016\n\006techID\030\001 \001(\t\022\020\n\010progress\030\002 "
-  "\001(\005\"\220\002\n\014UpdatePlayer\022\n\n\002id\030\001 \001(\005\022\020\n\010user"
-  "name\030\002 \001(\t\022\023\n\013baseRevenue\030\003 \001(\005\022\025\n\rbeake"
-  "rRevenue\030\004 \001(\005\022\023\n\013goldRevenue\030\005 \001(\005\022\020\n\010e"
-  "xpenses\030\006 \001(\005\022\017\n\007netGold\030\007 \001(\005\022\014\n\004gold\030\010"
-  " \001(\005\022)\n\017researchingTech\030\t \001(\0132\020.Research"
-  "ingTech\022\025\n\rcapitalCityID\030\n \001(\005\022\027\n\017unlock"
-  "edTechIDs\030\013 \003(\t\022\025\n\rbeakerPercent\030\014 \001(\005\"#"
-  "\n\014PathComputed\022\023\n\004path\030\001 \001(\0132\005.Path\"#\n\020C"
-  "onfirmMoveUnits\022\017\n\007success\030\001 \001(\010\"3\n\026Poss"
-  "ibleCityBuildTasks\022\031\n\005tasks\030\001 \003(\0132\n.Buil"
-  "dTask\"\036\n\rPossibleTechs\022\r\n\005techs\030\001 \003(\t\"9\n"
-  "\tMoveUnits\022\017\n\007unitIDs\030\001 \003(\005\022\033\n\014pathToFol"
-  "low\030\002 \001(\0132\005.Path\"@\n\020SetCityBuildTask\022\016\n\006"
-  "cityID\030\001 \001(\005\022\034\n\004task\030\002 \001(\0132\016.BuildTaskKi"
-  "nd\"<\n\rSetWorkerTask\022\020\n\010workerID\030\001 \001(\005\022\031\n"
-  "\004task\030\002 \001(\0132\013.WorkerTask\"G\n\013ComputePath\022"
-  "\022\n\004from\030\001 \001(\0132\004.Pos\022\020\n\002to\030\002 \001(\0132\004.Pos\022\022\n"
-  "\nunitKindID\030\003 \001(\t\"+\n\022SetEconomySettings\022"
-  "\025\n\rbeakerPercent\030\001 \001(\005\"\035\n\013SetResearch\022\016\n"
-  "\006techID\030\001 \001(\t\"\t\n\007EndTurn\"\037\n\rGetBuildTask"
-  "s\022\016\n\006cityID\030\001 \001(\005\"\022\n\020GetPossibleTechs*h\n"
-  "\003Era\022\013\n\007Ancient\020\000\022\r\n\tClassical\020\001\022\014\n\010Medi"
-  "eval\020\002\022\017\n\013Renaissance\020\003\022\016\n\nIndustrial\020\004\022"
-  "\n\n\006Modern\020\005\022\n\n\006Future\020\006*;\n\007Terrain\022\r\n\tGr"
-  "assland\020\000\022\n\n\006Desert\020\001\022\t\n\005Ocean\020\002\022\n\n\006Plai"
-  "ns\020\003*1\n\nVisibility\022\n\n\006Hidden\020\000\022\n\n\006Fogged"
-  "\020\001\022\013\n\007Visible\020\002b\006proto3"
+  "tings\030\n \001(\0132\023.SetEconomySettingsH\000\022%\n\014do"
+  "UnitAction\030\013 \001(\0132\r.DoUnitActionH\000B\010\n\006pac"
+  "ket\"\251\004\n\tAnyServer\022\021\n\trequestID\030\001 \001(\005\022!\n\n"
+  "serverInfo\030\002 \001(\0132\013.ServerInfoH\000\022\037\n\tstart"
+  "Game\030\003 \001(\0132\n.StartGameH\000\022!\n\nlobbyError\030\004"
+  " \001(\0132\013.LobbyErrorH\000\022-\n\020updateGlobalData\030"
+  "\005 \001(\0132\021.UpdateGlobalDataH\000\022\037\n\tupdateMap\030"
+  "\006 \001(\0132\n.UpdateMapH\000\022!\n\nupdateCity\030\007 \001(\0132"
+  "\013.UpdateCityH\000\022!\n\nupdateUnit\030\010 \001(\0132\013.Upd"
+  "ateUnitH\000\022%\n\014updatePlayer\030\t \001(\0132\r.Update"
+  "PlayerH\000\022%\n\014pathComputed\030\n \001(\0132\r.PathCom"
+  "putedH\000\022-\n\020confirmMoveUnits\030\013 \001(\0132\021.Conf"
+  "irmMoveUnitsH\000\0229\n\026possibleCityBuildTasks"
+  "\030\014 \001(\0132\027.PossibleCityBuildTasksH\000\022\'\n\rpos"
+  "sibleTechs\030\r \001(\0132\016.PossibleTechsH\000\022!\n\nde"
+  "leteUnit\030\016 \001(\0132\013.DeleteUnitH\000B\010\n\006packet\""
+  "\036\n\nClientInfo\022\020\n\010username\030\001 \001(\t\"C\n\nServe"
+  "rInfo\022\020\n\010playerID\030\001 \001(\005\022#\n\016currentPlayer"
+  "s\030\002 \003(\0132\013.PlayerInfo\"(\n\nKickPlayer\022\n\n\002id"
+  "\030\001 \001(\005\022\016\n\006reason\030\002 \001(\t\"*\n\tSetLeader\022\r\n\005c"
+  "ivID\030\001 \001(\t\022\016\n\006leader\030\002 \001(\t\"\020\n\016AdminStart"
+  "Game\"\035\n\nLobbyError\022\017\n\007message\030\001 \001(\t\"\013\n\tS"
+  "tartGame\"m\n\nPlayerInfo\022\020\n\010username\030\001 \001(\t"
+  "\022\r\n\005civID\030\002 \001(\t\022\022\n\nleaderName\030\003 \001(\t\022\r\n\005s"
+  "core\030\004 \001(\005\022\n\n\002id\030\005 \001(\005\022\017\n\007isAdmin\030\006 \001(\010\""
+  "c\n\020UpdateGlobalData\022\034\n\007players\030\001 \003(\0132\013.P"
+  "layerInfo\022\014\n\004turn\030\002 \001(\005\022\021\n\003era\030\003 \001(\0162\004.E"
+  "ra\022\020\n\010playerID\030\004 \001(\005\"/\n\013Improvement\022\n\n\002i"
+  "d\030\001 \001(\t\022\024\n\014cottageLevel\030\002 \001(\t\"8\n\005Yield\022\017"
+  "\n\007hammers\030\001 \001(\005\022\020\n\010commerce\030\002 \001(\005\022\014\n\004foo"
+  "d\030\003 \001(\005\"\263\001\n\004Tile\022\031\n\007terrain\030\001 \001(\0162\010.Terr"
+  "ain\022\020\n\010forested\030\002 \001(\010\022\016\n\006hilled\030\003 \001(\010\022\"\n"
+  "\014improvements\030\004 \003(\0132\014.Improvement\022\025\n\005yie"
+  "ld\030\005 \001(\0132\006.Yield\022\017\n\007ownerID\030\006 \001(\005\022\020\n\010has"
+  "Owner\030\007 \001(\010\022\020\n\010isWorked\030\010 \001(\010\"a\n\tUpdateM"
+  "ap\022\r\n\005width\030\001 \001(\r\022\016\n\006height\030\002 \001(\r\022\024\n\005til"
+  "es\030\003 \003(\0132\005.Tile\022\037\n\nvisibility\030\004 \003(\0162\013.Vi"
+  "sibility\"#\n\rUnitBuildTask\022\022\n\nunitKindID\030"
+  "\001 \001(\t\")\n\021BuildingBuildTask\022\024\n\014buildingNa"
+  "me\030\001 \001(\t\"_\n\rBuildTaskKind\022\036\n\004unit\030\001 \001(\0132"
+  "\016.UnitBuildTaskH\000\022&\n\010building\030\002 \001(\0132\022.Bu"
+  "ildingBuildTaskH\000B\006\n\004task\"I\n\tBuildTask\022\034"
+  "\n\004kind\030\001 \001(\0132\016.BuildTaskKind\022\020\n\010progress"
+  "\030\002 \001(\005\022\014\n\004cost\030\003 \001(\005\"\255\002\n\nUpdateCity\022\021\n\003p"
+  "os\030\001 \001(\0132\004.Pos\022\014\n\004name\030\002 \001(\t\022\017\n\007ownerID\030"
+  "\003 \001(\005\022\035\n\tbuildTask\030\004 \001(\0132\n.BuildTask\022\025\n\005"
+  "yield\030\005 \001(\0132\006.Yield\022\017\n\007culture\030\006 \001(\005\022\025\n\r"
+  "cultureNeeded\030\007 \001(\005\022\n\n\002id\030\010 \001(\005\022\025\n\rbuild"
+  "ingNames\030\t \003(\t\022\022\n\npopulation\030\n \001(\005\022\022\n\nst"
+  "oredFood\030\013 \001(\005\022\033\n\023foodNeededForGrowth\030\014 "
+  "\001(\005\022\024\n\014consumedFood\030\r \001(\005\022\021\n\tisCapital\030\016"
+  " \001(\010\"\031\n\004Path\022\021\n\tpositions\030\001 \003(\r\"\025\n\023Found"
+  "CityCapability\".\n\025WorkerTaskImprovement\022"
+  "\025\n\rimprovementID\030\001 \001(\t\"L\n\016WorkerTaskKind"
+  "\0222\n\020buildImprovement\030\001 \001(\0132\026.WorkerTaskI"
+  "mprovementH\000B\006\n\004kind\"L\n\nWorkerTask\022\014\n\004na"
+  "me\030\001 \001(\t\022\021\n\tturnsLeft\030\002 \001(\005\022\035\n\004kind\030\003 \001("
+  "\0132\017.WorkerTaskKind\"X\n\020WorkerCapability\022 "
+  "\n\013currentTask\030\001 \001(\0132\013.WorkerTask\022\"\n\rposs"
+  "ibleTasks\030\002 \003(\0132\013.WorkerTask\"/\n\024CarryUni"
+  "tsCapability\022\027\n\017carryingUnitIDs\030\001 \003(\005\"\220\001"
+  "\n\nCapability\022)\n\tfoundCity\030\001 \001(\0132\024.FoundC"
+  "ityCapabilityH\000\022#\n\006worker\030\002 \001(\0132\021.Worker"
+  "CapabilityH\000\022+\n\ncarryUnits\030\003 \001(\0132\025.Carry"
+  "UnitsCapabilityH\000B\005\n\003cap\"\305\001\n\nUpdateUnit\022"
+  "\021\n\003pos\030\001 \001(\0132\004.Pos\022\016\n\006kindID\030\002 \001(\t\022\017\n\007ow"
+  "nerID\030\003 \001(\005\022\016\n\006health\030\004 \001(\001\022\024\n\014movementL"
+  "eft\030\005 \001(\001\022\034\n\rfollowingPath\030\006 \001(\0132\005.Path\022"
+  "!\n\014capabilities\030\007 \003(\0132\013.Capability\022\n\n\002id"
+  "\030\010 \001(\005\022\020\n\010strength\030\t \001(\001\"3\n\017ResearchingT"
+  "ech\022\016\n\006techID\030\001 \001(\t\022\020\n\010progress\030\002 \001(\005\"\220\002"
+  "\n\014UpdatePlayer\022\n\n\002id\030\001 \001(\005\022\020\n\010username\030\002"
+  " \001(\t\022\023\n\013baseRevenue\030\003 \001(\005\022\025\n\rbeakerReven"
+  "ue\030\004 \001(\005\022\023\n\013goldRevenue\030\005 \001(\005\022\020\n\010expense"
+  "s\030\006 \001(\005\022\017\n\007netGold\030\007 \001(\005\022\014\n\004gold\030\010 \001(\005\022)"
+  "\n\017researchingTech\030\t \001(\0132\020.ResearchingTec"
+  "h\022\025\n\rcapitalCityID\030\n \001(\005\022\027\n\017unlockedTech"
+  "IDs\030\013 \003(\t\022\025\n\rbeakerPercent\030\014 \001(\005\"#\n\014Path"
+  "Computed\022\023\n\004path\030\001 \001(\0132\005.Path\"#\n\020Confirm"
+  "MoveUnits\022\017\n\007success\030\001 \001(\010\"3\n\026PossibleCi"
+  "tyBuildTasks\022\031\n\005tasks\030\001 \003(\0132\n.BuildTask\""
+  "\036\n\rPossibleTechs\022\r\n\005techs\030\001 \003(\t\"\034\n\nDelet"
+  "eUnit\022\016\n\006unitID\030\001 \001(\005\"9\n\tMoveUnits\022\017\n\007un"
+  "itIDs\030\001 \003(\005\022\033\n\014pathToFollow\030\002 \001(\0132\005.Path"
+  "\"@\n\020SetCityBuildTask\022\016\n\006cityID\030\001 \001(\005\022\034\n\004"
+  "task\030\002 \001(\0132\016.BuildTaskKind\"<\n\rSetWorkerT"
+  "ask\022\020\n\010workerID\030\001 \001(\005\022\031\n\004task\030\002 \001(\0132\013.Wo"
+  "rkerTask\"G\n\013ComputePath\022\022\n\004from\030\001 \001(\0132\004."
+  "Pos\022\020\n\002to\030\002 \001(\0132\004.Pos\022\022\n\nunitKindID\030\003 \001("
+  "\t\"+\n\022SetEconomySettings\022\025\n\rbeakerPercent"
+  "\030\001 \001(\005\"\035\n\013SetResearch\022\016\n\006techID\030\001 \001(\t\"\t\n"
+  "\007EndTurn\"\037\n\rGetBuildTasks\022\016\n\006cityID\030\001 \001("
+  "\005\"\022\n\020GetPossibleTechs\";\n\014DoUnitAction\022\016\n"
+  "\006unitID\030\001 \001(\005\022\033\n\006action\030\002 \001(\0162\013.UnitActi"
+  "on*h\n\003Era\022\013\n\007Ancient\020\000\022\r\n\tClassical\020\001\022\014\n"
+  "\010Medieval\020\002\022\017\n\013Renaissance\020\003\022\016\n\nIndustri"
+  "al\020\004\022\n\n\006Modern\020\005\022\n\n\006Future\020\006*;\n\007Terrain\022"
+  "\r\n\tGrassland\020\000\022\n\n\006Desert\020\001\022\t\n\005Ocean\020\002\022\n\n"
+  "\006Plains\020\003*1\n\nVisibility\022\n\n\006Hidden\020\000\022\n\n\006F"
+  "ogged\020\001\022\013\n\007Visible\020\002*X\n\nUnitAction\022\010\n\004Ki"
+  "ll\020\000\022\013\n\007Fortify\020\001\022\014\n\010SkipTurn\020\002\022\026\n\022Forti"
+  "fyUntilHealed\020\003\022\r\n\tFoundCity\020\004b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_riposte_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_riposte_2eproto = {
-  false, false, 4223, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
-  &descriptor_table_riposte_2eproto_once, nullptr, 0, 45,
+  false, false, 4478, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
+  &descriptor_table_riposte_2eproto_once, nullptr, 0, 47,
   schemas, file_default_instances, TableStruct_riposte_2eproto::offsets,
   file_level_metadata_riposte_2eproto, file_level_enum_descriptors_riposte_2eproto, file_level_service_descriptors_riposte_2eproto,
 };
@@ -1256,6 +1307,23 @@ bool Visibility_IsValid(int value) {
     case 0:
     case 1:
     case 2:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* UnitAction_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_riposte_2eproto);
+  return file_level_enum_descriptors_riposte_2eproto[3];
+}
+bool UnitAction_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
+    case 4:
       return true;
     default:
       return false;
@@ -1496,6 +1564,7 @@ class AnyClient::_Internal {
   static const ::SetResearch& setresearch(const AnyClient* msg);
   static const ::GetPossibleTechs& getpossibletechs(const AnyClient* msg);
   static const ::SetEconomySettings& seteconomysettings(const AnyClient* msg);
+  static const ::DoUnitAction& dounitaction(const AnyClient* msg);
 };
 
 const ::ClientInfo&
@@ -1533,6 +1602,10 @@ AnyClient::_Internal::getpossibletechs(const AnyClient* msg) {
 const ::SetEconomySettings&
 AnyClient::_Internal::seteconomysettings(const AnyClient* msg) {
   return *msg->packet_.seteconomysettings_;
+}
+const ::DoUnitAction&
+AnyClient::_Internal::dounitaction(const AnyClient* msg) {
+  return *msg->packet_.dounitaction_;
 }
 void AnyClient::set_allocated_clientinfo(::ClientInfo* clientinfo) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
@@ -1669,6 +1742,21 @@ void AnyClient::set_allocated_seteconomysettings(::SetEconomySettings* seteconom
   }
   // @@protoc_insertion_point(field_set_allocated:AnyClient.setEconomySettings)
 }
+void AnyClient::set_allocated_dounitaction(::DoUnitAction* dounitaction) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_packet();
+  if (dounitaction) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::DoUnitAction>::GetOwningArena(dounitaction);
+    if (message_arena != submessage_arena) {
+      dounitaction = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, dounitaction, submessage_arena);
+    }
+    set_has_dounitaction();
+    packet_.dounitaction_ = dounitaction;
+  }
+  // @@protoc_insertion_point(field_set_allocated:AnyClient.doUnitAction)
+}
 AnyClient::AnyClient(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -1718,6 +1806,10 @@ AnyClient::AnyClient(const AnyClient& from)
     }
     case kSetEconomySettings: {
       _internal_mutable_seteconomysettings()->::SetEconomySettings::MergeFrom(from._internal_seteconomysettings());
+      break;
+    }
+    case kDoUnitAction: {
+      _internal_mutable_dounitaction()->::DoUnitAction::MergeFrom(from._internal_dounitaction());
       break;
     }
     case PACKET_NOT_SET: {
@@ -1813,6 +1905,12 @@ void AnyClient::clear_packet() {
       }
       break;
     }
+    case kDoUnitAction: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete packet_.dounitaction_;
+      }
+      break;
+    }
     case PACKET_NOT_SET: {
       break;
     }
@@ -1905,6 +2003,13 @@ const char* AnyClient::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       case 10:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 82)) {
           ptr = ctx->ParseMessage(_internal_mutable_seteconomysettings(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .DoUnitAction doUnitAction = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 90)) {
+          ptr = ctx->ParseMessage(_internal_mutable_dounitaction(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -2015,6 +2120,14 @@ failure:
         10, _Internal::seteconomysettings(this), target, stream);
   }
 
+  // .DoUnitAction doUnitAction = 11;
+  if (_internal_has_dounitaction()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        11, _Internal::dounitaction(this), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -2102,6 +2215,13 @@ size_t AnyClient::ByteSizeLong() const {
           *packet_.seteconomysettings_);
       break;
     }
+    // .DoUnitAction doUnitAction = 11;
+    case kDoUnitAction: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *packet_.dounitaction_);
+      break;
+    }
     case PACKET_NOT_SET: {
       break;
     }
@@ -2174,6 +2294,10 @@ void AnyClient::MergeFrom(const AnyClient& from) {
       _internal_mutable_seteconomysettings()->::SetEconomySettings::MergeFrom(from._internal_seteconomysettings());
       break;
     }
+    case kDoUnitAction: {
+      _internal_mutable_dounitaction()->::DoUnitAction::MergeFrom(from._internal_dounitaction());
+      break;
+    }
     case PACKET_NOT_SET: {
       break;
     }
@@ -2222,6 +2346,7 @@ class AnyServer::_Internal {
   static const ::ConfirmMoveUnits& confirmmoveunits(const AnyServer* msg);
   static const ::PossibleCityBuildTasks& possiblecitybuildtasks(const AnyServer* msg);
   static const ::PossibleTechs& possibletechs(const AnyServer* msg);
+  static const ::DeleteUnit& deleteunit(const AnyServer* msg);
 };
 
 const ::ServerInfo&
@@ -2271,6 +2396,10 @@ AnyServer::_Internal::possiblecitybuildtasks(const AnyServer* msg) {
 const ::PossibleTechs&
 AnyServer::_Internal::possibletechs(const AnyServer* msg) {
   return *msg->packet_.possibletechs_;
+}
+const ::DeleteUnit&
+AnyServer::_Internal::deleteunit(const AnyServer* msg) {
+  return *msg->packet_.deleteunit_;
 }
 void AnyServer::set_allocated_serverinfo(::ServerInfo* serverinfo) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
@@ -2452,6 +2581,21 @@ void AnyServer::set_allocated_possibletechs(::PossibleTechs* possibletechs) {
   }
   // @@protoc_insertion_point(field_set_allocated:AnyServer.possibleTechs)
 }
+void AnyServer::set_allocated_deleteunit(::DeleteUnit* deleteunit) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_packet();
+  if (deleteunit) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::DeleteUnit>::GetOwningArena(deleteunit);
+    if (message_arena != submessage_arena) {
+      deleteunit = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, deleteunit, submessage_arena);
+    }
+    set_has_deleteunit();
+    packet_.deleteunit_ = deleteunit;
+  }
+  // @@protoc_insertion_point(field_set_allocated:AnyServer.deleteUnit)
+}
 AnyServer::AnyServer(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -2513,6 +2657,10 @@ AnyServer::AnyServer(const AnyServer& from)
     }
     case kPossibleTechs: {
       _internal_mutable_possibletechs()->::PossibleTechs::MergeFrom(from._internal_possibletechs());
+      break;
+    }
+    case kDeleteUnit: {
+      _internal_mutable_deleteunit()->::DeleteUnit::MergeFrom(from._internal_deleteunit());
       break;
     }
     case PACKET_NOT_SET: {
@@ -2623,6 +2771,12 @@ void AnyServer::clear_packet() {
     case kPossibleTechs: {
       if (GetArenaForAllocation() == nullptr) {
         delete packet_.possibletechs_;
+      }
+      break;
+    }
+    case kDeleteUnit: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete packet_.deleteunit_;
       }
       break;
     }
@@ -2739,6 +2893,13 @@ const char* AnyServer::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       case 13:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 106)) {
           ptr = ctx->ParseMessage(_internal_mutable_possibletechs(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .DeleteUnit deleteUnit = 14;
+      case 14:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 114)) {
+          ptr = ctx->ParseMessage(_internal_mutable_deleteunit(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -2873,6 +3034,14 @@ failure:
         13, _Internal::possibletechs(this), target, stream);
   }
 
+  // .DeleteUnit deleteUnit = 14;
+  if (_internal_has_deleteunit()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        14, _Internal::deleteunit(this), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -2981,6 +3150,13 @@ size_t AnyServer::ByteSizeLong() const {
           *packet_.possibletechs_);
       break;
     }
+    // .DeleteUnit deleteUnit = 14;
+    case kDeleteUnit: {
+      total_size += 1 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *packet_.deleteunit_);
+      break;
+    }
     case PACKET_NOT_SET: {
       break;
     }
@@ -3063,6 +3239,10 @@ void AnyServer::MergeFrom(const AnyServer& from) {
     }
     case kPossibleTechs: {
       _internal_mutable_possibletechs()->::PossibleTechs::MergeFrom(from._internal_possibletechs());
+      break;
+    }
+    case kDeleteUnit: {
+      _internal_mutable_deleteunit()->::DeleteUnit::MergeFrom(from._internal_deleteunit());
       break;
     }
     case PACKET_NOT_SET: {
@@ -11627,6 +11807,191 @@ void PossibleTechs::InternalSwap(PossibleTechs* other) {
 
 // ===================================================================
 
+class DeleteUnit::_Internal {
+ public:
+};
+
+DeleteUnit::DeleteUnit(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
+  // @@protoc_insertion_point(arena_constructor:DeleteUnit)
+}
+DeleteUnit::DeleteUnit(const DeleteUnit& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  unitid_ = from.unitid_;
+  // @@protoc_insertion_point(copy_constructor:DeleteUnit)
+}
+
+inline void DeleteUnit::SharedCtor() {
+unitid_ = 0;
+}
+
+DeleteUnit::~DeleteUnit() {
+  // @@protoc_insertion_point(destructor:DeleteUnit)
+  if (GetArenaForAllocation() != nullptr) return;
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+inline void DeleteUnit::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+}
+
+void DeleteUnit::ArenaDtor(void* object) {
+  DeleteUnit* _this = reinterpret_cast< DeleteUnit* >(object);
+  (void)_this;
+}
+void DeleteUnit::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void DeleteUnit::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void DeleteUnit::Clear() {
+// @@protoc_insertion_point(message_clear_start:DeleteUnit)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  unitid_ = 0;
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* DeleteUnit::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // int32 unitID = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          unitid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* DeleteUnit::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:DeleteUnit)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 unitID = 1;
+  if (this->_internal_unitid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_unitid(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:DeleteUnit)
+  return target;
+}
+
+size_t DeleteUnit::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:DeleteUnit)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // int32 unitID = 1;
+  if (this->_internal_unitid() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_unitid());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData DeleteUnit::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    DeleteUnit::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*DeleteUnit::GetClassData() const { return &_class_data_; }
+
+void DeleteUnit::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<DeleteUnit *>(to)->MergeFrom(
+      static_cast<const DeleteUnit &>(from));
+}
+
+
+void DeleteUnit::MergeFrom(const DeleteUnit& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:DeleteUnit)
+  GOOGLE_DCHECK_NE(&from, this);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_unitid() != 0) {
+    _internal_set_unitid(from._internal_unitid());
+  }
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void DeleteUnit::CopyFrom(const DeleteUnit& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:DeleteUnit)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DeleteUnit::IsInitialized() const {
+  return true;
+}
+
+void DeleteUnit::InternalSwap(DeleteUnit* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(unitid_, other->unitid_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata DeleteUnit::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
+      file_level_metadata_riposte_2eproto[36]);
+}
+
+// ===================================================================
+
 class MoveUnits::_Internal {
  public:
   static const ::Path& pathtofollow(const MoveUnits* msg);
@@ -11861,7 +12226,7 @@ void MoveUnits::InternalSwap(MoveUnits* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata MoveUnits::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[36]);
+      file_level_metadata_riposte_2eproto[37]);
 }
 
 // ===================================================================
@@ -12094,7 +12459,7 @@ void SetCityBuildTask::InternalSwap(SetCityBuildTask* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SetCityBuildTask::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[37]);
+      file_level_metadata_riposte_2eproto[38]);
 }
 
 // ===================================================================
@@ -12327,7 +12692,7 @@ void SetWorkerTask::InternalSwap(SetWorkerTask* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SetWorkerTask::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[38]);
+      file_level_metadata_riposte_2eproto[39]);
 }
 
 // ===================================================================
@@ -12617,7 +12982,7 @@ void ComputePath::InternalSwap(ComputePath* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata ComputePath::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[39]);
+      file_level_metadata_riposte_2eproto[40]);
 }
 
 // ===================================================================
@@ -12802,7 +13167,7 @@ void SetEconomySettings::InternalSwap(SetEconomySettings* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SetEconomySettings::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[40]);
+      file_level_metadata_riposte_2eproto[41]);
 }
 
 // ===================================================================
@@ -13002,7 +13367,7 @@ void SetResearch::InternalSwap(SetResearch* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SetResearch::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[41]);
+      file_level_metadata_riposte_2eproto[42]);
 }
 
 // ===================================================================
@@ -13155,7 +13520,7 @@ void EndTurn::InternalSwap(EndTurn* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata EndTurn::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[42]);
+      file_level_metadata_riposte_2eproto[43]);
 }
 
 // ===================================================================
@@ -13340,7 +13705,7 @@ void GetBuildTasks::InternalSwap(GetBuildTasks* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetBuildTasks::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[43]);
+      file_level_metadata_riposte_2eproto[44]);
 }
 
 // ===================================================================
@@ -13493,7 +13858,228 @@ void GetPossibleTechs::InternalSwap(GetPossibleTechs* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetPossibleTechs::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[44]);
+      file_level_metadata_riposte_2eproto[45]);
+}
+
+// ===================================================================
+
+class DoUnitAction::_Internal {
+ public:
+};
+
+DoUnitAction::DoUnitAction(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
+  // @@protoc_insertion_point(arena_constructor:DoUnitAction)
+}
+DoUnitAction::DoUnitAction(const DoUnitAction& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&unitid_, &from.unitid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&action_) -
+    reinterpret_cast<char*>(&unitid_)) + sizeof(action_));
+  // @@protoc_insertion_point(copy_constructor:DoUnitAction)
+}
+
+inline void DoUnitAction::SharedCtor() {
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&unitid_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&action_) -
+    reinterpret_cast<char*>(&unitid_)) + sizeof(action_));
+}
+
+DoUnitAction::~DoUnitAction() {
+  // @@protoc_insertion_point(destructor:DoUnitAction)
+  if (GetArenaForAllocation() != nullptr) return;
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+inline void DoUnitAction::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+}
+
+void DoUnitAction::ArenaDtor(void* object) {
+  DoUnitAction* _this = reinterpret_cast< DoUnitAction* >(object);
+  (void)_this;
+}
+void DoUnitAction::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void DoUnitAction::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void DoUnitAction::Clear() {
+// @@protoc_insertion_point(message_clear_start:DoUnitAction)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&unitid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&action_) -
+      reinterpret_cast<char*>(&unitid_)) + sizeof(action_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* DoUnitAction::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // int32 unitID = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          unitid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .UnitAction action = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          ::PROTOBUF_NAMESPACE_ID::uint64 val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_action(static_cast<::UnitAction>(val));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* DoUnitAction::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:DoUnitAction)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 unitID = 1;
+  if (this->_internal_unitid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_unitid(), target);
+  }
+
+  // .UnitAction action = 2;
+  if (this->_internal_action() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteEnumToArray(
+      2, this->_internal_action(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:DoUnitAction)
+  return target;
+}
+
+size_t DoUnitAction::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:DoUnitAction)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // int32 unitID = 1;
+  if (this->_internal_unitid() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_unitid());
+  }
+
+  // .UnitAction action = 2;
+  if (this->_internal_action() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::EnumSize(this->_internal_action());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData DoUnitAction::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    DoUnitAction::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*DoUnitAction::GetClassData() const { return &_class_data_; }
+
+void DoUnitAction::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<DoUnitAction *>(to)->MergeFrom(
+      static_cast<const DoUnitAction &>(from));
+}
+
+
+void DoUnitAction::MergeFrom(const DoUnitAction& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:DoUnitAction)
+  GOOGLE_DCHECK_NE(&from, this);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_unitid() != 0) {
+    _internal_set_unitid(from._internal_unitid());
+  }
+  if (from._internal_action() != 0) {
+    _internal_set_action(from._internal_action());
+  }
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void DoUnitAction::CopyFrom(const DoUnitAction& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:DoUnitAction)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DoUnitAction::IsInitialized() const {
+  return true;
+}
+
+void DoUnitAction::InternalSwap(DoUnitAction* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(DoUnitAction, action_)
+      + sizeof(DoUnitAction::action_)
+      - PROTOBUF_FIELD_OFFSET(DoUnitAction, unitid_)>(
+          reinterpret_cast<char*>(&unitid_),
+          reinterpret_cast<char*>(&other->unitid_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata DoUnitAction::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
+      file_level_metadata_riposte_2eproto[46]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
@@ -13606,6 +14192,9 @@ template<> PROTOBUF_NOINLINE ::PossibleCityBuildTasks* Arena::CreateMaybeMessage
 template<> PROTOBUF_NOINLINE ::PossibleTechs* Arena::CreateMaybeMessage< ::PossibleTechs >(Arena* arena) {
   return Arena::CreateMessageInternal< ::PossibleTechs >(arena);
 }
+template<> PROTOBUF_NOINLINE ::DeleteUnit* Arena::CreateMaybeMessage< ::DeleteUnit >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::DeleteUnit >(arena);
+}
 template<> PROTOBUF_NOINLINE ::MoveUnits* Arena::CreateMaybeMessage< ::MoveUnits >(Arena* arena) {
   return Arena::CreateMessageInternal< ::MoveUnits >(arena);
 }
@@ -13632,6 +14221,9 @@ template<> PROTOBUF_NOINLINE ::GetBuildTasks* Arena::CreateMaybeMessage< ::GetBu
 }
 template<> PROTOBUF_NOINLINE ::GetPossibleTechs* Arena::CreateMaybeMessage< ::GetPossibleTechs >(Arena* arena) {
   return Arena::CreateMessageInternal< ::GetPossibleTechs >(arena);
+}
+template<> PROTOBUF_NOINLINE ::DoUnitAction* Arena::CreateMaybeMessage< ::DoUnitAction >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::DoUnitAction >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

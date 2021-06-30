@@ -358,6 +358,32 @@ namespace rip {
         SEND(response, updateplayer, currentRequestID);
     }
 
+    void Connection::handleDoUnitAction(Game &game, const DoUnitAction &packet) {
+        auto &unit = game.getUnit({packet.unitid(), 0});
+
+        switch (packet.action()) {
+            case UnitAction::Kill:
+                game.killUnit({packet.unitid(), 0});
+
+                break;
+            case UnitAction::Fortify:
+                unit.fortify();
+                break;
+            case UnitAction::SkipTurn:
+                unit.skipTurn();
+                break;
+            case UnitAction::FortifyUntilHealed:
+                unit.fortifyUntilHealed();
+                break;
+            case UnitAction::FoundCity:
+                auto *cap = unit.getCapability<FoundCityCapability>();
+                if (cap) {
+                    cap->foundCity(game);
+                }
+                break;
+        }
+    }
+
     void Connection::handlePacket(Game &game, AnyClient &packet) {
         currentRequestID = packet.requestid();
         if (packet.has_clientinfo()) {
@@ -378,6 +404,8 @@ namespace rip {
             handleGetPossibleTechs(game, packet.getpossibletechs());
         } else if (packet.has_seteconomysettings()) {
             handleSetEconomySettings(game, packet.seteconomysettings());
+        } else if (packet.has_dounitaction()) {
+            handleDoUnitAction(game, packet.dounitaction());
         }
     }
 
@@ -428,6 +456,8 @@ namespace rip {
                 }
             }
 
+            game.tick();
+
             std::this_thread::sleep_for(std::chrono::milliseconds(15));
         }
     }
@@ -440,5 +470,11 @@ namespace rip {
     void Server::broadcastCityUpdate(City &city) {
         auto packet = getUpdateCityPacket(game, city);
         BROADCAST(packet, updatecity, 0);
+    }
+
+    void Server::broadcastUnitDeath(UnitId unitID) {
+        DeleteUnit packet;
+        packet.set_unitid(unitID.first);
+        BROADCAST(packet, deleteunit, 0);
     }
 }

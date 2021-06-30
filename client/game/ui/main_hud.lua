@@ -20,6 +20,8 @@ local SelectionGroups = require("game/ui/selection")
 
 local prompts = require("game/ui/prompts")
 
+local buildUnitActions = require("game/ui/unit_actions")
+
 local BottomControlWindow = {}
 local UnitDisplayWindow = {}
 local TurnIndicatorWindow = {}
@@ -63,6 +65,20 @@ function Hud:new(game)
     game.eventBus:registerHandler("thePlayerUpdated", function()
         o:onThePlayerUpdated()
         o:rebuildWindows()
+    end)
+
+    game.eventBus:registerHandler("unitDeleted", function(unit)
+        for i, u in ipairs(o.selectedUnits) do
+            if u == unit then
+                table.remove(o.selectedUnits, i)
+                game.eventBus:trigger("selectedUnitsUpdated", nil)
+                break
+            end
+        end
+
+        if #o.selectedUnits == 0 then
+            o.selectedStack = nil
+        end
     end)
 
     setmetatable(o, self)
@@ -176,21 +192,23 @@ function Hud:selectUnitGroup(group)
 
         for _, unit in ipairs(group) do
             if unit.owner ~= self.game.thePlayer then return end
-            if self.selectedStack ~= nil and self.selectedStack.pos ~= unit.pos then
-                self:clearSelectionNow()
-            end
+            if self.game:isUnitAlive(unit) then
+                if self.selectedStack ~= nil and self.selectedStack.pos ~= unit.pos then
+                    self:clearSelectionNow()
+                end
 
-            if self.selectedStack == nil or #self.selectedUnits == 0 then
-                self.selectedStack = self.game:getStackAtPos(unit.pos)
-            end
+                if self.selectedStack == nil or #self.selectedUnits == 0 then
+                    self.selectedStack = self.game:getStackAtPos(unit.pos)
+                end
 
-            -- don't duplicate selected units
-            for i=1,#self.selectedUnits do
-                if self.selectedUnits[i] == unit then return end
-            end
+                -- don't duplicate selected units
+                for i=1,#self.selectedUnits do
+                    if self.selectedUnits[i] == unit then return end
+                end
 
-            self.selectedUnits[#self.selectedUnits + 1] = unit
-            unit.isSelected = true
+                self.selectedUnits[#self.selectedUnits + 1] = unit
+                unit.isSelected = true
+            end
         end
 
         self.game.eventBus:trigger("selectedUnitsUpdated", nil)
@@ -365,7 +383,7 @@ function Hud:render(cv, time, dt)
 end
 
 function Hud:onCityUpdated(city)
-    if city.owner == self.game.thePlayer and city.buildTask == nil and self.game.turn ~= 0 then
+    if city.owner == self.game.thePlayer and city.buildTask == nil then
         -- Prompt the user to set the new build task.
         local co = coroutine.create(function()
             self.promptQueue:push(prompts.CityBuildPrompt:new(self.game, city))
@@ -390,11 +408,17 @@ function BottomControlWindow:new(game, hud)
     local o = { game = game, hud = hud }
     setmetatable(o, self)
     self.__index = self
+    game.eventBus:registerHandler("selectedUnitsUpdated", function()
+        o:rebuild()
+    end)
     return o
 end
 
 function BottomControlWindow:rebuild()
     local root = Flex:row()
+    root:setCrossAlign(dume.Align.Center)
+
+    buildUnitActions(root, self.hud.selectedUnits, self.game, self.hud)
 
     local container = Container:new(Padding:new(root, 20))
     container.fillParent = true
@@ -648,6 +672,7 @@ function EconomyWindow:rebuild()
     -- Gold
     local delta, deltaColor
     local netGold = self.game.thePlayer.netGold
+    if netGold == nil then return end
     if netGold >= 0 then
         delta = string.format("+%d", netGold)
         deltaColor = positiveColor

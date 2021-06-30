@@ -94,6 +94,13 @@ function Game:addUnit(data)
     self.eventBus:trigger("unitUpdated", unit)
 end
 
+function Game:deleteUnit(id)
+    local unit = self.units[id]
+    self:getStackAtPos(unit.pos):removeUnit(unit)
+    self.units[id] = nil
+    self.eventBus:trigger("unitDeleted", unit)
+end
+
 function Game:isUnitAlive(unit)
     return self.units[unit.id] == unit
 end

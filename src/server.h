@@ -44,6 +44,7 @@ namespace rip {
         void handleSetResearch(Game &game, const SetResearch &packet);
         void handleGetPossibleTechs(Game &game, const GetPossibleTechs &packet);
         void handleSetEconomySettings(Game &game, const SetEconomySettings &packet);
+        void handleDoUnitAction(Game &game, const DoUnitAction &packet);
         void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);
@@ -64,6 +65,7 @@ namespace rip {
 
         void broadcastUnitUpdate(Unit &unit);
         void broadcastCityUpdate(City &city);
+        void broadcastUnitDeath(UnitId unitID);
 
         void run();
     };
