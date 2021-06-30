@@ -202,6 +202,7 @@ message Tile {
   int32 ownerID = 6;
   bool hasOwner = 7;
   bool isWorked = 8;
+  string resourceID = 9;
 }
 
 enum Visibility {

@@ -3163,6 +3163,7 @@ class Tile final :
 
   enum : int {
     kImprovementsFieldNumber = 4,
+    kResourceIDFieldNumber = 9,
     kYieldFieldNumber = 5,
     kTerrainFieldNumber = 1,
     kForestedFieldNumber = 2,
@@ -3188,6 +3189,20 @@ class Tile final :
   ::Improvement* add_improvements();
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Improvement >&
       improvements() const;
+
+  // string resourceID = 9;
+  void clear_resourceid();
+  const std::string& resourceid() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_resourceid(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_resourceid();
+  PROTOBUF_MUST_USE_RESULT std::string* release_resourceid();
+  void set_allocated_resourceid(std::string* resourceid);
+  private:
+  const std::string& _internal_resourceid() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_resourceid(const std::string& value);
+  std::string* _internal_mutable_resourceid();
+  public:
 
   // .Yield yield = 5;
   bool has_yield() const;
@@ -3269,6 +3284,7 @@ class Tile final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Improvement > improvements_;
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr resourceid_;
   ::Yield* yield_;
   int terrain_;
   bool forested_;
@@ -11541,6 +11557,52 @@ inline void Tile::_internal_set_isworked(bool value) {
 inline void Tile::set_isworked(bool value) {
   _internal_set_isworked(value);
   // @@protoc_insertion_point(field_set:Tile.isWorked)
+}
+
+// string resourceID = 9;
+inline void Tile::clear_resourceid() {
+  resourceid_.ClearToEmpty();
+}
+inline const std::string& Tile::resourceid() const {
+  // @@protoc_insertion_point(field_get:Tile.resourceID)
+  return _internal_resourceid();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void Tile::set_resourceid(ArgT0&& arg0, ArgT... args) {
+ 
+ resourceid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Tile.resourceID)
+}
+inline std::string* Tile::mutable_resourceid() {
+  std::string* _s = _internal_mutable_resourceid();
+  // @@protoc_insertion_point(field_mutable:Tile.resourceID)
+  return _s;
+}
+inline const std::string& Tile::_internal_resourceid() const {
+  return resourceid_.Get();
+}
+inline void Tile::_internal_set_resourceid(const std::string& value) {
+  
+  resourceid_.Set(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, value, GetArenaForAllocation());
+}
+inline std::string* Tile::_internal_mutable_resourceid() {
+  
+  return resourceid_.Mutable(::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::EmptyDefault{}, GetArenaForAllocation());
+}
+inline std::string* Tile::release_resourceid() {
+  // @@protoc_insertion_point(field_release:Tile.resourceID)
+  return resourceid_.Release(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), GetArenaForAllocation());
+}
+inline void Tile::set_allocated_resourceid(std::string* resourceid) {
+  if (resourceid != nullptr) {
+    
+  } else {
+    
+  }
+  resourceid_.SetAllocated(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited(), resourceid,
+      GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set_allocated:Tile.resourceID)
 }
 
 // -------------------------------------------------------------------

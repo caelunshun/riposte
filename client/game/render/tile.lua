@@ -57,6 +57,15 @@ function TreeRenderer:renderTile(cv, tile, tilePos, game)
     end
 end
 
+-- Renders resources.
+local ResourceRenderer = {}
+
+function ResourceRenderer:renderTile(cv, tile)
+    if tile.resourceID ~= nil and #tile.resourceID > 0 then
+        cv:drawSprite("texture/resource/" .. tile.resourceID, Vector(0, 0), 100)
+    end
+end
+
 -- Renders units.
 local UnitRenderer = {
     allowFog = false
@@ -151,6 +160,7 @@ local TileRenderer = {
         -- NB: order determines layering
         TerrainRenderer,
         GridOverlayRenderer,
+        ResourceRenderer,
         TreeRenderer,
         CityRenderer,
         YieldRenderer,

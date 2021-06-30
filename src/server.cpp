@@ -72,6 +72,10 @@ namespace rip {
                 protoImprovement->set_cottagelevel(cottage->getLevelName());
             }
         }
+
+        if (tile.hasResource()) {
+            protoTile.set_resourceid((*tile.getResource())->id);
+        }
     }
 
     UpdateMap getUpdateMapPacket(Game &game, PlayerId playerID) {
