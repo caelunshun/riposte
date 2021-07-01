@@ -29,14 +29,14 @@ local function renderRoad(cv, tilePos, game)
     cv:strokeWidth(5)
     cv:solidColor(dume.rgb(80, 80, 80))
 
-    -- Roads connect to other roads on adjacent tiles (both straight and diagonal)
+    -- Roads connect to other roads/cities on adjacent tiles (both straight and diagonal)
     local numConnections = 0
     for i=1,#adjacentOffsets do
         local offset = adjacentOffsets[i]
         local adjacentTilePos = tilePos + offset
         local adjacentTile = game:getTile(adjacentTilePos)
 
-        if tileHasImprovement(adjacentTile, "Road") then
+        if tileHasImprovement(adjacentTile, "Road") or game:getCityAtPos(adjacentTilePos) ~= nil then
             numConnections = numConnections + 1
 
             cv:beginPath()
