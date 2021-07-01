@@ -54,7 +54,7 @@ function CityBuildPrompt:build()
             vars = { name = self.city.previousBuildTask.kind.building.buildingName }
         end
 
-        title = "You have constructed a @color{%highlight}{%name} in %city. What would you like to work on next?"
+        title = "You have " .. verb .. " a @color{%highlight}{%name} in %city. What would you like to work on next?"
     else
         vars = {}
         title = "What would you like to work on in %city?"
