@@ -41,7 +41,7 @@ namespace rip {
 
     // Manages trade route information for the whole map.
     class TradeRoutes {
-        rea::versioned_slot_map<TradeRoute> routes;
+        slot_map<TradeRoute> routes;
 
         // An index to quickly access the trade route for a given tile.
         absl::flat_hash_map<glm::uvec2, TradeRouteId, PosHash> routesByPos;

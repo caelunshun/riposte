@@ -7,8 +7,8 @@
 
 #include <memory>
 #include <glm/vec2.hpp>
-#include <rea.h>
 #include <GLFW/glfw3.h>
+#include "slot_map.h"
 
 // Avoid including headers that change frequently here,
 // or changing those headers will cause a recompilation of almost all source
@@ -74,8 +74,8 @@ namespace rip {
 
         void tick();
 
-        const rea::versioned_slot_map<City> &getCities() const;
-        rea::versioned_slot_map<City> &getCities();
+        const slot_map<City> &getCities() const;
+        slot_map<City> &getCities();
         CityId addCity(City city);
         City *getCityAtLocation(glm::uvec2 location);
         const City *getCityAtLocation(glm::uvec2 location) const;
@@ -90,7 +90,7 @@ namespace rip {
         size_t getNumPlayers() const;
         void setThePlayerID(PlayerId id);
         PlayerId addPlayer(Player player);
-        rea::versioned_slot_map<Player> &getPlayers();
+        slot_map<Player> &getPlayers();
 
         const Registry &getRegistry() const;
 
@@ -100,8 +100,8 @@ namespace rip {
         void killUnit(UnitId id);
         // Enqueues a unit to be killed as soon as possible.
         void deferKillUnit(UnitId id);
-        rea::versioned_slot_map<Unit> &getUnits();
-        const rea::versioned_slot_map<Unit> &getUnits() const;
+        slot_map<Unit> &getUnits();
+        const slot_map<Unit> &getUnits() const;
 
         int getTurn() const;
 
@@ -131,7 +131,7 @@ namespace rip {
         const std::vector<StackId> &getStacksAtPos(glm::uvec2 pos) const;
         const Stack &getStack(StackId id) const;
         Stack &getStack(StackId id);
-        rea::versioned_slot_map<Stack> &getStacks();
+        slot_map<Stack> &getStacks();
 
         void addEvent(std::unique_ptr<Event> event);
         std::vector<std::unique_ptr<Event>> &getEvents();

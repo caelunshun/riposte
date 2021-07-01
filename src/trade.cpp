@@ -85,7 +85,7 @@ namespace rip {
     }
 
     TradeRouteId TradeRoutes::createRoute() {
-        return routes.insert(TradeRoute()).second;
+        return routes.insert(TradeRoute());
     }
 
     void TradeRoutes::deleteRoute(TradeRouteId id) {
@@ -151,6 +151,6 @@ namespace rip {
     }
 
     TradeRoute &TradeRoutes::getRoute(TradeRouteId id) {
-        return routes.id_value(id);
+        return routes[id];
     }
 }

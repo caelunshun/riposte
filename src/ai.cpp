@@ -178,7 +178,7 @@ namespace rip {
                     auto &unitAI = unitAIs.at(i);
                     const auto unitID = unitAI->getUnitID();
 
-                    if (!game.getUnits().id_is_valid(unitID)) {
+                    if (!game.getUnits().contains(unitID)) {
                         // Unit died - delete its AI.
                         unitAI->onDeath(game, *this, player);
                         unitAIs.erase(unitAIs.begin() + i);
@@ -208,7 +208,7 @@ namespace rip {
                     auto &cityAI = cityAIs.at(i);
                     const auto cityID = cityAI.getCityID();
 
-                    if (!game.getCities().id_is_valid(cityID) || game.getCity(cityID).getOwner() != playerID) {
+                    if (!game.getCities().contains(cityID) || game.getCity(cityID).getOwner() != playerID) {
                         // Lost the city - delete its AI.
                         cityAIs.erase(cityAIs.begin() + i);
                         cityAISet.erase(cityID);

@@ -16,7 +16,7 @@ namespace rip {
         const auto newPos = game.getUnit(unitID).getPos();
         std::vector<UnitId> toRemove;
         for (const auto unitID : carryingUnits) {
-            if (!game.getUnits().id_is_valid(unitID)) {
+            if (!game.getUnits().contains(unitID)) {
                 toRemove.push_back(unitID);
                 continue;
             }
@@ -124,7 +124,7 @@ namespace rip {
 
     void CarryUnitsCapability::update(Game &game) {
         for (int i = carryingUnits.size() - 1; i >= 0; i--) {
-            if (!game.getUnits().id_is_valid(carryingUnits[i])) {
+            if (!game.getUnits().contains(carryingUnits[i])) {
                 removeCarryingUnit(carryingUnits[i]);
             }
 

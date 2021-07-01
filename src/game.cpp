@@ -24,10 +24,10 @@ namespace rip {
         uint32_t mapWidth;
         uint32_t mapHeight;
 
-        rea::versioned_slot_map<City> cities;
-        rea::versioned_slot_map<Player> players;
-        rea::versioned_slot_map<Unit> units;
-        rea::versioned_slot_map<Stack> stacks;
+        slot_map<City> cities;
+        slot_map<Player> players;
+        slot_map<Unit> units;
+        slot_map<Stack> stacks;
 
         absl::flat_hash_map<glm::uvec2, std::vector<StackId>, PosHash> stacksByPos;
 
@@ -187,16 +187,16 @@ namespace rip {
         impl->unitKillQueue.clear();
     }
 
-    const rea::versioned_slot_map<City> &Game::getCities() const {
+    const slot_map<City> &Game::getCities() const {
         return impl->cities;
     }
 
-    rea::versioned_slot_map<City> &Game::getCities() {
+    slot_map<City> &Game::getCities() {
         return impl->cities;
     }
 
     CityId Game::addCity(City city) {
-        auto id = getCities().insert(std::move(city)).second;
+        auto id = getCities().insert(std::move(city));
         getCity(id).setID(id);
         getCity(id).onCreated(*this);
         getServer().broadcastCityUpdate(getCity(id));
@@ -213,7 +213,7 @@ namespace rip {
     }
 
     const City *Game::getCityAtLocation(glm::uvec2 location) const {
-        for (auto &city : getCities()) {
+        for (const auto &city : getCities()) {
             if (city.getPos() == location) {
                 return &city;
             }
@@ -222,19 +222,19 @@ namespace rip {
     }
 
     City &Game::getCity(CityId id) {
-        return getCities().id_value(id);
+        return getCities()[id];
     }
 
     const City &Game::getCity(CityId id) const {
-        return getCities().id_value(id);
+        return getCities()[id];
     }
 
     Player &Game::getPlayer(PlayerId id) {
-        return getPlayers().id_value(id);
+        return getPlayers()[id];
     }
 
     const Player &Game::getPlayer(PlayerId id) const {
-        return impl->players.id_value(id);
+        return impl->players[id];
     }
 
     Player &Game::getThePlayer() {
@@ -258,10 +258,10 @@ namespace rip {
     }
 
     PlayerId Game::addPlayer(Player player) {
-        return impl->players.insert(std::move(player)).second;
+        return impl->players.insert(std::move(player));
     }
 
-    rea::versioned_slot_map<Player> &Game::getPlayers() {
+    slot_map<Player> &Game::getPlayers() {
         return impl->players;
     }
 
@@ -270,7 +270,7 @@ namespace rip {
     }
 
     UnitId Game::addUnit(Unit unit) {
-        auto id = impl->units.insert(std::move(unit)).second;
+        auto id = impl->units.insert(std::move(unit));
         auto &u = getUnit(id);
         u.setID(id);
         onUnitMoved(id, {}, u.getPos());
@@ -278,15 +278,15 @@ namespace rip {
     }
 
     const Unit &Game::getUnit(UnitId id) const {
-        return getUnits().id_value(id);
+        return getUnits()[id];
     }
 
     Unit &Game::getUnit(UnitId id) {
-        return getUnits().id_value(id);
+        return getUnits()[id];
     }
 
     void Game::killUnit(UnitId id) {
-        if (impl->units.id_is_valid(id)) {
+        if (impl->units.contains(id)) {
             auto stackID = getUnit(id).getStack(*this);
             auto &stack = getStack(stackID);
             stack.removeUnit(id);
@@ -303,11 +303,11 @@ namespace rip {
         impl->unitKillQueue.push_back(id);
     }
 
-    rea::versioned_slot_map<Unit> &Game::getUnits() {
+    slot_map<Unit> &Game::getUnits() {
         return impl->units;
     }
 
-    const rea::versioned_slot_map<Unit> &Game::getUnits() const {
+    const slot_map<Unit> &Game::getUnits() const {
         return impl->units;
     }
 
@@ -399,7 +399,7 @@ namespace rip {
             return *existing;
         }
 
-        auto id = impl->stacks.insert(Stack(owner, pos)).second;
+        auto id = impl->stacks.insert(Stack(owner, pos));
         if (!impl->stacksByPos.contains(pos)) {
             impl->stacksByPos[pos] = {};
         }
@@ -442,15 +442,15 @@ namespace rip {
 
     const Stack &Game::getStack(StackId id) const {
         assert(impl->stacks.id_is_valid(id));
-        return impl->stacks.id_value(id);
+        return impl->stacks[id];
     }
 
     Stack &Game::getStack(StackId id) {
         assert(impl->stacks.id_is_valid(id));
-        return impl->stacks.id_value(id);
+        return impl->stacks[id];
     }
 
-    rea::versioned_slot_map<Stack> &Game::getStacks() {
+    slot_map<Stack> &Game::getStacks() {
         return impl->stacks;
     }
 

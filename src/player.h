@@ -120,6 +120,8 @@ namespace rip {
          Player(Player &&other) = default;
          Player(const Player &other) = delete;
 
+         Player &operator=(Player &&other) = default;
+
          void setID(PlayerId id);
          void setCapital(CityId capital);
 

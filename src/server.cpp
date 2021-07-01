@@ -23,7 +23,7 @@ namespace rip {
         playerInfo.set_civid(player.getCiv().id);
         playerInfo.set_leadername(player.getLeader().name);
         playerInfo.set_score(player.getScore());
-        playerInfo.set_id(player.getID().first);
+        playerInfo.set_id(player.getID().encode());
         playerInfo.set_isadmin(false); // TODO: permissions
     }
 
@@ -37,7 +37,7 @@ namespace rip {
             setPlayerInfo(player, *protoPlayer);
         }
 
-        packet.set_playerid(thePlayerID.first);
+        packet.set_playerid(thePlayerID.encode());
 
         return packet;
     }
@@ -58,7 +58,7 @@ namespace rip {
 
         const auto owner = game.getCultureMap().getTileOwner(pos);
         if (owner.has_value()) {
-            protoTile.set_ownerid(owner->first);
+            protoTile.set_ownerid(owner->encode());
         }
         protoTile.set_hasowner(owner.has_value());
         protoTile.set_isworked(game.isTileWorked(pos).has_value());
@@ -124,7 +124,7 @@ namespace rip {
         protoPos->set_y(unit.getPos().y);
 
         packet.set_kindid(unit.getKind().id);
-        packet.set_ownerid(unit.getOwner().first);
+        packet.set_ownerid(unit.getOwner().encode());
         packet.set_health(unit.getHealth());
         packet.set_movementleft(unit.getMovementLeft());
         packet.set_strength(unit.getCombatStrength());
@@ -151,12 +151,12 @@ namespace rip {
             } else if (carryUnits) {
                 auto *protoCarryUnits = protoCap.mutable_carryunits();
                 for (const auto unitID : carryUnits->getCarryingUnits()) {
-                    protoCarryUnits->add_carryingunitids(unitID.first);
+                    protoCarryUnits->add_carryingunitids(unitID.encode());
                 }
             }
         }
 
-        packet.set_id(unit.getID().first);
+        packet.set_id(unit.getID().encode());
 
         return packet;
     }
@@ -184,7 +184,7 @@ namespace rip {
         packet.mutable_pos()->set_y(city.getPos().y);
 
         packet.set_name(city.getName());
-        packet.set_ownerid(city.getOwner().first);
+        packet.set_ownerid(city.getOwner().encode());
 
         if (city.hasBuildTask()) {
             writeBuildTask(*city.getBuildTask(), *packet.mutable_buildtask());
@@ -193,7 +193,7 @@ namespace rip {
         writeYield(city.computeYield(game), *packet.mutable_yield());
         packet.set_culture(city.getCulture().getCultureForPlayer(city.getOwner()));
         // packet.set_cultureneeded(city.getCultureNeeded()); TODO
-        packet.set_id(city.getID().first);
+        packet.set_id(city.getID().encode());
 
         for (const auto &building : city.getBuildings()) {
             packet.add_buildingnames(building->name);
@@ -211,7 +211,7 @@ namespace rip {
     UpdatePlayer getUpdatePlayerPacket(Game &game, Player &player) {
         UpdatePlayer packet;
 
-        packet.set_id(player.getID().first);
+        packet.set_id(player.getID().encode());
         packet.set_username(player.getUsername());
 
         packet.set_baserevenue(player.getBaseRevenue());
@@ -279,7 +279,7 @@ namespace rip {
             bool possible = true;
             bool skip = false;
             for (const auto unitID : packet.unitids()) {
-                auto &unit = game.getUnit({unitID, 0});
+                auto &unit = game.getUnit(UnitId(unitID));
                 if (unit.getPos() == targetPos) {
                     skip = true;
                     break;
@@ -296,7 +296,7 @@ namespace rip {
 
             success = true;
             for (const auto unitID : packet.unitids()) {
-                auto &unit = game.getUnit({unitID, 0});
+                auto &unit = game.getUnit(UnitId(unitID));
                 unit.moveTo(targetPos, game, true);
             }
         }
@@ -309,7 +309,7 @@ namespace rip {
     void Connection::handleGetBuildTasks(Game &game, const GetBuildTasks &packet) {
         PossibleCityBuildTasks response;
 
-        auto &city = game.getCity({packet.cityid(), 0});
+        auto &city = game.getCity(CityId(packet.cityid()));
         for (const auto &task : city.getPossibleBuildTasks(game)) {
             writeBuildTask(*task, *response.add_tasks());
         }
@@ -330,7 +330,7 @@ namespace rip {
                     );
         }
 
-        auto &city = game.getCity({packet.cityid(), 0});
+        auto &city = game.getCity(CityId(packet.cityid()));
         city.setBuildTask(std::move(task));
 
         auto response = getUpdateCityPacket(game, city);
@@ -364,11 +364,11 @@ namespace rip {
     }
 
     void Connection::handleDoUnitAction(Game &game, const DoUnitAction &packet) {
-        auto &unit = game.getUnit({packet.unitid(), 0});
+        auto &unit = game.getUnit(UnitId(packet.unitid()));
 
         switch (packet.action()) {
             case UnitAction::Kill:
-                game.killUnit({packet.unitid(), 0});
+                game.killUnit(UnitId(packet.unitid()));
 
                 break;
             case UnitAction::Fortify:
@@ -390,7 +390,7 @@ namespace rip {
     }
 
     void Connection::handleSetWorkerTask(Game &game, const SetWorkerTask &packet) {
-        auto &worker = game.getUnit({packet.workerid(), 0});
+        auto &worker = game.getUnit(UnitId(packet.workerid()));
         auto *workerCap = worker.getCapability<WorkerCapability>();
         if (!workerCap) return;
 
@@ -508,7 +508,7 @@ namespace rip {
 
     void Server::broadcastUnitDeath(UnitId unitID) {
         DeleteUnit packet;
-        packet.set_unitid(unitID.first);
+        packet.set_unitid(unitID.encode());
         BROADCAST(packet, deleteunit, 0);
     }
 }

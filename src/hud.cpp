@@ -330,7 +330,7 @@ namespace rip {
 
     void Hud::update(Game &game) {
         if (selectedStack.has_value() &&
-                !game.getStacks().id_is_valid(*selectedStack)) {
+                !game.getStacks().contains(*selectedStack)) {
             selectedStack = {};
         }
 
@@ -339,7 +339,7 @@ namespace rip {
         }
 
         for (const auto unitID : selectedUnits) {
-            if (!game.getUnits().id_is_valid(unitID)) {
+            if (!game.getUnits().contains(unitID)) {
                 selectedUnits.clear();
             }
         }

@@ -5,14 +5,14 @@
 #ifndef RIPOSTE_IDS_H
 #define RIPOSTE_IDS_H
 
-#include <tuple>
+#include "slot_map.h"
 
 namespace rip {
-    typedef std::pair<unsigned long, unsigned long> PlayerId;
-    typedef std::pair<unsigned long, unsigned long> CityId;
-    typedef std::pair<unsigned long, unsigned long> UnitId;
-    typedef std::pair<unsigned long, unsigned long> StackId;
-    typedef std::pair<unsigned long, unsigned long> TradeRouteId;
+    typedef ID PlayerId;
+    typedef ID CityId;
+    typedef ID UnitId;
+    typedef ID StackId;
+    typedef ID TradeRouteId;
 }
 
 #endif //RIPOSTE_IDS_H
