@@ -2,7 +2,15 @@ local Player = {}
 
 function Player:new(data)
     data.civ = registry.civs[data.civID]
-    if data.civ == nil then print("received invalid civ " .. data.civID .. "!") end
+    if data.civ == nil then error("received invalid civ " .. data.civID .. "!") end
+
+    for _, leader in ipairs(data.civ.leaders) do
+        if leader.name == data.leaderName then
+            data.leader = leader
+        end
+    end
+
+    if data.leader == nil then error("received invalid leader " .. data.leaderName) end
 
     setmetatable(data, self)
     self.__index =self

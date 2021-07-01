@@ -100,18 +100,21 @@ return {
         highlightedText = {
             defaultTextStyle = {
                 family = "Merriweather",
-                size = 12,
+                size = 14,
                 weight = dume.FontWeight.Normal,
                 style = dume.FontStyle.Normal,
                 color = dume.rgb(255, 191, 63),
             }
+        },
+        divider = {
+            color = dume.rgb(180, 180, 180),
         },
     },
     hovered = {
         hoverableText = {
             defaultTextStyle = {
                 family = "Merriweather",
-                size = 12,
+                size = 14,
                 weight = dume.FontWeight.Normal,
                 style = dume.FontStyle.Normal,
                 color = dume.rgb(255, 191, 63),

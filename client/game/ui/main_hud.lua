@@ -19,6 +19,7 @@ local TaskSequence = require("task_sequence")
 local SelectionGroups = require("game/ui/selection")
 
 local prompts = require("game/ui/prompts")
+local DiplomacyDialogue = require("game/ui/dialogue")
 
 local buildUnitActions = require("game/ui/unit_actions")
 
@@ -599,7 +600,15 @@ function ScoreWindow:rebuild()
             bracketA = bracketA,
             bracketB = bracketB,
         })
-        scores:addFixedChild(text)
+
+        local wrapper = Clickable:new(text, function()
+            -- open diplomacy dialogue with the player
+            if player ~= self.game.thePlayer then
+                self.hud.promptQueue:push(DiplomacyDialogue:new(self.game, player))
+            end
+        end)
+
+        scores:addFixedChild(wrapper)
     end
 
     local container = Container:new(Padding:new(scores, 20))
