@@ -21,6 +21,8 @@ local Unit = require("game/unit")
 local Stack = require("game/stack")
 local CombatEvent = require("game/combat")
 
+local MusicPlayer = require("game/music")
+
 function Game:new()
     local o = {
         players = {},
@@ -41,6 +43,7 @@ function Game:new()
     self.__index = self
 
     o.hud = HUD:new(o)
+    o.musicPlayer = MusicPlayer:new(o)
 
     return o
 end
@@ -69,7 +72,12 @@ function Game:setTurn(turn)
 end
 
 function Game:setEra(era)
+    local oldEra = self.era
     self.era = era
+
+    if era ~= oldEra then
+        self.eventBus:trigger("eraChanged")
+    end
 end
 
 function Game:addUnit(data)

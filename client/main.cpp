@@ -60,7 +60,9 @@ namespace rip {
         }
     };
 
-    void makeLuaClientBindings(sol::state &lua, std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree) {
+    void makeLuaClientBindings(sol::state &lua, std::shared_ptr<Assets> assets,
+                               std::shared_ptr<Registry> registry,
+                               std::shared_ptr<TechTree> techTree, std::shared_ptr<AudioManager> audio) {
         lua["createSingleplayerGame"] = [=]() {
             auto bridges = newLocalBridgePair();
             auto server = std::make_shared<Server>(registry, techTree);
@@ -77,6 +79,28 @@ namespace rip {
         auto bridge_type = lua.new_usertype<Bridge>("Bridge");
         bridge_type["pollReceivedPacket"] = &Bridge::pollReceivedPacket;
         bridge_type["sendPacket"] = &Bridge::sendPacket;
+
+        lua["playSound"] = [=](const std::string &soundID) {
+            auto *sound = audio->playSound(soundID);
+            return sol::light<InstanceHandle>(sound);
+        };
+        lua["isSoundPlaying"] = [=](sol::light<InstanceHandle> handle) {
+            return audio->isSoundPlaying(&*handle);
+        };
+        lua["stopSound"] = [=](sol::light<InstanceHandle> handle) {
+            rodio_stop_sound(&*handle);
+        };
+
+        lua["getAssetIDsWithPrefix"] = [=](const std::string &prefix) {
+            auto list = assets->getAllIDs();
+            std::vector<std::string> result;
+            for (const auto &id : list) {
+                if (id.rfind(prefix, 0) == 0) {
+                    result.push_back(id);
+                }
+            }
+            return result;
+        };
     }
 }
 
@@ -125,8 +149,10 @@ int main() {
     assets->addLoader("sound", std::make_unique<rip::AudioLoader>(audio));
     assets->loadAssetsDir("assets", false);
 
+    audio->setAssets(assets);
+
     auto techTree = std::make_shared<rip::TechTree>(*assets, *registry);
-    rip::makeLuaClientBindings(*lua, registry, techTree);
+    rip::makeLuaClientBindings(*lua, assets, registry, techTree, audio);
 
     lua->script_file("client/main.lua");
 
@@ -152,6 +178,8 @@ int main() {
     winit_window_grab_cursor(window, true);
 
     std::function<CControlFlow(Event)> callbackFunction([&](Event event) {
+        audio->update();
+
         if (event.kind == EventKind::RedrawRequested) {
             const auto currentTime = winit_get_time();
             const auto dt = currentTime - lastTime;

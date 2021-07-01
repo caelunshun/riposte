@@ -88,6 +88,7 @@ function render(dt)
 
         if game ~= nil then
             game.view:tick(dt, cursorPos)
+            game.musicPlayer:tick()
             Renderer:render(cv, game)
             game.hud:render(cv, time, dt)
 

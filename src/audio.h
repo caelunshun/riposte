@@ -7,9 +7,6 @@
 
 #include <crodio.h>
 #include <optional>
-#include <absl/container/flat_hash_map.h>
-#include "era.h"
-#include "rng.h"
 #include "assets.h"
 
 namespace rip {
@@ -24,13 +21,8 @@ namespace rip {
     class AudioManager {
         std::shared_ptr<Assets> assets;
         std::optional<InstanceHandle*> currentMusic;
-        Era currentMusicEra = Era::Ancient;
-
-        absl::flat_hash_map<Era, FairPicker<std::shared_ptr<SoundAsset>>> eraMusic;
 
         std::vector<InstanceHandle*> playingSounds;
-
-        void updateEraMusic(const Game &game);
 
         InstanceHandle *playSound(const SoundAsset &sound);
 
@@ -39,11 +31,13 @@ namespace rip {
 
         AudioManager();
 
-        void addSounds(std::shared_ptr<Assets> assets);
+        void setAssets(std::shared_ptr<Assets> assets);
 
-        void playSound(const std::string &id);
+        InstanceHandle *playSound(const std::string &id);
 
-        void update(const Game &game);
+        void update();
+
+        bool isSoundPlaying(InstanceHandle *sound) const;
     };
 
     class AudioLoader : public AssetLoader {

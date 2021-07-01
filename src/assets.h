@@ -33,6 +33,14 @@ namespace rip {
 
         std::shared_ptr<Asset> get(const std::string &id) const;
 
+        std::vector<std::string> getAllIDs() {
+            std::vector<std::string> result;
+            for (const auto &entry : assets) {
+                result.push_back(entry.first);
+            }
+            return result;
+        }
+
         template<class T>
         std::vector<std::shared_ptr<T>> getAll() const {
             std::vector<std::shared_ptr<T>> results;
