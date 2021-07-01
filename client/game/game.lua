@@ -96,6 +96,7 @@ end
 
 function Game:deleteUnit(id)
     local unit = self.units[id]
+    if unit == nil then return end
     self:getStackAtPos(unit.pos):removeUnit(unit)
     self.units[id] = nil
     self.eventBus:trigger("unitDeleted", unit)

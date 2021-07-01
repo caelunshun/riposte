@@ -1,6 +1,8 @@
 -- Renders base terrain (grassland, desert, etc.)
 local TerrainRenderer = {}
 
+local renderImprovement = require("game/render/improvement")
+
 local dume = require("dume")
 local Vector = require("brinevector")
 
@@ -66,6 +68,15 @@ function ResourceRenderer:renderTile(cv, tile, tilePos, game)
         if game.thePlayer:isTechUnlocked(resource.revealedBy) then
             cv:drawSprite("texture/resource/" .. tile.resourceID, Vector(0, 0), 100)
         end
+    end
+end
+
+-- Renders improvements.
+local ImprovementRenderer = {}
+
+function ImprovementRenderer:renderTile(cv, tile, tilePos, game)
+    for _, improvement in ipairs(tile.improvements) do
+        renderImprovement(cv, improvement.id, tilePos, game)
     end
 end
 
@@ -243,6 +254,7 @@ local TileRenderer = {
         GridOverlayRenderer,
         ResourceRenderer,
         TreeRenderer,
+        ImprovementRenderer,
         CityRenderer,
         YieldRenderer,
         UnitRenderer,
