@@ -273,7 +273,7 @@ function Hud:selectUnitGroup(group)
 
                 -- don't duplicate selected units
                 for i=1,#self.selectedUnits do
-                    if self.selectedUnits[i] == unit then return end
+                    if self.selectedUnits[i] == unit then break end
                 end
 
                 self.selectedUnits[#self.selectedUnits + 1] = unit
@@ -414,6 +414,8 @@ function Hud:doAutoSelect()
         else
             self.readyForNextTurn = false
         end
+
+        if group == nil then return end
 
         if group.followingPath ~= nil and #group.followingPath.positions > 0 then
             self:moveGroupAlongPath(group, group.followingPath, function()

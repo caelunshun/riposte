@@ -259,6 +259,8 @@ namespace rip {
         double inflationPercent = game.getTurn() < 100 ? 0 : (game.getTurn() - 100.0) * 1.0 / 400.0;
         int inflation = static_cast<int>(expenses * inflationPercent);
         expenses += inflation;
+
+        game.getServer().markPlayerDirty(id);
     }
 
     int Player::getBaseRevenue() const {

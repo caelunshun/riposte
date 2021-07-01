@@ -95,7 +95,7 @@ function UnitRenderer:renderTile(cv, tile, tilePos, game)
     local stack = game:getStackAtPos(tilePos)
     if #stack.units == 0 then return end
 
-    if stack == game.hud.selectedStack then
+    if game.hud.mainHud.selectedStack == stack then
         for i=1,#stack.units do
             if stack.units[i].isSelected then
                 unit = stack.units[i]
