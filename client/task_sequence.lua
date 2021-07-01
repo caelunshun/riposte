@@ -23,7 +23,7 @@ function TaskSequence:tick()
         if coroutine.status(self.tasks[1]) == "dead" then
             table.remove(self.tasks, 1)
 
-            if #self.tasks > 0 then
+            if #self.tasks > 0 and coroutine.status(self.tasks[1]) ~= "dead" then
                 callSafe(self.tasks[1])
             end
         else

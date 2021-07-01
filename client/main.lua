@@ -80,6 +80,8 @@ function render(dt)
     time = time + dt
 
     callSafe(function()
+        scheduler:tick(time)
+
         if client ~= nil then
             client:handleReceivedPackets()
         end

@@ -92,6 +92,26 @@ function Hud:rebuildWindows()
     end
 end
 
+function Hud:doUnitActions(action)
+    for _, unit in ipairs(self.selectedUnits) do
+        self.game.client:doUnitAction(unit, action)
+    end
+
+    self:clearSelection()
+end
+
+function Hud:handleKeyInput(event)
+    if event.action ~= dume.Action.Release then return end
+
+    if event.key == dume.Key.F then
+        self:doUnitActions("Fortify")
+    elseif event.key == dume.Key.Space then
+        self:doUnitActions("SkipTurn")
+    elseif event.key == dume.Key.H then
+        self:doUnitActions("FortifyUntilHealed")
+    end
+end
+
 function Hud:handleEvent(event)
     if self.promptQueue:getCurrentPrompt() ~= nil then return end
 
@@ -99,6 +119,10 @@ function Hud:handleEvent(event)
             and event.key == dume.Key.Return and self.readyForNextTurn then
         self.game.client:endTurn()
         self.readyForNextTurn = false
+    end
+
+    if event.type == dume.EventType.Key then
+        self:handleKeyInput(event)
     end
 
     if event.pos == nil then return end

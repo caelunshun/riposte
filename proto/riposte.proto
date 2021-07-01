@@ -314,6 +314,7 @@ message UpdateUnit {
   repeated Capability capabilities = 7;
   int32 id = 8;
   double strength = 9;
+  bool isFortified = 10;
 }
 
 message ResearchingTech {

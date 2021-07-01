@@ -5916,6 +5916,7 @@ class UpdateUnit final :
     kOwnerIDFieldNumber = 3,
     kIdFieldNumber = 8,
     kStrengthFieldNumber = 9,
+    kIsFortifiedFieldNumber = 10,
   };
   // repeated .Capability capabilities = 7;
   int capabilities_size() const;
@@ -6030,6 +6031,15 @@ class UpdateUnit final :
   void _internal_set_strength(double value);
   public:
 
+  // bool isFortified = 10;
+  void clear_isfortified();
+  bool isfortified() const;
+  void set_isfortified(bool value);
+  private:
+  bool _internal_isfortified() const;
+  void _internal_set_isfortified(bool value);
+  public:
+
   // @@protoc_insertion_point(class_scope:UpdateUnit)
  private:
   class _Internal;
@@ -6046,6 +6056,7 @@ class UpdateUnit final :
   ::PROTOBUF_NAMESPACE_ID::int32 ownerid_;
   ::PROTOBUF_NAMESPACE_ID::int32 id_;
   double strength_;
+  bool isfortified_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -14000,6 +14011,26 @@ inline void UpdateUnit::_internal_set_strength(double value) {
 inline void UpdateUnit::set_strength(double value) {
   _internal_set_strength(value);
   // @@protoc_insertion_point(field_set:UpdateUnit.strength)
+}
+
+// bool isFortified = 10;
+inline void UpdateUnit::clear_isfortified() {
+  isfortified_ = false;
+}
+inline bool UpdateUnit::_internal_isfortified() const {
+  return isfortified_;
+}
+inline bool UpdateUnit::isfortified() const {
+  // @@protoc_insertion_point(field_get:UpdateUnit.isFortified)
+  return _internal_isfortified();
+}
+inline void UpdateUnit::_internal_set_isfortified(bool value) {
+  
+  isfortified_ = value;
+}
+inline void UpdateUnit::set_isfortified(bool value) {
+  _internal_set_isfortified(value);
+  // @@protoc_insertion_point(field_set:UpdateUnit.isFortified)
 }
 
 // -------------------------------------------------------------------

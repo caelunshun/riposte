@@ -128,6 +128,7 @@ namespace rip {
         packet.set_health(unit.getHealth());
         packet.set_movementleft(unit.getMovementLeft());
         packet.set_strength(unit.getCombatStrength());
+        packet.set_isfortified(unit.isFortified());
 
         if (unit.hasPath()) {
             writePath(unit.getPath(), *packet.mutable_followingpath());
@@ -364,7 +365,8 @@ namespace rip {
     }
 
     void Connection::handleDoUnitAction(Game &game, const DoUnitAction &packet) {
-        auto &unit = game.getUnit(UnitId(packet.unitid()));
+        UnitId id(packet.unitid());
+        auto &unit = game.getUnit(id);
 
         switch (packet.action()) {
             case UnitAction::Kill:
@@ -386,6 +388,11 @@ namespace rip {
                     cap->foundCity(game);
                 }
                 break;
+        }
+
+        if (game.getUnits().contains(id)) {
+            auto packet = getUpdateUnitPacket(game, unit);
+            SEND(packet, updateunit, currentRequestID);
         }
     }
 

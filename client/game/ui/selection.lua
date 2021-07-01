@@ -58,7 +58,7 @@ function SelectionGroups:popNextGroup()
             local workerCap = unit:getCapability("worker")
             if unit.movementLeft < 0.1 or (
                     workerCap ~= nil and workerCap.currentTask ~= nil
-            ) then
+            ) or unit.isFortified then
                 valid = false
                 break
             end

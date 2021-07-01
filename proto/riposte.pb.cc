@@ -423,7 +423,8 @@ constexpr UpdateUnit::UpdateUnit(
   , movementleft_(0)
   , ownerid_(0)
   , id_(0)
-  , strength_(0){}
+  , strength_(0)
+  , isfortified_(false){}
 struct UpdateUnitDefaultTypeInternal {
   constexpr UpdateUnitDefaultTypeInternal()
     : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
@@ -922,6 +923,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::UpdateUnit, capabilities_),
   PROTOBUF_FIELD_OFFSET(::UpdateUnit, id_),
   PROTOBUF_FIELD_OFFSET(::UpdateUnit, strength_),
+  PROTOBUF_FIELD_OFFSET(::UpdateUnit, isfortified_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::ResearchingTech, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -1072,23 +1074,23 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 233, -1, sizeof(::CarryUnitsCapability)},
   { 239, -1, sizeof(::Capability)},
   { 248, -1, sizeof(::UpdateUnit)},
-  { 262, -1, sizeof(::ResearchingTech)},
-  { 269, -1, sizeof(::UpdatePlayer)},
-  { 286, -1, sizeof(::PathComputed)},
-  { 292, -1, sizeof(::ConfirmMoveUnits)},
-  { 298, -1, sizeof(::PossibleCityBuildTasks)},
-  { 304, -1, sizeof(::PossibleTechs)},
-  { 310, -1, sizeof(::DeleteUnit)},
-  { 316, -1, sizeof(::MoveUnits)},
-  { 323, -1, sizeof(::SetCityBuildTask)},
-  { 330, -1, sizeof(::SetWorkerTask)},
-  { 337, -1, sizeof(::ComputePath)},
-  { 345, -1, sizeof(::SetEconomySettings)},
-  { 351, -1, sizeof(::SetResearch)},
-  { 357, -1, sizeof(::EndTurn)},
-  { 362, -1, sizeof(::GetBuildTasks)},
-  { 368, -1, sizeof(::GetPossibleTechs)},
-  { 373, -1, sizeof(::DoUnitAction)},
+  { 263, -1, sizeof(::ResearchingTech)},
+  { 270, -1, sizeof(::UpdatePlayer)},
+  { 287, -1, sizeof(::PathComputed)},
+  { 293, -1, sizeof(::ConfirmMoveUnits)},
+  { 299, -1, sizeof(::PossibleCityBuildTasks)},
+  { 305, -1, sizeof(::PossibleTechs)},
+  { 311, -1, sizeof(::DeleteUnit)},
+  { 317, -1, sizeof(::MoveUnits)},
+  { 324, -1, sizeof(::SetCityBuildTask)},
+  { 331, -1, sizeof(::SetWorkerTask)},
+  { 338, -1, sizeof(::ComputePath)},
+  { 346, -1, sizeof(::SetEconomySettings)},
+  { 352, -1, sizeof(::SetResearch)},
+  { 358, -1, sizeof(::EndTurn)},
+  { 363, -1, sizeof(::GetBuildTasks)},
+  { 369, -1, sizeof(::GetPossibleTechs)},
+  { 374, -1, sizeof(::DoUnitAction)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -1218,49 +1220,49 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "\001 \003(\005\"\220\001\n\nCapability\022)\n\tfoundCity\030\001 \001(\0132"
   "\024.FoundCityCapabilityH\000\022#\n\006worker\030\002 \001(\0132"
   "\021.WorkerCapabilityH\000\022+\n\ncarryUnits\030\003 \001(\013"
-  "2\025.CarryUnitsCapabilityH\000B\005\n\003cap\"\305\001\n\nUpd"
+  "2\025.CarryUnitsCapabilityH\000B\005\n\003cap\"\332\001\n\nUpd"
   "ateUnit\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\016\n\006kindID\030\002 \001"
   "(\t\022\017\n\007ownerID\030\003 \001(\005\022\016\n\006health\030\004 \001(\001\022\024\n\014m"
   "ovementLeft\030\005 \001(\001\022\034\n\rfollowingPath\030\006 \001(\013"
   "2\005.Path\022!\n\014capabilities\030\007 \003(\0132\013.Capabili"
-  "ty\022\n\n\002id\030\010 \001(\005\022\020\n\010strength\030\t \001(\001\"3\n\017Rese"
-  "archingTech\022\016\n\006techID\030\001 \001(\t\022\020\n\010progress\030"
-  "\002 \001(\005\"\220\002\n\014UpdatePlayer\022\n\n\002id\030\001 \001(\005\022\020\n\010us"
-  "ername\030\002 \001(\t\022\023\n\013baseRevenue\030\003 \001(\005\022\025\n\rbea"
-  "kerRevenue\030\004 \001(\005\022\023\n\013goldRevenue\030\005 \001(\005\022\020\n"
-  "\010expenses\030\006 \001(\005\022\017\n\007netGold\030\007 \001(\005\022\014\n\004gold"
-  "\030\010 \001(\005\022)\n\017researchingTech\030\t \001(\0132\020.Resear"
-  "chingTech\022\025\n\rcapitalCityID\030\n \001(\005\022\027\n\017unlo"
-  "ckedTechIDs\030\013 \003(\t\022\025\n\rbeakerPercent\030\014 \001(\005"
-  "\"#\n\014PathComputed\022\023\n\004path\030\001 \001(\0132\005.Path\"#\n"
-  "\020ConfirmMoveUnits\022\017\n\007success\030\001 \001(\010\"3\n\026Po"
-  "ssibleCityBuildTasks\022\031\n\005tasks\030\001 \003(\0132\n.Bu"
-  "ildTask\"\036\n\rPossibleTechs\022\r\n\005techs\030\001 \003(\t\""
-  "\034\n\nDeleteUnit\022\016\n\006unitID\030\001 \001(\005\"9\n\tMoveUni"
-  "ts\022\017\n\007unitIDs\030\001 \003(\005\022\033\n\014pathToFollow\030\002 \001("
-  "\0132\005.Path\"@\n\020SetCityBuildTask\022\016\n\006cityID\030\001"
-  " \001(\005\022\034\n\004task\030\002 \001(\0132\016.BuildTaskKind\"<\n\rSe"
-  "tWorkerTask\022\020\n\010workerID\030\001 \001(\005\022\031\n\004task\030\002 "
-  "\001(\0132\013.WorkerTask\"G\n\013ComputePath\022\022\n\004from\030"
-  "\001 \001(\0132\004.Pos\022\020\n\002to\030\002 \001(\0132\004.Pos\022\022\n\nunitKin"
-  "dID\030\003 \001(\t\"+\n\022SetEconomySettings\022\025\n\rbeake"
-  "rPercent\030\001 \001(\005\"\035\n\013SetResearch\022\016\n\006techID\030"
-  "\001 \001(\t\"\t\n\007EndTurn\"\037\n\rGetBuildTasks\022\016\n\006cit"
-  "yID\030\001 \001(\005\"\022\n\020GetPossibleTechs\";\n\014DoUnitA"
-  "ction\022\016\n\006unitID\030\001 \001(\005\022\033\n\006action\030\002 \001(\0162\013."
-  "UnitAction*h\n\003Era\022\013\n\007Ancient\020\000\022\r\n\tClassi"
-  "cal\020\001\022\014\n\010Medieval\020\002\022\017\n\013Renaissance\020\003\022\016\n\n"
-  "Industrial\020\004\022\n\n\006Modern\020\005\022\n\n\006Future\020\006*;\n\007"
-  "Terrain\022\r\n\tGrassland\020\000\022\n\n\006Desert\020\001\022\t\n\005Oc"
-  "ean\020\002\022\n\n\006Plains\020\003*1\n\nVisibility\022\n\n\006Hidde"
-  "n\020\000\022\n\n\006Fogged\020\001\022\013\n\007Visible\020\002*X\n\nUnitActi"
-  "on\022\010\n\004Kill\020\000\022\013\n\007Fortify\020\001\022\014\n\010SkipTurn\020\002\022"
-  "\026\n\022FortifyUntilHealed\020\003\022\r\n\tFoundCity\020\004b\006"
-  "proto3"
+  "ty\022\n\n\002id\030\010 \001(\005\022\020\n\010strength\030\t \001(\001\022\023\n\013isFo"
+  "rtified\030\n \001(\010\"3\n\017ResearchingTech\022\016\n\006tech"
+  "ID\030\001 \001(\t\022\020\n\010progress\030\002 \001(\005\"\220\002\n\014UpdatePla"
+  "yer\022\n\n\002id\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\023\n\013bas"
+  "eRevenue\030\003 \001(\005\022\025\n\rbeakerRevenue\030\004 \001(\005\022\023\n"
+  "\013goldRevenue\030\005 \001(\005\022\020\n\010expenses\030\006 \001(\005\022\017\n\007"
+  "netGold\030\007 \001(\005\022\014\n\004gold\030\010 \001(\005\022)\n\017researchi"
+  "ngTech\030\t \001(\0132\020.ResearchingTech\022\025\n\rcapita"
+  "lCityID\030\n \001(\005\022\027\n\017unlockedTechIDs\030\013 \003(\t\022\025"
+  "\n\rbeakerPercent\030\014 \001(\005\"#\n\014PathComputed\022\023\n"
+  "\004path\030\001 \001(\0132\005.Path\"#\n\020ConfirmMoveUnits\022\017"
+  "\n\007success\030\001 \001(\010\"3\n\026PossibleCityBuildTask"
+  "s\022\031\n\005tasks\030\001 \003(\0132\n.BuildTask\"\036\n\rPossible"
+  "Techs\022\r\n\005techs\030\001 \003(\t\"\034\n\nDeleteUnit\022\016\n\006un"
+  "itID\030\001 \001(\005\"9\n\tMoveUnits\022\017\n\007unitIDs\030\001 \003(\005"
+  "\022\033\n\014pathToFollow\030\002 \001(\0132\005.Path\"@\n\020SetCity"
+  "BuildTask\022\016\n\006cityID\030\001 \001(\005\022\034\n\004task\030\002 \001(\0132"
+  "\016.BuildTaskKind\"<\n\rSetWorkerTask\022\020\n\010work"
+  "erID\030\001 \001(\005\022\031\n\004task\030\002 \001(\0132\013.WorkerTask\"G\n"
+  "\013ComputePath\022\022\n\004from\030\001 \001(\0132\004.Pos\022\020\n\002to\030\002"
+  " \001(\0132\004.Pos\022\022\n\nunitKindID\030\003 \001(\t\"+\n\022SetEco"
+  "nomySettings\022\025\n\rbeakerPercent\030\001 \001(\005\"\035\n\013S"
+  "etResearch\022\016\n\006techID\030\001 \001(\t\"\t\n\007EndTurn\"\037\n"
+  "\rGetBuildTasks\022\016\n\006cityID\030\001 \001(\005\"\022\n\020GetPos"
+  "sibleTechs\";\n\014DoUnitAction\022\016\n\006unitID\030\001 \001"
+  "(\005\022\033\n\006action\030\002 \001(\0162\013.UnitAction*h\n\003Era\022\013"
+  "\n\007Ancient\020\000\022\r\n\tClassical\020\001\022\014\n\010Medieval\020\002"
+  "\022\017\n\013Renaissance\020\003\022\016\n\nIndustrial\020\004\022\n\n\006Mod"
+  "ern\020\005\022\n\n\006Future\020\006*;\n\007Terrain\022\r\n\tGrasslan"
+  "d\020\000\022\n\n\006Desert\020\001\022\t\n\005Ocean\020\002\022\n\n\006Plains\020\003*1"
+  "\n\nVisibility\022\n\n\006Hidden\020\000\022\n\n\006Fogged\020\001\022\013\n\007"
+  "Visible\020\002*X\n\nUnitAction\022\010\n\004Kill\020\000\022\013\n\007For"
+  "tify\020\001\022\014\n\010SkipTurn\020\002\022\026\n\022FortifyUntilHeal"
+  "ed\020\003\022\r\n\tFoundCity\020\004b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_riposte_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_riposte_2eproto = {
-  false, false, 4566, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
+  false, false, 4587, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
   &descriptor_table_riposte_2eproto_once, nullptr, 0, 47,
   schemas, file_default_instances, TableStruct_riposte_2eproto::offsets,
   file_level_metadata_riposte_2eproto, file_level_enum_descriptors_riposte_2eproto, file_level_service_descriptors_riposte_2eproto,
@@ -10067,8 +10069,8 @@ UpdateUnit::UpdateUnit(const UpdateUnit& from)
     followingpath_ = nullptr;
   }
   ::memcpy(&health_, &from.health_,
-    static_cast<size_t>(reinterpret_cast<char*>(&strength_) -
-    reinterpret_cast<char*>(&health_)) + sizeof(strength_));
+    static_cast<size_t>(reinterpret_cast<char*>(&isfortified_) -
+    reinterpret_cast<char*>(&health_)) + sizeof(isfortified_));
   // @@protoc_insertion_point(copy_constructor:UpdateUnit)
 }
 
@@ -10076,8 +10078,8 @@ inline void UpdateUnit::SharedCtor() {
 kindid_.UnsafeSetDefault(&::PROTOBUF_NAMESPACE_ID::internal::GetEmptyStringAlreadyInited());
 ::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
     reinterpret_cast<char*>(&pos_) - reinterpret_cast<char*>(this)),
-    0, static_cast<size_t>(reinterpret_cast<char*>(&strength_) -
-    reinterpret_cast<char*>(&pos_)) + sizeof(strength_));
+    0, static_cast<size_t>(reinterpret_cast<char*>(&isfortified_) -
+    reinterpret_cast<char*>(&pos_)) + sizeof(isfortified_));
 }
 
 UpdateUnit::~UpdateUnit() {
@@ -10121,8 +10123,8 @@ void UpdateUnit::Clear() {
   }
   followingpath_ = nullptr;
   ::memset(&health_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&strength_) -
-      reinterpret_cast<char*>(&health_)) + sizeof(strength_));
+      reinterpret_cast<char*>(&isfortified_) -
+      reinterpret_cast<char*>(&health_)) + sizeof(isfortified_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -10200,6 +10202,13 @@ const char* UpdateUnit::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 73)) {
           strength_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr);
           ptr += sizeof(double);
+        } else goto handle_unusual;
+        continue;
+      // bool isFortified = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 80)) {
+          isfortified_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
         } else goto handle_unusual;
         continue;
       default: {
@@ -10295,6 +10304,12 @@ failure:
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(9, this->_internal_strength(), target);
   }
 
+  // bool isFortified = 10;
+  if (this->_internal_isfortified() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteBoolToArray(10, this->_internal_isfortified(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -10368,6 +10383,11 @@ size_t UpdateUnit::ByteSizeLong() const {
     total_size += 1 + 8;
   }
 
+  // bool isFortified = 10;
+  if (this->_internal_isfortified() != 0) {
+    total_size += 1 + 1;
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
         _internal_metadata_, total_size, &_cached_size_);
@@ -10421,6 +10441,9 @@ void UpdateUnit::MergeFrom(const UpdateUnit& from) {
   if (!(from._internal_strength() <= 0 && from._internal_strength() >= 0)) {
     _internal_set_strength(from._internal_strength());
   }
+  if (from._internal_isfortified() != 0) {
+    _internal_set_isfortified(from._internal_isfortified());
+  }
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
 
@@ -10445,8 +10468,8 @@ void UpdateUnit::InternalSwap(UpdateUnit* other) {
       &other->kindid_, other->GetArenaForAllocation()
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(UpdateUnit, strength_)
-      + sizeof(UpdateUnit::strength_)
+      PROTOBUF_FIELD_OFFSET(UpdateUnit, isfortified_)
+      + sizeof(UpdateUnit::isfortified_)
       - PROTOBUF_FIELD_OFFSET(UpdateUnit, pos_)>(
           reinterpret_cast<char*>(&pos_),
           reinterpret_cast<char*>(&other->pos_));

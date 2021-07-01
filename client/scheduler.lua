@@ -23,13 +23,13 @@ function Scheduler:tick(time)
     for i=1,#self.tasks do
         local task = self.tasks[i]
         if time <= task.wakeAt then
-            coroutine.resume(task)
+            callSafe(task.thread)
             toRemove[#toRemove + 1] = i
         end
     end
 
     for j, i in ipairs(toRemove) do
-        table.remove(self.tasks, i - j - 1)
+        table.remove(self.tasks, i - (j - 1))
     end
 end
 
