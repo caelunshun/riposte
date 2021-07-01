@@ -119,6 +119,12 @@ function Client:setWorkerTask(workerUnit, task)
     })
 end
 
+function Client:declareWarOn(player)
+    self:sendPacket("declareWar", {
+        onPlayerID = player.id,
+    })
+end
+
 function Client:endTurn()
     self:sendPacket("endTurn", {})
 end

@@ -133,19 +133,8 @@ function DiplomacyDialogue:getOptions()
     end
 end
 
-function DiplomacyDialogue:declareWar()
-    UIUtils.openConfirmationPrompt(
-            "Are you sure you want to declare war on " .. self.withPlayer.username .. "?",
-            "Yes, WAR!",
-            "No, reconsider...",
-            function()
-                print("DECLARING WAR")
-            end
-    )
-end
-
 function DiplomacyDialogue:getMainOptions()
-    return {
+    local options = {
         {
             text = "Your head would look good on the end of a pole.",
             onselect = function()
@@ -159,6 +148,13 @@ function DiplomacyDialogue:getMainOptions()
             end
         }
     }
+
+    if self.game.thePlayer:isAtWarWith(self.withPlayer) then
+        -- can't declare war again! (TODO:
+        table.remove(options, 1)
+    end
+
+    return options
 end
 
 function DiplomacyDialogue:getWarOptions()
@@ -170,6 +166,18 @@ function DiplomacyDialogue:getWarOptions()
             end
         }
     }
+end
+
+function DiplomacyDialogue:declareWar()
+    UIUtils.openConfirmationPrompt(
+            "Are you sure you want to declare war on " .. self.withPlayer.username .. "?",
+            "Yes, WAR!",
+            "No, reconsider...",
+            function()
+                self.game.client:declareWarOn(self.withPlayer)
+                self:close()
+            end
+    )
 end
 
 function DiplomacyDialogue:close()
@@ -192,24 +200,26 @@ function DiplomacyDialogue:build()
 
     root:addFixedChild(Divider:new(2))
 
-    root:addFixedChild(Spacer:new(dume.Axis.Vertical, 100))
+    root:addFixedChild(Spacer:new(dume.Axis.Vertical, 50))
 
     for _, option in ipairs(self.options) do
         local text = Text:new(option.text)
         table.insert(text.classes, "hoverableText")
 
-        local wrapper = Clickable:new(text, function()
+        local container = Container:new(Padding:new(text, 15))
+
+        local wrapper = Clickable:new(container, function()
             option.onselect()
         end)
 
-        root:addFixedChild(Container:new(Padding:new(wrapper, 15)))
+        root:addFixedChild(wrapper)
     end
 
     local container = Container:new(Padding:new(root, 20))
     container.fillParent = true
     table.insert(container.classes, "windowContainer")
 
-    local size = Vector(600, 800)
+    local size = Vector(600, 750)
     ui:createWindow("diplomacyDialogue", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2), size, container)
 end
 

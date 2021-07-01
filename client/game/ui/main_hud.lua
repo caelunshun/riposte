@@ -457,7 +457,7 @@ function Hud:onThePlayerUpdated()
 end
 
 local unitDisplayWindowWidth = 200
-local turnIndicatorWindowWidth = 200
+local turnIndicatorWindowWidth = 250
 
 function BottomControlWindow:new(game, hud)
     local o = { game = game, hud = hud }
@@ -593,12 +593,18 @@ function ScoreWindow:rebuild()
             bracketB = "]"
         end
 
-        local text = Text:new("%score:    %bracketA@color{%col}{%playerName}%bracketB", {
+        local war = ""
+        if self.game.thePlayer:isAtWarWith(player) then
+            war = " (WAR)"
+        end
+
+        local text = Text:new("%score:    %bracketA@color{%col}{%playerName}%bracketB@color{rgb(207,69,32)}{%war}", {
             score = tostring(player.score),
             col = dumeColorToString(player.civ.color),
             playerName = player.username,
             bracketA = bracketA,
             bracketB = bracketB,
+            war =  war,
         })
 
         local wrapper = Clickable:new(text, function()
@@ -615,7 +621,7 @@ function ScoreWindow:rebuild()
     container.fillParent = true
     table.insert(container.classes, "windowContainer")
 
-    local size = Vector(200, 175)
+    local size = Vector(250, 225)
     ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container, false, true)
 end
 

@@ -47,7 +47,7 @@ struct TableStruct_riposte_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[49]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[50]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -87,6 +87,9 @@ extern ComputePathDefaultTypeInternal _ComputePath_default_instance_;
 class ConfirmMoveUnits;
 struct ConfirmMoveUnitsDefaultTypeInternal;
 extern ConfirmMoveUnitsDefaultTypeInternal _ConfirmMoveUnits_default_instance_;
+class DeclareWar;
+struct DeclareWarDefaultTypeInternal;
+extern DeclareWarDefaultTypeInternal _DeclareWar_default_instance_;
 class DeleteUnit;
 struct DeleteUnitDefaultTypeInternal;
 extern DeleteUnitDefaultTypeInternal _DeleteUnit_default_instance_;
@@ -213,6 +216,7 @@ template<> ::CarryUnitsCapability* Arena::CreateMaybeMessage<::CarryUnitsCapabil
 template<> ::ClientInfo* Arena::CreateMaybeMessage<::ClientInfo>(Arena*);
 template<> ::ComputePath* Arena::CreateMaybeMessage<::ComputePath>(Arena*);
 template<> ::ConfirmMoveUnits* Arena::CreateMaybeMessage<::ConfirmMoveUnits>(Arena*);
+template<> ::DeclareWar* Arena::CreateMaybeMessage<::DeclareWar>(Arena*);
 template<> ::DeleteUnit* Arena::CreateMaybeMessage<::DeleteUnit>(Arena*);
 template<> ::DoUnitAction* Arena::CreateMaybeMessage<::DoUnitAction>(Arena*);
 template<> ::EndTurn* Arena::CreateMaybeMessage<::EndTurn>(Arena*);
@@ -567,6 +571,7 @@ class AnyClient final :
     kSetEconomySettings = 10,
     kDoUnitAction = 11,
     kSetWorkerTask = 12,
+    kDeclareWar = 13,
     PACKET_NOT_SET = 0,
   };
 
@@ -658,6 +663,7 @@ class AnyClient final :
     kSetEconomySettingsFieldNumber = 10,
     kDoUnitActionFieldNumber = 11,
     kSetWorkerTaskFieldNumber = 12,
+    kDeclareWarFieldNumber = 13,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -866,6 +872,24 @@ class AnyClient final :
       ::SetWorkerTask* setworkertask);
   ::SetWorkerTask* unsafe_arena_release_setworkertask();
 
+  // .DeclareWar declareWar = 13;
+  bool has_declarewar() const;
+  private:
+  bool _internal_has_declarewar() const;
+  public:
+  void clear_declarewar();
+  const ::DeclareWar& declarewar() const;
+  PROTOBUF_MUST_USE_RESULT ::DeclareWar* release_declarewar();
+  ::DeclareWar* mutable_declarewar();
+  void set_allocated_declarewar(::DeclareWar* declarewar);
+  private:
+  const ::DeclareWar& _internal_declarewar() const;
+  ::DeclareWar* _internal_mutable_declarewar();
+  public:
+  void unsafe_arena_set_allocated_declarewar(
+      ::DeclareWar* declarewar);
+  ::DeclareWar* unsafe_arena_release_declarewar();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyClient)
@@ -882,6 +906,7 @@ class AnyClient final :
   void set_has_seteconomysettings();
   void set_has_dounitaction();
   void set_has_setworkertask();
+  void set_has_declarewar();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -904,6 +929,7 @@ class AnyClient final :
     ::SetEconomySettings* seteconomysettings_;
     ::DoUnitAction* dounitaction_;
     ::SetWorkerTask* setworkertask_;
+    ::DeclareWar* declarewar_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -6683,6 +6709,7 @@ class UpdatePlayer final :
 
   enum : int {
     kUnlockedTechIDsFieldNumber = 11,
+    kAtWarWithIDsFieldNumber = 13,
     kUsernameFieldNumber = 2,
     kResearchingTechFieldNumber = 9,
     kIdFieldNumber = 1,
@@ -6718,6 +6745,28 @@ class UpdatePlayer final :
   const std::string& _internal_unlockedtechids(int index) const;
   std::string* _internal_add_unlockedtechids();
   public:
+
+  // repeated int32 atWarWithIDs = 13;
+  int atwarwithids_size() const;
+  private:
+  int _internal_atwarwithids_size() const;
+  public:
+  void clear_atwarwithids();
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_atwarwithids(int index) const;
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      _internal_atwarwithids() const;
+  void _internal_add_atwarwithids(::PROTOBUF_NAMESPACE_ID::int32 value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      _internal_mutable_atwarwithids();
+  public:
+  ::PROTOBUF_NAMESPACE_ID::int32 atwarwithids(int index) const;
+  void set_atwarwithids(int index, ::PROTOBUF_NAMESPACE_ID::int32 value);
+  void add_atwarwithids(::PROTOBUF_NAMESPACE_ID::int32 value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+      atwarwithids() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+      mutable_atwarwithids();
 
   // string username = 2;
   void clear_username();
@@ -6840,6 +6889,8 @@ class UpdatePlayer final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> unlockedtechids_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 > atwarwithids_;
+  mutable std::atomic<int> _atwarwithids_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr username_;
   ::ResearchingTech* researchingtech_;
   ::PROTOBUF_NAMESPACE_ID::int32 id_;
@@ -9081,6 +9132,145 @@ class DoUnitAction final :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
+// -------------------------------------------------------------------
+
+class DeclareWar final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:DeclareWar) */ {
+ public:
+  inline DeclareWar() : DeclareWar(nullptr) {}
+  ~DeclareWar() override;
+  explicit constexpr DeclareWar(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  DeclareWar(const DeclareWar& from);
+  DeclareWar(DeclareWar&& from) noexcept
+    : DeclareWar() {
+    *this = ::std::move(from);
+  }
+
+  inline DeclareWar& operator=(const DeclareWar& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline DeclareWar& operator=(DeclareWar&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const DeclareWar& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const DeclareWar* internal_default_instance() {
+    return reinterpret_cast<const DeclareWar*>(
+               &_DeclareWar_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    49;
+
+  friend void swap(DeclareWar& a, DeclareWar& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(DeclareWar* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(DeclareWar* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline DeclareWar* New() const final {
+    return new DeclareWar();
+  }
+
+  DeclareWar* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<DeclareWar>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const DeclareWar& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const DeclareWar& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DeclareWar* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "DeclareWar";
+  }
+  protected:
+  explicit DeclareWar(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kOnPlayerIDFieldNumber = 1,
+  };
+  // int32 onPlayerID = 1;
+  void clear_onplayerid();
+  ::PROTOBUF_NAMESPACE_ID::int32 onplayerid() const;
+  void set_onplayerid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_onplayerid() const;
+  void _internal_set_onplayerid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:DeclareWar)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::int32 onplayerid_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
 // ===================================================================
 
 
@@ -9967,6 +10157,80 @@ inline ::SetWorkerTask* AnyClient::_internal_mutable_setworkertask() {
 inline ::SetWorkerTask* AnyClient::mutable_setworkertask() {
   ::SetWorkerTask* _msg = _internal_mutable_setworkertask();
   // @@protoc_insertion_point(field_mutable:AnyClient.setWorkerTask)
+  return _msg;
+}
+
+// .DeclareWar declareWar = 13;
+inline bool AnyClient::_internal_has_declarewar() const {
+  return packet_case() == kDeclareWar;
+}
+inline bool AnyClient::has_declarewar() const {
+  return _internal_has_declarewar();
+}
+inline void AnyClient::set_has_declarewar() {
+  _oneof_case_[0] = kDeclareWar;
+}
+inline void AnyClient::clear_declarewar() {
+  if (_internal_has_declarewar()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.declarewar_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::DeclareWar* AnyClient::release_declarewar() {
+  // @@protoc_insertion_point(field_release:AnyClient.declareWar)
+  if (_internal_has_declarewar()) {
+    clear_has_packet();
+      ::DeclareWar* temp = packet_.declarewar_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.declarewar_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::DeclareWar& AnyClient::_internal_declarewar() const {
+  return _internal_has_declarewar()
+      ? *packet_.declarewar_
+      : reinterpret_cast< ::DeclareWar&>(::_DeclareWar_default_instance_);
+}
+inline const ::DeclareWar& AnyClient::declarewar() const {
+  // @@protoc_insertion_point(field_get:AnyClient.declareWar)
+  return _internal_declarewar();
+}
+inline ::DeclareWar* AnyClient::unsafe_arena_release_declarewar() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.declareWar)
+  if (_internal_has_declarewar()) {
+    clear_has_packet();
+    ::DeclareWar* temp = packet_.declarewar_;
+    packet_.declarewar_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_declarewar(::DeclareWar* declarewar) {
+  clear_packet();
+  if (declarewar) {
+    set_has_declarewar();
+    packet_.declarewar_ = declarewar;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.declareWar)
+}
+inline ::DeclareWar* AnyClient::_internal_mutable_declarewar() {
+  if (!_internal_has_declarewar()) {
+    clear_packet();
+    set_has_declarewar();
+    packet_.declarewar_ = CreateMaybeMessage< ::DeclareWar >(GetArenaForAllocation());
+  }
+  return packet_.declarewar_;
+}
+inline ::DeclareWar* AnyClient::mutable_declarewar() {
+  ::DeclareWar* _msg = _internal_mutable_declarewar();
+  // @@protoc_insertion_point(field_mutable:AnyClient.declareWar)
   return _msg;
 }
 
@@ -15134,6 +15398,53 @@ inline void UpdatePlayer::set_beakerpercent(::PROTOBUF_NAMESPACE_ID::int32 value
   // @@protoc_insertion_point(field_set:UpdatePlayer.beakerPercent)
 }
 
+// repeated int32 atWarWithIDs = 13;
+inline int UpdatePlayer::_internal_atwarwithids_size() const {
+  return atwarwithids_.size();
+}
+inline int UpdatePlayer::atwarwithids_size() const {
+  return _internal_atwarwithids_size();
+}
+inline void UpdatePlayer::clear_atwarwithids() {
+  atwarwithids_.Clear();
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdatePlayer::_internal_atwarwithids(int index) const {
+  return atwarwithids_.Get(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 UpdatePlayer::atwarwithids(int index) const {
+  // @@protoc_insertion_point(field_get:UpdatePlayer.atWarWithIDs)
+  return _internal_atwarwithids(index);
+}
+inline void UpdatePlayer::set_atwarwithids(int index, ::PROTOBUF_NAMESPACE_ID::int32 value) {
+  atwarwithids_.Set(index, value);
+  // @@protoc_insertion_point(field_set:UpdatePlayer.atWarWithIDs)
+}
+inline void UpdatePlayer::_internal_add_atwarwithids(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  atwarwithids_.Add(value);
+}
+inline void UpdatePlayer::add_atwarwithids(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_add_atwarwithids(value);
+  // @@protoc_insertion_point(field_add:UpdatePlayer.atWarWithIDs)
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+UpdatePlayer::_internal_atwarwithids() const {
+  return atwarwithids_;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >&
+UpdatePlayer::atwarwithids() const {
+  // @@protoc_insertion_point(field_list:UpdatePlayer.atWarWithIDs)
+  return _internal_atwarwithids();
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+UpdatePlayer::_internal_mutable_atwarwithids() {
+  return &atwarwithids_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedField< ::PROTOBUF_NAMESPACE_ID::int32 >*
+UpdatePlayer::mutable_atwarwithids() {
+  // @@protoc_insertion_point(field_mutable_list:UpdatePlayer.atWarWithIDs)
+  return _internal_mutable_atwarwithids();
+}
+
 // -------------------------------------------------------------------
 
 // PathComputed
@@ -16148,9 +16459,35 @@ inline void DoUnitAction::set_action(::UnitAction value) {
   // @@protoc_insertion_point(field_set:DoUnitAction.action)
 }
 
+// -------------------------------------------------------------------
+
+// DeclareWar
+
+// int32 onPlayerID = 1;
+inline void DeclareWar::clear_onplayerid() {
+  onplayerid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 DeclareWar::_internal_onplayerid() const {
+  return onplayerid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 DeclareWar::onplayerid() const {
+  // @@protoc_insertion_point(field_get:DeclareWar.onPlayerID)
+  return _internal_onplayerid();
+}
+inline void DeclareWar::_internal_set_onplayerid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  onplayerid_ = value;
+}
+inline void DeclareWar::set_onplayerid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_onplayerid(value);
+  // @@protoc_insertion_point(field_set:DeclareWar.onPlayerID)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

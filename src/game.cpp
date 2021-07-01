@@ -486,11 +486,11 @@ namespace rip {
     // EVENTS
 
     void Game::onWarDeclared(Player &declarer, Player &declared) {
-        getScriptEngine().onWarDeclared(declarer, declared);
+
     }
 
     void Game::onDialogueOpened(Player &with) {
-        getScriptEngine().onDialogueOpened(with);
+
     }
 
     Game::~Game() = default;

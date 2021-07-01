@@ -64,6 +64,7 @@ message AnyClient {
     SetEconomySettings setEconomySettings = 10;
     DoUnitAction doUnitAction = 11;
     SetWorkerTask setWorkerTask = 12;
+    DeclareWar declareWar = 13;
   }
 }
 
@@ -355,6 +356,8 @@ message UpdatePlayer {
   repeated string unlockedTechIDs = 11;
 
   int32 beakerPercent = 12;
+
+  repeated int32 atWarWithIDs = 13;
 }
 
 message PathComputed {
@@ -439,4 +442,8 @@ enum UnitAction {
 message DoUnitAction {
   int32 unitID = 1;
   UnitAction action = 2;
+}
+
+message DeclareWar {
+  int32 onPlayerID = 1;
 }

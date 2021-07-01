@@ -257,6 +257,12 @@ namespace rip {
             packet.add_unlockedtechids(tech->name);
         }
 
+        for (const auto &otherPlayer : game.getPlayers()) {
+            if (player.isAtWarWith(otherPlayer.getID())) {
+                packet.add_atwarwithids(otherPlayer.getID().encode());
+            }
+        }
+
         return packet;
     }
 
@@ -466,6 +472,10 @@ namespace rip {
         game.getServer().markUnitDirty(worker.getID());
     }
 
+    void Connection::handleDeclareWar(Game &game, const DeclareWar &packet) {
+        game.getPlayer(playerID).declareWarOn(PlayerId(packet.onplayerid()), game);
+    }
+
     void Connection::handlePacket(Game &game, AnyClient &packet) {
         currentRequestID = packet.requestid();
         if (packet.has_clientinfo()) {
@@ -490,6 +500,8 @@ namespace rip {
             handleDoUnitAction(game, packet.dounitaction());
         } else if (packet.has_setworkertask()) {
             handleSetWorkerTask(game, packet.setworkertask());
+        } else if (packet.has_declarewar()) {
+            handleDeclareWar(game, packet.declarewar());
         }
     }
 

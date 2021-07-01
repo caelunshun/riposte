@@ -38,4 +38,13 @@ function Player:estimateResearchTurns(tech, progress)
     return math.ceil((tech.cost - (progress or 0)) / self.beakerRevenue)
 end
 
+function Player:isAtWarWith(otherPlayer)
+    for _, otherPlayerID in ipairs(self.atWarWithIDs or {}) do
+        if otherPlayerID == otherPlayer.id then
+            return true
+        end
+    end
+    return false
+end
+
 return Player
