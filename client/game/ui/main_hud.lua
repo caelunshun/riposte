@@ -46,16 +46,22 @@ function Hud:new(game)
     }
 
     game.eventBus:registerHandler("globalDataUpdated", function()
-        o:rebuildWindows()
+        if o.active then
+            o:rebuildWindows()
+        end
     end)
 
     game.eventBus:registerHandler("cityUpdated", function(city)
-        o:onCityUpdated(city)
+        if o.active then
+            o:onCityUpdated(city)
+        end
     end)
 
     game.eventBus:registerHandler("thePlayerUpdated", function()
-        o:onThePlayerUpdated()
-        o:rebuildWindows()
+        if o.active then
+            o:onThePlayerUpdated()
+            o:rebuildWindows()
+        end
     end)
 
     game.eventBus:registerHandler("turnChanged", function()
@@ -103,6 +109,12 @@ end
 function Hud:rebuildWindows()
     for _, window in ipairs(self.windows) do
         window:rebuild()
+    end
+end
+
+function Hud:close()
+    for _, window in ipairs(self.windows) do
+        window:close()
     end
 end
 
@@ -469,10 +481,14 @@ function BottomControlWindow:new(game, hud)
     setmetatable(o, self)
     self.__index = self
     game.eventBus:registerHandler("selectedUnitsUpdated", function()
-        o:rebuild()
+        if hud.active then
+            o:rebuild()
+        end
     end)
     game.eventBus:registerHandler("unitUpdated", function(unit)
-        o:rebuild()
+        if hud.active then
+            o:rebuild()
+        end
     end)
     return o
 end
@@ -491,10 +507,16 @@ function BottomControlWindow:rebuild()
     ui:createWindow("bottomControls", Vector(unitDisplayWindowWidth, cv:getHeight() - size.y), size, container, true, true)
 end
 
+function BottomControlWindow:close()
+    ui:deleteWindow("bottomControls")
+end
+
 function UnitDisplayWindow:new(game, hud)
     local o = { game = game, hud = hud }
     game.eventBus:registerHandler("selectedUnitsUpdated", function()
-        o:rebuild()
+        if hud.active then
+            o:rebuild()
+        end
     end)
     setmetatable(o, self)
     self.__index = self
@@ -552,6 +574,10 @@ function UnitDisplayWindow:rebuild()
     ui:createWindow("unitDisplay", Vector(0, cv:getHeight() - size.y), size, container, false, false)
 end
 
+function UnitDisplayWindow:close()
+    ui:deleteWindow("unitDisplay")
+end
+
 function TurnIndicatorWindow:new(game, hud)
     local o = { game = game, hud = hud }
     setmetatable(o, self)
@@ -571,6 +597,10 @@ function TurnIndicatorWindow:rebuild()
 
     local size = Vector(turnIndicatorWindowWidth, 150)
     ui:createWindow("turnIndicator", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y), size, container, false, true)
+end
+
+function TurnIndicatorWindow:close()
+    ui:deleteWindow("turnIndicator")
 end
 
 function ScoreWindow:new(game, hud)
@@ -630,6 +660,10 @@ function ScoreWindow:rebuild()
     ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container, false, true)
 end
 
+function ScoreWindow:close()
+    ui:deleteWindow("scores")
+end
+
 local UnitStatus = {
     Green = dume.rgb(68, 194, 113),
     Yellow = dume.rgb(254, 221, 0),
@@ -677,10 +711,14 @@ function UnitStackWindow:new(game, hud)
     self.__index = self
 
     game.eventBus:registerHandler("selectedUnitsUpdated", function()
-        o:rebuild()
+        if hud.active then
+            o:rebuild()
+        end
     end)
     game.eventBus:registerHandler("unitUpdated", function()
-        o:rebuild()
+        if hud.active then
+            o:rebuild()
+        end
     end)
 
     return o
@@ -741,6 +779,10 @@ function UnitStackWindow:rebuild()
     ui:createWindow("unitStack", Vector(unitDisplayWindowWidth + 100, cv:getHeight() - 120 - size.y), size, root, false, true)
 end
 
+function UnitStackWindow:close()
+    ui:deleteWindow("unitStack")
+end
+
 function ResearchBar:new(game, hud)
     local o = {
         game = game,
@@ -783,6 +825,10 @@ function ResearchBar:rebuild()
     table.insert(root.classes, "researchProgressBar")
 
     ui:createWindow("researchBar", Vector(cv:getWidth() / 2 - size.x / 2, 1), size, root)
+end
+
+function ResearchBar:close()
+    ui:deleteWindow("researchBar")
 end
 
 function EconomyWindow:new(game, hud)
@@ -862,6 +908,10 @@ function EconomyWindow:rebuild()
 
     local size = Vector(275, 150)
     ui:createWindow("economy", Vector(0, 0), size, container, false, false)
+end
+
+function EconomyWindow:close()
+    ui:deleteWindow("economy")
 end
 
 function dumeColorToString(color)

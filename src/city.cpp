@@ -158,7 +158,9 @@ namespace rip {
         return true;
     }
 
-    void City::addManualWorkedTile(glm::uvec2 pos) {
+    void City::addManualWorkedTile(const Game &game, glm::uvec2 pos) {
+        if (!canWorkTile(pos, game)) return;
+
         removeManualWorkedTile(pos);
         manualWorkedTiles.push_back(pos);
 

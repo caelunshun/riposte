@@ -52,6 +52,7 @@ namespace rip {
         void handleDoUnitAction(Game &game, const DoUnitAction &packet);
         void handleSetWorkerTask(Game &game, const SetWorkerTask &packet);
         void handleDeclareWar(Game &game, const DeclareWar &packet);
+        void handleConfigureWorkedTiles(Game &game, const ConfigureWorkedTiles &packet);
         void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);

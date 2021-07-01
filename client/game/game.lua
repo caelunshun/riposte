@@ -13,7 +13,7 @@ local dume = require("dume")
 local Vector = require("brinevector")
 
 local EventBus = require("game/event")
-local Hud = require("game/ui/main_hud")
+local HUD = require("game/ui/hud")
 local View = require("game/view")
 local City = require("game/city")
 local Player = require("game/player")
@@ -40,7 +40,7 @@ function Game:new()
     setmetatable(o, self)
     self.__index = self
 
-    o.hud = Hud:new(o)
+    o.hud = HUD:new(o)
 
     return o
 end

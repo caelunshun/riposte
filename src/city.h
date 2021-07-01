@@ -185,7 +185,7 @@ namespace rip {
         // Returns whether this city can work the given tile.
         bool canWorkTile(glm::uvec2 pos, const Game &game) const;
         // Adds a manual worked tile that overrides an automatic one.
-        void addManualWorkedTile(glm::uvec2 pos);
+        void addManualWorkedTile(const Game &game, glm::uvec2 pos);
         // Removes a manual worked tile.
         void removeManualWorkedTile(glm::uvec2 pos);
         // Gets a list of worked tiles.

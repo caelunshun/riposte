@@ -80,6 +80,15 @@ function City:estimateTurnsToBuild(buildTask)
     )
 end
 
+function City:isTileWorked(tilePos)
+    for _, workedTile in ipairs(self.workedTiles) do
+        if workedTile.x == tilePos.x and workedTile.y == tilePos.y then
+            return true
+        end
+    end
+    return false
+end
+
 local function drawFivePointStar(cv, center, outerRadius, innerRadius)
     local angleStep = math.pi * 2 / 5
 

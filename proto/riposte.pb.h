@@ -47,7 +47,7 @@ struct TableStruct_riposte_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[52]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[53]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -90,6 +90,9 @@ extern CombatRoundDefaultTypeInternal _CombatRound_default_instance_;
 class ComputePath;
 struct ComputePathDefaultTypeInternal;
 extern ComputePathDefaultTypeInternal _ComputePath_default_instance_;
+class ConfigureWorkedTiles;
+struct ConfigureWorkedTilesDefaultTypeInternal;
+extern ConfigureWorkedTilesDefaultTypeInternal _ConfigureWorkedTiles_default_instance_;
 class ConfirmMoveUnits;
 struct ConfirmMoveUnitsDefaultTypeInternal;
 extern ConfirmMoveUnitsDefaultTypeInternal _ConfirmMoveUnits_default_instance_;
@@ -223,6 +226,7 @@ template<> ::ClientInfo* Arena::CreateMaybeMessage<::ClientInfo>(Arena*);
 template<> ::CombatEvent* Arena::CreateMaybeMessage<::CombatEvent>(Arena*);
 template<> ::CombatRound* Arena::CreateMaybeMessage<::CombatRound>(Arena*);
 template<> ::ComputePath* Arena::CreateMaybeMessage<::ComputePath>(Arena*);
+template<> ::ConfigureWorkedTiles* Arena::CreateMaybeMessage<::ConfigureWorkedTiles>(Arena*);
 template<> ::ConfirmMoveUnits* Arena::CreateMaybeMessage<::ConfirmMoveUnits>(Arena*);
 template<> ::DeclareWar* Arena::CreateMaybeMessage<::DeclareWar>(Arena*);
 template<> ::DeleteUnit* Arena::CreateMaybeMessage<::DeleteUnit>(Arena*);
@@ -580,6 +584,7 @@ class AnyClient final :
     kDoUnitAction = 11,
     kSetWorkerTask = 12,
     kDeclareWar = 13,
+    kConfigureWorkedTiles = 14,
     PACKET_NOT_SET = 0,
   };
 
@@ -672,6 +677,7 @@ class AnyClient final :
     kDoUnitActionFieldNumber = 11,
     kSetWorkerTaskFieldNumber = 12,
     kDeclareWarFieldNumber = 13,
+    kConfigureWorkedTilesFieldNumber = 14,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -898,6 +904,24 @@ class AnyClient final :
       ::DeclareWar* declarewar);
   ::DeclareWar* unsafe_arena_release_declarewar();
 
+  // .ConfigureWorkedTiles configureWorkedTiles = 14;
+  bool has_configureworkedtiles() const;
+  private:
+  bool _internal_has_configureworkedtiles() const;
+  public:
+  void clear_configureworkedtiles();
+  const ::ConfigureWorkedTiles& configureworkedtiles() const;
+  PROTOBUF_MUST_USE_RESULT ::ConfigureWorkedTiles* release_configureworkedtiles();
+  ::ConfigureWorkedTiles* mutable_configureworkedtiles();
+  void set_allocated_configureworkedtiles(::ConfigureWorkedTiles* configureworkedtiles);
+  private:
+  const ::ConfigureWorkedTiles& _internal_configureworkedtiles() const;
+  ::ConfigureWorkedTiles* _internal_mutable_configureworkedtiles();
+  public:
+  void unsafe_arena_set_allocated_configureworkedtiles(
+      ::ConfigureWorkedTiles* configureworkedtiles);
+  ::ConfigureWorkedTiles* unsafe_arena_release_configureworkedtiles();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyClient)
@@ -915,6 +939,7 @@ class AnyClient final :
   void set_has_dounitaction();
   void set_has_setworkertask();
   void set_has_declarewar();
+  void set_has_configureworkedtiles();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -938,6 +963,7 @@ class AnyClient final :
     ::DoUnitAction* dounitaction_;
     ::SetWorkerTask* setworkertask_;
     ::DeclareWar* declarewar_;
+    ::ConfigureWorkedTiles* configureworkedtiles_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -4676,6 +4702,7 @@ class UpdateCity final :
 
   enum : int {
     kBuildingNamesFieldNumber = 9,
+    kWorkedTilesFieldNumber = 15,
     kNameFieldNumber = 2,
     kPosFieldNumber = 1,
     kBuildTaskFieldNumber = 4,
@@ -4713,6 +4740,24 @@ class UpdateCity final :
   const std::string& _internal_buildingnames(int index) const;
   std::string* _internal_add_buildingnames();
   public:
+
+  // repeated .Pos workedTiles = 15;
+  int workedtiles_size() const;
+  private:
+  int _internal_workedtiles_size() const;
+  public:
+  void clear_workedtiles();
+  ::Pos* mutable_workedtiles(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Pos >*
+      mutable_workedtiles();
+  private:
+  const ::Pos& _internal_workedtiles(int index) const;
+  ::Pos* _internal_add_workedtiles();
+  public:
+  const ::Pos& workedtiles(int index) const;
+  ::Pos* add_workedtiles();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Pos >&
+      workedtiles() const;
 
   // string name = 2;
   void clear_name();
@@ -4871,6 +4916,7 @@ class UpdateCity final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField<std::string> buildingnames_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Pos > workedtiles_;
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr name_;
   ::Pos* pos_;
   ::BuildTask* buildtask_;
@@ -9621,6 +9667,176 @@ class DeclareWar final :
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
+// -------------------------------------------------------------------
+
+class ConfigureWorkedTiles final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:ConfigureWorkedTiles) */ {
+ public:
+  inline ConfigureWorkedTiles() : ConfigureWorkedTiles(nullptr) {}
+  ~ConfigureWorkedTiles() override;
+  explicit constexpr ConfigureWorkedTiles(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  ConfigureWorkedTiles(const ConfigureWorkedTiles& from);
+  ConfigureWorkedTiles(ConfigureWorkedTiles&& from) noexcept
+    : ConfigureWorkedTiles() {
+    *this = ::std::move(from);
+  }
+
+  inline ConfigureWorkedTiles& operator=(const ConfigureWorkedTiles& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline ConfigureWorkedTiles& operator=(ConfigureWorkedTiles&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const ConfigureWorkedTiles& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const ConfigureWorkedTiles* internal_default_instance() {
+    return reinterpret_cast<const ConfigureWorkedTiles*>(
+               &_ConfigureWorkedTiles_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    52;
+
+  friend void swap(ConfigureWorkedTiles& a, ConfigureWorkedTiles& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(ConfigureWorkedTiles* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(ConfigureWorkedTiles* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline ConfigureWorkedTiles* New() const final {
+    return new ConfigureWorkedTiles();
+  }
+
+  ConfigureWorkedTiles* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<ConfigureWorkedTiles>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const ConfigureWorkedTiles& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const ConfigureWorkedTiles& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(ConfigureWorkedTiles* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "ConfigureWorkedTiles";
+  }
+  protected:
+  explicit ConfigureWorkedTiles(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTilePosFieldNumber = 2,
+    kCityIDFieldNumber = 1,
+    kShouldManuallyWorkFieldNumber = 3,
+  };
+  // .Pos tilePos = 2;
+  bool has_tilepos() const;
+  private:
+  bool _internal_has_tilepos() const;
+  public:
+  void clear_tilepos();
+  const ::Pos& tilepos() const;
+  PROTOBUF_MUST_USE_RESULT ::Pos* release_tilepos();
+  ::Pos* mutable_tilepos();
+  void set_allocated_tilepos(::Pos* tilepos);
+  private:
+  const ::Pos& _internal_tilepos() const;
+  ::Pos* _internal_mutable_tilepos();
+  public:
+  void unsafe_arena_set_allocated_tilepos(
+      ::Pos* tilepos);
+  ::Pos* unsafe_arena_release_tilepos();
+
+  // int32 cityID = 1;
+  void clear_cityid();
+  ::PROTOBUF_NAMESPACE_ID::int32 cityid() const;
+  void set_cityid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_cityid() const;
+  void _internal_set_cityid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // bool shouldManuallyWork = 3;
+  void clear_shouldmanuallywork();
+  bool shouldmanuallywork() const;
+  void set_shouldmanuallywork(bool value);
+  private:
+  bool _internal_shouldmanuallywork() const;
+  void _internal_set_shouldmanuallywork(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:ConfigureWorkedTiles)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::Pos* tilepos_;
+  ::PROTOBUF_NAMESPACE_ID::int32 cityid_;
+  bool shouldmanuallywork_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
 // ===================================================================
 
 
@@ -10581,6 +10797,80 @@ inline ::DeclareWar* AnyClient::_internal_mutable_declarewar() {
 inline ::DeclareWar* AnyClient::mutable_declarewar() {
   ::DeclareWar* _msg = _internal_mutable_declarewar();
   // @@protoc_insertion_point(field_mutable:AnyClient.declareWar)
+  return _msg;
+}
+
+// .ConfigureWorkedTiles configureWorkedTiles = 14;
+inline bool AnyClient::_internal_has_configureworkedtiles() const {
+  return packet_case() == kConfigureWorkedTiles;
+}
+inline bool AnyClient::has_configureworkedtiles() const {
+  return _internal_has_configureworkedtiles();
+}
+inline void AnyClient::set_has_configureworkedtiles() {
+  _oneof_case_[0] = kConfigureWorkedTiles;
+}
+inline void AnyClient::clear_configureworkedtiles() {
+  if (_internal_has_configureworkedtiles()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.configureworkedtiles_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::ConfigureWorkedTiles* AnyClient::release_configureworkedtiles() {
+  // @@protoc_insertion_point(field_release:AnyClient.configureWorkedTiles)
+  if (_internal_has_configureworkedtiles()) {
+    clear_has_packet();
+      ::ConfigureWorkedTiles* temp = packet_.configureworkedtiles_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.configureworkedtiles_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::ConfigureWorkedTiles& AnyClient::_internal_configureworkedtiles() const {
+  return _internal_has_configureworkedtiles()
+      ? *packet_.configureworkedtiles_
+      : reinterpret_cast< ::ConfigureWorkedTiles&>(::_ConfigureWorkedTiles_default_instance_);
+}
+inline const ::ConfigureWorkedTiles& AnyClient::configureworkedtiles() const {
+  // @@protoc_insertion_point(field_get:AnyClient.configureWorkedTiles)
+  return _internal_configureworkedtiles();
+}
+inline ::ConfigureWorkedTiles* AnyClient::unsafe_arena_release_configureworkedtiles() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyClient.configureWorkedTiles)
+  if (_internal_has_configureworkedtiles()) {
+    clear_has_packet();
+    ::ConfigureWorkedTiles* temp = packet_.configureworkedtiles_;
+    packet_.configureworkedtiles_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyClient::unsafe_arena_set_allocated_configureworkedtiles(::ConfigureWorkedTiles* configureworkedtiles) {
+  clear_packet();
+  if (configureworkedtiles) {
+    set_has_configureworkedtiles();
+    packet_.configureworkedtiles_ = configureworkedtiles;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyClient.configureWorkedTiles)
+}
+inline ::ConfigureWorkedTiles* AnyClient::_internal_mutable_configureworkedtiles() {
+  if (!_internal_has_configureworkedtiles()) {
+    clear_packet();
+    set_has_configureworkedtiles();
+    packet_.configureworkedtiles_ = CreateMaybeMessage< ::ConfigureWorkedTiles >(GetArenaForAllocation());
+  }
+  return packet_.configureworkedtiles_;
+}
+inline ::ConfigureWorkedTiles* AnyClient::mutable_configureworkedtiles() {
+  ::ConfigureWorkedTiles* _msg = _internal_mutable_configureworkedtiles();
+  // @@protoc_insertion_point(field_mutable:AnyClient.configureWorkedTiles)
   return _msg;
 }
 
@@ -14149,6 +14439,46 @@ inline void UpdateCity::set_iscapital(bool value) {
   // @@protoc_insertion_point(field_set:UpdateCity.isCapital)
 }
 
+// repeated .Pos workedTiles = 15;
+inline int UpdateCity::_internal_workedtiles_size() const {
+  return workedtiles_.size();
+}
+inline int UpdateCity::workedtiles_size() const {
+  return _internal_workedtiles_size();
+}
+inline void UpdateCity::clear_workedtiles() {
+  workedtiles_.Clear();
+}
+inline ::Pos* UpdateCity::mutable_workedtiles(int index) {
+  // @@protoc_insertion_point(field_mutable:UpdateCity.workedTiles)
+  return workedtiles_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Pos >*
+UpdateCity::mutable_workedtiles() {
+  // @@protoc_insertion_point(field_mutable_list:UpdateCity.workedTiles)
+  return &workedtiles_;
+}
+inline const ::Pos& UpdateCity::_internal_workedtiles(int index) const {
+  return workedtiles_.Get(index);
+}
+inline const ::Pos& UpdateCity::workedtiles(int index) const {
+  // @@protoc_insertion_point(field_get:UpdateCity.workedTiles)
+  return _internal_workedtiles(index);
+}
+inline ::Pos* UpdateCity::_internal_add_workedtiles() {
+  return workedtiles_.Add();
+}
+inline ::Pos* UpdateCity::add_workedtiles() {
+  ::Pos* _add = _internal_add_workedtiles();
+  // @@protoc_insertion_point(field_add:UpdateCity.workedTiles)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Pos >&
+UpdateCity::workedtiles() const {
+  // @@protoc_insertion_point(field_list:UpdateCity.workedTiles)
+  return workedtiles_;
+}
+
 // -------------------------------------------------------------------
 
 // Path
@@ -17035,9 +17365,145 @@ inline void DeclareWar::set_onplayerid(::PROTOBUF_NAMESPACE_ID::int32 value) {
   // @@protoc_insertion_point(field_set:DeclareWar.onPlayerID)
 }
 
+// -------------------------------------------------------------------
+
+// ConfigureWorkedTiles
+
+// int32 cityID = 1;
+inline void ConfigureWorkedTiles::clear_cityid() {
+  cityid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ConfigureWorkedTiles::_internal_cityid() const {
+  return cityid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 ConfigureWorkedTiles::cityid() const {
+  // @@protoc_insertion_point(field_get:ConfigureWorkedTiles.cityID)
+  return _internal_cityid();
+}
+inline void ConfigureWorkedTiles::_internal_set_cityid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  cityid_ = value;
+}
+inline void ConfigureWorkedTiles::set_cityid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_cityid(value);
+  // @@protoc_insertion_point(field_set:ConfigureWorkedTiles.cityID)
+}
+
+// .Pos tilePos = 2;
+inline bool ConfigureWorkedTiles::_internal_has_tilepos() const {
+  return this != internal_default_instance() && tilepos_ != nullptr;
+}
+inline bool ConfigureWorkedTiles::has_tilepos() const {
+  return _internal_has_tilepos();
+}
+inline void ConfigureWorkedTiles::clear_tilepos() {
+  if (GetArenaForAllocation() == nullptr && tilepos_ != nullptr) {
+    delete tilepos_;
+  }
+  tilepos_ = nullptr;
+}
+inline const ::Pos& ConfigureWorkedTiles::_internal_tilepos() const {
+  const ::Pos* p = tilepos_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Pos&>(
+      ::_Pos_default_instance_);
+}
+inline const ::Pos& ConfigureWorkedTiles::tilepos() const {
+  // @@protoc_insertion_point(field_get:ConfigureWorkedTiles.tilePos)
+  return _internal_tilepos();
+}
+inline void ConfigureWorkedTiles::unsafe_arena_set_allocated_tilepos(
+    ::Pos* tilepos) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(tilepos_);
+  }
+  tilepos_ = tilepos;
+  if (tilepos) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:ConfigureWorkedTiles.tilePos)
+}
+inline ::Pos* ConfigureWorkedTiles::release_tilepos() {
+  
+  ::Pos* temp = tilepos_;
+  tilepos_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Pos* ConfigureWorkedTiles::unsafe_arena_release_tilepos() {
+  // @@protoc_insertion_point(field_release:ConfigureWorkedTiles.tilePos)
+  
+  ::Pos* temp = tilepos_;
+  tilepos_ = nullptr;
+  return temp;
+}
+inline ::Pos* ConfigureWorkedTiles::_internal_mutable_tilepos() {
+  
+  if (tilepos_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Pos>(GetArenaForAllocation());
+    tilepos_ = p;
+  }
+  return tilepos_;
+}
+inline ::Pos* ConfigureWorkedTiles::mutable_tilepos() {
+  ::Pos* _msg = _internal_mutable_tilepos();
+  // @@protoc_insertion_point(field_mutable:ConfigureWorkedTiles.tilePos)
+  return _msg;
+}
+inline void ConfigureWorkedTiles::set_allocated_tilepos(::Pos* tilepos) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete tilepos_;
+  }
+  if (tilepos) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::Pos>::GetOwningArena(tilepos);
+    if (message_arena != submessage_arena) {
+      tilepos = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, tilepos, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  tilepos_ = tilepos;
+  // @@protoc_insertion_point(field_set_allocated:ConfigureWorkedTiles.tilePos)
+}
+
+// bool shouldManuallyWork = 3;
+inline void ConfigureWorkedTiles::clear_shouldmanuallywork() {
+  shouldmanuallywork_ = false;
+}
+inline bool ConfigureWorkedTiles::_internal_shouldmanuallywork() const {
+  return shouldmanuallywork_;
+}
+inline bool ConfigureWorkedTiles::shouldmanuallywork() const {
+  // @@protoc_insertion_point(field_get:ConfigureWorkedTiles.shouldManuallyWork)
+  return _internal_shouldmanuallywork();
+}
+inline void ConfigureWorkedTiles::_internal_set_shouldmanuallywork(bool value) {
+  
+  shouldmanuallywork_ = value;
+}
+inline void ConfigureWorkedTiles::set_shouldmanuallywork(bool value) {
+  _internal_set_shouldmanuallywork(value);
+  // @@protoc_insertion_point(field_set:ConfigureWorkedTiles.shouldManuallyWork)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

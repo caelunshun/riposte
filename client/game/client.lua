@@ -125,6 +125,14 @@ function Client:declareWarOn(player)
     })
 end
 
+function Client:setTileWorkedManually(city, tilePos, worked)
+    self:sendPacket("configureWorkedTiles", {
+        cityID = city.id,
+        tilePos = { x = tilePos.x, y = tilePos.y },
+        shouldManuallyWork = worked,
+    })
+end
+
 function Client:endTurn()
     self:sendPacket("endTurn", {})
 end

@@ -230,6 +230,12 @@ namespace rip {
         packet.set_consumedfood(city.getConsumedFood());
         packet.set_iscapital(city.isCapital());
 
+        for (const auto workedPos : city.getWorkedTiles()) {
+            auto *pos = packet.add_workedtiles();
+            pos->set_x(workedPos.x);
+            pos->set_y(workedPos.y);
+        }
+
         return packet;
     }
 
@@ -476,6 +482,18 @@ namespace rip {
         game.getPlayer(playerID).declareWarOn(PlayerId(packet.onplayerid()), game);
     }
 
+    void Connection::handleConfigureWorkedTiles(Game &game, const ConfigureWorkedTiles &packet) {
+        auto &city = game.getCity(CityId(packet.cityid()));
+        glm::uvec2 tilePos(packet.tilepos().x(), packet.tilepos().y());
+        if (packet.shouldmanuallywork()) {
+            city.addManualWorkedTile(game, tilePos);
+        } else {
+            city.removeManualWorkedTile(tilePos);
+        }
+        city.updateWorkedTiles(game);
+        game.getServer().markCityDirty(city.getID());
+    }
+
     void Connection::handlePacket(Game &game, AnyClient &packet) {
         currentRequestID = packet.requestid();
         if (packet.has_clientinfo()) {
@@ -502,6 +520,8 @@ namespace rip {
             handleSetWorkerTask(game, packet.setworkertask());
         } else if (packet.has_declarewar()) {
             handleDeclareWar(game, packet.declarewar());
+        } else if (packet.has_configureworkedtiles()) {
+            handleConfigureWorkedTiles(game, packet.configureworkedtiles());
         }
     }
 

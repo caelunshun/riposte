@@ -52,7 +52,6 @@ namespace rip {
         city_type["updateWorkedTiles"] = [=] (City &self) {
             self.updateWorkedTiles(**game);
         };
-        city_type["addManualWorkedTile"] = &City::addManualWorkedTile;
         city_type["removeManualWorkedTile"] = &City::removeManualWorkedTile;
         city_type["getManualWorkedTiles"] = &City::getManualWorkedTiles;
         city_type["canWorkTile"] = [=] (City &self, glm::uvec2 pos) {
