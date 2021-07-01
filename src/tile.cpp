@@ -7,6 +7,7 @@
 #include "city.h"
 #include "game.h"
 #include "rng.h"
+#include "server.h"
 
 namespace rip {
     float Tile::getMovementCost() const {
@@ -105,9 +106,10 @@ namespace rip {
         return improvements;
     }
 
-    bool Tile::addImprovement(std::unique_ptr<Improvement> improvement) {
+    bool Tile::addImprovement(Game &game, glm::uvec2 ourPos, std::unique_ptr<Improvement> improvement) {
         if (improvement->isCompatible(*this)) {
             improvements.push_back(std::move(improvement));
+            game.getServer().markTileDirty(ourPos);
             return true;
         } else {
             return false;

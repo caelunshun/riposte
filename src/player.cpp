@@ -9,6 +9,7 @@
 #include "tile.h"
 #include "unit.h"
 #include "event.h"
+#include "server.h"
 
 namespace rip {
     Player::Player(std::string username, std::shared_ptr<CivKind> civ, Leader leader, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree)
@@ -124,7 +125,7 @@ namespace rip {
         return capital;
     }
 
-    void Player::recomputeVisibility(const Game &game) {
+    void Player::recomputeVisibility(Game &game) {
         // Change Visible => Fogged
         for (int x = 0; x < game.getMapWidth(); x++) {
             for (int y = 0; y < game.getMapHeight(); y++) {
@@ -166,6 +167,8 @@ namespace rip {
                 }
             }
         }
+
+        game.getServer().markPlayerVisibilityDirty(id);
     }
 
     bool Player::isDead() const {
@@ -181,6 +184,7 @@ namespace rip {
             ai->doTurn(game);
         }
         recomputeScore(game);
+        game.getServer().markPlayerDirty(id);
     }
 
     const PlayerTechs &Player::getTechs() const {
@@ -370,6 +374,9 @@ namespace rip {
 
             game.onWarDeclared(*this, other);
             game.addEvent(std::make_unique<WarDeclaredEvent>(leader.name, other.leader.name));
+
+            game.getServer().markPlayerDirty(id);
+            game.getServer().markPlayerDirty(player);
         }
     }
 
@@ -401,5 +408,7 @@ namespace rip {
         game.addEvent(std::make_unique<PlayerKilledEvent>(civ->name));
 
         dead = true;
+
+        game.getServer().markPlayerDirty(id);
     }
 }

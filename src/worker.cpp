@@ -104,7 +104,7 @@ namespace rip {
         }
 
         auto &tile = game.getTile(pos);
-        tile.addImprovement(std::move(improvement));
+        tile.addImprovement(game, pos, std::move(improvement));
         tile.setForested(false);
     }
 

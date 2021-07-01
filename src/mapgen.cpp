@@ -373,9 +373,10 @@ namespace rip {
     }
 
     Game MapGenerator::generate(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry,
-                                const std::shared_ptr<TechTree> &techTree) {
+                                const std::shared_ptr<TechTree> &techTree, Server *server) {
         while (true) {
             Game game(mapWidth, mapHeight, registry, techTree);
+            game.setServer(server);
             if (tryGenerate(game, rng, techTree)) {
                 for (auto &player : game.getPlayers()) {
                     player.recomputeVisibility(game);

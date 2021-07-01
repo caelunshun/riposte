@@ -64,7 +64,6 @@ namespace rip {
         lua["createSingleplayerGame"] = [=]() {
             auto bridges = newLocalBridgePair();
             auto server = std::make_shared<Server>(registry, techTree);
-            server->game.setServer(server);
             server->addConnection(std::move(bridges.first));
 
             auto serverThread = std::thread([server = std::move(server)] () mutable {

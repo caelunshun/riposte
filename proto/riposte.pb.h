@@ -47,7 +47,7 @@ struct TableStruct_riposte_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[47]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[49]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -177,9 +177,15 @@ extern UpdateMapDefaultTypeInternal _UpdateMap_default_instance_;
 class UpdatePlayer;
 struct UpdatePlayerDefaultTypeInternal;
 extern UpdatePlayerDefaultTypeInternal _UpdatePlayer_default_instance_;
+class UpdateTile;
+struct UpdateTileDefaultTypeInternal;
+extern UpdateTileDefaultTypeInternal _UpdateTile_default_instance_;
 class UpdateUnit;
 struct UpdateUnitDefaultTypeInternal;
 extern UpdateUnitDefaultTypeInternal _UpdateUnit_default_instance_;
+class UpdateVisibility;
+struct UpdateVisibilityDefaultTypeInternal;
+extern UpdateVisibilityDefaultTypeInternal _UpdateVisibility_default_instance_;
 class WorkerCapability;
 struct WorkerCapabilityDefaultTypeInternal;
 extern WorkerCapabilityDefaultTypeInternal _WorkerCapability_default_instance_;
@@ -237,7 +243,9 @@ template<> ::UpdateCity* Arena::CreateMaybeMessage<::UpdateCity>(Arena*);
 template<> ::UpdateGlobalData* Arena::CreateMaybeMessage<::UpdateGlobalData>(Arena*);
 template<> ::UpdateMap* Arena::CreateMaybeMessage<::UpdateMap>(Arena*);
 template<> ::UpdatePlayer* Arena::CreateMaybeMessage<::UpdatePlayer>(Arena*);
+template<> ::UpdateTile* Arena::CreateMaybeMessage<::UpdateTile>(Arena*);
 template<> ::UpdateUnit* Arena::CreateMaybeMessage<::UpdateUnit>(Arena*);
+template<> ::UpdateVisibility* Arena::CreateMaybeMessage<::UpdateVisibility>(Arena*);
 template<> ::WorkerCapability* Arena::CreateMaybeMessage<::WorkerCapability>(Arena*);
 template<> ::WorkerTask* Arena::CreateMaybeMessage<::WorkerTask>(Arena*);
 template<> ::WorkerTaskImprovement* Arena::CreateMaybeMessage<::WorkerTaskImprovement>(Arena*);
@@ -957,6 +965,8 @@ class AnyServer final :
     kPossibleCityBuildTasks = 12,
     kPossibleTechs = 13,
     kDeleteUnit = 14,
+    kUpdateTile = 15,
+    kUpdateVisibility = 16,
     PACKET_NOT_SET = 0,
   };
 
@@ -1050,6 +1060,8 @@ class AnyServer final :
     kPossibleCityBuildTasksFieldNumber = 12,
     kPossibleTechsFieldNumber = 13,
     kDeleteUnitFieldNumber = 14,
+    kUpdateTileFieldNumber = 15,
+    kUpdateVisibilityFieldNumber = 16,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -1294,6 +1306,42 @@ class AnyServer final :
       ::DeleteUnit* deleteunit);
   ::DeleteUnit* unsafe_arena_release_deleteunit();
 
+  // .UpdateTile updateTile = 15;
+  bool has_updatetile() const;
+  private:
+  bool _internal_has_updatetile() const;
+  public:
+  void clear_updatetile();
+  const ::UpdateTile& updatetile() const;
+  PROTOBUF_MUST_USE_RESULT ::UpdateTile* release_updatetile();
+  ::UpdateTile* mutable_updatetile();
+  void set_allocated_updatetile(::UpdateTile* updatetile);
+  private:
+  const ::UpdateTile& _internal_updatetile() const;
+  ::UpdateTile* _internal_mutable_updatetile();
+  public:
+  void unsafe_arena_set_allocated_updatetile(
+      ::UpdateTile* updatetile);
+  ::UpdateTile* unsafe_arena_release_updatetile();
+
+  // .UpdateVisibility updateVisibility = 16;
+  bool has_updatevisibility() const;
+  private:
+  bool _internal_has_updatevisibility() const;
+  public:
+  void clear_updatevisibility();
+  const ::UpdateVisibility& updatevisibility() const;
+  PROTOBUF_MUST_USE_RESULT ::UpdateVisibility* release_updatevisibility();
+  ::UpdateVisibility* mutable_updatevisibility();
+  void set_allocated_updatevisibility(::UpdateVisibility* updatevisibility);
+  private:
+  const ::UpdateVisibility& _internal_updatevisibility() const;
+  ::UpdateVisibility* _internal_mutable_updatevisibility();
+  public:
+  void unsafe_arena_set_allocated_updatevisibility(
+      ::UpdateVisibility* updatevisibility);
+  ::UpdateVisibility* unsafe_arena_release_updatevisibility();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyServer)
@@ -1312,6 +1360,8 @@ class AnyServer final :
   void set_has_possiblecitybuildtasks();
   void set_has_possibletechs();
   void set_has_deleteunit();
+  void set_has_updatetile();
+  void set_has_updatevisibility();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -1336,6 +1386,8 @@ class AnyServer final :
     ::PossibleCityBuildTasks* possiblecitybuildtasks_;
     ::PossibleTechs* possibletechs_;
     ::DeleteUnit* deleteunit_;
+    ::UpdateTile* updatetile_;
+    ::UpdateVisibility* updatevisibility_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -3435,7 +3487,6 @@ class UpdateMap final :
 
   enum : int {
     kTilesFieldNumber = 3,
-    kVisibilityFieldNumber = 4,
     kWidthFieldNumber = 1,
     kHeightFieldNumber = 2,
   };
@@ -3456,23 +3507,6 @@ class UpdateMap final :
   ::Tile* add_tiles();
   const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Tile >&
       tiles() const;
-
-  // repeated .Visibility visibility = 4;
-  int visibility_size() const;
-  private:
-  int _internal_visibility_size() const;
-  public:
-  void clear_visibility();
-  private:
-  ::Visibility _internal_visibility(int index) const;
-  void _internal_add_visibility(::Visibility value);
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_visibility();
-  public:
-  ::Visibility visibility(int index) const;
-  void set_visibility(int index, ::Visibility value);
-  void add_visibility(::Visibility value);
-  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& visibility() const;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_visibility();
 
   // uint32 width = 1;
   void clear_width();
@@ -3500,10 +3534,326 @@ class UpdateMap final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Tile > tiles_;
-  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int> visibility_;
-  mutable std::atomic<int> _visibility_cached_byte_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 width_;
   ::PROTOBUF_NAMESPACE_ID::uint32 height_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
+// -------------------------------------------------------------------
+
+class UpdateVisibility final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:UpdateVisibility) */ {
+ public:
+  inline UpdateVisibility() : UpdateVisibility(nullptr) {}
+  ~UpdateVisibility() override;
+  explicit constexpr UpdateVisibility(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  UpdateVisibility(const UpdateVisibility& from);
+  UpdateVisibility(UpdateVisibility&& from) noexcept
+    : UpdateVisibility() {
+    *this = ::std::move(from);
+  }
+
+  inline UpdateVisibility& operator=(const UpdateVisibility& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline UpdateVisibility& operator=(UpdateVisibility&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const UpdateVisibility& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const UpdateVisibility* internal_default_instance() {
+    return reinterpret_cast<const UpdateVisibility*>(
+               &_UpdateVisibility_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    16;
+
+  friend void swap(UpdateVisibility& a, UpdateVisibility& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(UpdateVisibility* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(UpdateVisibility* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline UpdateVisibility* New() const final {
+    return new UpdateVisibility();
+  }
+
+  UpdateVisibility* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UpdateVisibility>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const UpdateVisibility& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const UpdateVisibility& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(UpdateVisibility* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "UpdateVisibility";
+  }
+  protected:
+  explicit UpdateVisibility(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kVisibilityFieldNumber = 1,
+  };
+  // repeated .Visibility visibility = 1;
+  int visibility_size() const;
+  private:
+  int _internal_visibility_size() const;
+  public:
+  void clear_visibility();
+  private:
+  ::Visibility _internal_visibility(int index) const;
+  void _internal_add_visibility(::Visibility value);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* _internal_mutable_visibility();
+  public:
+  ::Visibility visibility(int index) const;
+  void set_visibility(int index, ::Visibility value);
+  void add_visibility(::Visibility value);
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>& visibility() const;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>* mutable_visibility();
+
+  // @@protoc_insertion_point(class_scope:UpdateVisibility)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedField<int> visibility_;
+  mutable std::atomic<int> _visibility_cached_byte_size_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
+// -------------------------------------------------------------------
+
+class UpdateTile final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:UpdateTile) */ {
+ public:
+  inline UpdateTile() : UpdateTile(nullptr) {}
+  ~UpdateTile() override;
+  explicit constexpr UpdateTile(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  UpdateTile(const UpdateTile& from);
+  UpdateTile(UpdateTile&& from) noexcept
+    : UpdateTile() {
+    *this = ::std::move(from);
+  }
+
+  inline UpdateTile& operator=(const UpdateTile& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline UpdateTile& operator=(UpdateTile&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const UpdateTile& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const UpdateTile* internal_default_instance() {
+    return reinterpret_cast<const UpdateTile*>(
+               &_UpdateTile_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    17;
+
+  friend void swap(UpdateTile& a, UpdateTile& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(UpdateTile* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(UpdateTile* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline UpdateTile* New() const final {
+    return new UpdateTile();
+  }
+
+  UpdateTile* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<UpdateTile>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const UpdateTile& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const UpdateTile& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(UpdateTile* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "UpdateTile";
+  }
+  protected:
+  explicit UpdateTile(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kTileFieldNumber = 1,
+    kXFieldNumber = 2,
+    kYFieldNumber = 3,
+  };
+  // .Tile tile = 1;
+  bool has_tile() const;
+  private:
+  bool _internal_has_tile() const;
+  public:
+  void clear_tile();
+  const ::Tile& tile() const;
+  PROTOBUF_MUST_USE_RESULT ::Tile* release_tile();
+  ::Tile* mutable_tile();
+  void set_allocated_tile(::Tile* tile);
+  private:
+  const ::Tile& _internal_tile() const;
+  ::Tile* _internal_mutable_tile();
+  public:
+  void unsafe_arena_set_allocated_tile(
+      ::Tile* tile);
+  ::Tile* unsafe_arena_release_tile();
+
+  // uint32 x = 2;
+  void clear_x();
+  ::PROTOBUF_NAMESPACE_ID::uint32 x() const;
+  void set_x(::PROTOBUF_NAMESPACE_ID::uint32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::uint32 _internal_x() const;
+  void _internal_set_x(::PROTOBUF_NAMESPACE_ID::uint32 value);
+  public:
+
+  // uint32 y = 3;
+  void clear_y();
+  ::PROTOBUF_NAMESPACE_ID::uint32 y() const;
+  void set_y(::PROTOBUF_NAMESPACE_ID::uint32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::uint32 _internal_y() const;
+  void _internal_set_y(::PROTOBUF_NAMESPACE_ID::uint32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:UpdateTile)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::Tile* tile_;
+  ::PROTOBUF_NAMESPACE_ID::uint32 x_;
+  ::PROTOBUF_NAMESPACE_ID::uint32 y_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   friend struct ::TableStruct_riposte_2eproto;
 };
@@ -3553,7 +3903,7 @@ class UnitBuildTask final :
                &_UnitBuildTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    16;
+    18;
 
   friend void swap(UnitBuildTask& a, UnitBuildTask& b) {
     a.Swap(&b);
@@ -3697,7 +4047,7 @@ class BuildingBuildTask final :
                &_BuildingBuildTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    17;
+    19;
 
   friend void swap(BuildingBuildTask& a, BuildingBuildTask& b) {
     a.Swap(&b);
@@ -3847,7 +4197,7 @@ class BuildTaskKind final :
                &_BuildTaskKind_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    18;
+    20;
 
   friend void swap(BuildTaskKind& a, BuildTaskKind& b) {
     a.Swap(&b);
@@ -4028,7 +4378,7 @@ class BuildTask final :
                &_BuildTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    19;
+    21;
 
   friend void swap(BuildTask& a, BuildTask& b) {
     a.Swap(&b);
@@ -4198,7 +4548,7 @@ class UpdateCity final :
                &_UpdateCity_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    20;
+    22;
 
   friend void swap(UpdateCity& a, UpdateCity& b) {
     a.Swap(&b);
@@ -4527,7 +4877,7 @@ class Path final :
                &_Path_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    21;
+    23;
 
   friend void swap(Path& a, Path& b) {
     a.Swap(&b);
@@ -4680,7 +5030,7 @@ class FoundCityCapability final :
                &_FoundCityCapability_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    22;
+    24;
 
   friend void swap(FoundCityCapability& a, FoundCityCapability& b) {
     a.Swap(&b);
@@ -4806,7 +5156,7 @@ class WorkerTaskImprovement final :
                &_WorkerTaskImprovement_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    23;
+    25;
 
   friend void swap(WorkerTaskImprovement& a, WorkerTaskImprovement& b) {
     a.Swap(&b);
@@ -4955,7 +5305,7 @@ class WorkerTaskKind final :
                &_WorkerTaskKind_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    24;
+    26;
 
   friend void swap(WorkerTaskKind& a, WorkerTaskKind& b) {
     a.Swap(&b);
@@ -5115,7 +5465,7 @@ class WorkerTask final :
                &_WorkerTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    25;
+    27;
 
   friend void swap(WorkerTask& a, WorkerTask& b) {
     a.Swap(&b);
@@ -5306,7 +5656,7 @@ class WorkerCapability final :
                &_WorkerCapability_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    26;
+    28;
 
   friend void swap(WorkerCapability& a, WorkerCapability& b) {
     a.Swap(&b);
@@ -5474,7 +5824,7 @@ class CarryUnitsCapability final :
                &_CarryUnitsCapability_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    27;
+    29;
 
   friend void swap(CarryUnitsCapability& a, CarryUnitsCapability& b) {
     a.Swap(&b);
@@ -5634,7 +5984,7 @@ class Capability final :
                &_Capability_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    28;
+    30;
 
   friend void swap(Capability& a, Capability& b) {
     a.Swap(&b);
@@ -5836,7 +6186,7 @@ class UpdateUnit final :
                &_UpdateUnit_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    29;
+    31;
 
   friend void swap(UpdateUnit& a, UpdateUnit& b) {
     a.Swap(&b);
@@ -6106,7 +6456,7 @@ class ResearchingTech final :
                &_ResearchingTech_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    30;
+    32;
 
   friend void swap(ResearchingTech& a, ResearchingTech& b) {
     a.Swap(&b);
@@ -6261,7 +6611,7 @@ class UpdatePlayer final :
                &_UpdatePlayer_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    31;
+    33;
 
   friend void swap(UpdatePlayer& a, UpdatePlayer& b) {
     a.Swap(&b);
@@ -6550,7 +6900,7 @@ class PathComputed final :
                &_PathComputed_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    32;
+    34;
 
   friend void swap(PathComputed& a, PathComputed& b) {
     a.Swap(&b);
@@ -6698,7 +7048,7 @@ class ConfirmMoveUnits final :
                &_ConfirmMoveUnits_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    33;
+    35;
 
   friend void swap(ConfirmMoveUnits& a, ConfirmMoveUnits& b) {
     a.Swap(&b);
@@ -6837,7 +7187,7 @@ class PossibleCityBuildTasks final :
                &_PossibleCityBuildTasks_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    34;
+    36;
 
   friend void swap(PossibleCityBuildTasks& a, PossibleCityBuildTasks& b) {
     a.Swap(&b);
@@ -6985,7 +7335,7 @@ class PossibleTechs final :
                &_PossibleTechs_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    35;
+    37;
 
   friend void swap(PossibleTechs& a, PossibleTechs& b) {
     a.Swap(&b);
@@ -7139,7 +7489,7 @@ class DeleteUnit final :
                &_DeleteUnit_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    36;
+    38;
 
   friend void swap(DeleteUnit& a, DeleteUnit& b) {
     a.Swap(&b);
@@ -7278,7 +7628,7 @@ class MoveUnits final :
                &_MoveUnits_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    37;
+    39;
 
   friend void swap(MoveUnits& a, MoveUnits& b) {
     a.Swap(&b);
@@ -7451,7 +7801,7 @@ class SetCityBuildTask final :
                &_SetCityBuildTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    38;
+    40;
 
   friend void swap(SetCityBuildTask& a, SetCityBuildTask& b) {
     a.Swap(&b);
@@ -7610,7 +7960,7 @@ class SetWorkerTask final :
                &_SetWorkerTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    39;
+    41;
 
   friend void swap(SetWorkerTask& a, SetWorkerTask& b) {
     a.Swap(&b);
@@ -7769,7 +8119,7 @@ class ComputePath final :
                &_ComputePath_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    40;
+    42;
 
   friend void swap(ComputePath& a, ComputePath& b) {
     a.Swap(&b);
@@ -7953,7 +8303,7 @@ class SetEconomySettings final :
                &_SetEconomySettings_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    41;
+    43;
 
   friend void swap(SetEconomySettings& a, SetEconomySettings& b) {
     a.Swap(&b);
@@ -8092,7 +8442,7 @@ class SetResearch final :
                &_SetResearch_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    42;
+    44;
 
   friend void swap(SetResearch& a, SetResearch& b) {
     a.Swap(&b);
@@ -8236,7 +8586,7 @@ class EndTurn final :
                &_EndTurn_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    43;
+    45;
 
   friend void swap(EndTurn& a, EndTurn& b) {
     a.Swap(&b);
@@ -8362,7 +8712,7 @@ class GetBuildTasks final :
                &_GetBuildTasks_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    44;
+    46;
 
   friend void swap(GetBuildTasks& a, GetBuildTasks& b) {
     a.Swap(&b);
@@ -8501,7 +8851,7 @@ class GetPossibleTechs final :
                &_GetPossibleTechs_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    45;
+    47;
 
   friend void swap(GetPossibleTechs& a, GetPossibleTechs& b) {
     a.Swap(&b);
@@ -8627,7 +8977,7 @@ class DoUnitAction final :
                &_DoUnitAction_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    46;
+    48;
 
   friend void swap(DoUnitAction& a, DoUnitAction& b) {
     a.Swap(&b);
@@ -10615,6 +10965,154 @@ inline ::DeleteUnit* AnyServer::mutable_deleteunit() {
   return _msg;
 }
 
+// .UpdateTile updateTile = 15;
+inline bool AnyServer::_internal_has_updatetile() const {
+  return packet_case() == kUpdateTile;
+}
+inline bool AnyServer::has_updatetile() const {
+  return _internal_has_updatetile();
+}
+inline void AnyServer::set_has_updatetile() {
+  _oneof_case_[0] = kUpdateTile;
+}
+inline void AnyServer::clear_updatetile() {
+  if (_internal_has_updatetile()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.updatetile_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::UpdateTile* AnyServer::release_updatetile() {
+  // @@protoc_insertion_point(field_release:AnyServer.updateTile)
+  if (_internal_has_updatetile()) {
+    clear_has_packet();
+      ::UpdateTile* temp = packet_.updatetile_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.updatetile_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::UpdateTile& AnyServer::_internal_updatetile() const {
+  return _internal_has_updatetile()
+      ? *packet_.updatetile_
+      : reinterpret_cast< ::UpdateTile&>(::_UpdateTile_default_instance_);
+}
+inline const ::UpdateTile& AnyServer::updatetile() const {
+  // @@protoc_insertion_point(field_get:AnyServer.updateTile)
+  return _internal_updatetile();
+}
+inline ::UpdateTile* AnyServer::unsafe_arena_release_updatetile() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyServer.updateTile)
+  if (_internal_has_updatetile()) {
+    clear_has_packet();
+    ::UpdateTile* temp = packet_.updatetile_;
+    packet_.updatetile_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyServer::unsafe_arena_set_allocated_updatetile(::UpdateTile* updatetile) {
+  clear_packet();
+  if (updatetile) {
+    set_has_updatetile();
+    packet_.updatetile_ = updatetile;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyServer.updateTile)
+}
+inline ::UpdateTile* AnyServer::_internal_mutable_updatetile() {
+  if (!_internal_has_updatetile()) {
+    clear_packet();
+    set_has_updatetile();
+    packet_.updatetile_ = CreateMaybeMessage< ::UpdateTile >(GetArenaForAllocation());
+  }
+  return packet_.updatetile_;
+}
+inline ::UpdateTile* AnyServer::mutable_updatetile() {
+  ::UpdateTile* _msg = _internal_mutable_updatetile();
+  // @@protoc_insertion_point(field_mutable:AnyServer.updateTile)
+  return _msg;
+}
+
+// .UpdateVisibility updateVisibility = 16;
+inline bool AnyServer::_internal_has_updatevisibility() const {
+  return packet_case() == kUpdateVisibility;
+}
+inline bool AnyServer::has_updatevisibility() const {
+  return _internal_has_updatevisibility();
+}
+inline void AnyServer::set_has_updatevisibility() {
+  _oneof_case_[0] = kUpdateVisibility;
+}
+inline void AnyServer::clear_updatevisibility() {
+  if (_internal_has_updatevisibility()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.updatevisibility_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::UpdateVisibility* AnyServer::release_updatevisibility() {
+  // @@protoc_insertion_point(field_release:AnyServer.updateVisibility)
+  if (_internal_has_updatevisibility()) {
+    clear_has_packet();
+      ::UpdateVisibility* temp = packet_.updatevisibility_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.updatevisibility_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::UpdateVisibility& AnyServer::_internal_updatevisibility() const {
+  return _internal_has_updatevisibility()
+      ? *packet_.updatevisibility_
+      : reinterpret_cast< ::UpdateVisibility&>(::_UpdateVisibility_default_instance_);
+}
+inline const ::UpdateVisibility& AnyServer::updatevisibility() const {
+  // @@protoc_insertion_point(field_get:AnyServer.updateVisibility)
+  return _internal_updatevisibility();
+}
+inline ::UpdateVisibility* AnyServer::unsafe_arena_release_updatevisibility() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyServer.updateVisibility)
+  if (_internal_has_updatevisibility()) {
+    clear_has_packet();
+    ::UpdateVisibility* temp = packet_.updatevisibility_;
+    packet_.updatevisibility_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyServer::unsafe_arena_set_allocated_updatevisibility(::UpdateVisibility* updatevisibility) {
+  clear_packet();
+  if (updatevisibility) {
+    set_has_updatevisibility();
+    packet_.updatevisibility_ = updatevisibility;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyServer.updateVisibility)
+}
+inline ::UpdateVisibility* AnyServer::_internal_mutable_updatevisibility() {
+  if (!_internal_has_updatevisibility()) {
+    clear_packet();
+    set_has_updatevisibility();
+    packet_.updatevisibility_ = CreateMaybeMessage< ::UpdateVisibility >(GetArenaForAllocation());
+  }
+  return packet_.updatevisibility_;
+}
+inline ::UpdateVisibility* AnyServer::mutable_updatevisibility() {
+  ::UpdateVisibility* _msg = _internal_mutable_updatevisibility();
+  // @@protoc_insertion_point(field_mutable:AnyServer.updateVisibility)
+  return _msg;
+}
+
 inline bool AnyServer::has_packet() const {
   return packet_case() != PACKET_NOT_SET;
 }
@@ -11812,47 +12310,185 @@ UpdateMap::tiles() const {
   return tiles_;
 }
 
-// repeated .Visibility visibility = 4;
-inline int UpdateMap::_internal_visibility_size() const {
+// -------------------------------------------------------------------
+
+// UpdateVisibility
+
+// repeated .Visibility visibility = 1;
+inline int UpdateVisibility::_internal_visibility_size() const {
   return visibility_.size();
 }
-inline int UpdateMap::visibility_size() const {
+inline int UpdateVisibility::visibility_size() const {
   return _internal_visibility_size();
 }
-inline void UpdateMap::clear_visibility() {
+inline void UpdateVisibility::clear_visibility() {
   visibility_.Clear();
 }
-inline ::Visibility UpdateMap::_internal_visibility(int index) const {
+inline ::Visibility UpdateVisibility::_internal_visibility(int index) const {
   return static_cast< ::Visibility >(visibility_.Get(index));
 }
-inline ::Visibility UpdateMap::visibility(int index) const {
-  // @@protoc_insertion_point(field_get:UpdateMap.visibility)
+inline ::Visibility UpdateVisibility::visibility(int index) const {
+  // @@protoc_insertion_point(field_get:UpdateVisibility.visibility)
   return _internal_visibility(index);
 }
-inline void UpdateMap::set_visibility(int index, ::Visibility value) {
+inline void UpdateVisibility::set_visibility(int index, ::Visibility value) {
   visibility_.Set(index, value);
-  // @@protoc_insertion_point(field_set:UpdateMap.visibility)
+  // @@protoc_insertion_point(field_set:UpdateVisibility.visibility)
 }
-inline void UpdateMap::_internal_add_visibility(::Visibility value) {
+inline void UpdateVisibility::_internal_add_visibility(::Visibility value) {
   visibility_.Add(value);
 }
-inline void UpdateMap::add_visibility(::Visibility value) {
+inline void UpdateVisibility::add_visibility(::Visibility value) {
   _internal_add_visibility(value);
-  // @@protoc_insertion_point(field_add:UpdateMap.visibility)
+  // @@protoc_insertion_point(field_add:UpdateVisibility.visibility)
 }
 inline const ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>&
-UpdateMap::visibility() const {
-  // @@protoc_insertion_point(field_list:UpdateMap.visibility)
+UpdateVisibility::visibility() const {
+  // @@protoc_insertion_point(field_list:UpdateVisibility.visibility)
   return visibility_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
-UpdateMap::_internal_mutable_visibility() {
+UpdateVisibility::_internal_mutable_visibility() {
   return &visibility_;
 }
 inline ::PROTOBUF_NAMESPACE_ID::RepeatedField<int>*
-UpdateMap::mutable_visibility() {
-  // @@protoc_insertion_point(field_mutable_list:UpdateMap.visibility)
+UpdateVisibility::mutable_visibility() {
+  // @@protoc_insertion_point(field_mutable_list:UpdateVisibility.visibility)
   return _internal_mutable_visibility();
+}
+
+// -------------------------------------------------------------------
+
+// UpdateTile
+
+// .Tile tile = 1;
+inline bool UpdateTile::_internal_has_tile() const {
+  return this != internal_default_instance() && tile_ != nullptr;
+}
+inline bool UpdateTile::has_tile() const {
+  return _internal_has_tile();
+}
+inline void UpdateTile::clear_tile() {
+  if (GetArenaForAllocation() == nullptr && tile_ != nullptr) {
+    delete tile_;
+  }
+  tile_ = nullptr;
+}
+inline const ::Tile& UpdateTile::_internal_tile() const {
+  const ::Tile* p = tile_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Tile&>(
+      ::_Tile_default_instance_);
+}
+inline const ::Tile& UpdateTile::tile() const {
+  // @@protoc_insertion_point(field_get:UpdateTile.tile)
+  return _internal_tile();
+}
+inline void UpdateTile::unsafe_arena_set_allocated_tile(
+    ::Tile* tile) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(tile_);
+  }
+  tile_ = tile;
+  if (tile) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:UpdateTile.tile)
+}
+inline ::Tile* UpdateTile::release_tile() {
+  
+  ::Tile* temp = tile_;
+  tile_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Tile* UpdateTile::unsafe_arena_release_tile() {
+  // @@protoc_insertion_point(field_release:UpdateTile.tile)
+  
+  ::Tile* temp = tile_;
+  tile_ = nullptr;
+  return temp;
+}
+inline ::Tile* UpdateTile::_internal_mutable_tile() {
+  
+  if (tile_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Tile>(GetArenaForAllocation());
+    tile_ = p;
+  }
+  return tile_;
+}
+inline ::Tile* UpdateTile::mutable_tile() {
+  ::Tile* _msg = _internal_mutable_tile();
+  // @@protoc_insertion_point(field_mutable:UpdateTile.tile)
+  return _msg;
+}
+inline void UpdateTile::set_allocated_tile(::Tile* tile) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete tile_;
+  }
+  if (tile) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::Tile>::GetOwningArena(tile);
+    if (message_arena != submessage_arena) {
+      tile = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, tile, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  tile_ = tile;
+  // @@protoc_insertion_point(field_set_allocated:UpdateTile.tile)
+}
+
+// uint32 x = 2;
+inline void UpdateTile::clear_x() {
+  x_ = 0u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint32 UpdateTile::_internal_x() const {
+  return x_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint32 UpdateTile::x() const {
+  // @@protoc_insertion_point(field_get:UpdateTile.x)
+  return _internal_x();
+}
+inline void UpdateTile::_internal_set_x(::PROTOBUF_NAMESPACE_ID::uint32 value) {
+  
+  x_ = value;
+}
+inline void UpdateTile::set_x(::PROTOBUF_NAMESPACE_ID::uint32 value) {
+  _internal_set_x(value);
+  // @@protoc_insertion_point(field_set:UpdateTile.x)
+}
+
+// uint32 y = 3;
+inline void UpdateTile::clear_y() {
+  y_ = 0u;
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint32 UpdateTile::_internal_y() const {
+  return y_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::uint32 UpdateTile::y() const {
+  // @@protoc_insertion_point(field_get:UpdateTile.y)
+  return _internal_y();
+}
+inline void UpdateTile::_internal_set_y(::PROTOBUF_NAMESPACE_ID::uint32 value) {
+  
+  y_ = value;
+}
+inline void UpdateTile::set_y(::PROTOBUF_NAMESPACE_ID::uint32 value) {
+  _internal_set_y(value);
+  // @@protoc_insertion_point(field_set:UpdateTile.y)
 }
 
 // -------------------------------------------------------------------
@@ -15515,6 +16151,10 @@ inline void DoUnitAction::set_action(::UnitAction value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

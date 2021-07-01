@@ -171,6 +171,10 @@ function Client:handlePacket(packet)
         self:handleUpdateGlobalData(packet.updateGlobalData)
     elseif packet.updateMap ~= nil then
         self:handleUpdateMap(packet.updateMap)
+    elseif packet.updateVisibility ~= nil then
+        self:handleUpdateVisibility(packet.updateVisibility)
+    elseif packet.updateTile ~= nil then
+        self:handleUpdateTile(packet.updateTile)
     elseif packet.updateUnit ~= nil then
         self:handleUpdateUnit(packet.updateUnit)
     elseif packet.updateCity ~= nil then
@@ -201,7 +205,14 @@ function Client:handleUpdateMap(packet)
     self.game.tiles = packet.tiles
     self.game.mapWidth = packet.width
     self.game.mapHeight = packet.height
+end
+
+function Client:handleUpdateVisibility(packet)
     self.game.visibility = packet.visibility
+end
+
+function Client:handleUpdateTile(packet)
+    self.game.tiles[packet.x + packet.y * self.game.mapWidth + 1] = packet.tile
 end
 
 function Client:handleUpdateUnit(packet)

@@ -465,6 +465,9 @@ function BottomControlWindow:new(game, hud)
     game.eventBus:registerHandler("selectedUnitsUpdated", function()
         o:rebuild()
     end)
+    game.eventBus:registerHandler("unitUpdated", function(unit)
+        o:rebuild()
+    end)
     return o
 end
 

@@ -208,7 +208,7 @@ namespace rip {
 
         const std::vector<std::unique_ptr<Improvement>> &getImprovements() const;
 
-        bool addImprovement(std::unique_ptr<Improvement> improvement);
+        bool addImprovement(Game &game, glm::uvec2 ourPos, std::unique_ptr<Improvement> improvement);
         bool hasImprovement(const std::string &name) const;
         void clearImprovements();
 

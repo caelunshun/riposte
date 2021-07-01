@@ -6,6 +6,7 @@
 #define RIPOSTE_SERVER_H
 
 #include <riposte.pb.h>
+#include <absl/container/flat_hash_set.h>
 
 #include "bridge.h"
 #include "game.h"
@@ -35,6 +36,10 @@ namespace rip {
         }
 
         void sendGameData(Game &game);
+        void sendUpdateTile(Game &game, glm::uvec2 pos);
+        void sendUpdateVisibility(Game &game);
+        void sendPlayerData(Game &game);
+        void sendGlobalData(Game &game);
 
         void handleClientInfo(Game &game, const ClientInfo &packet);
         void handleComputePath(Game &game, const ComputePath &packet);
@@ -49,6 +54,8 @@ namespace rip {
         void handlePacket(Game &game, AnyClient &packet);
 
         void update(Game &game);
+
+        PlayerId getPlayerID() const;
     };
 
     // The Riposte game server.
@@ -57,6 +64,12 @@ namespace rip {
     class Server {
         std::vector<Connection> connections;
 
+        absl::flat_hash_set<UnitId> dirtyUnits;
+        absl::flat_hash_set<CityId> dirtyCities;
+        absl::flat_hash_set<PlayerId> playersWithDirtyVisibility;
+        absl::flat_hash_set<glm::uvec2, PosHash> dirtyTiles;
+        absl::flat_hash_set<PlayerId> dirtyPlayers;
+
     public:
         Game game;
 
@@ -64,9 +77,15 @@ namespace rip {
 
         void addConnection(std::unique_ptr<Bridge> bridge);
 
-        void broadcastUnitUpdate(Unit &unit);
-        void broadcastCityUpdate(City &city);
         void broadcastUnitDeath(UnitId unitID);
+
+        void flushDirtyItems();
+
+        void markUnitDirty(UnitId unit);
+        void markCityDirty(CityId city);
+        void markPlayerVisibilityDirty(PlayerId player);
+        void markTileDirty(glm::uvec2 pos);
+        void markPlayerDirty(PlayerId player);
 
         void run();
     };

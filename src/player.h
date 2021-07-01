@@ -144,7 +144,7 @@ namespace rip {
          // Creates a City.
          CityId createCity(glm::uvec2 pos, Game &game);
 
-         void recomputeVisibility(const Game &game);
+         void recomputeVisibility(Game &game);
 
          bool isDead() const;
 

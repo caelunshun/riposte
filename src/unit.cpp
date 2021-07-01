@@ -222,6 +222,8 @@ namespace rip {
         if (health == 1.0) {
             fortifiedUntilHeal = false;
         }
+
+        game.getServer().markUnitDirty(id);
     }
 
     std::vector<std::unique_ptr<Capability>> &Unit::getCapabilities() {
@@ -299,6 +301,6 @@ namespace rip {
 
         inCombat = false;
 
-        game.getServer().broadcastUnitUpdate(*this);
+        game.getServer().markUnitDirty(id);
     }
 }

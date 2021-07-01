@@ -90,10 +90,34 @@ namespace rip {
                 const auto &tile = game.getTile(pos);
                 auto protoTile = packet.add_tiles();
                 setTile(game, playerID, pos, tile, *protoTile);
+            }
+        }
 
+        return packet;
+    }
+
+    UpdateVisibility getUpdateVisibilityPacket(Game &game, PlayerId playerID) {
+        UpdateVisibility packet;
+
+        const auto &player = game.getPlayer(playerID);
+        for (int y = 0; y < game.getMapHeight(); y++) {
+            for (int x = 0; x < game.getMapWidth(); x++) {
+                glm::uvec2 pos(x, y);
                 packet.add_visibility(static_cast<::Visibility>(static_cast<int>(player.getVisibilityMap()[pos])));
             }
         }
+
+        return packet;
+    }
+
+    UpdateTile getUpdateTilePacket(Game &game, glm::uvec2 pos, PlayerId player) {
+        auto &tile = game.getTile(pos);
+
+        UpdateTile packet;
+        setTile(game, player, pos, tile, *packet.mutable_tile());
+
+        packet.set_x(pos.x);
+        packet.set_y(pos.y);
 
         return packet;
     }
@@ -236,9 +260,33 @@ namespace rip {
         return packet;
     }
 
-    void Connection::sendGameData(Game &game) {
+    void Connection::sendUpdateTile(Game &game, glm::uvec2 pos) {
+        auto packet = getUpdateTilePacket(game, pos, playerID);
+        SEND(packet, updatetile, 0);
+    }
+
+    void Connection::sendUpdateVisibility(Game &game) {
+        auto packet = getUpdateVisibilityPacket(game, playerID);
+        SEND(packet, updatevisibility, 0);
+    }
+
+    void Connection::sendPlayerData(Game &game) {
+        auto packet = getUpdatePlayerPacket(game, game.getPlayer(playerID));
+        SEND(packet, updateplayer, 0);
+    }
+
+    PlayerId Connection::getPlayerID() const {
+        return rip::PlayerId();
+    }
+
+    void Connection::sendGlobalData(Game &game) {
         SEND(getUpdateGlobalDataPacket(game, playerID), updateglobaldata, 0);
-        SEND(getUpdatePlayerPacket(game, game.getPlayer(playerID)), updateplayer, 0);
+    }
+
+    void Connection::sendGameData(Game &game) {
+        sendGlobalData(game);
+        sendPlayerData(game);
+        sendUpdateVisibility(game);
         SEND(getUpdateMapPacket(game, playerID), updatemap, 0);
 
         for (auto &unit : game.getUnits()) {
@@ -302,6 +350,8 @@ namespace rip {
             }
         }
 
+        game.getServer().flushDirtyItems();
+
         ConfirmMoveUnits response;
         response.set_success(success);
         SEND(response, confirmmoveunits, currentRequestID);
@@ -331,19 +381,17 @@ namespace rip {
                     );
         }
 
-        auto &city = game.getCity(CityId(packet.cityid()));
+        CityId cityID(packet.cityid());
+        auto &city = game.getCity(cityID);
         city.setBuildTask(std::move(task));
 
-        auto response = getUpdateCityPacket(game, city);
-        SEND(response, updatecity, currentRequestID);
+        game.getServer().markCityDirty(cityID);
     }
 
     void Connection::handleSetResearch(Game &game, const SetResearch &packet) {
         auto tech = game.getTechTree().getTechs().at(packet.techid());
         game.getPlayer(playerID).setResearchingTech(tech);
-
-        auto response = getUpdatePlayerPacket(game, game.getPlayer(playerID));
-        SEND(response, updateplayer, currentRequestID);
+        game.getServer().markPlayerDirty(playerID);
     }
 
     void Connection::handleGetPossibleTechs(Game &game, const GetPossibleTechs &packet) {
@@ -359,9 +407,7 @@ namespace rip {
     void Connection::handleSetEconomySettings(Game &game, const SetEconomySettings &packet) {
         auto &player = game.getPlayer(playerID);
         player.setSciencePercent(packet.beakerpercent(), game);
-
-        auto response = getUpdatePlayerPacket(game, player);
-        SEND(response, updateplayer, currentRequestID);
+        game.getServer().markPlayerDirty(playerID);
     }
 
     void Connection::handleDoUnitAction(Game &game, const DoUnitAction &packet) {
@@ -390,10 +436,7 @@ namespace rip {
                 break;
         }
 
-        if (game.getUnits().contains(id)) {
-            auto packet = getUpdateUnitPacket(game, unit);
-            SEND(packet, updateunit, currentRequestID);
-        }
+        game.getServer().markUnitDirty(unit.getID());
     }
 
     void Connection::handleSetWorkerTask(Game &game, const SetWorkerTask &packet) {
@@ -420,7 +463,7 @@ namespace rip {
 
         workerCap->setTask(std::make_unique<BuildImprovementTask>(improvement->getNumBuildTurns(), worker.getPos(), std::move(improvement)));
 
-        SEND(getUpdateUnitPacket(game, worker), updateunit, currentRequestID);
+        game.getServer().markUnitDirty(worker.getID());
     }
 
     void Connection::handlePacket(Game &game, AnyClient &packet) {
@@ -467,7 +510,7 @@ namespace rip {
     }
 
     Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)
-        : game(MapGenerator().generate(64, 64, registry, techTree)) {
+        : game(MapGenerator().generate(64, 64, registry, techTree, this)) {
     }
 
     void Server::addConnection(std::unique_ptr<Bridge> bridge) {
@@ -493,29 +536,87 @@ namespace rip {
                 game.advanceTurn();
                 for (auto &connection : connections) {
                     connection.endedTurn = false;
-                    connection.sendGameData(game);
+                    connection.sendGlobalData(game);
                 }
             }
 
             game.tick();
+            flushDirtyItems();
 
             std::this_thread::sleep_for(std::chrono::milliseconds(15));
         }
-    }
-
-    void Server::broadcastUnitUpdate(Unit &unit) {
-        auto packet = getUpdateUnitPacket(game, unit);
-        BROADCAST(packet, updateunit, 0);
-    }
-
-    void Server::broadcastCityUpdate(City &city) {
-        auto packet = getUpdateCityPacket(game, city);
-        BROADCAST(packet, updatecity, 0);
     }
 
     void Server::broadcastUnitDeath(UnitId unitID) {
         DeleteUnit packet;
         packet.set_unitid(unitID.encode());
         BROADCAST(packet, deleteunit, 0);
+    }
+
+    void Server::flushDirtyItems() {
+        for (const auto unitID : dirtyUnits) {
+            if (game.getUnits().contains(unitID)) {
+                auto packet = getUpdateUnitPacket(game, game.getUnit(unitID));
+                BROADCAST(packet, updateunit, 0);
+            }
+        }
+
+        for (const auto cityID : dirtyCities) {
+            if (game.getCities().contains(cityID)) {
+                auto packet = getUpdateCityPacket(game, game.getCity(cityID));
+                BROADCAST(packet, updatecity, 0);
+            }
+        }
+
+        for (const auto playerID : playersWithDirtyVisibility) {
+            for (auto &conn : connections) {
+                if (conn.getPlayerID() == playerID) {
+                    conn.sendUpdateVisibility(game);
+                    break;
+                }
+            }
+        }
+
+        for (const auto tile : dirtyTiles) {
+            for (auto &conn : connections) {
+                conn.sendUpdateTile(game, tile);
+            }
+        }
+
+        for (const auto playerID : dirtyPlayers) {
+            auto &player = game.getPlayer(playerID);
+            for (auto &conn : connections) {
+                if (conn.getPlayerID() == playerID) {
+                    conn.sendPlayerData(game);
+                    break;
+                }
+            }
+        }
+
+        dirtyUnits.clear();
+        dirtyCities.clear();
+        playersWithDirtyVisibility.clear();
+        dirtyTiles.clear();
+        dirtyPlayers.clear();
+    }
+
+    void Server::markUnitDirty(UnitId unit) {
+        dirtyUnits.insert(unit);
+    }
+
+    void Server::markCityDirty(CityId city) {
+        dirtyCities.insert(city);
+    }
+
+    void Server::markPlayerVisibilityDirty(PlayerId player) {
+        playersWithDirtyVisibility.insert(player);
+    }
+
+    void Server::markTileDirty(glm::uvec2 pos) {
+        dirtyTiles.insert(pos);
+    }
+
+    void Server::markPlayerDirty(PlayerId player) {
+        dirtyPlayers.insert(player);
     }
 }

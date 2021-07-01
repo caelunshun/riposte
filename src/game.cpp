@@ -62,7 +62,7 @@ namespace rip {
 
         std::shared_ptr<ScriptEngine> scriptEngine;
 
-        std::shared_ptr<Server> server;
+        Server *server;
 
         std::shared_ptr<TechTree> techTree;
 
@@ -199,7 +199,7 @@ namespace rip {
         auto id = getCities().insert(std::move(city));
         getCity(id).setID(id);
         getCity(id).onCreated(*this);
-        getServer().broadcastCityUpdate(getCity(id));
+        getServer().markCityDirty(id);
         return id;
     }
 
@@ -274,6 +274,7 @@ namespace rip {
         auto &u = getUnit(id);
         u.setID(id);
         onUnitMoved(id, {}, u.getPos());
+        getServer().markUnitDirty(id);
         return id;
     }
 
@@ -474,7 +475,7 @@ namespace rip {
         return *impl->server;
     }
 
-    void Game::setServer(std::shared_ptr<Server> server) {
+    void Game::setServer(Server *server) {
         impl->server = server;
     }
 

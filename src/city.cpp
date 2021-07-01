@@ -11,6 +11,7 @@
 #include <string>
 #include <utility>
 #include <iostream>
+#include "server.h"
 
 namespace rip {
     BuildTask::BuildTask(int cost) : cost(cost) {}
@@ -230,6 +231,8 @@ namespace rip {
         doGrowth(game);
 
         culture.addCultureForPlayer(owner, getCulturePerTurn());
+
+        game.getServer().markCityDirty(id);
     }
 
     bool City::hasBuildTask() const {
@@ -251,7 +254,6 @@ namespace rip {
     const std::string &City::getPreviousBuildTask() const {
         return previousBuildTask;
     }
-
 
     UnitBuildTask::UnitBuildTask(std::shared_ptr<UnitKind> unitKind) : BuildTask(unitKind->cost), unitKind(std::move(unitKind)) {}
 
@@ -493,6 +495,8 @@ namespace rip {
 
         newOwner.recomputeScore(game);
         oldOwner.recomputeScore(game);
+
+        game.getServer().markCityDirty(id);
     }
 
     const std::vector<std::shared_ptr<Building>> &City::getBuildings() const {

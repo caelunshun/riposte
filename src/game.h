@@ -40,7 +40,7 @@ namespace rip {
     public:
         Game(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree);
 
-        void setServer(std::shared_ptr<Server> server);
+        void setServer(Server *server);
 
         ~Game();
 
