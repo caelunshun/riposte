@@ -365,7 +365,7 @@ function Hud:doAutoSelect()
             self.readyForNextTurn = false
         end
 
-        if group.followingPath ~= nil and #group.followingPath > 0 then
+        if group.followingPath ~= nil and #group.followingPath.positions > 0 then
             self:moveGroupAlongPath(group, group.followingPath, function()
                 self.selectionGroups:createGroup(group)
             end, function()
