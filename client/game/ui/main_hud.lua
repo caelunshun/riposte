@@ -44,16 +44,6 @@ function Hud:new(game)
         promptQueue = prompts.PromptQueue:new(),
     }
 
-    o.windows = {
-        BottomControlWindow:new(game, o),
-        UnitDisplayWindow:new(game, o),
-        TurnIndicatorWindow:new(game, o),
-        ScoreWindow:new(game, o),
-        UnitStackWindow:new(game, o),
-        ResearchBar:new(game, o),
-        EconomyWindow:new(game, o),
-    }
-
     game.eventBus:registerHandler("globalDataUpdated", function()
         o:rebuildWindows()
     end)
@@ -80,6 +70,24 @@ function Hud:new(game)
             o.selectedStack = nil
         end
     end)
+
+    game.eventBus:registerHandler("unitUpdated", function(unit)
+        for _, u in ipairs(o.selectedUnits) do
+            if u == unit then
+                o.selectedStack = game:getStackAtPos(u.pos)
+            end
+        end
+    end)
+
+    o.windows = {
+        BottomControlWindow:new(game, o),
+        UnitDisplayWindow:new(game, o),
+        TurnIndicatorWindow:new(game, o),
+        ScoreWindow:new(game, o),
+        UnitStackWindow:new(game, o),
+        ResearchBar:new(game, o),
+        EconomyWindow:new(game, o),
+    }
 
     setmetatable(o, self)
     self.__index = self
@@ -599,12 +607,56 @@ function ScoreWindow:rebuild()
     ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container, false, true)
 end
 
+local UnitStatus = {
+    Green = dume.rgb(68, 194, 113),
+    Yellow = dume.rgb(254, 221, 0),
+    Red = dume.rgb(231, 60, 62),
+    Gray = dume.rgb(180, 180, 180),
+}
+
+local function getUnitStatus(unit)
+    if unit.isFortified then
+        return UnitStatus.Gray
+    elseif unit.movementLeft < 0.1 then
+        return UnitStatus.Red
+    elseif unit.movementLeft < unit.kind.movement then
+        return UnitStatus.Yellow
+    else
+        return UnitStatus.Green
+    end
+end
+
+-- Widget that draws a circle whose color indicates a unit's status.
+local UnitStatusIndicator = {}
+
+function UnitStatusIndicator:new(status)
+    local o = { params = {status = status}, fillParent = true }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function UnitStatusIndicator:paint(cv)
+    cv:beginPath()
+    cv:rect(Vector(-5, -5), Vector(10, 10))
+    cv:solidColor(self.params.status)
+    cv:fill()
+
+    -- border
+    cv:strokeWidth(0.8)
+    cv:solidColor(dume.rgb(0, 0, 0))
+    cv:stroke()
+end
+
 function UnitStackWindow:new(game, hud)
     local o = { game = game, hud = hud }
     setmetatable(o, self)
     self.__index = self
 
     game.eventBus:registerHandler("selectedUnitsUpdated", function()
+        o:rebuild()
+    end)
+    game.eventBus:registerHandler("unitUpdated", function()
         o:rebuild()
     end)
 
@@ -619,7 +671,9 @@ function UnitStackWindow:rebuild()
     if self.hud.selectedStack ~= nil and #self.hud.selectedUnits > 0 then
         for _, unit in ipairs(self.hud.selectedStack.units) do
             if unit.owner == self.game.thePlayer then
-                local image = Image:new("icon/unit_head/" .. unit.kind.id, 35)
+                local status = getUnitStatus(unit)
+                local indicator = UnitStatusIndicator:new(status)
+                local image = Image:new("icon/unit_head/" .. unit.kind.id, 35, indicator)
 
                 local container = Container:new(image)
                 table.insert(container.classes, "unitHeadContainer")
