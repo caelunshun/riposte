@@ -121,6 +121,7 @@ namespace rip {
             auto &owner = owners[tilePos.x + tilePos.y * mapWidth];
             if (owner == city.getOwner()) {
                 owner = {};
+                game.getServer().markTileDirty(tilePos);
             }
         }, [&] (Tile &tile, glm::uvec2 tilePos) {
             auto d = dist(tilePos, city.getPos());

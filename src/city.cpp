@@ -477,6 +477,10 @@ namespace rip {
     }
 
     void City::transferControlTo(Game &game, PlayerId newOwnerID) {
+        if (newOwnerID == owner) return;
+
+        capital = false;
+
         game.getCultureMap().onCityDestroyed(game, id);
         auto &oldOwner = game.getPlayer(owner);
         oldOwner.removeCity(id, game);
