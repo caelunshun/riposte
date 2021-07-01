@@ -93,6 +93,8 @@ function Hud:rebuildWindows()
 end
 
 function Hud:handleEvent(event)
+    if self.promptQueue:getCurrentPrompt() ~= nil then return end
+
     if event.type == dume.EventType.Key and event.action == dume.Action.Release
             and event.key == dume.Key.Return and self.readyForNextTurn then
         self.game.client:endTurn()
@@ -107,7 +109,7 @@ function Hud:handleEvent(event)
     if event.type == dume.EventType.MouseClick then
         if event.action == dume.Action.Press
                 and event.mouse == dume.Mouse.Left
-                and not (self.selectedStack ~= nil and self.selectedStack.pos == clickedPos) then
+                and not (self.selectedStack ~= nil and self.selectedStack.pos == clickedPos and #self.selectedUnits > 0) then
             -- Attempt to select a unit at the top of the stack.
             local stack = self.game:getStackAtPos(clickedPos)
             local unit = stack.units[1]
@@ -150,6 +152,11 @@ end
 function Hud:computePath(from, to)
     self.stagedPathTarget = to
 
+    if from == to then
+        self.stagedPath = { positions = {from.x, from.y} }
+        return
+    end
+
     local unitKindID = self.selectedUnits[1].kind.id
 
     self.tasks:enqueue(coroutine.create(function()
@@ -181,8 +188,21 @@ end
 -- Enqueues a task that moves the current selection along the currently staged path.
 -- After the task finishes, the selection is cleared if moving the units was successful.
 function Hud:moveSelectionAlongStagedPath()
-    self:moveGroupAlongPath(self.selectedUnits, self.stagedPath, function()
-        self:clearSelection()
+    local units = self.selectedUnits
+    self:moveGroupAlongPath(units, self.stagedPath, function()
+        local hasMovementLeft = false
+        for _, unit in ipairs(units) do
+            if unit.movementLeft > 0.1 then
+                hasMovementLeft = true
+                break
+            end
+        end
+
+        if not hasMovementLeft then
+            self:clearSelection()
+        else
+            self.selectedStack = self.game:getStackAtPos(units[1].pos)
+        end
     end)
 end
 
@@ -333,6 +353,8 @@ end
 
 -- Automatically selects the next available unit group.
 function Hud:doAutoSelect()
+    if self.promptQueue:getCurrentPrompt() ~= nil then return end
+
     self.tasks:enqueue(coroutine.create(function()
         local group = self.selectionGroups:popNextGroup()
 

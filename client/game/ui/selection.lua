@@ -55,7 +55,10 @@ function SelectionGroups:popNextGroup()
 
         local valid = true
         for _, unit in ipairs(group) do
-            if unit.movementLeft < 0.1 then
+            local workerCap = unit:getCapability("worker")
+            if unit.movementLeft < 0.1 or (
+                    workerCap ~= nil and workerCap.currentTask ~= nil
+            ) then
                 valid = false
                 break
             end
