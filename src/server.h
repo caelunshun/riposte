@@ -88,6 +88,13 @@ namespace rip {
         void markTileDirty(glm::uvec2 pos);
         void markPlayerDirty(PlayerId player);
 
+        void broadcastCombatEvent(
+                UnitId attackerID,
+                UnitId defenderID,
+                UnitId winnerID,
+                const std::vector<CombatRound> &rounds
+                );
+
         void run();
     };
 }

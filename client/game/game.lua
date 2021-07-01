@@ -19,6 +19,7 @@ local City = require("game/city")
 local Player = require("game/player")
 local Unit = require("game/unit")
 local Stack = require("game/stack")
+local CombatEvent = require("game/combat")
 
 function Game:new()
     local o = {
@@ -134,6 +135,22 @@ end
 function Game:updateThePlayer(packet)
     self.thePlayer:updateData(packet)
     self.eventBus:trigger("thePlayerUpdated")
+end
+
+function Game:hasCombatEvent()
+    return self.currentCombatEvent ~= nil
+end
+
+function Game:getCombatEvent()
+    return self.currentCombatEvent
+end
+
+function Game:clearCombatEvent()
+    self.currentCombatEvent = nil
+end
+
+function Game:startCombatEvent(packet)
+    self.currentCombatEvent = CombatEvent:new(self, packet)
 end
 
 return Game

@@ -87,7 +87,34 @@ function Unit:render(cv, game)
     cv:solidColor(owner.civ.color)
     cv:fill()
 
+    -- Unit health bar if in combat (combat animation)
+    if self.isInCombat then
+        self:drawHealthBar(cv)
+    end
+
     cv:translate(-translation)
+end
+
+local healthBarBackgroundColor = dume.rgb(100, 100, 100, 150)
+local healthBarForegroundColor = dume.rgb(108, 198, 74)
+local black = dume.rgb(0, 0, 0)
+
+function Unit:drawHealthBar(cv)
+    local size = Vector(60, 10)
+    local pos = Vector(50 - size.x / 2, 25)
+
+    cv:beginPath()
+    cv:rect(pos, size)
+    cv:solidColor(healthBarBackgroundColor)
+    cv:fill()
+    cv:strokeWidth(1)
+    cv:solidColor(black)
+    cv:stroke()
+
+    cv:beginPath()
+    cv:rect(pos, Vector(size.x * self.health, size.y))
+    cv:solidColor(healthBarForegroundColor)
+    cv:fill()
 end
 
 -- Attempts to move the unit.

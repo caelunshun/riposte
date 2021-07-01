@@ -8,6 +8,8 @@
 #include "rng.h"
 #include "ids.h"
 
+class CombatRound;
+
 namespace rip {
     class Game;
     class Unit;
@@ -24,7 +26,7 @@ namespace rip {
         double startingAttackerStrength;
         double startingDefenderStrength;
 
-        float getNextRoundTime() const;
+        std::vector<CombatRound> rounds;
 
         void doRound(Game &game);
 
@@ -34,17 +36,17 @@ namespace rip {
     public:
         Combat(UnitId attacker, UnitId defender, Game &game);
 
-        // Advances combat by the given time.
-        void advance(Game &game, float dt);
-
         // Determines whether combat has finished.
         bool isFinished() const;
 
-        // Finishes combat by killing the loser (if needed).
+        // Finishes combat by simulating all rounds and killing the loser (if needed).
         void finish(Game &game);
 
         UnitId getAttacker();
         UnitId getDefender();
+
+        // Returns the rounds of simulated combat.
+        const std::vector<CombatRound> &getRounds() const;
     };
 }
 

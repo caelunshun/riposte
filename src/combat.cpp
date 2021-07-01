@@ -8,6 +8,8 @@
 #include "unit.h"
 #include "event.h"
 #include "city.h"
+#include <riposte.pb.h>
+#include "server.h"
 
 namespace rip {
     const float roundTime = 0.4;
@@ -64,9 +66,6 @@ namespace rip {
         return baseStrength + (percentBonus / 100.0) * baseStrength;
     }
 
-    float Combat::getNextRoundTime() const {
-        return nextRound * roundTime;
-    }
 
     void Combat::doRound(Game &game) {
         auto &attacker = game.getUnit(attackerID);
@@ -88,17 +87,12 @@ namespace rip {
 
         if (attacker.shouldDie() || defender.shouldDie()) finished = true;
 
+        CombatRound round;
+        round.set_attackerhealth(attacker.getHealth());
+        round.set_defenderhealth(defender.getHealth());
+        rounds.push_back(std::move(round));
+
         ++nextRound;
-    }
-
-    void Combat::advance(Game &game, float dt) {
-        time += dt;
-
-        if (getNextRoundTime() > time) return;
-
-        if (finished) return;
-
-        doRound(game);
     }
 
     bool Combat::isFinished() const {
@@ -132,6 +126,12 @@ namespace rip {
             UnitId ours;
             if (attacker.getOwner() == game.getThePlayerID()) { enemy = defenderID; ours = attackerID; }
             else { enemy = attackerID; ours = defenderID; }
+            game.getServer().broadcastCombatEvent(
+                    attacker.getID(),
+                    defender.getID(),
+                    winner,
+                    getRounds()
+                    );
             game.addEvent(std::make_unique<CombatEvent>(
                         game.getUnit(winner).getOwner() == game.getThePlayerID(),
                         game.getPlayer(game.getUnit(enemy).getOwner()).getCiv().adjective,
@@ -147,5 +147,9 @@ namespace rip {
 
     UnitId Combat::getDefender() {
         return defenderID;
+    }
+
+    const std::vector<CombatRound> &Combat::getRounds() const {
+        return rounds;
     }
 }

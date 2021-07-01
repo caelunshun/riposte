@@ -90,6 +90,7 @@ message AnyServer {
     DeleteUnit deleteUnit = 14;
     UpdateTile updateTile = 15;
     UpdateVisibility updateVisibility = 16;
+    CombatEvent combatEvent = 17;
   }
 }
 
@@ -380,6 +381,37 @@ message PossibleTechs {
 
 message DeleteUnit {
   int32 unitID = 1;
+}
+
+// Informs the client of a combat event that occurred between two units.
+//
+// Only sent if combat happens during the player's turn, or if one of the player's
+// units is involved. If it happens in between
+// turns (e.g. because of AI vs AI combat) then this packet is not sent.
+// However, DeleteUnit is always sent for the loser.
+//
+// If one of the client's units is involved in this combat event, the client should stop
+// handling packets until it has finished displaying the combat animation. This ensures
+// that cities won't turn, units won't die, and new combat animations won't be displayed until
+// after the player has watched the animation.
+//
+// Following this packet, DeleteUnit is sent for the loser of the battle, if any,
+// and UpdateUnit is sent for the winner.
+message CombatEvent {
+  int32 attackerID = 1;
+  int32 defenderID = 2;
+
+  // A list of rounds that occurred during combat.
+  // Used to display the animation.
+  repeated CombatRound rounds = 3;
+}
+
+// A round of combat during which one or both units suffered damage.
+message CombatRound {
+  // The attacker's health (0..1) at the end of this round.
+  double attackerHealth = 1;
+  // The defender's health (0..1) at the end of this round.
+  double defenderHealth = 2;
 }
 
 // ---------------------

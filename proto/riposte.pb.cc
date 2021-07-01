@@ -557,6 +557,33 @@ struct DeleteUnitDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT DeleteUnitDefaultTypeInternal _DeleteUnit_default_instance_;
+constexpr CombatEvent::CombatEvent(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : rounds_()
+  , attackerid_(0)
+  , defenderid_(0){}
+struct CombatEventDefaultTypeInternal {
+  constexpr CombatEventDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~CombatEventDefaultTypeInternal() {}
+  union {
+    CombatEvent _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT CombatEventDefaultTypeInternal _CombatEvent_default_instance_;
+constexpr CombatRound::CombatRound(
+  ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
+  : attackerhealth_(0)
+  , defenderhealth_(0){}
+struct CombatRoundDefaultTypeInternal {
+  constexpr CombatRoundDefaultTypeInternal()
+    : _instance(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized{}) {}
+  ~CombatRoundDefaultTypeInternal() {}
+  union {
+    CombatRound _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT CombatRoundDefaultTypeInternal _CombatRound_default_instance_;
 constexpr MoveUnits::MoveUnits(
   ::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized)
   : unitids_()
@@ -695,7 +722,7 @@ struct DeclareWarDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT DeclareWarDefaultTypeInternal _DeclareWar_default_instance_;
-static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_riposte_2eproto[50];
+static ::PROTOBUF_NAMESPACE_ID::Metadata file_level_metadata_riposte_2eproto[52];
 static const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* file_level_enum_descriptors_riposte_2eproto[4];
 static constexpr ::PROTOBUF_NAMESPACE_ID::ServiceDescriptor const** file_level_service_descriptors_riposte_2eproto = nullptr;
 
@@ -732,6 +759,7 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   PROTOBUF_FIELD_OFFSET(::AnyServer, _oneof_case_[0]),
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::AnyServer, requestid_),
+  ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
   ::PROTOBUF_NAMESPACE_ID::internal::kInvalidFieldOffsetTag,
@@ -1035,6 +1063,21 @@ const ::PROTOBUF_NAMESPACE_ID::uint32 TableStruct_riposte_2eproto::offsets[] PRO
   ~0u,  // no _weak_field_map_
   PROTOBUF_FIELD_OFFSET(::DeleteUnit, unitid_),
   ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::CombatEvent, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::CombatEvent, attackerid_),
+  PROTOBUF_FIELD_OFFSET(::CombatEvent, defenderid_),
+  PROTOBUF_FIELD_OFFSET(::CombatEvent, rounds_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::CombatRound, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  PROTOBUF_FIELD_OFFSET(::CombatRound, attackerhealth_),
+  PROTOBUF_FIELD_OFFSET(::CombatRound, defenderhealth_),
+  ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::MoveUnits, _internal_metadata_),
   ~0u,  // no _extensions_
   ~0u,  // no _oneof_case_
@@ -1109,53 +1152,55 @@ static const ::PROTOBUF_NAMESPACE_ID::internal::MigrationSchema schemas[] PROTOB
   { 0, -1, sizeof(::Pos)},
   { 7, -1, sizeof(::AnyClient)},
   { 26, -1, sizeof(::AnyServer)},
-  { 48, -1, sizeof(::ClientInfo)},
-  { 54, -1, sizeof(::ServerInfo)},
-  { 61, -1, sizeof(::KickPlayer)},
-  { 68, -1, sizeof(::SetLeader)},
-  { 75, -1, sizeof(::AdminStartGame)},
-  { 80, -1, sizeof(::LobbyError)},
-  { 86, -1, sizeof(::StartGame)},
-  { 91, -1, sizeof(::PlayerInfo)},
-  { 102, -1, sizeof(::UpdateGlobalData)},
-  { 111, -1, sizeof(::Improvement)},
-  { 118, -1, sizeof(::Yield)},
-  { 126, -1, sizeof(::Tile)},
-  { 140, -1, sizeof(::UpdateMap)},
-  { 148, -1, sizeof(::UpdateVisibility)},
-  { 154, -1, sizeof(::UpdateTile)},
-  { 162, -1, sizeof(::UnitBuildTask)},
-  { 168, -1, sizeof(::BuildingBuildTask)},
-  { 174, -1, sizeof(::BuildTaskKind)},
-  { 182, -1, sizeof(::BuildTask)},
-  { 190, -1, sizeof(::UpdateCity)},
-  { 209, -1, sizeof(::Path)},
-  { 215, -1, sizeof(::FoundCityCapability)},
-  { 220, -1, sizeof(::WorkerTaskImprovement)},
-  { 226, -1, sizeof(::WorkerTaskKind)},
-  { 233, -1, sizeof(::WorkerTask)},
-  { 242, -1, sizeof(::WorkerCapability)},
-  { 249, -1, sizeof(::CarryUnitsCapability)},
-  { 255, -1, sizeof(::Capability)},
-  { 264, -1, sizeof(::UpdateUnit)},
-  { 279, -1, sizeof(::ResearchingTech)},
-  { 286, -1, sizeof(::UpdatePlayer)},
-  { 304, -1, sizeof(::PathComputed)},
-  { 310, -1, sizeof(::ConfirmMoveUnits)},
-  { 316, -1, sizeof(::PossibleCityBuildTasks)},
-  { 322, -1, sizeof(::PossibleTechs)},
-  { 328, -1, sizeof(::DeleteUnit)},
-  { 334, -1, sizeof(::MoveUnits)},
-  { 341, -1, sizeof(::SetCityBuildTask)},
-  { 348, -1, sizeof(::SetWorkerTask)},
-  { 355, -1, sizeof(::ComputePath)},
-  { 363, -1, sizeof(::SetEconomySettings)},
-  { 369, -1, sizeof(::SetResearch)},
-  { 375, -1, sizeof(::EndTurn)},
-  { 380, -1, sizeof(::GetBuildTasks)},
-  { 386, -1, sizeof(::GetPossibleTechs)},
-  { 391, -1, sizeof(::DoUnitAction)},
-  { 398, -1, sizeof(::DeclareWar)},
+  { 49, -1, sizeof(::ClientInfo)},
+  { 55, -1, sizeof(::ServerInfo)},
+  { 62, -1, sizeof(::KickPlayer)},
+  { 69, -1, sizeof(::SetLeader)},
+  { 76, -1, sizeof(::AdminStartGame)},
+  { 81, -1, sizeof(::LobbyError)},
+  { 87, -1, sizeof(::StartGame)},
+  { 92, -1, sizeof(::PlayerInfo)},
+  { 103, -1, sizeof(::UpdateGlobalData)},
+  { 112, -1, sizeof(::Improvement)},
+  { 119, -1, sizeof(::Yield)},
+  { 127, -1, sizeof(::Tile)},
+  { 141, -1, sizeof(::UpdateMap)},
+  { 149, -1, sizeof(::UpdateVisibility)},
+  { 155, -1, sizeof(::UpdateTile)},
+  { 163, -1, sizeof(::UnitBuildTask)},
+  { 169, -1, sizeof(::BuildingBuildTask)},
+  { 175, -1, sizeof(::BuildTaskKind)},
+  { 183, -1, sizeof(::BuildTask)},
+  { 191, -1, sizeof(::UpdateCity)},
+  { 210, -1, sizeof(::Path)},
+  { 216, -1, sizeof(::FoundCityCapability)},
+  { 221, -1, sizeof(::WorkerTaskImprovement)},
+  { 227, -1, sizeof(::WorkerTaskKind)},
+  { 234, -1, sizeof(::WorkerTask)},
+  { 243, -1, sizeof(::WorkerCapability)},
+  { 250, -1, sizeof(::CarryUnitsCapability)},
+  { 256, -1, sizeof(::Capability)},
+  { 265, -1, sizeof(::UpdateUnit)},
+  { 280, -1, sizeof(::ResearchingTech)},
+  { 287, -1, sizeof(::UpdatePlayer)},
+  { 305, -1, sizeof(::PathComputed)},
+  { 311, -1, sizeof(::ConfirmMoveUnits)},
+  { 317, -1, sizeof(::PossibleCityBuildTasks)},
+  { 323, -1, sizeof(::PossibleTechs)},
+  { 329, -1, sizeof(::DeleteUnit)},
+  { 335, -1, sizeof(::CombatEvent)},
+  { 343, -1, sizeof(::CombatRound)},
+  { 350, -1, sizeof(::MoveUnits)},
+  { 357, -1, sizeof(::SetCityBuildTask)},
+  { 364, -1, sizeof(::SetWorkerTask)},
+  { 371, -1, sizeof(::ComputePath)},
+  { 379, -1, sizeof(::SetEconomySettings)},
+  { 385, -1, sizeof(::SetResearch)},
+  { 391, -1, sizeof(::EndTurn)},
+  { 396, -1, sizeof(::GetBuildTasks)},
+  { 402, -1, sizeof(::GetPossibleTechs)},
+  { 407, -1, sizeof(::DoUnitAction)},
+  { 414, -1, sizeof(::DeclareWar)},
 };
 
 static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] = {
@@ -1198,6 +1243,8 @@ static ::PROTOBUF_NAMESPACE_ID::Message const * const file_default_instances[] =
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_PossibleCityBuildTasks_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_PossibleTechs_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_DeleteUnit_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_CombatEvent_default_instance_),
+  reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_CombatRound_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_MoveUnits_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_SetCityBuildTask_default_instance_),
   reinterpret_cast<const ::PROTOBUF_NAMESPACE_ID::Message*>(&::_SetWorkerTask_default_instance_),
@@ -1226,7 +1273,7 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "UnitAction\030\013 \001(\0132\r.DoUnitActionH\000\022\'\n\rset"
   "WorkerTask\030\014 \001(\0132\016.SetWorkerTaskH\000\022!\n\nde"
   "clareWar\030\r \001(\0132\013.DeclareWarH\000B\010\n\006packet\""
-  "\373\004\n\tAnyServer\022\021\n\trequestID\030\001 \001(\005\022!\n\nserv"
+  "\240\005\n\tAnyServer\022\021\n\trequestID\030\001 \001(\005\022!\n\nserv"
   "erInfo\030\002 \001(\0132\013.ServerInfoH\000\022\037\n\tstartGame"
   "\030\003 \001(\0132\n.StartGameH\000\022!\n\nlobbyError\030\004 \001(\013"
   "2\013.LobbyErrorH\000\022-\n\020updateGlobalData\030\005 \001("
@@ -1241,103 +1288,108 @@ const char descriptor_table_protodef_riposte_2eproto[] PROTOBUF_SECTION_VARIABLE
   "eTechs\030\r \001(\0132\016.PossibleTechsH\000\022!\n\ndelete"
   "Unit\030\016 \001(\0132\013.DeleteUnitH\000\022!\n\nupdateTile\030"
   "\017 \001(\0132\013.UpdateTileH\000\022-\n\020updateVisibility"
-  "\030\020 \001(\0132\021.UpdateVisibilityH\000B\010\n\006packet\"\036\n"
-  "\nClientInfo\022\020\n\010username\030\001 \001(\t\"C\n\nServerI"
-  "nfo\022\020\n\010playerID\030\001 \001(\005\022#\n\016currentPlayers\030"
-  "\002 \003(\0132\013.PlayerInfo\"(\n\nKickPlayer\022\n\n\002id\030\001"
-  " \001(\005\022\016\n\006reason\030\002 \001(\t\"*\n\tSetLeader\022\r\n\005civ"
-  "ID\030\001 \001(\t\022\016\n\006leader\030\002 \001(\t\"\020\n\016AdminStartGa"
-  "me\"\035\n\nLobbyError\022\017\n\007message\030\001 \001(\t\"\013\n\tSta"
-  "rtGame\"m\n\nPlayerInfo\022\020\n\010username\030\001 \001(\t\022\r"
-  "\n\005civID\030\002 \001(\t\022\022\n\nleaderName\030\003 \001(\t\022\r\n\005sco"
-  "re\030\004 \001(\005\022\n\n\002id\030\005 \001(\005\022\017\n\007isAdmin\030\006 \001(\010\"c\n"
-  "\020UpdateGlobalData\022\034\n\007players\030\001 \003(\0132\013.Pla"
-  "yerInfo\022\014\n\004turn\030\002 \001(\005\022\021\n\003era\030\003 \001(\0162\004.Era"
-  "\022\020\n\010playerID\030\004 \001(\005\"/\n\013Improvement\022\n\n\002id\030"
-  "\001 \001(\t\022\024\n\014cottageLevel\030\002 \001(\t\"8\n\005Yield\022\017\n\007"
-  "hammers\030\001 \001(\005\022\020\n\010commerce\030\002 \001(\005\022\014\n\004food\030"
-  "\003 \001(\005\"\307\001\n\004Tile\022\031\n\007terrain\030\001 \001(\0162\010.Terrai"
-  "n\022\020\n\010forested\030\002 \001(\010\022\016\n\006hilled\030\003 \001(\010\022\"\n\014i"
-  "mprovements\030\004 \003(\0132\014.Improvement\022\025\n\005yield"
-  "\030\005 \001(\0132\006.Yield\022\017\n\007ownerID\030\006 \001(\005\022\020\n\010hasOw"
-  "ner\030\007 \001(\010\022\020\n\010isWorked\030\010 \001(\010\022\022\n\nresourceI"
-  "D\030\t \001(\t\"@\n\tUpdateMap\022\r\n\005width\030\001 \001(\r\022\016\n\006h"
-  "eight\030\002 \001(\r\022\024\n\005tiles\030\003 \003(\0132\005.Tile\"3\n\020Upd"
-  "ateVisibility\022\037\n\nvisibility\030\001 \003(\0162\013.Visi"
-  "bility\"7\n\nUpdateTile\022\023\n\004tile\030\001 \001(\0132\005.Til"
-  "e\022\t\n\001x\030\002 \001(\r\022\t\n\001y\030\003 \001(\r\"#\n\rUnitBuildTask"
-  "\022\022\n\nunitKindID\030\001 \001(\t\")\n\021BuildingBuildTas"
-  "k\022\024\n\014buildingName\030\001 \001(\t\"_\n\rBuildTaskKind"
-  "\022\036\n\004unit\030\001 \001(\0132\016.UnitBuildTaskH\000\022&\n\010buil"
-  "ding\030\002 \001(\0132\022.BuildingBuildTaskH\000B\006\n\004task"
-  "\"I\n\tBuildTask\022\034\n\004kind\030\001 \001(\0132\016.BuildTaskK"
-  "ind\022\020\n\010progress\030\002 \001(\005\022\014\n\004cost\030\003 \001(\005\"\255\002\n\n"
-  "UpdateCity\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\014\n\004name\030\002 "
-  "\001(\t\022\017\n\007ownerID\030\003 \001(\005\022\035\n\tbuildTask\030\004 \001(\0132"
-  "\n.BuildTask\022\025\n\005yield\030\005 \001(\0132\006.Yield\022\017\n\007cu"
-  "lture\030\006 \001(\005\022\025\n\rcultureNeeded\030\007 \001(\005\022\n\n\002id"
-  "\030\010 \001(\005\022\025\n\rbuildingNames\030\t \003(\t\022\022\n\npopulat"
-  "ion\030\n \001(\005\022\022\n\nstoredFood\030\013 \001(\005\022\033\n\023foodNee"
-  "dedForGrowth\030\014 \001(\005\022\024\n\014consumedFood\030\r \001(\005"
-  "\022\021\n\tisCapital\030\016 \001(\010\"\031\n\004Path\022\021\n\tpositions"
-  "\030\001 \003(\r\"\025\n\023FoundCityCapability\".\n\025WorkerT"
-  "askImprovement\022\025\n\rimprovementID\030\001 \001(\t\"L\n"
-  "\016WorkerTaskKind\0222\n\020buildImprovement\030\001 \001("
-  "\0132\026.WorkerTaskImprovementH\000B\006\n\004kind\"g\n\nW"
-  "orkerTask\022\014\n\004name\030\001 \001(\t\022\021\n\tturnsLeft\030\002 \001"
-  "(\005\022\035\n\004kind\030\003 \001(\0132\017.WorkerTaskKind\022\031\n\021pre"
-  "sentParticiple\030\004 \001(\t\"X\n\020WorkerCapability"
-  "\022 \n\013currentTask\030\001 \001(\0132\013.WorkerTask\022\"\n\rpo"
-  "ssibleTasks\030\002 \003(\0132\013.WorkerTask\"/\n\024CarryU"
-  "nitsCapability\022\027\n\017carryingUnitIDs\030\001 \003(\005\""
-  "\220\001\n\nCapability\022)\n\tfoundCity\030\001 \001(\0132\024.Foun"
-  "dCityCapabilityH\000\022#\n\006worker\030\002 \001(\0132\021.Work"
-  "erCapabilityH\000\022+\n\ncarryUnits\030\003 \001(\0132\025.Car"
-  "ryUnitsCapabilityH\000B\005\n\003cap\"\332\001\n\nUpdateUni"
-  "t\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\016\n\006kindID\030\002 \001(\t\022\017\n\007"
-  "ownerID\030\003 \001(\005\022\016\n\006health\030\004 \001(\001\022\024\n\014movemen"
-  "tLeft\030\005 \001(\001\022\034\n\rfollowingPath\030\006 \001(\0132\005.Pat"
-  "h\022!\n\014capabilities\030\007 \003(\0132\013.Capability\022\n\n\002"
-  "id\030\010 \001(\005\022\020\n\010strength\030\t \001(\001\022\023\n\013isFortifie"
-  "d\030\n \001(\010\"3\n\017ResearchingTech\022\016\n\006techID\030\001 \001"
-  "(\t\022\020\n\010progress\030\002 \001(\005\"\246\002\n\014UpdatePlayer\022\n\n"
-  "\002id\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\023\n\013baseReven"
-  "ue\030\003 \001(\005\022\025\n\rbeakerRevenue\030\004 \001(\005\022\023\n\013goldR"
-  "evenue\030\005 \001(\005\022\020\n\010expenses\030\006 \001(\005\022\017\n\007netGol"
-  "d\030\007 \001(\005\022\014\n\004gold\030\010 \001(\005\022)\n\017researchingTech"
-  "\030\t \001(\0132\020.ResearchingTech\022\025\n\rcapitalCityI"
-  "D\030\n \001(\005\022\027\n\017unlockedTechIDs\030\013 \003(\t\022\025\n\rbeak"
-  "erPercent\030\014 \001(\005\022\024\n\014atWarWithIDs\030\r \003(\005\"#\n"
-  "\014PathComputed\022\023\n\004path\030\001 \001(\0132\005.Path\"#\n\020Co"
-  "nfirmMoveUnits\022\017\n\007success\030\001 \001(\010\"3\n\026Possi"
-  "bleCityBuildTasks\022\031\n\005tasks\030\001 \003(\0132\n.Build"
-  "Task\"\036\n\rPossibleTechs\022\r\n\005techs\030\001 \003(\t\"\034\n\n"
-  "DeleteUnit\022\016\n\006unitID\030\001 \001(\005\"9\n\tMoveUnits\022"
-  "\017\n\007unitIDs\030\001 \003(\005\022\033\n\014pathToFollow\030\002 \001(\0132\005"
-  ".Path\"@\n\020SetCityBuildTask\022\016\n\006cityID\030\001 \001("
-  "\005\022\034\n\004task\030\002 \001(\0132\016.BuildTaskKind\"<\n\rSetWo"
-  "rkerTask\022\020\n\010workerID\030\001 \001(\005\022\031\n\004task\030\002 \001(\013"
-  "2\013.WorkerTask\"G\n\013ComputePath\022\022\n\004from\030\001 \001"
-  "(\0132\004.Pos\022\020\n\002to\030\002 \001(\0132\004.Pos\022\022\n\nunitKindID"
-  "\030\003 \001(\t\"+\n\022SetEconomySettings\022\025\n\rbeakerPe"
-  "rcent\030\001 \001(\005\"\035\n\013SetResearch\022\016\n\006techID\030\001 \001"
-  "(\t\"\t\n\007EndTurn\"\037\n\rGetBuildTasks\022\016\n\006cityID"
-  "\030\001 \001(\005\"\022\n\020GetPossibleTechs\";\n\014DoUnitActi"
-  "on\022\016\n\006unitID\030\001 \001(\005\022\033\n\006action\030\002 \001(\0162\013.Uni"
-  "tAction\" \n\nDeclareWar\022\022\n\nonPlayerID\030\001 \001("
-  "\005*h\n\003Era\022\013\n\007Ancient\020\000\022\r\n\tClassical\020\001\022\014\n\010"
-  "Medieval\020\002\022\017\n\013Renaissance\020\003\022\016\n\nIndustria"
-  "l\020\004\022\n\n\006Modern\020\005\022\n\n\006Future\020\006*;\n\007Terrain\022\r"
-  "\n\tGrassland\020\000\022\n\n\006Desert\020\001\022\t\n\005Ocean\020\002\022\n\n\006"
-  "Plains\020\003*1\n\nVisibility\022\n\n\006Hidden\020\000\022\n\n\006Fo"
-  "gged\020\001\022\013\n\007Visible\020\002*X\n\nUnitAction\022\010\n\004Kil"
-  "l\020\000\022\013\n\007Fortify\020\001\022\014\n\010SkipTurn\020\002\022\026\n\022Fortif"
-  "yUntilHealed\020\003\022\r\n\tFoundCity\020\004b\006proto3"
+  "\030\020 \001(\0132\021.UpdateVisibilityH\000\022#\n\013combatEve"
+  "nt\030\021 \001(\0132\014.CombatEventH\000B\010\n\006packet\"\036\n\nCl"
+  "ientInfo\022\020\n\010username\030\001 \001(\t\"C\n\nServerInfo"
+  "\022\020\n\010playerID\030\001 \001(\005\022#\n\016currentPlayers\030\002 \003"
+  "(\0132\013.PlayerInfo\"(\n\nKickPlayer\022\n\n\002id\030\001 \001("
+  "\005\022\016\n\006reason\030\002 \001(\t\"*\n\tSetLeader\022\r\n\005civID\030"
+  "\001 \001(\t\022\016\n\006leader\030\002 \001(\t\"\020\n\016AdminStartGame\""
+  "\035\n\nLobbyError\022\017\n\007message\030\001 \001(\t\"\013\n\tStartG"
+  "ame\"m\n\nPlayerInfo\022\020\n\010username\030\001 \001(\t\022\r\n\005c"
+  "ivID\030\002 \001(\t\022\022\n\nleaderName\030\003 \001(\t\022\r\n\005score\030"
+  "\004 \001(\005\022\n\n\002id\030\005 \001(\005\022\017\n\007isAdmin\030\006 \001(\010\"c\n\020Up"
+  "dateGlobalData\022\034\n\007players\030\001 \003(\0132\013.Player"
+  "Info\022\014\n\004turn\030\002 \001(\005\022\021\n\003era\030\003 \001(\0162\004.Era\022\020\n"
+  "\010playerID\030\004 \001(\005\"/\n\013Improvement\022\n\n\002id\030\001 \001"
+  "(\t\022\024\n\014cottageLevel\030\002 \001(\t\"8\n\005Yield\022\017\n\007ham"
+  "mers\030\001 \001(\005\022\020\n\010commerce\030\002 \001(\005\022\014\n\004food\030\003 \001"
+  "(\005\"\307\001\n\004Tile\022\031\n\007terrain\030\001 \001(\0162\010.Terrain\022\020"
+  "\n\010forested\030\002 \001(\010\022\016\n\006hilled\030\003 \001(\010\022\"\n\014impr"
+  "ovements\030\004 \003(\0132\014.Improvement\022\025\n\005yield\030\005 "
+  "\001(\0132\006.Yield\022\017\n\007ownerID\030\006 \001(\005\022\020\n\010hasOwner"
+  "\030\007 \001(\010\022\020\n\010isWorked\030\010 \001(\010\022\022\n\nresourceID\030\t"
+  " \001(\t\"@\n\tUpdateMap\022\r\n\005width\030\001 \001(\r\022\016\n\006heig"
+  "ht\030\002 \001(\r\022\024\n\005tiles\030\003 \003(\0132\005.Tile\"3\n\020Update"
+  "Visibility\022\037\n\nvisibility\030\001 \003(\0162\013.Visibil"
+  "ity\"7\n\nUpdateTile\022\023\n\004tile\030\001 \001(\0132\005.Tile\022\t"
+  "\n\001x\030\002 \001(\r\022\t\n\001y\030\003 \001(\r\"#\n\rUnitBuildTask\022\022\n"
+  "\nunitKindID\030\001 \001(\t\")\n\021BuildingBuildTask\022\024"
+  "\n\014buildingName\030\001 \001(\t\"_\n\rBuildTaskKind\022\036\n"
+  "\004unit\030\001 \001(\0132\016.UnitBuildTaskH\000\022&\n\010buildin"
+  "g\030\002 \001(\0132\022.BuildingBuildTaskH\000B\006\n\004task\"I\n"
+  "\tBuildTask\022\034\n\004kind\030\001 \001(\0132\016.BuildTaskKind"
+  "\022\020\n\010progress\030\002 \001(\005\022\014\n\004cost\030\003 \001(\005\"\255\002\n\nUpd"
+  "ateCity\022\021\n\003pos\030\001 \001(\0132\004.Pos\022\014\n\004name\030\002 \001(\t"
+  "\022\017\n\007ownerID\030\003 \001(\005\022\035\n\tbuildTask\030\004 \001(\0132\n.B"
+  "uildTask\022\025\n\005yield\030\005 \001(\0132\006.Yield\022\017\n\007cultu"
+  "re\030\006 \001(\005\022\025\n\rcultureNeeded\030\007 \001(\005\022\n\n\002id\030\010 "
+  "\001(\005\022\025\n\rbuildingNames\030\t \003(\t\022\022\n\npopulation"
+  "\030\n \001(\005\022\022\n\nstoredFood\030\013 \001(\005\022\033\n\023foodNeeded"
+  "ForGrowth\030\014 \001(\005\022\024\n\014consumedFood\030\r \001(\005\022\021\n"
+  "\tisCapital\030\016 \001(\010\"\031\n\004Path\022\021\n\tpositions\030\001 "
+  "\003(\r\"\025\n\023FoundCityCapability\".\n\025WorkerTask"
+  "Improvement\022\025\n\rimprovementID\030\001 \001(\t\"L\n\016Wo"
+  "rkerTaskKind\0222\n\020buildImprovement\030\001 \001(\0132\026"
+  ".WorkerTaskImprovementH\000B\006\n\004kind\"g\n\nWork"
+  "erTask\022\014\n\004name\030\001 \001(\t\022\021\n\tturnsLeft\030\002 \001(\005\022"
+  "\035\n\004kind\030\003 \001(\0132\017.WorkerTaskKind\022\031\n\021presen"
+  "tParticiple\030\004 \001(\t\"X\n\020WorkerCapability\022 \n"
+  "\013currentTask\030\001 \001(\0132\013.WorkerTask\022\"\n\rpossi"
+  "bleTasks\030\002 \003(\0132\013.WorkerTask\"/\n\024CarryUnit"
+  "sCapability\022\027\n\017carryingUnitIDs\030\001 \003(\005\"\220\001\n"
+  "\nCapability\022)\n\tfoundCity\030\001 \001(\0132\024.FoundCi"
+  "tyCapabilityH\000\022#\n\006worker\030\002 \001(\0132\021.WorkerC"
+  "apabilityH\000\022+\n\ncarryUnits\030\003 \001(\0132\025.CarryU"
+  "nitsCapabilityH\000B\005\n\003cap\"\332\001\n\nUpdateUnit\022\021"
+  "\n\003pos\030\001 \001(\0132\004.Pos\022\016\n\006kindID\030\002 \001(\t\022\017\n\007own"
+  "erID\030\003 \001(\005\022\016\n\006health\030\004 \001(\001\022\024\n\014movementLe"
+  "ft\030\005 \001(\001\022\034\n\rfollowingPath\030\006 \001(\0132\005.Path\022!"
+  "\n\014capabilities\030\007 \003(\0132\013.Capability\022\n\n\002id\030"
+  "\010 \001(\005\022\020\n\010strength\030\t \001(\001\022\023\n\013isFortified\030\n"
+  " \001(\010\"3\n\017ResearchingTech\022\016\n\006techID\030\001 \001(\t\022"
+  "\020\n\010progress\030\002 \001(\005\"\246\002\n\014UpdatePlayer\022\n\n\002id"
+  "\030\001 \001(\005\022\020\n\010username\030\002 \001(\t\022\023\n\013baseRevenue\030"
+  "\003 \001(\005\022\025\n\rbeakerRevenue\030\004 \001(\005\022\023\n\013goldReve"
+  "nue\030\005 \001(\005\022\020\n\010expenses\030\006 \001(\005\022\017\n\007netGold\030\007"
+  " \001(\005\022\014\n\004gold\030\010 \001(\005\022)\n\017researchingTech\030\t "
+  "\001(\0132\020.ResearchingTech\022\025\n\rcapitalCityID\030\n"
+  " \001(\005\022\027\n\017unlockedTechIDs\030\013 \003(\t\022\025\n\rbeakerP"
+  "ercent\030\014 \001(\005\022\024\n\014atWarWithIDs\030\r \003(\005\"#\n\014Pa"
+  "thComputed\022\023\n\004path\030\001 \001(\0132\005.Path\"#\n\020Confi"
+  "rmMoveUnits\022\017\n\007success\030\001 \001(\010\"3\n\026Possible"
+  "CityBuildTasks\022\031\n\005tasks\030\001 \003(\0132\n.BuildTas"
+  "k\"\036\n\rPossibleTechs\022\r\n\005techs\030\001 \003(\t\"\034\n\nDel"
+  "eteUnit\022\016\n\006unitID\030\001 \001(\005\"S\n\013CombatEvent\022\022"
+  "\n\nattackerID\030\001 \001(\005\022\022\n\ndefenderID\030\002 \001(\005\022\034"
+  "\n\006rounds\030\003 \003(\0132\014.CombatRound\"=\n\013CombatRo"
+  "und\022\026\n\016attackerHealth\030\001 \001(\001\022\026\n\016defenderH"
+  "ealth\030\002 \001(\001\"9\n\tMoveUnits\022\017\n\007unitIDs\030\001 \003("
+  "\005\022\033\n\014pathToFollow\030\002 \001(\0132\005.Path\"@\n\020SetCit"
+  "yBuildTask\022\016\n\006cityID\030\001 \001(\005\022\034\n\004task\030\002 \001(\013"
+  "2\016.BuildTaskKind\"<\n\rSetWorkerTask\022\020\n\010wor"
+  "kerID\030\001 \001(\005\022\031\n\004task\030\002 \001(\0132\013.WorkerTask\"G"
+  "\n\013ComputePath\022\022\n\004from\030\001 \001(\0132\004.Pos\022\020\n\002to\030"
+  "\002 \001(\0132\004.Pos\022\022\n\nunitKindID\030\003 \001(\t\"+\n\022SetEc"
+  "onomySettings\022\025\n\rbeakerPercent\030\001 \001(\005\"\035\n\013"
+  "SetResearch\022\016\n\006techID\030\001 \001(\t\"\t\n\007EndTurn\"\037"
+  "\n\rGetBuildTasks\022\016\n\006cityID\030\001 \001(\005\"\022\n\020GetPo"
+  "ssibleTechs\";\n\014DoUnitAction\022\016\n\006unitID\030\001 "
+  "\001(\005\022\033\n\006action\030\002 \001(\0162\013.UnitAction\" \n\nDecl"
+  "areWar\022\022\n\nonPlayerID\030\001 \001(\005*h\n\003Era\022\013\n\007Anc"
+  "ient\020\000\022\r\n\tClassical\020\001\022\014\n\010Medieval\020\002\022\017\n\013R"
+  "enaissance\020\003\022\016\n\nIndustrial\020\004\022\n\n\006Modern\020\005"
+  "\022\n\n\006Future\020\006*;\n\007Terrain\022\r\n\tGrassland\020\000\022\n"
+  "\n\006Desert\020\001\022\t\n\005Ocean\020\002\022\n\n\006Plains\020\003*1\n\nVis"
+  "ibility\022\n\n\006Hidden\020\000\022\n\n\006Fogged\020\001\022\013\n\007Visib"
+  "le\020\002*X\n\nUnitAction\022\010\n\004Kill\020\000\022\013\n\007Fortify\020"
+  "\001\022\014\n\010SkipTurn\020\002\022\026\n\022FortifyUntilHealed\020\003\022"
+  "\r\n\tFoundCity\020\004b\006proto3"
   ;
 static ::PROTOBUF_NAMESPACE_ID::internal::once_flag descriptor_table_riposte_2eproto_once;
 const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_riposte_2eproto = {
-  false, false, 4837, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
-  &descriptor_table_riposte_2eproto_once, nullptr, 0, 50,
+  false, false, 5022, descriptor_table_protodef_riposte_2eproto, "riposte.proto", 
+  &descriptor_table_riposte_2eproto_once, nullptr, 0, 52,
   schemas, file_default_instances, TableStruct_riposte_2eproto::offsets,
   file_level_metadata_riposte_2eproto, file_level_enum_descriptors_riposte_2eproto, file_level_service_descriptors_riposte_2eproto,
 };
@@ -2545,6 +2597,7 @@ class AnyServer::_Internal {
   static const ::DeleteUnit& deleteunit(const AnyServer* msg);
   static const ::UpdateTile& updatetile(const AnyServer* msg);
   static const ::UpdateVisibility& updatevisibility(const AnyServer* msg);
+  static const ::CombatEvent& combatevent(const AnyServer* msg);
 };
 
 const ::ServerInfo&
@@ -2606,6 +2659,10 @@ AnyServer::_Internal::updatetile(const AnyServer* msg) {
 const ::UpdateVisibility&
 AnyServer::_Internal::updatevisibility(const AnyServer* msg) {
   return *msg->packet_.updatevisibility_;
+}
+const ::CombatEvent&
+AnyServer::_Internal::combatevent(const AnyServer* msg) {
+  return *msg->packet_.combatevent_;
 }
 void AnyServer::set_allocated_serverinfo(::ServerInfo* serverinfo) {
   ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
@@ -2832,6 +2889,21 @@ void AnyServer::set_allocated_updatevisibility(::UpdateVisibility* updatevisibil
   }
   // @@protoc_insertion_point(field_set_allocated:AnyServer.updateVisibility)
 }
+void AnyServer::set_allocated_combatevent(::CombatEvent* combatevent) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  clear_packet();
+  if (combatevent) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+      ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper<::CombatEvent>::GetOwningArena(combatevent);
+    if (message_arena != submessage_arena) {
+      combatevent = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, combatevent, submessage_arena);
+    }
+    set_has_combatevent();
+    packet_.combatevent_ = combatevent;
+  }
+  // @@protoc_insertion_point(field_set_allocated:AnyServer.combatEvent)
+}
 AnyServer::AnyServer(::PROTOBUF_NAMESPACE_ID::Arena* arena,
                          bool is_message_owned)
   : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
@@ -2905,6 +2977,10 @@ AnyServer::AnyServer(const AnyServer& from)
     }
     case kUpdateVisibility: {
       _internal_mutable_updatevisibility()->::UpdateVisibility::MergeFrom(from._internal_updatevisibility());
+      break;
+    }
+    case kCombatEvent: {
+      _internal_mutable_combatevent()->::CombatEvent::MergeFrom(from._internal_combatevent());
       break;
     }
     case PACKET_NOT_SET: {
@@ -3033,6 +3109,12 @@ void AnyServer::clear_packet() {
     case kUpdateVisibility: {
       if (GetArenaForAllocation() == nullptr) {
         delete packet_.updatevisibility_;
+      }
+      break;
+    }
+    case kCombatEvent: {
+      if (GetArenaForAllocation() == nullptr) {
+        delete packet_.combatevent_;
       }
       break;
     }
@@ -3170,6 +3252,13 @@ const char* AnyServer::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::
       case 16:
         if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 130)) {
           ptr = ctx->ParseMessage(_internal_mutable_updatevisibility(), ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // .CombatEvent combatEvent = 17;
+      case 17:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 138)) {
+          ptr = ctx->ParseMessage(_internal_mutable_combatevent(), ptr);
           CHK_(ptr);
         } else goto handle_unusual;
         continue;
@@ -3328,6 +3417,14 @@ failure:
         16, _Internal::updatevisibility(this), target, stream);
   }
 
+  // .CombatEvent combatEvent = 17;
+  if (_internal_has_combatevent()) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(
+        17, _Internal::combatevent(this), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -3457,6 +3554,13 @@ size_t AnyServer::ByteSizeLong() const {
           *packet_.updatevisibility_);
       break;
     }
+    // .CombatEvent combatEvent = 17;
+    case kCombatEvent: {
+      total_size += 2 +
+        ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+          *packet_.combatevent_);
+      break;
+    }
     case PACKET_NOT_SET: {
       break;
     }
@@ -3551,6 +3655,10 @@ void AnyServer::MergeFrom(const AnyServer& from) {
     }
     case kUpdateVisibility: {
       _internal_mutable_updatevisibility()->::UpdateVisibility::MergeFrom(from._internal_updatevisibility());
+      break;
+    }
+    case kCombatEvent: {
+      _internal_mutable_combatevent()->::CombatEvent::MergeFrom(from._internal_combatevent());
       break;
     }
     case PACKET_NOT_SET: {
@@ -12862,6 +12970,474 @@ void DeleteUnit::InternalSwap(DeleteUnit* other) {
 
 // ===================================================================
 
+class CombatEvent::_Internal {
+ public:
+};
+
+CombatEvent::CombatEvent(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned),
+  rounds_(arena) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
+  // @@protoc_insertion_point(arena_constructor:CombatEvent)
+}
+CombatEvent::CombatEvent(const CombatEvent& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message(),
+      rounds_(from.rounds_) {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&attackerid_, &from.attackerid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&defenderid_) -
+    reinterpret_cast<char*>(&attackerid_)) + sizeof(defenderid_));
+  // @@protoc_insertion_point(copy_constructor:CombatEvent)
+}
+
+inline void CombatEvent::SharedCtor() {
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&attackerid_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&defenderid_) -
+    reinterpret_cast<char*>(&attackerid_)) + sizeof(defenderid_));
+}
+
+CombatEvent::~CombatEvent() {
+  // @@protoc_insertion_point(destructor:CombatEvent)
+  if (GetArenaForAllocation() != nullptr) return;
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+inline void CombatEvent::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+}
+
+void CombatEvent::ArenaDtor(void* object) {
+  CombatEvent* _this = reinterpret_cast< CombatEvent* >(object);
+  (void)_this;
+}
+void CombatEvent::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void CombatEvent::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void CombatEvent::Clear() {
+// @@protoc_insertion_point(message_clear_start:CombatEvent)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  rounds_.Clear();
+  ::memset(&attackerid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&defenderid_) -
+      reinterpret_cast<char*>(&attackerid_)) + sizeof(defenderid_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* CombatEvent::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // int32 attackerID = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 8)) {
+          attackerid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // int32 defenderID = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 16)) {
+          defenderid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else goto handle_unusual;
+        continue;
+      // repeated .CombatRound rounds = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 26)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_rounds(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<26>(ptr));
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* CombatEvent::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:CombatEvent)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 attackerID = 1;
+  if (this->_internal_attackerid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(1, this->_internal_attackerid(), target);
+  }
+
+  // int32 defenderID = 2;
+  if (this->_internal_defenderid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteInt32ToArray(2, this->_internal_defenderid(), target);
+  }
+
+  // repeated .CombatRound rounds = 3;
+  for (unsigned int i = 0,
+      n = static_cast<unsigned int>(this->_internal_rounds_size()); i < n; i++) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(3, this->_internal_rounds(i), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:CombatEvent)
+  return target;
+}
+
+size_t CombatEvent::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:CombatEvent)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .CombatRound rounds = 3;
+  total_size += 1UL * this->_internal_rounds_size();
+  for (const auto& msg : this->rounds_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // int32 attackerID = 1;
+  if (this->_internal_attackerid() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_attackerid());
+  }
+
+  // int32 defenderID = 2;
+  if (this->_internal_defenderid() != 0) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::Int32Size(
+        this->_internal_defenderid());
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData CombatEvent::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    CombatEvent::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*CombatEvent::GetClassData() const { return &_class_data_; }
+
+void CombatEvent::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<CombatEvent *>(to)->MergeFrom(
+      static_cast<const CombatEvent &>(from));
+}
+
+
+void CombatEvent::MergeFrom(const CombatEvent& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:CombatEvent)
+  GOOGLE_DCHECK_NE(&from, this);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  rounds_.MergeFrom(from.rounds_);
+  if (from._internal_attackerid() != 0) {
+    _internal_set_attackerid(from._internal_attackerid());
+  }
+  if (from._internal_defenderid() != 0) {
+    _internal_set_defenderid(from._internal_defenderid());
+  }
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void CombatEvent::CopyFrom(const CombatEvent& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:CombatEvent)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CombatEvent::IsInitialized() const {
+  return true;
+}
+
+void CombatEvent::InternalSwap(CombatEvent* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  rounds_.InternalSwap(&other->rounds_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(CombatEvent, defenderid_)
+      + sizeof(CombatEvent::defenderid_)
+      - PROTOBUF_FIELD_OFFSET(CombatEvent, attackerid_)>(
+          reinterpret_cast<char*>(&attackerid_),
+          reinterpret_cast<char*>(&other->attackerid_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata CombatEvent::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
+      file_level_metadata_riposte_2eproto[39]);
+}
+
+// ===================================================================
+
+class CombatRound::_Internal {
+ public:
+};
+
+CombatRound::CombatRound(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor();
+  if (!is_message_owned) {
+    RegisterArenaDtor(arena);
+  }
+  // @@protoc_insertion_point(arena_constructor:CombatRound)
+}
+CombatRound::CombatRound(const CombatRound& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  ::memcpy(&attackerhealth_, &from.attackerhealth_,
+    static_cast<size_t>(reinterpret_cast<char*>(&defenderhealth_) -
+    reinterpret_cast<char*>(&attackerhealth_)) + sizeof(defenderhealth_));
+  // @@protoc_insertion_point(copy_constructor:CombatRound)
+}
+
+inline void CombatRound::SharedCtor() {
+::memset(reinterpret_cast<char*>(this) + static_cast<size_t>(
+    reinterpret_cast<char*>(&attackerhealth_) - reinterpret_cast<char*>(this)),
+    0, static_cast<size_t>(reinterpret_cast<char*>(&defenderhealth_) -
+    reinterpret_cast<char*>(&attackerhealth_)) + sizeof(defenderhealth_));
+}
+
+CombatRound::~CombatRound() {
+  // @@protoc_insertion_point(destructor:CombatRound)
+  if (GetArenaForAllocation() != nullptr) return;
+  SharedDtor();
+  _internal_metadata_.Delete<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+inline void CombatRound::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+}
+
+void CombatRound::ArenaDtor(void* object) {
+  CombatRound* _this = reinterpret_cast< CombatRound* >(object);
+  (void)_this;
+}
+void CombatRound::RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena*) {
+}
+void CombatRound::SetCachedSize(int size) const {
+  _cached_size_.Set(size);
+}
+
+void CombatRound::Clear() {
+// @@protoc_insertion_point(message_clear_start:CombatRound)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  ::memset(&attackerhealth_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&defenderhealth_) -
+      reinterpret_cast<char*>(&attackerhealth_)) + sizeof(defenderhealth_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* CombatRound::_InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    ::PROTOBUF_NAMESPACE_ID::uint32 tag;
+    ptr = ::PROTOBUF_NAMESPACE_ID::internal::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // double attackerHealth = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 9)) {
+          attackerhealth_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr);
+          ptr += sizeof(double);
+        } else goto handle_unusual;
+        continue;
+      // double defenderHealth = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<::PROTOBUF_NAMESPACE_ID::uint8>(tag) == 17)) {
+          defenderhealth_ = ::PROTOBUF_NAMESPACE_ID::internal::UnalignedLoad<double>(ptr);
+          ptr += sizeof(double);
+        } else goto handle_unusual;
+        continue;
+      default: {
+      handle_unusual:
+        if ((tag == 0) || ((tag & 7) == 4)) {
+          CHK_(ptr);
+          ctx->SetLastTag(tag);
+          goto success;
+        }
+        ptr = UnknownFieldParse(tag,
+            _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+            ptr, ctx);
+        CHK_(ptr != nullptr);
+        continue;
+      }
+    }  // switch
+  }  // while
+success:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto success;
+#undef CHK_
+}
+
+::PROTOBUF_NAMESPACE_ID::uint8* CombatRound::_InternalSerialize(
+    ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:CombatRound)
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // double attackerHealth = 1;
+  if (!(this->_internal_attackerhealth() <= 0 && this->_internal_attackerhealth() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(1, this->_internal_attackerhealth(), target);
+  }
+
+  // double defenderHealth = 2;
+  if (!(this->_internal_defenderhealth() <= 0 && this->_internal_defenderhealth() >= 0)) {
+    target = stream->EnsureSpace(target);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::WriteDoubleToArray(2, this->_internal_defenderhealth(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:CombatRound)
+  return target;
+}
+
+size_t CombatRound::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:CombatRound)
+  size_t total_size = 0;
+
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // double attackerHealth = 1;
+  if (!(this->_internal_attackerhealth() <= 0 && this->_internal_attackerhealth() >= 0)) {
+    total_size += 1 + 8;
+  }
+
+  // double defenderHealth = 2;
+  if (!(this->_internal_defenderhealth() <= 0 && this->_internal_defenderhealth() >= 0)) {
+    total_size += 1 + 8;
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    return ::PROTOBUF_NAMESPACE_ID::internal::ComputeUnknownFieldsSize(
+        _internal_metadata_, total_size, &_cached_size_);
+  }
+  int cached_size = ::PROTOBUF_NAMESPACE_ID::internal::ToCachedSize(total_size);
+  SetCachedSize(cached_size);
+  return total_size;
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData CombatRound::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSizeCheck,
+    CombatRound::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*CombatRound::GetClassData() const { return &_class_data_; }
+
+void CombatRound::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to,
+                      const ::PROTOBUF_NAMESPACE_ID::Message&from) {
+  static_cast<CombatRound *>(to)->MergeFrom(
+      static_cast<const CombatRound &>(from));
+}
+
+
+void CombatRound::MergeFrom(const CombatRound& from) {
+// @@protoc_insertion_point(class_specific_merge_from_start:CombatRound)
+  GOOGLE_DCHECK_NE(&from, this);
+  ::PROTOBUF_NAMESPACE_ID::uint32 cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!(from._internal_attackerhealth() <= 0 && from._internal_attackerhealth() >= 0)) {
+    _internal_set_attackerhealth(from._internal_attackerhealth());
+  }
+  if (!(from._internal_defenderhealth() <= 0 && from._internal_defenderhealth() >= 0)) {
+    _internal_set_defenderhealth(from._internal_defenderhealth());
+  }
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void CombatRound::CopyFrom(const CombatRound& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:CombatRound)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool CombatRound::IsInitialized() const {
+  return true;
+}
+
+void CombatRound::InternalSwap(CombatRound* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(CombatRound, defenderhealth_)
+      + sizeof(CombatRound::defenderhealth_)
+      - PROTOBUF_FIELD_OFFSET(CombatRound, attackerhealth_)>(
+          reinterpret_cast<char*>(&attackerhealth_),
+          reinterpret_cast<char*>(&other->attackerhealth_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata CombatRound::GetMetadata() const {
+  return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
+      &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
+      file_level_metadata_riposte_2eproto[40]);
+}
+
+// ===================================================================
+
 class MoveUnits::_Internal {
  public:
   static const ::Path& pathtofollow(const MoveUnits* msg);
@@ -13096,7 +13672,7 @@ void MoveUnits::InternalSwap(MoveUnits* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata MoveUnits::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[39]);
+      file_level_metadata_riposte_2eproto[41]);
 }
 
 // ===================================================================
@@ -13329,7 +13905,7 @@ void SetCityBuildTask::InternalSwap(SetCityBuildTask* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SetCityBuildTask::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[40]);
+      file_level_metadata_riposte_2eproto[42]);
 }
 
 // ===================================================================
@@ -13562,7 +14138,7 @@ void SetWorkerTask::InternalSwap(SetWorkerTask* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SetWorkerTask::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[41]);
+      file_level_metadata_riposte_2eproto[43]);
 }
 
 // ===================================================================
@@ -13852,7 +14428,7 @@ void ComputePath::InternalSwap(ComputePath* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata ComputePath::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[42]);
+      file_level_metadata_riposte_2eproto[44]);
 }
 
 // ===================================================================
@@ -14037,7 +14613,7 @@ void SetEconomySettings::InternalSwap(SetEconomySettings* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SetEconomySettings::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[43]);
+      file_level_metadata_riposte_2eproto[45]);
 }
 
 // ===================================================================
@@ -14237,7 +14813,7 @@ void SetResearch::InternalSwap(SetResearch* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata SetResearch::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[44]);
+      file_level_metadata_riposte_2eproto[46]);
 }
 
 // ===================================================================
@@ -14390,7 +14966,7 @@ void EndTurn::InternalSwap(EndTurn* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata EndTurn::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[45]);
+      file_level_metadata_riposte_2eproto[47]);
 }
 
 // ===================================================================
@@ -14575,7 +15151,7 @@ void GetBuildTasks::InternalSwap(GetBuildTasks* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetBuildTasks::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[46]);
+      file_level_metadata_riposte_2eproto[48]);
 }
 
 // ===================================================================
@@ -14728,7 +15304,7 @@ void GetPossibleTechs::InternalSwap(GetPossibleTechs* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata GetPossibleTechs::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[47]);
+      file_level_metadata_riposte_2eproto[49]);
 }
 
 // ===================================================================
@@ -14949,7 +15525,7 @@ void DoUnitAction::InternalSwap(DoUnitAction* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata DoUnitAction::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[48]);
+      file_level_metadata_riposte_2eproto[50]);
 }
 
 // ===================================================================
@@ -15134,7 +15710,7 @@ void DeclareWar::InternalSwap(DeclareWar* other) {
 ::PROTOBUF_NAMESPACE_ID::Metadata DeclareWar::GetMetadata() const {
   return ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(
       &descriptor_table_riposte_2eproto_getter, &descriptor_table_riposte_2eproto_once,
-      file_level_metadata_riposte_2eproto[49]);
+      file_level_metadata_riposte_2eproto[51]);
 }
 
 // @@protoc_insertion_point(namespace_scope)
@@ -15255,6 +15831,12 @@ template<> PROTOBUF_NOINLINE ::PossibleTechs* Arena::CreateMaybeMessage< ::Possi
 }
 template<> PROTOBUF_NOINLINE ::DeleteUnit* Arena::CreateMaybeMessage< ::DeleteUnit >(Arena* arena) {
   return Arena::CreateMessageInternal< ::DeleteUnit >(arena);
+}
+template<> PROTOBUF_NOINLINE ::CombatEvent* Arena::CreateMaybeMessage< ::CombatEvent >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::CombatEvent >(arena);
+}
+template<> PROTOBUF_NOINLINE ::CombatRound* Arena::CreateMaybeMessage< ::CombatRound >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::CombatRound >(arena);
 }
 template<> PROTOBUF_NOINLINE ::MoveUnits* Arena::CreateMaybeMessage< ::MoveUnits >(Arena* arena) {
   return Arena::CreateMessageInternal< ::MoveUnits >(arena);

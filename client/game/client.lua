@@ -146,6 +146,9 @@ function Client:sendPacket(packetKind, packet, callback)
 end
 
 function Client:handleReceivedPackets()
+    -- don't update game state during combat animations
+    if self.game:hasCombatEvent() then return end
+
     local packet = self.bridge:pollReceivedPacket()
     while packet ~= nil do
         local decodedPacket = pb.decode("AnyServer", packet)
@@ -166,6 +169,8 @@ function Client:handleReceivedPackets()
             callback(decodedPacket[packetType])
             self.responseCallbacks[decodedPacket.requestID] = nil
         end
+
+        if self.game:hasCombatEvent() then return end
 
         packet = self.bridge:pollReceivedPacket()
     end
@@ -189,6 +194,8 @@ function Client:handlePacket(packet)
         self:handleUpdatePlayer(packet.updatePlayer)
     elseif packet.deleteUnit ~= nil then
         self:handleDeleteUnit(packet.deleteUnit)
+    elseif packet.combatEvent ~= nil then
+        self:handleCombatEvent(packet.combatEvent)
     end
 end
 
@@ -235,6 +242,10 @@ end
 
 function Client:handleDeleteUnit(packet)
     self.game:deleteUnit(packet.unitID)
+end
+
+function Client:handleCombatEvent(packet)
+    self.game:startCombatEvent(packet)
 end
 
 return Client

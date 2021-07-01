@@ -90,6 +90,10 @@ function render(dt)
             game.view:tick(dt, cursorPos)
             Renderer:render(cv, game)
             game.hud:render(cv, time, dt)
+
+            if game:hasCombatEvent() then
+                game:getCombatEvent():tick()
+            end
         end
 
         ui:render()

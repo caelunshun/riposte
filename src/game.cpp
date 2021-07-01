@@ -11,7 +11,6 @@
 #include "trade.h"
 #include "registry.h"
 #include "tile.h"
-#include "combat.h"
 #include "stack.h"
 #include "event.h"
 #include "script.h"
@@ -54,8 +53,6 @@ namespace rip {
 
         TradeRoutes tradeRoutes;
 
-        std::vector<Combat> ongoingCombats;
-
         std::vector<std::unique_ptr<Event>> events;
 
         bool inTurnEnd = false;
@@ -94,11 +91,6 @@ namespace rip {
         }
 
         impl->cultureMap.onTurnEnd(*this);
-
-        for (auto &combat : impl->ongoingCombats) {
-            combat.finish(*this);
-        }
-        impl->ongoingCombats.clear();
 
         ++(impl->turn);
         impl->inTurnEnd = false;
@@ -366,14 +358,6 @@ namespace rip {
             return Era::Modern;
         } else {
             return Era::Future;
-        }
-    }
-
-    void Game::addCombat(Combat &combat) {
-        if (impl->inTurnEnd) {
-            combat.finish(*this);
-        } else {
-            impl->ongoingCombats.push_back(combat);
         }
     }
 

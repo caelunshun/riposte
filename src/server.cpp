@@ -631,4 +631,26 @@ namespace rip {
     void Server::markPlayerDirty(PlayerId player) {
         dirtyPlayers.insert(player);
     }
+
+    void Server::broadcastCombatEvent(UnitId attackerID, UnitId defenderID, UnitId winnerID,
+                                      const std::vector<CombatRound> &rounds) {
+        CombatEvent packet;
+        packet.set_attackerid(attackerID.encode());
+        packet.set_defenderid(defenderID.encode());
+        for (const auto &round : rounds) {
+            packet.add_rounds()->CopyFrom(round);
+        }
+
+        AnyServer wrappedPacket;
+        wrappedPacket.mutable_combatevent()->CopyFrom(packet);
+
+        // A combat event is sent to a client only if one of its units is involved in the combat.
+        const auto &attacker = game.getUnit(attackerID);
+        const auto &defender = game.getUnit(defenderID);
+        for (auto &conn : connections) {
+            if (attacker.getOwner() == conn.getPlayerID() || defender.getOwner() == conn.getPlayerID()) {
+                conn.send(wrappedPacket);
+            }
+        }
+    }
 }

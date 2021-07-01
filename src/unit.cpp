@@ -148,9 +148,7 @@ namespace rip {
         if (otherUnit.has_value()) {
             if (!allowCombat && game.getUnit(*otherUnit).canFight()) return;
             Combat combat(getID(), *otherUnit, game);
-            game.addCombat(combat);
-            game.getUnit(*otherUnit).setInCombat(true);
-            this->setInCombat(true);
+            combat.finish(game);
             std::cout << "attack" << std::endl;
             return;
         }

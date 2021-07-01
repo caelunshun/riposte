@@ -22,12 +22,18 @@ function City:updateData(data, game)
         self.buildTask = nil
     end
 
+    local previousOwner = self.owner
+
     for k, v in pairs(data) do
         self[k] = v
     end
 
     self.owner = game.players[self.ownerID]
     if self.owner == nil then print("city '" .. self.name .. "' has invalid owner!") end
+
+    if self.owner ~= previousOwner then
+        self.previousBuildTask = nil
+    end
 
     self.buildings = {}
     for _, buildingName in ipairs(data.buildingNames) do

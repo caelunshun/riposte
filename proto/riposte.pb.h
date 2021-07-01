@@ -47,7 +47,7 @@ struct TableStruct_riposte_2eproto {
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::AuxiliaryParseTableField aux[]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
-  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[50]
+  static const ::PROTOBUF_NAMESPACE_ID::internal::ParseTable schema[52]
     PROTOBUF_SECTION_VARIABLE(protodesc_cold);
   static const ::PROTOBUF_NAMESPACE_ID::internal::FieldMetadata field_metadata[];
   static const ::PROTOBUF_NAMESPACE_ID::internal::SerializationTable serialization_table[];
@@ -81,6 +81,12 @@ extern CarryUnitsCapabilityDefaultTypeInternal _CarryUnitsCapability_default_ins
 class ClientInfo;
 struct ClientInfoDefaultTypeInternal;
 extern ClientInfoDefaultTypeInternal _ClientInfo_default_instance_;
+class CombatEvent;
+struct CombatEventDefaultTypeInternal;
+extern CombatEventDefaultTypeInternal _CombatEvent_default_instance_;
+class CombatRound;
+struct CombatRoundDefaultTypeInternal;
+extern CombatRoundDefaultTypeInternal _CombatRound_default_instance_;
 class ComputePath;
 struct ComputePathDefaultTypeInternal;
 extern ComputePathDefaultTypeInternal _ComputePath_default_instance_;
@@ -214,6 +220,8 @@ template<> ::BuildingBuildTask* Arena::CreateMaybeMessage<::BuildingBuildTask>(A
 template<> ::Capability* Arena::CreateMaybeMessage<::Capability>(Arena*);
 template<> ::CarryUnitsCapability* Arena::CreateMaybeMessage<::CarryUnitsCapability>(Arena*);
 template<> ::ClientInfo* Arena::CreateMaybeMessage<::ClientInfo>(Arena*);
+template<> ::CombatEvent* Arena::CreateMaybeMessage<::CombatEvent>(Arena*);
+template<> ::CombatRound* Arena::CreateMaybeMessage<::CombatRound>(Arena*);
 template<> ::ComputePath* Arena::CreateMaybeMessage<::ComputePath>(Arena*);
 template<> ::ConfirmMoveUnits* Arena::CreateMaybeMessage<::ConfirmMoveUnits>(Arena*);
 template<> ::DeclareWar* Arena::CreateMaybeMessage<::DeclareWar>(Arena*);
@@ -993,6 +1001,7 @@ class AnyServer final :
     kDeleteUnit = 14,
     kUpdateTile = 15,
     kUpdateVisibility = 16,
+    kCombatEvent = 17,
     PACKET_NOT_SET = 0,
   };
 
@@ -1088,6 +1097,7 @@ class AnyServer final :
     kDeleteUnitFieldNumber = 14,
     kUpdateTileFieldNumber = 15,
     kUpdateVisibilityFieldNumber = 16,
+    kCombatEventFieldNumber = 17,
   };
   // int32 requestID = 1;
   void clear_requestid();
@@ -1368,6 +1378,24 @@ class AnyServer final :
       ::UpdateVisibility* updatevisibility);
   ::UpdateVisibility* unsafe_arena_release_updatevisibility();
 
+  // .CombatEvent combatEvent = 17;
+  bool has_combatevent() const;
+  private:
+  bool _internal_has_combatevent() const;
+  public:
+  void clear_combatevent();
+  const ::CombatEvent& combatevent() const;
+  PROTOBUF_MUST_USE_RESULT ::CombatEvent* release_combatevent();
+  ::CombatEvent* mutable_combatevent();
+  void set_allocated_combatevent(::CombatEvent* combatevent);
+  private:
+  const ::CombatEvent& _internal_combatevent() const;
+  ::CombatEvent* _internal_mutable_combatevent();
+  public:
+  void unsafe_arena_set_allocated_combatevent(
+      ::CombatEvent* combatevent);
+  ::CombatEvent* unsafe_arena_release_combatevent();
+
   void clear_packet();
   PacketCase packet_case() const;
   // @@protoc_insertion_point(class_scope:AnyServer)
@@ -1388,6 +1416,7 @@ class AnyServer final :
   void set_has_deleteunit();
   void set_has_updatetile();
   void set_has_updatevisibility();
+  void set_has_combatevent();
 
   inline bool has_packet() const;
   inline void clear_has_packet();
@@ -1414,6 +1443,7 @@ class AnyServer final :
     ::DeleteUnit* deleteunit_;
     ::UpdateTile* updatetile_;
     ::UpdateVisibility* updatevisibility_;
+    ::CombatEvent* combatevent_;
   } packet_;
   mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   ::PROTOBUF_NAMESPACE_ID::uint32 _oneof_case_[1];
@@ -7635,6 +7665,326 @@ class DeleteUnit final :
 };
 // -------------------------------------------------------------------
 
+class CombatEvent final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:CombatEvent) */ {
+ public:
+  inline CombatEvent() : CombatEvent(nullptr) {}
+  ~CombatEvent() override;
+  explicit constexpr CombatEvent(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  CombatEvent(const CombatEvent& from);
+  CombatEvent(CombatEvent&& from) noexcept
+    : CombatEvent() {
+    *this = ::std::move(from);
+  }
+
+  inline CombatEvent& operator=(const CombatEvent& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline CombatEvent& operator=(CombatEvent&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const CombatEvent& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const CombatEvent* internal_default_instance() {
+    return reinterpret_cast<const CombatEvent*>(
+               &_CombatEvent_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    39;
+
+  friend void swap(CombatEvent& a, CombatEvent& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(CombatEvent* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(CombatEvent* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CombatEvent* New() const final {
+    return new CombatEvent();
+  }
+
+  CombatEvent* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<CombatEvent>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const CombatEvent& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const CombatEvent& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CombatEvent* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "CombatEvent";
+  }
+  protected:
+  explicit CombatEvent(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kRoundsFieldNumber = 3,
+    kAttackerIDFieldNumber = 1,
+    kDefenderIDFieldNumber = 2,
+  };
+  // repeated .CombatRound rounds = 3;
+  int rounds_size() const;
+  private:
+  int _internal_rounds_size() const;
+  public:
+  void clear_rounds();
+  ::CombatRound* mutable_rounds(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::CombatRound >*
+      mutable_rounds();
+  private:
+  const ::CombatRound& _internal_rounds(int index) const;
+  ::CombatRound* _internal_add_rounds();
+  public:
+  const ::CombatRound& rounds(int index) const;
+  ::CombatRound* add_rounds();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::CombatRound >&
+      rounds() const;
+
+  // int32 attackerID = 1;
+  void clear_attackerid();
+  ::PROTOBUF_NAMESPACE_ID::int32 attackerid() const;
+  void set_attackerid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_attackerid() const;
+  void _internal_set_attackerid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // int32 defenderID = 2;
+  void clear_defenderid();
+  ::PROTOBUF_NAMESPACE_ID::int32 defenderid() const;
+  void set_defenderid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  private:
+  ::PROTOBUF_NAMESPACE_ID::int32 _internal_defenderid() const;
+  void _internal_set_defenderid(::PROTOBUF_NAMESPACE_ID::int32 value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:CombatEvent)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::CombatRound > rounds_;
+  ::PROTOBUF_NAMESPACE_ID::int32 attackerid_;
+  ::PROTOBUF_NAMESPACE_ID::int32 defenderid_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
+// -------------------------------------------------------------------
+
+class CombatRound final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:CombatRound) */ {
+ public:
+  inline CombatRound() : CombatRound(nullptr) {}
+  ~CombatRound() override;
+  explicit constexpr CombatRound(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  CombatRound(const CombatRound& from);
+  CombatRound(CombatRound&& from) noexcept
+    : CombatRound() {
+    *this = ::std::move(from);
+  }
+
+  inline CombatRound& operator=(const CombatRound& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline CombatRound& operator=(CombatRound&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const CombatRound& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const CombatRound* internal_default_instance() {
+    return reinterpret_cast<const CombatRound*>(
+               &_CombatRound_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    40;
+
+  friend void swap(CombatRound& a, CombatRound& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(CombatRound* other) {
+    if (other == this) return;
+    if (GetOwningArena() == other->GetOwningArena()) {
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(CombatRound* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  inline CombatRound* New() const final {
+    return new CombatRound();
+  }
+
+  CombatRound* New(::PROTOBUF_NAMESPACE_ID::Arena* arena) const final {
+    return CreateMaybeMessage<CombatRound>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const CombatRound& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom(const CombatRound& from);
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message*to, const ::PROTOBUF_NAMESPACE_ID::Message&from);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  ::PROTOBUF_NAMESPACE_ID::uint8* _InternalSerialize(
+      ::PROTOBUF_NAMESPACE_ID::uint8* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _cached_size_.Get(); }
+
+  private:
+  void SharedCtor();
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(CombatRound* other);
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "CombatRound";
+  }
+  protected:
+  explicit CombatRound(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  private:
+  static void ArenaDtor(void* object);
+  inline void RegisterArenaDtor(::PROTOBUF_NAMESPACE_ID::Arena* arena);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kAttackerHealthFieldNumber = 1,
+    kDefenderHealthFieldNumber = 2,
+  };
+  // double attackerHealth = 1;
+  void clear_attackerhealth();
+  double attackerhealth() const;
+  void set_attackerhealth(double value);
+  private:
+  double _internal_attackerhealth() const;
+  void _internal_set_attackerhealth(double value);
+  public:
+
+  // double defenderHealth = 2;
+  void clear_defenderhealth();
+  double defenderhealth() const;
+  void set_defenderhealth(double value);
+  private:
+  double _internal_defenderhealth() const;
+  void _internal_set_defenderhealth(double value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:CombatRound)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  double attackerhealth_;
+  double defenderhealth_;
+  mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  friend struct ::TableStruct_riposte_2eproto;
+};
+// -------------------------------------------------------------------
+
 class MoveUnits final :
     public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:MoveUnits) */ {
  public:
@@ -7679,7 +8029,7 @@ class MoveUnits final :
                &_MoveUnits_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    39;
+    41;
 
   friend void swap(MoveUnits& a, MoveUnits& b) {
     a.Swap(&b);
@@ -7852,7 +8202,7 @@ class SetCityBuildTask final :
                &_SetCityBuildTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    40;
+    42;
 
   friend void swap(SetCityBuildTask& a, SetCityBuildTask& b) {
     a.Swap(&b);
@@ -8011,7 +8361,7 @@ class SetWorkerTask final :
                &_SetWorkerTask_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    41;
+    43;
 
   friend void swap(SetWorkerTask& a, SetWorkerTask& b) {
     a.Swap(&b);
@@ -8170,7 +8520,7 @@ class ComputePath final :
                &_ComputePath_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    42;
+    44;
 
   friend void swap(ComputePath& a, ComputePath& b) {
     a.Swap(&b);
@@ -8354,7 +8704,7 @@ class SetEconomySettings final :
                &_SetEconomySettings_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    43;
+    45;
 
   friend void swap(SetEconomySettings& a, SetEconomySettings& b) {
     a.Swap(&b);
@@ -8493,7 +8843,7 @@ class SetResearch final :
                &_SetResearch_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    44;
+    46;
 
   friend void swap(SetResearch& a, SetResearch& b) {
     a.Swap(&b);
@@ -8637,7 +8987,7 @@ class EndTurn final :
                &_EndTurn_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    45;
+    47;
 
   friend void swap(EndTurn& a, EndTurn& b) {
     a.Swap(&b);
@@ -8763,7 +9113,7 @@ class GetBuildTasks final :
                &_GetBuildTasks_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    46;
+    48;
 
   friend void swap(GetBuildTasks& a, GetBuildTasks& b) {
     a.Swap(&b);
@@ -8902,7 +9252,7 @@ class GetPossibleTechs final :
                &_GetPossibleTechs_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    47;
+    49;
 
   friend void swap(GetPossibleTechs& a, GetPossibleTechs& b) {
     a.Swap(&b);
@@ -9028,7 +9378,7 @@ class DoUnitAction final :
                &_DoUnitAction_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    48;
+    50;
 
   friend void swap(DoUnitAction& a, DoUnitAction& b) {
     a.Swap(&b);
@@ -9178,7 +9528,7 @@ class DeclareWar final :
                &_DeclareWar_default_instance_);
   }
   static constexpr int kIndexInFileMessages =
-    49;
+    51;
 
   friend void swap(DeclareWar& a, DeclareWar& b) {
     a.Swap(&b);
@@ -11374,6 +11724,80 @@ inline ::UpdateVisibility* AnyServer::_internal_mutable_updatevisibility() {
 inline ::UpdateVisibility* AnyServer::mutable_updatevisibility() {
   ::UpdateVisibility* _msg = _internal_mutable_updatevisibility();
   // @@protoc_insertion_point(field_mutable:AnyServer.updateVisibility)
+  return _msg;
+}
+
+// .CombatEvent combatEvent = 17;
+inline bool AnyServer::_internal_has_combatevent() const {
+  return packet_case() == kCombatEvent;
+}
+inline bool AnyServer::has_combatevent() const {
+  return _internal_has_combatevent();
+}
+inline void AnyServer::set_has_combatevent() {
+  _oneof_case_[0] = kCombatEvent;
+}
+inline void AnyServer::clear_combatevent() {
+  if (_internal_has_combatevent()) {
+    if (GetArenaForAllocation() == nullptr) {
+      delete packet_.combatevent_;
+    }
+    clear_has_packet();
+  }
+}
+inline ::CombatEvent* AnyServer::release_combatevent() {
+  // @@protoc_insertion_point(field_release:AnyServer.combatEvent)
+  if (_internal_has_combatevent()) {
+    clear_has_packet();
+      ::CombatEvent* temp = packet_.combatevent_;
+    if (GetArenaForAllocation() != nullptr) {
+      temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+    }
+    packet_.combatevent_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline const ::CombatEvent& AnyServer::_internal_combatevent() const {
+  return _internal_has_combatevent()
+      ? *packet_.combatevent_
+      : reinterpret_cast< ::CombatEvent&>(::_CombatEvent_default_instance_);
+}
+inline const ::CombatEvent& AnyServer::combatevent() const {
+  // @@protoc_insertion_point(field_get:AnyServer.combatEvent)
+  return _internal_combatevent();
+}
+inline ::CombatEvent* AnyServer::unsafe_arena_release_combatevent() {
+  // @@protoc_insertion_point(field_unsafe_arena_release:AnyServer.combatEvent)
+  if (_internal_has_combatevent()) {
+    clear_has_packet();
+    ::CombatEvent* temp = packet_.combatevent_;
+    packet_.combatevent_ = nullptr;
+    return temp;
+  } else {
+    return nullptr;
+  }
+}
+inline void AnyServer::unsafe_arena_set_allocated_combatevent(::CombatEvent* combatevent) {
+  clear_packet();
+  if (combatevent) {
+    set_has_combatevent();
+    packet_.combatevent_ = combatevent;
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:AnyServer.combatEvent)
+}
+inline ::CombatEvent* AnyServer::_internal_mutable_combatevent() {
+  if (!_internal_has_combatevent()) {
+    clear_packet();
+    set_has_combatevent();
+    packet_.combatevent_ = CreateMaybeMessage< ::CombatEvent >(GetArenaForAllocation());
+  }
+  return packet_.combatevent_;
+}
+inline ::CombatEvent* AnyServer::mutable_combatevent() {
+  ::CombatEvent* _msg = _internal_mutable_combatevent();
+  // @@protoc_insertion_point(field_mutable:AnyServer.combatEvent)
   return _msg;
 }
 
@@ -15712,6 +16136,134 @@ inline void DeleteUnit::set_unitid(::PROTOBUF_NAMESPACE_ID::int32 value) {
 
 // -------------------------------------------------------------------
 
+// CombatEvent
+
+// int32 attackerID = 1;
+inline void CombatEvent::clear_attackerid() {
+  attackerid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 CombatEvent::_internal_attackerid() const {
+  return attackerid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 CombatEvent::attackerid() const {
+  // @@protoc_insertion_point(field_get:CombatEvent.attackerID)
+  return _internal_attackerid();
+}
+inline void CombatEvent::_internal_set_attackerid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  attackerid_ = value;
+}
+inline void CombatEvent::set_attackerid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_attackerid(value);
+  // @@protoc_insertion_point(field_set:CombatEvent.attackerID)
+}
+
+// int32 defenderID = 2;
+inline void CombatEvent::clear_defenderid() {
+  defenderid_ = 0;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 CombatEvent::_internal_defenderid() const {
+  return defenderid_;
+}
+inline ::PROTOBUF_NAMESPACE_ID::int32 CombatEvent::defenderid() const {
+  // @@protoc_insertion_point(field_get:CombatEvent.defenderID)
+  return _internal_defenderid();
+}
+inline void CombatEvent::_internal_set_defenderid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  
+  defenderid_ = value;
+}
+inline void CombatEvent::set_defenderid(::PROTOBUF_NAMESPACE_ID::int32 value) {
+  _internal_set_defenderid(value);
+  // @@protoc_insertion_point(field_set:CombatEvent.defenderID)
+}
+
+// repeated .CombatRound rounds = 3;
+inline int CombatEvent::_internal_rounds_size() const {
+  return rounds_.size();
+}
+inline int CombatEvent::rounds_size() const {
+  return _internal_rounds_size();
+}
+inline void CombatEvent::clear_rounds() {
+  rounds_.Clear();
+}
+inline ::CombatRound* CombatEvent::mutable_rounds(int index) {
+  // @@protoc_insertion_point(field_mutable:CombatEvent.rounds)
+  return rounds_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::CombatRound >*
+CombatEvent::mutable_rounds() {
+  // @@protoc_insertion_point(field_mutable_list:CombatEvent.rounds)
+  return &rounds_;
+}
+inline const ::CombatRound& CombatEvent::_internal_rounds(int index) const {
+  return rounds_.Get(index);
+}
+inline const ::CombatRound& CombatEvent::rounds(int index) const {
+  // @@protoc_insertion_point(field_get:CombatEvent.rounds)
+  return _internal_rounds(index);
+}
+inline ::CombatRound* CombatEvent::_internal_add_rounds() {
+  return rounds_.Add();
+}
+inline ::CombatRound* CombatEvent::add_rounds() {
+  ::CombatRound* _add = _internal_add_rounds();
+  // @@protoc_insertion_point(field_add:CombatEvent.rounds)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::CombatRound >&
+CombatEvent::rounds() const {
+  // @@protoc_insertion_point(field_list:CombatEvent.rounds)
+  return rounds_;
+}
+
+// -------------------------------------------------------------------
+
+// CombatRound
+
+// double attackerHealth = 1;
+inline void CombatRound::clear_attackerhealth() {
+  attackerhealth_ = 0;
+}
+inline double CombatRound::_internal_attackerhealth() const {
+  return attackerhealth_;
+}
+inline double CombatRound::attackerhealth() const {
+  // @@protoc_insertion_point(field_get:CombatRound.attackerHealth)
+  return _internal_attackerhealth();
+}
+inline void CombatRound::_internal_set_attackerhealth(double value) {
+  
+  attackerhealth_ = value;
+}
+inline void CombatRound::set_attackerhealth(double value) {
+  _internal_set_attackerhealth(value);
+  // @@protoc_insertion_point(field_set:CombatRound.attackerHealth)
+}
+
+// double defenderHealth = 2;
+inline void CombatRound::clear_defenderhealth() {
+  defenderhealth_ = 0;
+}
+inline double CombatRound::_internal_defenderhealth() const {
+  return defenderhealth_;
+}
+inline double CombatRound::defenderhealth() const {
+  // @@protoc_insertion_point(field_get:CombatRound.defenderHealth)
+  return _internal_defenderhealth();
+}
+inline void CombatRound::_internal_set_defenderhealth(double value) {
+  
+  defenderhealth_ = value;
+}
+inline void CombatRound::set_defenderhealth(double value) {
+  _internal_set_defenderhealth(value);
+  // @@protoc_insertion_point(field_set:CombatRound.defenderHealth)
+}
+
+// -------------------------------------------------------------------
+
 // MoveUnits
 
 // repeated int32 unitIDs = 1;
@@ -16486,6 +17038,10 @@ inline void DeclareWar::set_onplayerid(::PROTOBUF_NAMESPACE_ID::int32 value) {
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------
