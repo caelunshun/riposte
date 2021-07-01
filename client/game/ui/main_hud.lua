@@ -58,6 +58,11 @@ function Hud:new(game)
         o:rebuildWindows()
     end)
 
+    game.eventBus:registerHandler("turnChanged", function()
+        o.readyForNextTurn = false
+        o.timeSinceLastSelect = nil
+    end)
+
     game.eventBus:registerHandler("unitDeleted", function(unit)
         for i, u in ipairs(o.selectedUnits) do
             if u == unit then
@@ -391,7 +396,7 @@ function Hud:doAutoSelect()
     self.tasks:enqueue(coroutine.create(function()
         local group = self.selectionGroups:popNextGroup()
 
-        if group == nil then
+        if group == nil and #self.selectedUnits == 0 then
             self.readyForNextTurn = true
             return
         else

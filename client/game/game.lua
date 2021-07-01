@@ -60,7 +60,12 @@ function Game:updatePlayer(playerdata)
 end
 
 function Game:setTurn(turn)
+    local oldTurn = self.turn
     self.turn = turn
+
+    if oldTurn ~= turn then
+        self.eventBus:trigger("turnChanged")
+    end
 end
 
 function Game:setEra(era)
