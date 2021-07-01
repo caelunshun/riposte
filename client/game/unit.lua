@@ -61,7 +61,7 @@ function Unit:render(cv, game)
         end
 
         local posA = Vector(0, 0)
-        local posB = (self.pos - self.previousPos) % Vector(100, 100)
+        local posB = (self.pos - self.previousPos) % Vector(100, 100) * game.view.zoomFactor
         local dist = (posB - posA).length
 
         pos = math.clamp(pos, 0, dist)
