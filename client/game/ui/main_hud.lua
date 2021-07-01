@@ -141,7 +141,7 @@ end
 function Hud:handleEvent(event)
     if self.promptQueue:getCurrentPrompt() ~= nil then return end
 
-    if event.type == dume.EventType.Key and event.action == dume.Action.Release
+    if event.type == dume.EventType.Key and event.action == dume.Action.Press
             and event.key == dume.Key.Return and self.readyForNextTurn then
         self.game.client:endTurn()
         self.readyForNextTurn = false
