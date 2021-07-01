@@ -151,7 +151,7 @@ int main() {
 
     winit_window_grab_cursor(window, true);
 
-    std::function callbackFunction([&](Event event) {
+    std::function<CControlFlow(Event)> callbackFunction([&](Event event) {
         if (event.kind == EventKind::RedrawRequested) {
             const auto currentTime = winit_get_time();
             const auto dt = currentTime - lastTime;
