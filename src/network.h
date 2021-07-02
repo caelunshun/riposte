@@ -19,8 +19,8 @@ namespace rip {
 
         void setError(std::string message);
 
-        std::optional<int> decodeLengthField();
-        std::optional<int> hasEnoughData();
+        std::optional<uint32_t> decodeLengthField();
+        std::optional<uint32_t> hasEnoughData();
 
     public:
         NetworkConnection(const std::string &address, uint16_t port);

@@ -63,14 +63,16 @@ namespace rip {
         output.clear();
     }
 
-    std::optional<int> NetworkConnection::decodeLengthField() {
+    std::optional<uint32_t> NetworkConnection::decodeLengthField() {
         if (_impl->receiveBuffer.size() < 4) return {};
 
-        return (((int) _impl->receiveBuffer[0]) << 24) | (((int) _impl->receiveBuffer[1]) << 16)
-            | (((int) _impl->receiveBuffer[2]) << 8) | ((int) _impl->receiveBuffer[2]);
+        auto *data = (unsigned char*) _impl->receiveBuffer.data();
+
+        return (((int) data[0]) << 24) | (((int) data[1]) << 16)
+            | (((int) data[2]) << 8) | ((int) data[3]);
     }
 
-    std::optional<int> NetworkConnection::hasEnoughData() {
+    std::optional<uint32_t> NetworkConnection::hasEnoughData() {
         const auto length = decodeLengthField();
         if (!length.has_value()) return {};
 
@@ -102,7 +104,7 @@ namespace rip {
             dataLength = hasEnoughData();
         }
 
-        auto result = _impl->receiveBuffer.substr(4, *dataLength + 4);
+        auto result = _impl->receiveBuffer.substr(4, *dataLength);
         _impl->receiveBuffer.erase(0, *dataLength + 4);
         return result;
     }

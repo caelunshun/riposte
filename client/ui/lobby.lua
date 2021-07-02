@@ -12,6 +12,7 @@ local Flex = require("widget/flex")
 local Clickable = require("widget/clickable")
 local Text = require("widget/text")
 local Padding = require("widget/padding")
+local Button = require("widget/button")
 
 local json = require("lunajson")
 
@@ -44,7 +45,22 @@ function Lobby:updateAvailableGames()
 
     local response = conn:recvMessage()
     checkError(conn)
+    print(response)
     self.availableGames = json.decode(response)
+end
+
+function Lobby:createGame()
+    local conn = NetworkConnection:new(ip, port)
+    checkError(conn)
+    conn:sendMessage(json.encode({
+        type = "createGame",
+        info = {
+            numHumanPlayers = 1,
+            neededHumanPlayers = 2,
+            totalPlayers = 7,
+        }
+    }))
+    checkError(conn)
 end
 
 function Lobby:buildRootWidget()
@@ -55,6 +71,11 @@ function Lobby:buildRootWidget()
     root:addFixedChild(Text:new("@size{20}{Multiplayer Games}"))
 
     root:addFixedChild(Text:new("Available: " .. #self.availableGames))
+
+    root:addFixedChild(Button:new(Text:new("@size{18}{Create Game}"), function()
+        self:createGame()
+        self:updateAvailableGames()
+    end))
 
     return root
 end
