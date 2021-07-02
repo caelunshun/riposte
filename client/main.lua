@@ -1,6 +1,11 @@
-package.path = "client/?.lua;external/dume/ui/?.lua;external/lunajson/src/?.lua;external/lua-protobuf/?.lua"
+package.path = "client/?.lua;external/dume/ui/?.lua;external/lunajson/src/?.lua;external/lua-protobuf/?.lua;external/lua-profiler/src/?.lua"
 package.cpath = "cmake-build-release/lib/lib?.so;cmake-build-debug/lib/lib?.so;cmake-build-relwithdebinfo/lib/lib?.so"
 jit.on()
+
+local profiler = require("profiler")
+-- Uncomment to enable profiling.
+-- profiler.start()
+profiler.configuration({fW = 50, fnW = 50})
 
 local buildMainMenu = require("ui/main_menu")
 local uiStyle = require("ui/style")
@@ -74,10 +79,19 @@ end
 
 time = 0
 
+local profileWritten = false
+
 function render(dt)
     cursorPos = Vector(_G.cursorPos.x, _G.cursorPos.y)
 
     time = time + dt
+
+    if time > 20 and not profileWritten then
+        profiler.stop()
+        profiler.report("profile_data.txt")
+        profileWritten = true
+        print("[lua] Wrote profile data")
+    end
 
     callSafe(function()
         scheduler:tick(time)

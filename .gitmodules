@@ -22,3 +22,6 @@
 [submodule "external/lua-protobuf"]
 	path = external/lua-protobuf
 	url = https://github.com/starwing/lua-protobuf
+[submodule "external/lua-profiler"]
+	path = external/lua-profiler
+	url = https://github.com/charlesmallah/lua-profiler

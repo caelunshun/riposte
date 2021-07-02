@@ -156,8 +156,12 @@ namespace rip {
         }
 
         for (const auto sightPos : sightPositions) {
-            for (int dx = -2; dx <= 2; dx++) {
-                for (int dy = -2; dy <= 2; dy++) {
+            int sightDistance = 1;
+            const auto &tile = game.getTile(sightPos);
+            if (tile.isHilled() && !tile.isForested()) sightDistance = 2;
+
+            for (int dx = -sightDistance; dx <= sightDistance; dx++) {
+                for (int dy = -sightDistance; dy <= sightDistance; dy++) {
                     auto p = glm::ivec2(sightPos) + glm::ivec2(dx, dy);
                     if (p.x < 0 || p.y < 0 || p.x >= game.getMapWidth() || p.y >= game.getMapHeight()) {
                         continue;
