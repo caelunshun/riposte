@@ -891,10 +891,12 @@ function EconomyWindow:rebuild()
     local plus = Button:new(Text:new("+", {}, {baseline=dume.Baseline.Middle}), function()
         self.game.client:setEconomySettings(self.game.thePlayer.beakerPercent + 10)
     end)
+    table.insert(plus.classes, "sliderButton")
     slider:addFixedChild(plus)
     local minus = Button:new(Text:new("-", {}, {baseline=dume.Baseline.Middle}), function()
         self.game.client:setEconomySettings(self.game.thePlayer.beakerPercent - 10)
     end)
+    table.insert(minus.classes, "sliderButton")
     slider:addFixedChild(minus)
 
     local outputText = Text:new("(+%beakerRevenue / turn)", {

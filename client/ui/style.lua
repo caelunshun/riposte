@@ -88,14 +88,14 @@ return {
             hoveredBarColor = dume.rgb(70, 70, 70),
             grabbedBarColor = dume.rgb(80, 80, 80),
         },
-        button = {
-            minSize = Vector(20, 20),
-        },
         unitActionButton = {
             minSize = Vector(150, 50),
         },
         confirmationButton = {
             minSize = Vector(100, 20),
+        },
+        sliderButton = {
+            minSize = Vector(20, 20),
         },
         highlightedText = {
             defaultTextStyle = {

@@ -66,8 +66,8 @@ namespace rip {
     std::optional<int> NetworkConnection::decodeLengthField() {
         if (_impl->receiveBuffer.size() < 4) return {};
 
-        return (((int) (_impl->receiveBuffer[0] << 24)) | ((int) (_impl->receiveBuffer[1] << 16)))
-            | ((int) (_impl->receiveBuffer[2] << 8)) | ((int) _impl->receiveBuffer[2]);
+        return (((int) _impl->receiveBuffer[0]) << 24) | (((int) _impl->receiveBuffer[1]) << 16)
+            | (((int) _impl->receiveBuffer[2]) << 8) | ((int) _impl->receiveBuffer[2]);
     }
 
     std::optional<int> NetworkConnection::hasEnoughData() {
@@ -98,6 +98,8 @@ namespace rip {
             }
 
             _impl->receiveBuffer.erase(pos + receivedBytes, std::string::npos);
+
+            dataLength = hasEnoughData();
         }
 
         auto result = _impl->receiveBuffer.substr(4, *dataLength + 4);

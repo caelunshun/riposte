@@ -11,8 +11,20 @@ local Flex = require("widget/flex")
 local Clickable = require("widget/clickable")
 local Text = require("widget/text")
 local Padding = require("widget/padding")
+local Button = require("widget/button")
+local Spacer = require("widget/spacer")
 
-local buildLobby = require("ui/lobby")
+local Lobby = require("ui/lobby")
+
+local navigator = nil
+
+local function wrapWithBackButton(widget)
+    widget:addFixedChild(Spacer:new(dume.Axis.Vertical, 52))
+    widget:addFixedChild(Button:new(Padding:new(Text:new("@size{20}{BACK}"), 10), function()
+        navigator:setPage("main")
+    end))
+    return widget
+end
 
 local function build(ui)
     local entries = {
@@ -26,7 +38,7 @@ local function build(ui)
         {
             name = "MULTIPLAYER",
             onclick = function()
-                buildLobby(ui)
+                navigator:setPage("lobby")
             end
         },
         {
@@ -50,9 +62,10 @@ local function build(ui)
         main:addFixedChild(clickable)
     end
 
-    local navigator = Navigator:new(
+    navigator = Navigator:new(
             {
                 main = Container:new(Padding:new(main, 50)),
+                lobby = Container:new(Padding:new(wrapWithBackButton(Lobby:new():buildRootWidget()), 50)),
             },
             "main"
     )
