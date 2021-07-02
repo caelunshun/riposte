@@ -14,6 +14,7 @@
 
 #include <memory>
 #include <thread>
+#include <network.h>
 
 const int windowWidth = 1920 / 2;
 const int windowHeight = 1080 / 2;
@@ -60,9 +61,21 @@ namespace rip {
         }
     };
 
+    // Creates bindings to the NetworkConnection class.
+    void makeLuaNetworkBindings(sol::state &lua) {
+        auto conn_type = lua.new_usertype<NetworkConnection>("NetworkConnection",
+                                                             sol::constructors<NetworkConnection(const std::string&, uint16_t)>());
+
+        conn_type["getError"] = &NetworkConnection::getError;
+        conn_type["sendMessage"] = &NetworkConnection::sendMessage;
+        conn_type["recvMessage"] = &NetworkConnection::recvMessage;
+    }
+
     void makeLuaClientBindings(sol::state &lua, std::shared_ptr<Assets> assets,
                                std::shared_ptr<Registry> registry,
                                std::shared_ptr<TechTree> techTree, std::shared_ptr<AudioManager> audio) {
+        makeLuaNetworkBindings(lua);
+
         lua["createSingleplayerGame"] = [=]() {
             auto bridges = newLocalBridgePair();
             auto server = std::make_shared<Server>(registry, techTree);

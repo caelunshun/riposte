@@ -12,6 +12,8 @@ local Clickable = require("widget/clickable")
 local Text = require("widget/text")
 local Padding = require("widget/padding")
 
+local buildLobby = require("ui/lobby")
+
 local function build(ui)
     local entries = {
         {
@@ -23,7 +25,9 @@ local function build(ui)
         },
         {
             name = "MULTIPLAYER",
-            onclick = function()  end
+            onclick = function()
+                buildLobby(ui)
+            end
         },
         {
             name = "OPTIONS",

@@ -3,4 +3,5 @@ cmake-build-*
 asset_src
 crodio/target
 bundler/target
+lobby/target
 **/.DS_Store
