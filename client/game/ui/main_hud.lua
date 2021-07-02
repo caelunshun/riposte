@@ -240,10 +240,10 @@ end
 function Hud:moveSelectionAlongStagedPath()
     local units = self.selectedUnits
     self:moveGroupAlongPath(units, self.stagedPath, function()
-        local hasMovementLeft = false
+        local hasMovementLeft = true
         for _, unit in ipairs(units) do
-            if unit.movementLeft > 0.1 then
-                hasMovementLeft = true
+            if unit.movementLeft < 0.1 then
+                hasMovementLeft = false
                 break
             end
         end
