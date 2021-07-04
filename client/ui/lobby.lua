@@ -25,7 +25,7 @@ local function showError(message)
     local root = Flex:column()
     root:addFixedChild(Text:new("@size{20}{%message}", {message=message}))
     root:addFixedChild(Button:new(Text:new("OK"), function()
-        ui:deleteWindow("error")
+        ui:deleteWindow("errorDialogue")
     end))
     root:setCrossAlign(dume.Align.Center)
     local size = Vector(300, 100)
@@ -65,11 +65,13 @@ function Lobby:updateAvailableGames()
     if checkError(conn) then return end
     print(response)
     self.availableGames = json.decode(response)
+
+    self:rebuild()
 end
 
 function Lobby:createGame()
     local conn = NetworkConnection:new(ip, port)
-    checkError(conn)
+    if checkError(conn) then return end
     conn:sendMessage(json.encode({
         type = "createGame",
         info = {
@@ -78,7 +80,7 @@ function Lobby:createGame()
             totalPlayers = 7,
         }
     }))
-    checkError(conn)
+    if checkError(conn) then return end
 end
 
 function Lobby:buildRootWidget()
@@ -95,7 +97,11 @@ function Lobby:buildRootWidget()
         self:updateAvailableGames()
     end))
 
-    return root
+    return wrapWithMenuBackButton(root)
+end
+
+function Lobby:rebuild()
+    ui:createWindow("multiplayerList", Vector(0, 0), Vector(cv:getWidth(), cv:getHeight()), Container:new(Padding:new(self:buildRootWidget(), 50)))
 end
 
 return Lobby

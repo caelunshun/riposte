@@ -16,17 +16,18 @@ local Spacer = require("widget/spacer")
 
 local Lobby = require("ui/lobby")
 
-local navigator = nil
+local build
 
-local function wrapWithBackButton(widget)
+function wrapWithMenuBackButton(widget)
     widget:addFixedChild(Spacer:new(dume.Axis.Vertical, 52))
     widget:addFixedChild(Button:new(Padding:new(Text:new("@size{20}{BACK}"), 10), function()
-        navigator:setPage("main")
+        ui:deleteWindow("multiplayerList")
+        build(ui)
     end))
     return widget
 end
 
-local function build(ui)
+build = function (ui)
     local entries = {
         {
             name = "SINGLEPLAYER",
@@ -38,7 +39,8 @@ local function build(ui)
         {
             name = "MULTIPLAYER",
             onclick = function()
-                navigator:setPage("lobby")
+                Lobby:new():rebuild()
+                ui:deleteWindow("mainMenu")
             end
         },
         {
@@ -62,17 +64,11 @@ local function build(ui)
         main:addFixedChild(clickable)
     end
 
-    navigator = Navigator:new(
-            {
-                main = Container:new(Padding:new(main, 50)),
-                lobby = Container:new(Padding:new(wrapWithBackButton(Lobby:new():buildRootWidget()), 50)),
-            },
-            "main"
-    )
-
-    local root = Image:new("icon/menu", nil, navigator)
+    local root = Container:new(Padding:new(main, 50))
 
     ui:createWindow("mainMenu", Vector(0, 0), Vector(ui.cv:getWidth(), ui.cv:getHeight()), root, true)
+
+    ui:createWindow("menuBackgroundImage", Vector(0, 0), Vector(ui.cv:getWidth(), ui.cv:getHeight()), Image:new("icon/menu"), true)
 end
 
 return build

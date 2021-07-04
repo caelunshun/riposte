@@ -18,7 +18,7 @@
 //! * select a game, then send ClientMessage::JoinGame
 //! * now you're connected to the game server
 
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, fmt::Debug, sync::Arc};
 
 use anyhow::{anyhow, bail};
 use flume::Sender;
@@ -38,6 +38,7 @@ const PORT: u16 = 19836;
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[serde(tag = "type")]
 pub enum ClientMessage {
     CreateGame { info: GameInfo },
     UpdateGameInfo { info: GameInfo },
@@ -48,6 +49,7 @@ pub enum ClientMessage {
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
+#[serde(tag = "type")]
 pub enum ServerMessage {
     NewClient { client_id: Uuid },
 }
@@ -82,10 +84,11 @@ impl Connection {
         }
     }
 
-    pub async fn send_message(&mut self, message: &impl Serialize) -> anyhow::Result<()> {
+    pub async fn send_message(&mut self, message: &(impl Serialize + Debug)) -> anyhow::Result<()> {
         self.codec
             .send(serde_json::to_string_pretty(message)?.into_bytes().into())
             .await?;
+        log::debug!("Sent message: {:#?}", message);
         Ok(())
     }
 
@@ -140,7 +143,15 @@ async fn handle_connection(stream: TcpStream, state: &Mutex<State>) -> anyhow::R
             let mut state_guard = state.lock().await;
             state_guard.games.insert(id, info);
 
-            handle_game_server_connection(conn, id, state).await?;
+            drop(state_guard);
+
+            let result = handle_game_server_connection(conn, id, state).await;
+
+            state_guard = state.lock().await;
+            state_guard.games.remove(&id);
+            state_guard.joining_client_channels.remove(&id);
+
+            return result;
         }
         ClientMessage::RequestGameList => {
             conn.send_message(
