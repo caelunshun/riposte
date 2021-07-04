@@ -14,19 +14,37 @@ local Text = require("widget/text")
 local Padding = require("widget/padding")
 local Button = require("widget/button")
 
+local UiUtils = require("ui/utils")
+
 local json = require("lunajson")
 
 local ip = "127.0.0.1"
 local port = 19836
 
+local function showError(message)
+    local root = Flex:column()
+    root:addFixedChild(Text:new("@size{20}{%message}", {message=message}))
+    root:addFixedChild(Button:new(Text:new("OK"), function()
+        ui:deleteWindow("error")
+    end))
+    root:setCrossAlign(dume.Align.Center)
+    local size = Vector(300, 100)
+    local container = UiUtils.createWindowContainer(root)
+    ui:createWindow("errorDialogue", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2), size, container)
+end
+
 local function checkError(conn)
     if conn:getError() ~= nil then
-        error(conn:getError())
+        showError(conn:getError())
+        return true
     end
+    return false
 end
 
 function Lobby:new()
-    local o = {}
+    local o = {
+        availableGames = {}
+    }
     setmetatable(o, self)
     self.__index = self
 
@@ -41,10 +59,10 @@ function Lobby:updateAvailableGames()
     conn:sendMessage(json.encode({
         type = "requestGameList"
     }))
-    checkError(conn)
+    if checkError(conn) then return end
 
     local response = conn:recvMessage()
-    checkError(conn)
+    if checkError(conn) then return end
     print(response)
     self.availableGames = json.decode(response)
 end
