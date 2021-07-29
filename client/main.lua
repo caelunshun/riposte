@@ -3,9 +3,12 @@ package.cpath = "cmake-build-release/lib/lib?.so;cmake-build-debug/lib/lib?.so;c
 jit.on()
 
 local profiler = require("profiler")
--- Uncomment to enable profiling.
--- profiler.start()
-profiler.configuration({fW = 50, fnW = 50})
+local enableProfiling = false
+
+if enableProfiling then
+    profiler.start()
+    profiler.configuration({fW = 50, fnW = 50})
+end
 
 local buildMainMenu = require("ui/main_menu")
 local uiStyle = require("ui/style")
@@ -86,7 +89,7 @@ function render(dt)
 
     time = time + dt
 
-    if time > 20 and not profileWritten then
+    if enableProfiling and time > 20 and not profileWritten then
         profiler.stop()
         profiler.report("profile_data.txt")
         profileWritten = true

@@ -14,7 +14,7 @@ local Padding = require("widget/padding")
 local Button = require("widget/button")
 local Spacer = require("widget/spacer")
 
-local Lobby = require("ui/lobby")
+local ServerList = require("ui/server_list")
 
 local build
 
@@ -39,7 +39,7 @@ build = function (ui)
         {
             name = "MULTIPLAYER",
             onclick = function()
-                Lobby:new():rebuild()
+                ServerList:new():rebuild()
                 ui:deleteWindow("mainMenu")
             end
         },

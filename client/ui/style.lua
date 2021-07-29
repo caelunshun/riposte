@@ -109,6 +109,11 @@ return {
         divider = {
             color = dume.rgb(180, 180, 180),
         },
+        table = {
+            cellBorderWidth = 2,
+            cellBorderColor = dume.rgb(100, 100, 100),
+            backgroundColor = dume.rgb(100, 100, 100, 100),
+        }
     },
     hovered = {
         hoverableText = {
