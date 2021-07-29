@@ -22,7 +22,7 @@ function wrapWithMenuBackButton(widget)
     widget:addFixedChild(Spacer:new(dume.Axis.Vertical, 52))
     widget:addFixedChild(Button:new(Padding:new(Text:new("@size{20}{BACK}"), 10), function()
         ui:deleteWindow("multiplayerList")
-        ui:deleteWindow("lobby")
+        ui:deleteWindow("multiplayerLobby")
         build(ui)
     end))
     return widget

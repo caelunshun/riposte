@@ -10,7 +10,7 @@
 // The client is now in a "Waiting for Game to Start" state.
 // It remains in this state until the server sends StartGame as
 // a result of one of the following events:
-// * the game admin starts the game
+// * the game host starts the game
 // * the game was in progress, and the client was allowed to rejoin
 // (because its username matched one of the existing players)
 //
@@ -66,6 +66,7 @@ message AnyClient {
     SetWorkerTask setWorkerTask = 12;
     DeclareWar declareWar = 13;
     ConfigureWorkedTiles configureWorkedTiles = 14;
+    GameOptions gameOptions = 15;
   }
 }
 
@@ -135,6 +136,12 @@ message AdminStartGame {}
 // (game cannot start, etc.)
 message LobbyError {
   string message = 1;
+}
+
+// Updates game options. Can only be sent by the admin.
+message GameOptions {
+  uint32 mapWidth = 1;
+  uint32 mapHeight = 2;
 }
 
 // ---------------------

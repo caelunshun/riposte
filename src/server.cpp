@@ -494,38 +494,52 @@ namespace rip {
         game.getServer().markCityDirty(city.getID());
     }
 
-    void Connection::handlePacket(Game &game, AnyClient &packet) {
-        currentRequestID = packet.requestid();
-        if (packet.has_clientinfo()) {
-            handleClientInfo(game, packet.clientinfo());
-        } else if (packet.has_computepath()) {
-            handleComputePath(game, packet.computepath());
-        } else if (packet.has_moveunits()) {
-            handleMoveUnits(game, packet.moveunits());
-        } else if (packet.has_endturn()) {
-            endedTurn = true;
-        } else if (packet.has_getbuildtasks()) {
-            handleGetBuildTasks(game, packet.getbuildtasks());
-        } else if (packet.has_setcitybuildtask()) {
-            handleSetBuildTask(game, packet.setcitybuildtask());
-        } else if (packet.has_setresearch()) {
-            handleSetResearch(game, packet.setresearch());
-        } else if (packet.has_getpossibletechs()) {
-            handleGetPossibleTechs(game, packet.getpossibletechs());
-        } else if (packet.has_seteconomysettings()) {
-            handleSetEconomySettings(game, packet.seteconomysettings());
-        } else if (packet.has_dounitaction()) {
-            handleDoUnitAction(game, packet.dounitaction());
-        } else if (packet.has_setworkertask()) {
-            handleSetWorkerTask(game, packet.setworkertask());
-        } else if (packet.has_declarewar()) {
-            handleDeclareWar(game, packet.declarewar());
-        } else if (packet.has_configureworkedtiles()) {
-            handleConfigureWorkedTiles(game, packet.configureworkedtiles());
+    void Connection::handleGameOptions(const GameOptions &packet) {
+        if (isAdmin) {
+            server->setGameOptions(packet);
         }
     }
 
-    void Connection::update(Game &game) {
+    void Connection::handlePacket(Game *gamePtr, AnyClient &packet) {
+        currentRequestID = packet.requestid();
+        if (gamePtr) {
+            auto &game = *gamePtr;
+            if (packet.has_clientinfo()) {
+                handleClientInfo(game, packet.clientinfo());
+            } else if (packet.has_computepath()) {
+                handleComputePath(game, packet.computepath());
+            } else if (packet.has_moveunits()) {
+                handleMoveUnits(game, packet.moveunits());
+            } else if (packet.has_endturn()) {
+                endedTurn = true;
+            } else if (packet.has_getbuildtasks()) {
+                handleGetBuildTasks(game, packet.getbuildtasks());
+            } else if (packet.has_setcitybuildtask()) {
+                handleSetBuildTask(game, packet.setcitybuildtask());
+            } else if (packet.has_setresearch()) {
+                handleSetResearch(game, packet.setresearch());
+            } else if (packet.has_getpossibletechs()) {
+                handleGetPossibleTechs(game, packet.getpossibletechs());
+            } else if (packet.has_seteconomysettings()) {
+                handleSetEconomySettings(game, packet.seteconomysettings());
+            } else if (packet.has_dounitaction()) {
+                handleDoUnitAction(game, packet.dounitaction());
+            } else if (packet.has_setworkertask()) {
+                handleSetWorkerTask(game, packet.setworkertask());
+            } else if (packet.has_declarewar()) {
+                handleDeclareWar(game, packet.declarewar());
+            } else if (packet.has_configureworkedtiles()) {
+                handleConfigureWorkedTiles(game, packet.configureworkedtiles());
+            }
+        } else {
+            // game hasn't started; we're in the lobby phase
+            if (packet.has_gameoptions()) {
+                handleGameOptions(packet.gameoptions());
+            }
+        }
+    }
+
+    void Connection::update(Game *game) {
         while (true) {
             auto packetData = bridge->pollReceivedPacket();
             if (!packetData.has_value()) break;
@@ -542,40 +556,62 @@ namespace rip {
     }
 
     Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)
-        : game(MapGenerator().generate(64, 64, registry, techTree, this)) {
-    }
+        : registry(registry), techTree(techTree) {}
 
-    void Server::addConnection(std::unique_ptr<Bridge> bridge) {
-        connections.emplace_back(std::move(bridge), game.getThePlayerID()); // TODO: multiplayer
-        connections[connections.size() - 1].sendGameData(game);
+    void Server::addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin) {
+        connections.emplace_back(std::move(bridge), playerIDAllocator.insert(0), isAdmin, this);
     }
 
     void Server::run() {
         while (!connections.empty()) {
             for (auto &connection : connections) {
-                connection.update(game);
+                connection.update(game.get());
             }
 
-            bool haveAllTurnsEnded = true;
-            for (auto &connection : connections) {
-                if (!connection.endedTurn) {
-                    haveAllTurnsEnded = false;
-                    break;
-                }
-            }
-
-            if (haveAllTurnsEnded) {
-                game.advanceTurn();
+            if (game) {
+                bool haveAllTurnsEnded = true;
                 for (auto &connection : connections) {
-                    connection.endedTurn = false;
-                    connection.sendGlobalData(game);
+                    if (!connection.endedTurn) {
+                        haveAllTurnsEnded = false;
+                        break;
+                    }
                 }
-            }
 
-            game.tick();
-            flushDirtyItems();
+                if (haveAllTurnsEnded) {
+                    game->advanceTurn();
+                    for (auto &connection : connections) {
+                        connection.endedTurn = false;
+                        connection.sendGlobalData(*game);
+                    }
+                }
+
+                game->tick();
+                flushDirtyItems();
+            }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(15));
+        }
+    }
+
+    void Server::setGameOptions(GameOptions gameOptions) {
+        this->gameOptions = std::move(gameOptions);
+    }
+
+    void Server::startGame() {
+        const int minMapWidth = 64, minMapHeight = 64;
+
+        if (gameOptions.mapwidth() < minMapWidth) {
+            gameOptions.set_mapwidth(minMapWidth);
+        }
+        if (gameOptions.mapheight() < minMapHeight) {
+            gameOptions.set_mapheight(minMapHeight);
+        }
+
+        auto theGame = MapGenerator().generate(gameOptions.mapwidth(), gameOptions.mapheight(), registry, techTree, this);
+        game = std::make_unique<Game>(std::move(theGame));
+
+        for (auto &conn : connections) {
+            conn.sendGameData(*game);
         }
     }
 
@@ -586,6 +622,8 @@ namespace rip {
     }
 
     void Server::flushDirtyItems() {
+        auto &game = *this->game;
+
         for (const auto unitID : dirtyUnits) {
             if (game.getUnits().contains(unitID)) {
                 auto packet = getUpdateUnitPacket(game, game.getUnit(unitID));
@@ -665,8 +703,8 @@ namespace rip {
         wrappedPacket.mutable_combatevent()->CopyFrom(packet);
 
         // A combat event is sent to a client only if one of its units is involved in the combat.
-        const auto &attacker = game.getUnit(attackerID);
-        const auto &defender = game.getUnit(defenderID);
+        const auto &attacker = game->getUnit(attackerID);
+        const auto &defender = game->getUnit(defenderID);
         for (auto &conn : connections) {
             if (attacker.getOwner() == conn.getPlayerID() || defender.getOwner() == conn.getPlayerID()) {
                 conn.send(wrappedPacket);
