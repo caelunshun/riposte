@@ -16,7 +16,8 @@
 //! Connection process for a client:
 //! * connect to lobby, send ClientMessage::RequestGameList
 //! * select a game, then send ClientMessage::JoinGame
-//! * now you're connected to the game server
+//! * now you're connected to the game server. All further data is proxied directly
+//!   to the host.
 
 use std::{collections::HashMap, fmt::Debug, sync::Arc};
 

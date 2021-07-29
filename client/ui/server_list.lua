@@ -19,10 +19,17 @@ local Empty = require("widget/empty")
 
 local UiUtils = require("ui/utils")
 
+local Lobby = require("ui/lobby")
+
 local json = require("lunajson")
 
 local ip = "127.0.0.1"
 local port = 19836
+
+local function enterLobby(lobby)
+    lobby:rebuild()
+    ui:deleteWindow("multiplayerList")
+end
 
 local function showError(message)
     local root = Flex:column()
@@ -84,6 +91,8 @@ function ServerList:createGame()
         }
     }))
     if checkError(conn) then return end
+
+    return conn
 end
 
 function ServerList:buildRootWidget()
@@ -131,8 +140,8 @@ function ServerList:buildRootWidget()
     root:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
 
     root:addFixedChild(Button:new(Text:new("@size{18}{Create Game}"), function()
-        self:createGame()
-        self:updateAvailableGames()
+        local conn = self:createGame()
+        enterLobby(Lobby:new(nil, conn))
     end))
 
     return wrapWithMenuBackButton(root)
