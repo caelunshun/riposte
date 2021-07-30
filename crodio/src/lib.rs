@@ -41,10 +41,12 @@ pub struct InstanceHandle {
 pub unsafe extern "C" fn rodio_start_sound(
     device: &mut OutputDevice,
     sound: &SoundHandle,
+    volume: f32,
 ) -> *mut InstanceHandle {
     let sink = Sink::try_new(&device.handle).expect("failed to create sink");
     let source = Decoder::new(Cursor::new(sound.source.clone())).expect("failed to create decoder");
     sink.append(source);
+    sink.set_volume(volume);
     sink.play();
     Box::leak(Box::new(InstanceHandle { sink })) as *mut _
 }

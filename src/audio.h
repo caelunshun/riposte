@@ -24,7 +24,7 @@ namespace rip {
 
         std::vector<InstanceHandle*> playingSounds;
 
-        InstanceHandle *playSound(const SoundAsset &sound);
+        InstanceHandle *playSound(const SoundAsset &sound, float volume);
 
     public:
         OutputDevice *rodio;
@@ -33,7 +33,7 @@ namespace rip {
 
         void setAssets(std::shared_ptr<Assets> assets);
 
-        InstanceHandle *playSound(const std::string &id);
+        InstanceHandle *playSound(const std::string &id, float volume);
 
         void update();
 

@@ -665,6 +665,26 @@
     "loader": "sound"
   },
   {
+    "path": "sound/event/move.ogg",
+    "id": "sound/event/move",
+    "loader": "sound"
+  },
+  {
+    "path": "sound/event/move_through_trees.ogg",
+    "id": "sound/event/move_through_trees",
+    "loader": "sound"
+  },
+  {
+    "path": "sound/event/turn_end.ogg",
+    "id": "sound/event/turn_end",
+    "loader": "sound"
+  },
+  {
+    "path": "sound/ambient/city1.ogg",
+    "id": "sound/ambient/city1",
+    "loader": "sound"
+  },
+  {
     "path": "icon/flag/america.png",
     "id": "icon/flag/america",
     "loader": "image"

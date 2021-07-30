@@ -17,9 +17,9 @@ namespace rip {
         rodio = rodio_new();
     }
 
-    InstanceHandle *AudioManager::playSound(const std::string &id) {
+    InstanceHandle *AudioManager::playSound(const std::string &id, float volume) {
         auto sound = std::dynamic_pointer_cast<SoundAsset>(assets->get(id));
-        return playSound(*sound);
+        return playSound(*sound, volume);
     }
 
     void AudioManager::setAssets(std::shared_ptr<Assets> assets) {
@@ -41,13 +41,13 @@ namespace rip {
         return !rodio_is_sound_done(sound);
     }
 
-    InstanceHandle *AudioManager::playSound(const SoundAsset &sound) {
+    InstanceHandle *AudioManager::playSound(const SoundAsset &sound, float volume) {
         const auto maxSounds = 16;
         if (playingSounds.size() > maxSounds) {
             return nullptr;
         }
 
-        auto *instance = rodio_start_sound(rodio, sound.handle);
+        auto *instance = rodio_start_sound(rodio, sound.handle, volume);
         playingSounds.push_back(instance);
         return instance;
     }

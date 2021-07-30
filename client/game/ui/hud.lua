@@ -66,6 +66,7 @@ function HUD:onDoubleClick(pos)
     if city ~= nil then
         local cityHud = CityHud:new(self.game, city)
         self:setCurrent(cityHud)
+        self.game.eventBus:trigger("cityHudOpened")
     end
 end
 

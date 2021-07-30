@@ -21,7 +21,7 @@ bool rodio_is_sound_done(InstanceHandle *sound);
 
 OutputDevice *rodio_new();
 
-InstanceHandle *rodio_start_sound(OutputDevice *device, const SoundHandle *sound);
+InstanceHandle *rodio_start_sound(OutputDevice *device, const SoundHandle *sound, float volume);
 
 void rodio_stop_sound(InstanceHandle *sound);
 

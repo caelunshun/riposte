@@ -242,6 +242,7 @@ function CityHud:close()
     end
     self.closed = true
     self.game.eventBus:deregisterHandler(self.handlerID)
+    self.game.eventBus:trigger("cityHudClosed")
 end
 
 return CityHud

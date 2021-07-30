@@ -93,8 +93,8 @@ namespace rip {
         bridge_type["pollReceivedPacket"] = &Bridge::pollReceivedPacket;
         bridge_type["sendPacket"] = &Bridge::sendPacket;
 
-        lua["playSound"] = [=](const std::string &soundID) {
-            auto *sound = audio->playSound(soundID);
+        lua["playSound"] = [=](const std::string &soundID, float volume) {
+            auto *sound = audio->playSound(soundID, volume);
             return sol::light<InstanceHandle>(sound);
         };
         lua["isSoundPlaying"] = [=](sol::light<InstanceHandle> handle) {

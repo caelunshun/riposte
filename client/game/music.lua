@@ -57,11 +57,13 @@ function MusicPlayer:selectNewSong()
 
     print("Soundtrack set to " .. newSong)
 
-    self.currentSound = playSound(newSong)
+    self.currentSound = playSound(newSong, 0.6)
     self.previousSong = newSong
 end
 
 function MusicPlayer:tick()
+    if self.game.era == nil then return end
+
     if self.currentSound == nil then
         self:selectNewSong()
     end

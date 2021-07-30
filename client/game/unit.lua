@@ -17,6 +17,11 @@ function Unit:updateData(data, game)
     if newPos ~= self.pos and self.pos ~= nil then
         self.moveStartTime = time
         self.previousPos = self.pos
+        game.eventBus:trigger("unitMoved", {
+            unit = self,
+            oldPos = self.pos,
+            newPos = newPos,
+        })
     end
 
     for k, v in pairs(data) do

@@ -22,6 +22,7 @@ local Stack = require("game/stack")
 local CombatEvent = require("game/combat")
 
 local MusicPlayer = require("game/music")
+local registerSoundEvents = require("game/sounds")
 
 function Game:new()
     local o = {
@@ -44,6 +45,8 @@ function Game:new()
 
     o.hud = HUD:new(o)
     o.musicPlayer = MusicPlayer:new(o)
+
+    registerSoundEvents(o)
 
     return o
 end
