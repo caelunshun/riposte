@@ -89,13 +89,19 @@ jobs:
             sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
             mkdir -p cmake-build-release
             cd cmake-build-release
-            export CMAKE_C_COMPILER=gcc-10 && export CMAKE_CXX_COMPILER=g++-10 &&
+            sudo apt install clang-12
             conan install ..
             cmake .. -DCMAKE_BUILD_TYPE=Release
             cd ..
+        env:
+          CC: clang-12
+          CXX: clang++-12
       
       - name: Build
-        run: export CMAKE_C_COMPILER=gcc-10 && export CMAKE_CXX_COMPILER=g++-10 && cd cmake-build-release && cmake --build . --target riposte
+        run: cd cmake-build-release && cmake --build . --target riposte
+        env:
+          CC: clang-12
+          CXX: clang++-12
         
       - name: Build riposte-bundler
         run: |
