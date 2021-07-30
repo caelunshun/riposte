@@ -2,12 +2,8 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
-    
-  pull_request:
-    branches: [ master ]
-    
-  workflow_dispatch:
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -29,7 +25,7 @@ jobs:
            conan --version
            ls
            
-           # Caching
+        # Caching
 
         # Work around https://github.com/actions/cache/issues/403 by using GNU tar
         # instead of BSD tar.
@@ -105,10 +101,25 @@ jobs:
       - name: Bundle
         run: bundler/target/release/riposte-bundler
         
-      - name: Upload bundled artifact
-        uses: softprops/action-gh-release@v1
-        if: startsWith(github.ref, 'refs/tags/')
-        with:
-          files: cmake-build-release/riposte.tar.zst
+      - name: Get tag name
+        uses: olegtarasov/get-tag@v2
+        id: tagName
+
+      - name: Create release
+        uses: actions/create-release@v1
+        id: create_release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.tagName.outputs.tag }}
+          release_name: Release ${{ steps.tagName.outputs.tag }}
+        
+      - name: Upload Linux package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: cmake-build-release/riposte.tar.zst
+          asset_name: riposte-linux.tar.zst
+          asset_content_type: application/zstd
