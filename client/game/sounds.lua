@@ -10,7 +10,7 @@ local function handleUnitMovement(game, event)
 end
 
 local function handleTurnChange(game)
-    if game.turn <= 1 then return end
+    if game.turn == 0 then return end
     playSound("sound/event/turn_end", 1)
 end
 
