@@ -89,6 +89,7 @@ jobs:
             sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
             mkdir -p cmake-build-release
             cd cmake-build-release
+            export CMAKE_C_COMPILER=gcc-10 && export CMAKE_CXX_COMPILER=g++-10 &&
             conan install ..
             cmake .. -DCMAKE_BUILD_TYPE=Release
             cd ..
