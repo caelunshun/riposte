@@ -89,19 +89,19 @@ jobs:
             sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
             mkdir -p cmake-build-release
             cd cmake-build-release
-            sudo apt install clang-12
+            sudo apt install clang-11
             conan install ..
             cmake .. -DCMAKE_BUILD_TYPE=Release
             cd ..
         env:
-          CC: clang-12
-          CXX: clang++-12
+          CC: clang-11
+          CXX: clang++-11
       
       - name: Build
         run: cd cmake-build-release && cmake --build . --target riposte
         env:
-          CC: clang-12
-          CXX: clang++-12
+          CC: clang-11
+          CXX: clang++-11
         
       - name: Build riposte-bundler
         run: |
