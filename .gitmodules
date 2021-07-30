@@ -22,3 +22,6 @@
 [submodule "external/lua-profiler"]
 	path = external/lua-profiler
 	url = https://github.com/charlesmallah/lua-profiler
+[submodule "external/dume"]
+	path = external/dume
+	url = https://github.com/caelunshun/dume
