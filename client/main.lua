@@ -17,8 +17,10 @@ local Client = require("game/client")
 local Renderer = require("game/renderer")
 
 local Scheduler = require("scheduler")
+local Networking = require("networking")
 
 scheduler = Scheduler:new()
+networking = Networking:new()
 
 local dume = require("dume")
 local Vector = require("brinevector")
@@ -109,6 +111,7 @@ function render(dt)
     end
 
     callSafe(function()
+        networking:tick()
         scheduler:tick(time)
 
         if client ~= nil then

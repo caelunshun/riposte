@@ -23,8 +23,8 @@ local Lobby = require("ui/lobby")
 
 local json = require("lunajson")
 
-local ip = "127.0.0.1"
-local port = 19836
+lobbyIP = "127.0.0.1"
+lobbyPort = 19836
 
 local function enterLobby(lobby)
     lobby:rebuild()
@@ -44,14 +44,6 @@ local function showError(message)
     ui:createWindow("errorDialogue", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2), size, container)
 end
 
-local function checkError(conn)
-    if conn:getError() ~= nil then
-        showError(conn:getError())
-        return true
-    end
-    return false
-end
-
 function ServerList:new()
     local o = {
         availableGames = {}
@@ -65,35 +57,48 @@ function ServerList:new()
 end
 
 function ServerList:updateAvailableGames()
-    local conn = NetworkConnection:new(ip, port)
-    checkError(conn)
-    conn:sendMessage(json.encode({
-        type = "requestGameList"
-    }))
-    if checkError(conn) then return end
+    networking:connectAsync(lobbyIP, lobbyPort, function(connHandle, error)
+        if error ~= nil then
+            showError(error)
+            return
+        end
 
-    local response = conn:recvMessage()
-    if checkError(conn) then return end
-    print(response)
-    self.availableGames = json.decode(response)
+        -- Send RequestGameList message
+        networking:sendMessage(connHandle, json.encode({
+            type = "requestGameList"
+        }))
 
-    self:rebuild()
+        -- Wait for response
+        networking:recvMessageAsync(connHandle, function(messageJSON, error)
+            if error ~= nil then
+                showError(error)
+                return
+            end
+
+            self.availableGames = json.decode(messageJSON)
+            self:rebuild()
+        end)
+    end)
 end
 
-function ServerList:createGame()
-    local conn = NetworkConnection:new(ip, port)
-    if checkError(conn) then return end
-    conn:sendMessage(json.encode({
-        type = "createGame",
-        info = {
-            numHumanPlayers = 1,
-            neededHumanPlayers = 2,
-            totalPlayers = 7,
-        }
-    }))
-    if checkError(conn) then return end
+function ServerList:createGame(callback)
+    networking:connectAsync(lobbyIP, lobbyPort, function(connHandle, error)
+        if error ~= nil then
+            showError(error)
+            return
+        end
 
-    return conn
+        networking:sendMessage(connHandle, json.encode({
+            type = "createGame",
+            info = {
+                numHumanPlayers = 1,
+                neededHumanPlayers = 2,
+                totalPlayers = 7,
+            }
+        }))
+
+        callback(connHandle)
+    end)
 end
 
 function ServerList:buildRootWidget()
@@ -141,9 +146,10 @@ function ServerList:buildRootWidget()
     root:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
 
     root:addFixedChild(Button:new(Text:new("@size{18}{Create Game}"), function()
-        local conn = self:createGame()
-        local serverBridge = createServer()
-        enterLobby(Lobby:new(serverBridge, conn))
+        self:createGame(function(conn)
+            local serverBridge = createServer()
+            enterLobby(Lobby:new(serverBridge, conn))
+        end)
     end))
 
     return wrapWithMenuBackButton(root)

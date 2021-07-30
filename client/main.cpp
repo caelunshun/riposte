@@ -11,6 +11,7 @@
 #include <tech.h>
 #include <audio.h>
 #include <bridge.h>
+#include "lua_networking.h"
 
 #include <memory>
 #include <thread>
@@ -61,21 +62,9 @@ namespace rip {
         }
     };
 
-    // Creates bindings to the NetworkConnection class.
-    void makeLuaNetworkBindings(sol::state &lua) {
-        auto conn_type = lua.new_usertype<NetworkConnection>("NetworkConnection",
-                                                             sol::constructors<NetworkConnection(const std::string&, uint16_t)>());
-
-        conn_type["getError"] = &NetworkConnection::getError;
-        conn_type["sendMessage"] = &NetworkConnection::sendMessage;
-        conn_type["recvMessage"] = &NetworkConnection::recvMessage;
-    }
-
     void makeLuaClientBindings(sol::state &lua, std::shared_ptr<Assets> assets,
                                std::shared_ptr<Registry> registry,
                                std::shared_ptr<TechTree> techTree, std::shared_ptr<AudioManager> audio) {
-        makeLuaNetworkBindings(lua);
-
         lua["createServer"] = [=]() {
             auto bridges = newLocalBridgePair();
             auto server = std::make_shared<Server>(registry, techTree);
@@ -144,6 +133,8 @@ int main() {
             sol::lib::table, sol::lib::utf8
     );
 
+    rip::registerNetworkBindings(lua);
+
     dume::makeLuaBindings(*lua);
     (*lua)["cv"] = canvas;
 
@@ -188,7 +179,7 @@ int main() {
     int width = windowWidth, height = windowHeight;
     double cursorX = 0, cursorY = 0;
 
-    winit_window_grab_cursor(window, true);
+    // winit_window_grab_cursor(window, true);
 
     std::function<CControlFlow(Event)> callbackFunction([&](Event event) {
         audio->update();
