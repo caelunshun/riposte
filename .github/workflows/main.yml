@@ -102,8 +102,8 @@ jobs:
         run: bundler/target/release/riposte-bundler
         
       - name: Get tag name
-        uses: olegtarasov/get-tag@v2
-        id: tagName
+        id: get_tag
+        run: echo ::set-output name=TAG::$(echo $GITHUB_REF | cut -d / -f 3)
 
       - name: Create release
         uses: actions/create-release@v1
@@ -111,8 +111,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          tag_name: ${{ steps.tagName.outputs.tag }}
-          release_name: Release ${{ steps.tagName.outputs.tag }}
+          tag_name: ${{ steps.get_tag.outputs.TAG }}
+          release_name: Release ${{ steps.get_tag.outputs.TAG }}
         
       - name: Upload Linux package
         uses: actions/upload-release-asset@v1
