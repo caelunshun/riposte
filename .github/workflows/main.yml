@@ -89,7 +89,7 @@ jobs:
             sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
             mkdir -p cmake-build-release
             cd cmake-build-release
-            sudo apt install clang-11
+            sudo bash -c "$(wget -O - https://apt.llvm.org/llvm.sh)"
             conan install ..
             cmake .. -DCMAKE_BUILD_TYPE=Release
             cd ..
