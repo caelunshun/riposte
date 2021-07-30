@@ -4,4 +4,5 @@ asset_src
 crodio/target
 bundler/target
 lobby/target
+launcher/target
 **/.DS_Store

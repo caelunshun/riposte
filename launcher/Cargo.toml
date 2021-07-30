@@ -1,0 +1,10 @@
+[package]
+name = "riposte-launcher"
+version = "0.1.0"
+edition = "2018"
+
+[dependencies]
+iced = { git = "https://github.com/hecrj/iced", rev = "a08e4ebccbb72f9cf6fca01047e0b46a482ca9ea", default-features = false, features = [ "wgpu", "tokio" ] }
+octocrab = { version = "0.10", default-features = false, features = [ "rustls"] }
+tar = "0.4"
+zstd = "0.9"
