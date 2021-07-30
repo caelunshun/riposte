@@ -62,7 +62,7 @@ jobs:
            
       - name: Cache protobuf library
         id: cache-protobuf
-        uses: actions/cache@v1
+        uses: actions/cache@v2
         with:
           path: protobuf
           key: ${{ runner.os }}-protobuf
@@ -94,10 +94,7 @@ jobs:
             cd ..
       
       - name: Build
-        run: cd cmake-build-release && cmake --build . --target riposte
-        
-      - name: Update Rust
-        run: rustup update
+        run: export CMAKE_C_COMPILER=gcc-10 && export CMAKE_CXX_COMPILER=g++-10 && cd cmake-build-release && cmake --build . --target riposte
         
       - name: Build riposte-bundler
         run: |
@@ -108,7 +105,7 @@ jobs:
       - name: Bundle
         run: bundler/target/release/riposte-bundler
         
-      - name: Upload bundle artifact
+      - name: Upload bundled artifact
         uses: softprops/action-gh-release@v1
         if: startsWith(github.ref, 'refs/tags/')
         with:
