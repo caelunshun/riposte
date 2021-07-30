@@ -69,6 +69,7 @@ local function getGreeting(greetingPlayer, greetedPlayer)
         end
     end
 
+    math.randomseed(os.time())
     local index = math.random(1, #r)
     return r[index]
 end
@@ -85,6 +86,7 @@ local function getWarDeclaration(greetingPlayer, greetedPlayer)
         r[#r + 1] = "You are but an ant to us. We will stampede you on the path to domination."
     end
 
+    math.randomseed(os.time())
     local index = math.random(1, #r)
     return r[index] .. string.format(" (%s declares war!)", greetingPlayer.username)
 end
