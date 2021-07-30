@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.14)
 project(riposte)
 
+set(CONAN_DISABLE_CHECK_COMPILER ON)
+
 include(${CMAKE_BINARY_DIR}/conanbuildinfo.cmake)
 conan_basic_setup()
 
