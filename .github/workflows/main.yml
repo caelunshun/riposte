@@ -94,14 +94,14 @@ jobs:
             cmake .. -DCMAKE_BUILD_TYPE=Release
             cd ..
         env:
-          CC: clang-11
-          CXX: clang++-11
+          CC: clang-12
+          CXX: clang++-12
       
       - name: Build
         run: cd cmake-build-release && cmake --build . --target riposte
         env:
-          CC: clang-11
-          CXX: clang++-11
+          CC: clang-12
+          CXX: clang++-12
         
       - name: Build riposte-bundler
         run: |
