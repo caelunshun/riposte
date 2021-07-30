@@ -28,11 +28,15 @@ namespace rip {
 
         Server *server;
 
+        LobbyPlayer lobbyPlayerInfo;
+
+        std::string username;
+
     public:
         // Whether the player has ended their current turn.
         bool endedTurn = false;
 
-        Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID, bool isAdmin, Server *server) : bridge(std::move(bridge)), playerID(playerID), isAdmin(isAdmin), server(server) {}
+        Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID, bool isAdmin, Server *server);
 
         template<typename T>
         void send(T &packet) {
@@ -47,7 +51,6 @@ namespace rip {
         void sendPlayerData(Game &game);
         void sendGlobalData(Game &game);
 
-        void handleClientInfo(Game &game, const ClientInfo &packet);
         void handleComputePath(Game &game, const ComputePath &packet);
         void handleMoveUnits(Game &game, const MoveUnits &packet);
         void handleGetBuildTasks(Game &game, const GetBuildTasks &packet);
@@ -60,13 +63,19 @@ namespace rip {
         void handleDeclareWar(Game &game, const DeclareWar &packet);
         void handleConfigureWorkedTiles(Game &game, const ConfigureWorkedTiles &packet);
 
+        void handleClientInfo(const ClientInfo &packet);
         void handleGameOptions(const GameOptions &packet);
+        void handleAdminStartGame(const AdminStartGame &packet);
+        void handleSetLeader(const SetLeader &packet);
 
         void handlePacket(Game *game, AnyClient &packet);
 
         void update(Game *game);
 
         PlayerId getPlayerID() const;
+        const LobbyPlayer &getLobbyPlayerInfo() const;
+        const std::string &getUsername() const;
+        bool getIsAdmin() const;
     };
 
     // The Riposte game server.
@@ -83,20 +92,21 @@ namespace rip {
         absl::flat_hash_set<glm::uvec2, PosHash> dirtyTiles;
         absl::flat_hash_set<PlayerId> dirtyPlayers;
 
-        std::shared_ptr<Registry> registry;
-        std::shared_ptr<TechTree> techTree;
-
         GameOptions gameOptions;
 
     public:
         // NB: may be null if we're still in the lobby phase.
         std::unique_ptr<Game> game;
+        std::shared_ptr<Registry> registry;
+        std::shared_ptr<TechTree> techTree;
 
         Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree);
         void setGameOptions(GameOptions gameOptions);
         void startGame();
 
         void addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin);
+
+        void updateServerInfo();
 
         void broadcastUnitDeath(UnitId unitID);
 
@@ -116,6 +126,8 @@ namespace rip {
                 );
 
         void run();
+
+        bool hasPlayerWithCiv(const std::string &civID) const;
     };
 }
 

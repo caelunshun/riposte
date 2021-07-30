@@ -358,6 +358,8 @@ namespace rip {
         const absl::flat_hash_map<std::string, std::shared_ptr<Resource>> &getResources() const;
 
         const std::shared_ptr<Building> &getBuilding(const std::string &name) const;
+
+        const std::shared_ptr<CivKind> &getCiv(const std::string &id) const;
     };
 
     class CivLoader : public AssetLoader {

@@ -76,12 +76,10 @@ namespace rip {
                                std::shared_ptr<TechTree> techTree, std::shared_ptr<AudioManager> audio) {
         makeLuaNetworkBindings(lua);
 
-        lua["createSingleplayerGame"] = [=]() {
+        lua["createServer"] = [=]() {
             auto bridges = newLocalBridgePair();
             auto server = std::make_shared<Server>(registry, techTree);
             server->addConnection(std::move(bridges.first), true);
-
-            server->startGame();
 
             auto serverThread = std::thread([server = std::move(server)] () mutable {
                 server->run();

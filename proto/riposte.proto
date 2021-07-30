@@ -67,6 +67,8 @@ message AnyClient {
     DeclareWar declareWar = 13;
     ConfigureWorkedTiles configureWorkedTiles = 14;
     GameOptions gameOptions = 15;
+    AdminStartGame adminStartGame = 16;
+    SetLeader setLeader = 17;
   }
 }
 
@@ -103,15 +105,25 @@ message ClientInfo {
   string username = 1;
 }
 
-// Response to ClientInfo.
+message LobbyPlayer {
+  string username = 1;
+  bool isHuman = 2;
+  string civID = 3;
+  string leaderName = 4;
+  int32 playerID = 5;
+  // If `false`, then we're still waiting for a human player in this slot.
+  bool exists = 6;
+  bool isAdmin = 7;
+}
+
+// Response to ClientInfo. Indicates lobby data.
 //
-// Also sent whenever the lobby data changes (e.g. a player
-// changes their leader)
+// Also sent whenever lobby data changes (a player leaves/joins, etc.)
 message ServerInfo {
-  // ID of the client's player
-  int32 playerID = 1;
-  // Players currently waiting in the lobby.
-  repeated PlayerInfo currentPlayers = 2;
+  // Players in the lobby.
+  repeated LobbyPlayer players = 1;
+  // The ID of the player in this connection.
+  int32 thePlayerID = 2;
 }
 
 // Can only be sent by the admin.
@@ -142,6 +154,7 @@ message LobbyError {
 message GameOptions {
   uint32 mapWidth = 1;
   uint32 mapHeight = 2;
+  uint32 numHumanPlayers = 3;
 }
 
 // ---------------------

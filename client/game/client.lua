@@ -22,6 +22,16 @@ function Client:new(game, bridge)
     return o
 end
 
+function Client:adminStartGame()
+    self:sendPacket("adminStartGame", {})
+end
+
+function Client:sendClientInfo(username)
+    self:sendPacket("clientInfo", {
+        username = username
+    })
+end
+
 -- Requests that the server compute the shortest path the given unit
 -- can take between two points.
 --
@@ -154,8 +164,14 @@ function Client:sendPacket(packetKind, packet, callback)
 end
 
 function Client:handleReceivedPackets()
+    self:handleReceivedPacketsWithHandler(function(packet)
+        self:handlePacket(packet)
+    end)
+end
+
+function Client:handleReceivedPacketsWithHandler(handler)
     -- don't update game state during combat animations
-    if self.game:hasCombatEvent() then return end
+    if self.game ~= nil and self.game:hasCombatEvent() then return end
 
     local packet = self.bridge:pollReceivedPacket()
     while packet ~= nil do
@@ -170,7 +186,7 @@ function Client:handleReceivedPackets()
             end
         end
 
-        self:handlePacket(decodedPacket)
+        handler(decodedPacket)
 
         local callback = self.responseCallbacks[decodedPacket.requestID]
         if callback ~= nil then
@@ -178,7 +194,7 @@ function Client:handleReceivedPackets()
             self.responseCallbacks[decodedPacket.requestID] = nil
         end
 
-        if self.game:hasCombatEvent() then return end
+        if game ~= nil and self.game:hasCombatEvent() then return end
 
         packet = self.bridge:pollReceivedPacket()
     end

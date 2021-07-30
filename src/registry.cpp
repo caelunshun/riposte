@@ -66,4 +66,14 @@ namespace rip {
         }
         throw std::string("missing building '" + name + "'");
     }
+
+    const std::shared_ptr<CivKind> &Registry::getCiv(const std::string &id) const {
+        for (const auto &civ : civs) {
+            if (civ->id == id) {
+                return civ;
+            }
+        }
+
+        throw std::string("missing civ '" + id + "'");
+    }
 }

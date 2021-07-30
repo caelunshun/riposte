@@ -29,6 +29,7 @@ local port = 19836
 local function enterLobby(lobby)
     lobby:rebuild()
     ui:deleteWindow("multiplayerList")
+    _G.enterLobby(lobby)
 end
 
 local function showError(message)
@@ -141,7 +142,8 @@ function ServerList:buildRootWidget()
 
     root:addFixedChild(Button:new(Text:new("@size{18}{Create Game}"), function()
         local conn = self:createGame()
-        enterLobby(Lobby:new(nil, conn))
+        local serverBridge = createServer()
+        enterLobby(Lobby:new(serverBridge, conn))
     end))
 
     return wrapWithMenuBackButton(root)

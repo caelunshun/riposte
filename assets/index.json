@@ -100,6 +100,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/crown.png",
+    "id": "icon/crown",
+    "loader": "image"
+  },
+  {
     "path": "civ/greece.json",
     "id": "civ/greece",
     "loader": "civ"

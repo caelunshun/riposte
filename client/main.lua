@@ -67,17 +67,29 @@ function loadDataFile(id, type, jsonData)
     registryEntry:add(data)
 end
 
+local lobby = nil
+
 local game = nil
 local client = nil
 
 local cursorPos = Vector(0, 0)
 
-function enterGame(bridge)
+function enterLobby(l)
+    lobby = l
+end
+
+function enterGame(bridge, isMultiplayer)
+    lobby = nil
+
     -- Clear the UI to get rid of the menu.
     for windowName, _ in pairs(ui.windows) do ui:deleteWindow(windowName) end
     game = Game:new()
     client = Client:new(game, bridge)
     game.client = client
+
+    if not isMultiplayer then
+        client:adminStartGame()
+    end
 end
 
 time = 0
@@ -112,6 +124,10 @@ function render(dt)
             if game:hasCombatEvent() then
                 game:getCombatEvent():tick()
             end
+        end
+
+        if lobby ~= nil then
+            lobby:tick(dt)
         end
 
         ui:render()

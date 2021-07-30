@@ -272,6 +272,20 @@ namespace rip {
         return packet;
     }
 
+    Connection::Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID, bool isAdmin, Server *server)
+        : bridge(std::move(bridge)), playerID(playerID), isAdmin(isAdmin), server(server) {
+        // choose random initial civ and leader
+        Rng rng;
+        while (true) {
+            auto civ = server->registry->getCivs()[rng.u32(0, server->registry->getCivs().size())];
+            if (!server->hasPlayerWithCiv(civ->id)) {
+                lobbyPlayerInfo.set_civid(civ->id);
+                lobbyPlayerInfo.set_leadername(civ->leaders[rng.u32(0, civ->leaders.size())].name);
+                break;
+            }
+        }
+    }
+
     void Connection::sendUpdateTile(Game &game, glm::uvec2 pos) {
         auto packet = getUpdateTilePacket(game, pos, playerID);
         SEND(packet, updatetile, 0);
@@ -307,10 +321,6 @@ namespace rip {
         for (auto &city : game.getCities()) {
             SEND(getUpdateCityPacket(game, city), updatecity, 0);
         }
-    }
-
-    void Connection::handleClientInfo(Game &game, const ClientInfo &packet) {
-        game.getPlayer(playerID).setUsername(packet.username());
     }
 
     void Connection::handleComputePath(Game &game, const ComputePath &packet) {
@@ -500,13 +510,27 @@ namespace rip {
         }
     }
 
+    void Connection::handleAdminStartGame(const AdminStartGame &packet) {
+        if (isAdmin) {
+            server->startGame();
+        }
+    }
+
+    void Connection::handleSetLeader(const SetLeader &packet) {
+        lobbyPlayerInfo.set_civid(packet.civid());
+        lobbyPlayerInfo.set_leadername(packet.leader());
+    }
+
+    void Connection::handleClientInfo(const ClientInfo &packet) {
+        username = packet.username();
+        server->updateServerInfo();
+    }
+
     void Connection::handlePacket(Game *gamePtr, AnyClient &packet) {
         currentRequestID = packet.requestid();
         if (gamePtr) {
             auto &game = *gamePtr;
-            if (packet.has_clientinfo()) {
-                handleClientInfo(game, packet.clientinfo());
-            } else if (packet.has_computepath()) {
+            if (packet.has_computepath()) {
                 handleComputePath(game, packet.computepath());
             } else if (packet.has_moveunits()) {
                 handleMoveUnits(game, packet.moveunits());
@@ -535,6 +559,12 @@ namespace rip {
             // game hasn't started; we're in the lobby phase
             if (packet.has_gameoptions()) {
                 handleGameOptions(packet.gameoptions());
+            } else if (packet.has_adminstartgame()) {
+                handleAdminStartGame(packet.adminstartgame());
+            } else if (packet.has_setleader()) {
+                handleSetLeader(packet.setleader());
+            } else if (packet.has_clientinfo()) {
+                handleClientInfo(packet.clientinfo());
             }
         }
     }
@@ -555,11 +585,54 @@ namespace rip {
         }
     }
 
+    const LobbyPlayer &Connection::getLobbyPlayerInfo() const {
+        return lobbyPlayerInfo;
+    }
+
+    const std::string &Connection::getUsername() const {
+        return username;
+    }
+
+    bool Connection::getIsAdmin() const {
+        return isAdmin;
+    }
+
     Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)
         : registry(registry), techTree(techTree) {}
 
     void Server::addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin) {
         connections.emplace_back(std::move(bridge), playerIDAllocator.insert(0), isAdmin, this);
+    }
+
+    void Server::updateServerInfo() {
+        ServerInfo packet;
+        
+        // Add human players
+        for (auto &conn : connections) {
+            auto *player = packet.add_players();
+            player->set_civid(conn.getLobbyPlayerInfo().civid());
+            player->set_leadername(conn.getLobbyPlayerInfo().leadername());
+            player->set_username(conn.getUsername());
+            player->set_ishuman(true);
+            player->set_playerid(conn.getPlayerID().encode());
+            player->set_exists(true);
+            player->set_isadmin(conn.getIsAdmin());
+        }
+
+        // Add empty slots
+        int neededPlayers = gameOptions.numhumanplayers() - connections.size();
+        for (int i = 0; i < neededPlayers; i++) {
+            auto *player = packet.add_players();
+            player->set_exists(false);
+            player->set_ishuman(true);
+        }
+
+        for (auto &conn : connections) {
+            packet.set_theplayerid(conn.getPlayerID().encode());
+            AnyServer anyServer;
+            anyServer.mutable_serverinfo()->CopyFrom(packet);
+            conn.send(anyServer);
+        }
     }
 
     void Server::run() {
@@ -607,11 +680,23 @@ namespace rip {
             gameOptions.set_mapheight(minMapHeight);
         }
 
+        if (gameOptions.numhumanplayers() < 1) {
+            gameOptions.set_numhumanplayers(1);
+        }
+
         auto theGame = MapGenerator().generate(gameOptions.mapwidth(), gameOptions.mapheight(), registry, techTree, this);
         game = std::make_unique<Game>(std::move(theGame));
 
+        absl::flat_hash_set<PlayerId> humanPlayers;
         for (auto &conn : connections) {
             conn.sendGameData(*game);
+            humanPlayers.insert(conn.getPlayerID());
+        }
+
+        for (auto &player : game->getPlayers()) {
+            if (!humanPlayers.contains(player.getID())) {
+                player.enableAI();
+            }
         }
     }
 
@@ -710,5 +795,14 @@ namespace rip {
                 conn.send(wrappedPacket);
             }
         }
+    }
+
+    bool Server::hasPlayerWithCiv(const std::string &civID) const {
+        for (const auto &conn : connections) {
+            if (conn.getLobbyPlayerInfo().civid() == civID) {
+                return true;
+            }
+        }
+        return false;
     }
 }
