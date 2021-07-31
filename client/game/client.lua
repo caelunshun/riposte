@@ -186,7 +186,7 @@ function Client:handleReceivedPacketsWithHandler(handler)
             end
         end
 
-        handler(decodedPacket)
+        local shouldStopHandlingPackets = handler(decodedPacket)
 
         local callback = self.responseCallbacks[decodedPacket.requestID]
         if callback ~= nil then
@@ -195,6 +195,8 @@ function Client:handleReceivedPacketsWithHandler(handler)
         end
 
         if game ~= nil and self.game:hasCombatEvent() then return end
+
+        if shouldStopHandlingPackets then return end
 
         packet = self.bridge:pollReceivedPacket()
     end

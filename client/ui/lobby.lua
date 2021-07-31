@@ -180,7 +180,7 @@ function Lobby:handlePacket(packet)
     if packet.serverInfo ~= nil then
         self:handleServerInfo(packet.serverInfo)
     elseif packet.startGame ~= nil then
-        self:handleStartGame(packet.startGame)
+        return self:handleStartGame(packet.startGame)
     end
 end
 
@@ -198,6 +198,8 @@ end
 
 function Lobby:handleStartGame(packet)
     enterGame(self.server.bridge, true)
+    -- stop handling packets so that game data packets are handled by the game client instead of the lobby client
+    return true
 end
 
 function Lobby:getNumHumanPlayers()
