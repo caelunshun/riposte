@@ -155,6 +155,7 @@ message GameOptions {
   uint32 mapWidth = 1;
   uint32 mapHeight = 2;
   uint32 numHumanPlayers = 3;
+  uint32 numAIPlayers = 4;
 }
 
 // ---------------------

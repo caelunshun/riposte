@@ -33,10 +33,17 @@ function Networking:recvMessageAsync(connHandle, callback)
     self.callbacks[id] = callback
 end
 
+-- Converts a connection into a `Bridge` that can be used as a multiplayer game connection.
+function Networking:convertToBridgeAsync(connHandle, callback)
+    local id = networkingConvertToBridge(connHandle)
+    self.callbacks[id] = callback
+end
+
 function Networking:tick()
     local completions = networkingPoll()
     for id, payload in pairs(completions) do
         self.callbacks[id](payload.contents, payload.error)
+        self.callbacks[id] = nil
     end
 end
 

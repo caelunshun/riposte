@@ -7,10 +7,13 @@
 
 #include <riposte.pb.h>
 #include <absl/container/flat_hash_set.h>
+#include <readerwriterqueue/readerwriterqueue.h>
 
 #include "bridge.h"
 #include "game.h"
 #include "tech.h"
+
+using namespace moodycamel;
 
 namespace rip {
     class Server;
@@ -125,7 +128,7 @@ namespace rip {
                 const std::vector<CombatRound> &rounds
                 );
 
-        void run();
+        void run(std::shared_ptr<ReaderWriterQueue<std::unique_ptr<Bridge>>> newConnections);
 
         bool hasPlayerWithCiv(const std::string &civID) const;
     };

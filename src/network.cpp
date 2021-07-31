@@ -116,4 +116,12 @@ namespace rip {
     NetworkConnection::~NetworkConnection() {
         close(_impl->sock);
     }
+
+    NetworkConnection::NetworkConnection(NetworkConnection &&other)  noexcept {
+        _impl = std::make_unique<impl>();
+        _impl->receiveBuffer = std::move(other._impl->receiveBuffer);
+        _impl->sock = other._impl->sock;
+        _impl->error = std::move(other._impl->error);
+        other._impl->sock = 0;
+    }
 }

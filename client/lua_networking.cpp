@@ -13,6 +13,7 @@
 #include <utility>
 #include "lua_networking.h"
 #include <readerwriterqueue/readerwriterqueue.h>
+#include <bridge.h>
 
 using namespace moodycamel;
 
@@ -25,12 +26,15 @@ namespace rip {
         ReceivedMessage,
         SendMessage,
         Errored,
+        ConvertToBridge,
+        ConvertedToBridge,
     };
 
     struct Message {
         MessageType type;
         CompletionID completionID;
         std::string message;
+        std::unique_ptr<Bridge> bridge;
 
         Message() {}
 
@@ -96,12 +100,13 @@ namespace rip {
                      Message message;
                      threadHandle.mainToThread->wait_dequeue(message);
 
+                     std::string data;
                      switch (message.type) {
                          case MessageType::SendMessage:
                              conn.sendMessage(message.message);
                              break;
                          case MessageType::WaitForMessage:
-                             auto data = conn.recvMessage();
+                             data = conn.recvMessage();
                              if (conn.getError()) {
                                  threadHandle.threadToMain->emplace(MessageType::Errored, message.completionID, *conn.getError());
                                  return;
@@ -109,6 +114,15 @@ namespace rip {
 
                              threadHandle.threadToMain->emplace(MessageType::ReceivedMessage, message.completionID, std::move(data));
                              break;
+                         case MessageType::ConvertToBridge:
+                             auto bridge = std::make_unique<NetworkBridge>(std::move(conn));
+
+                             Message response(MessageType::ConvertedToBridge, message.completionID, "");
+                             response.bridge = std::move(bridge);
+
+                             threadHandle.threadToMain->emplace(std::move(response));
+
+                             return;
                      }
                  }
             });
@@ -133,6 +147,12 @@ namespace rip {
             return completionID;
         }
 
+        CompletionID makeBridgeFromConn(ID connHandleID) {
+            const auto completionID = getNextCompletionID();
+            connectionHandles[connHandleID].mainToThread->emplace(MessageType::ConvertToBridge, completionID, "");
+            return completionID;
+        }
+
         // generates a table of completion ID to {payload, error}
         sol::table pollCompletions(sol::state &lua) {
             auto result = lua.create_table();
@@ -150,6 +170,9 @@ namespace rip {
                             break;
                         case MessageType::Connected:
                             payload = lua.create_table_with("contents", connHandle.id);
+                            break;
+                        case MessageType::ConvertedToBridge:
+                            payload = lua.create_table_with("contents", std::move(msg.bridge));
                             break;
                     }
                     result[msg.completionID] = payload;
@@ -171,6 +194,9 @@ namespace rip {
         };
         (*lua)["networkingRecvAsync"] = [=](ID connHandle) {
             return bridge->recvMessageAsync(connHandle);
+        };
+        (*lua)["networkingConvertToBridge"] = [=] (ID connHandle) {
+            return bridge->makeBridgeFromConn(connHandle);
         };
         (*lua)["networkingPoll"] = [=] () {
             return bridge->pollCompletions(*lua);

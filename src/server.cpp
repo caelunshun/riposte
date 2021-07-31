@@ -635,7 +635,7 @@ namespace rip {
         }
     }
 
-    void Server::run() {
+    void Server::run(std::shared_ptr<ReaderWriterQueue<std::unique_ptr<Bridge>>> newConnections) {
         while (!connections.empty()) {
             for (auto &connection : connections) {
                 connection.update(game.get());
@@ -660,6 +660,11 @@ namespace rip {
 
                 game->tick();
                 flushDirtyItems();
+            } else {
+                std::unique_ptr<Bridge> newBridge;
+                while (newConnections->try_dequeue(newBridge)) {
+                    addConnection(std::move(newBridge), false);
+                }
             }
 
             std::this_thread::sleep_for(std::chrono::milliseconds(15));

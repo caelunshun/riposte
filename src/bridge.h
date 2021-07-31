@@ -10,6 +10,7 @@
 #include <memory>
 
 #include <readerwriterqueue/readerwriterqueue.h>
+#include "network.h"
 
 namespace rip {
     // A bridge between client and server.
@@ -21,6 +22,8 @@ namespace rip {
         Bridge() = default;
 
         virtual ~Bridge() = default;
+
+        Bridge(Bridge &&other) noexcept = default;
 
         virtual std::optional<std::string> pollReceivedPacket() = 0;
 
@@ -37,6 +40,21 @@ namespace rip {
                     std::shared_ptr<moodycamel::ReaderWriterQueue<std::string>> receiveQueue) : Bridge(), sendQueue(sendQueue), receiveQueue(receiveQueue) {}
 
         ~LocalBridge() override = default;
+
+        std::optional<std::string> pollReceivedPacket() override;
+
+        void sendPacket(std::string data) override;
+    };
+
+    // A bridge connected to a network connection, driven on a separate thread.
+    class NetworkBridge : public Bridge {
+        std::shared_ptr<moodycamel::BlockingReaderWriterQueue<std::string>> sendQueue;
+        std::shared_ptr<moodycamel::ReaderWriterQueue<std::string>> receiveQueue;
+
+    public:
+        NetworkBridge(NetworkConnection conn);
+
+        ~NetworkBridge() override = default;
 
         std::optional<std::string> pollReceivedPacket() override;
 

@@ -27,6 +27,7 @@ namespace rip {
         ~NetworkConnection();
 
         NetworkConnection(const NetworkConnection &other) = delete;
+        NetworkConnection(NetworkConnection &&other) noexcept;
 
         // Sends a message. _Blocks_.
         //

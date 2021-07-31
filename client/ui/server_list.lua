@@ -32,7 +32,7 @@ local function enterLobby(lobby)
     _G.enterLobby(lobby)
 end
 
-local function showError(message)
+function showError(message)
     local root = Flex:column()
     root:addFixedChild(Text:new("@size{20}{%message}", {message=message}))
     root:addFixedChild(Button:new(Text:new("OK"), function()
@@ -42,6 +42,25 @@ local function showError(message)
     local size = Vector(300, 100)
     local container = UiUtils.createWindowContainer(root)
     ui:createWindow("errorDialogue", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2), size, container)
+end
+
+local function joinGame(gameID)
+    networking:connectAsync(lobbyIP, lobbyPort, function(connHandle, error)
+        if error ~= nil then
+            showError(error)
+            return
+        end
+
+        networking:sendMessage(connHandle, json.encode({
+            type = "joinGame",
+            id = gameID,
+        }))
+
+        networking:convertToBridgeAsync(connHandle, function(bridge)
+            local lobby = Lobby:new({bridge = bridge}, nil)
+            enterLobby(lobby)
+        end)
+    end)
 end
 
 function ServerList:new()
@@ -126,7 +145,7 @@ function ServerList:buildRootWidget()
             neededPlayers = Text:new(tostring(game.neededHumanPlayers)),
             totalPlayers = Text:new(tostring(game.totalPlayers)),
             join = Button:new(Text:new("Join"), function()
-                print("joining game")
+                joinGame(game.id)
             end)
         }
     end
@@ -147,8 +166,8 @@ function ServerList:buildRootWidget()
 
     root:addFixedChild(Button:new(Text:new("@size{18}{Create Game}"), function()
         self:createGame(function(conn)
-            local serverBridge = createServer()
-            enterLobby(Lobby:new(serverBridge, conn))
+            local server = createServer()
+            enterLobby(Lobby:new(server, conn))
         end)
     end))
 

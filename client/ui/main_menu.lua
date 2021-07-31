@@ -33,7 +33,7 @@ build = function (ui)
         {
             name = "SINGLEPLAYER",
             onclick = function()
-                local bridge = createServer()
+                local bridge = createServer().bridge
                 enterGame(bridge, false)
             end
         },

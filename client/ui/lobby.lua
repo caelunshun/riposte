@@ -23,25 +23,41 @@ local Client = require("game/client")
 
 local Lobby = {}
 
+local json = require("lunajson")
+
+local function defaultSettings()
+    return {
+        mapWidth = 64,
+        mapHeight = 64,
+        numHumanPlayers = 2,
+        numAIPlayers = 5,
+    }
+end
+
 -- Creates a new lobby.
 --
--- serverBridge is the Bridge with the server hosting the lobby.
+-- server is the Bridge with the server hosting the lobby.
 --
 -- lobbyServerConn is our connection with the lobby server, which is not null
 -- only if we're the game host. It's used to accept new connections and to update
 -- game info in the server list.
-function Lobby:new(serverBridge, lobbyServerConn)
+function Lobby:new(server, lobbyServerConn)
     local o = {
-        serverBridge = serverBridge,
+        server = server,
         lobbyServerConn = lobbyServerConn,
         isTheHost = (lobbyServerConn ~= nil),
-        client = Client:new(nil, serverBridge),
+        client = Client:new(nil, server.bridge),
+        settings = defaultSettings(),
+        listeningForConnections = false,
     }
 
     o.client:sendClientInfo("caelunshun") -- TODO: don't hardcode username
 
     setmetatable(o, self)
     self.__index = self
+
+    o:waitForNextClient()
+
     return o
 end
 
@@ -61,9 +77,14 @@ function Lobby:buildRootWidget()
 
     root:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
 
-    -- Players table
     root:addFixedChild(Divider:new(2))
-    root:addFixedChild(Text:new("@size{20}{Players}"), {}, {alignH = dume.Align.Center})
+
+    local bottom = Flex:row()
+    bottom:setMainAlign(dume.Align.Center)
+
+    -- Players table
+    local players = Flex:column()
+    players:addFixedChild(Text:new("@size{20}{Players}"), {}, {alignH = dume.Align.Center})
 
     local rows = {}
     -- title row
@@ -90,7 +111,7 @@ function Lobby:buildRootWidget()
         end
     end
 
-    root:addFixedChild(Table:new(
+    players:addFixedChild(Table:new(
             {
                 "username",
                 "civ",
@@ -98,6 +119,27 @@ function Lobby:buildRootWidget()
             },
             rows
     ))
+    bottom:addFlexChild(players, 1)
+
+    local settings = Flex:column()
+    settings:addFixedChild(Text:new("@size{20}{Settings}"), {}, {alignH = dume.Align.Center})
+
+    settings:addFixedChild(Divider:new(1))
+
+    settings:addFixedChild(Text:new("Map Width: " .. tostring(self.settings.mapWidth) .. " tiles"))
+    settings:addFixedChild(Text:new("Map Height: " .. tostring(self.settings.mapHeight) .. " tiles"))
+
+    settings:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
+    settings:addFixedChild(Divider:new(1))
+    settings:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
+
+    settings:addFixedChild(Text:new(tostring(self.settings.numHumanPlayers) .. " Human Players"))
+    settings:addFixedChild(Text:new(tostring(self.settings.numAIPlayers) .. " AI Players"))
+    settings:addFixedChild(Text:new(tostring(self.settings.numHumanPlayers + self.settings.numAIPlayers) .. " Total Players"))
+
+    bottom:addFlexChild(settings, 1)
+
+    root:addFlexChild(bottom, 1)
 
     return UiUtils.createWindowContainer(root)
 end
@@ -128,6 +170,54 @@ function Lobby:handleServerInfo(packet)
     end
 
     self:rebuild()
+end
+
+function Lobby:getNumHumanPlayers()
+    local count = 0
+    for _, player in ipairs(self.players or {}) do
+        if player.isHuman and player.exists then
+            count = count + 1
+        end
+    end
+    return count
+end
+
+function Lobby:waitForNextClient()
+    if self.settings.numHumanPlayers == self:getNumHumanPlayers() then
+        self.listeningForConnections = false
+        return
+    end
+
+    if self.lobbyServerConn == nil then return end -- not the game host
+
+    networking:recvMessageAsync(self.lobbyServerConn, function(messageJSON, error)
+        if error ~= nil then
+            showError(error)
+            return
+        end
+
+        local message = json.decode(messageJSON)
+        print(messageJSON)
+
+        -- Create proxied connection with new client.
+        networking:connectAsync(lobbyIP, lobbyPort, function(connHandle, error)
+            if error ~= nil then
+                showError(error)
+            end
+
+            networking:sendMessage(connHandle, json.encode({
+                type = "proxyWithClient",
+                client_id = message.client_id,
+            }))
+
+            networking:convertToBridgeAsync(connHandle, function(bridge)
+                addServerConnection(self.server.newConnections, bridge)
+            end)
+        end)
+
+        self:waitForNextClient()
+    end)
+    self.listeningForConnections = true
 end
 
 return Lobby

@@ -62,20 +62,28 @@ namespace rip {
         }
     };
 
-    void makeLuaClientBindings(sol::state &lua, std::shared_ptr<Assets> assets,
+    void makeLuaClientBindings(std::shared_ptr<sol::state> &luaPtr, std::shared_ptr<Assets> assets,
                                std::shared_ptr<Registry> registry,
                                std::shared_ptr<TechTree> techTree, std::shared_ptr<AudioManager> audio) {
+        auto &lua = *luaPtr;
         lua["createServer"] = [=]() {
             auto bridges = newLocalBridgePair();
             auto server = std::make_shared<Server>(registry, techTree);
             server->addConnection(std::move(bridges.first), true);
 
-            auto serverThread = std::thread([server = std::move(server)] () mutable {
-                server->run();
+            auto newConnections = std::make_shared<moodycamel::ReaderWriterQueue<std::unique_ptr<Bridge>>>();
+
+            auto serverThread = std::thread([=, server = std::move(server)] () mutable {
+                server->run(newConnections);
             });
             serverThread.detach();
 
-            return std::move(bridges.second);
+            return luaPtr->create_table_with("bridge", std::move(bridges.second), "newConnections", std::move(newConnections));
+        };
+
+        lua["addServerConnection"] = [=](std::shared_ptr<moodycamel::ReaderWriterQueue<std::unique_ptr<Bridge>>> handle,
+                std::unique_ptr<Bridge> &bridge) {
+            handle->emplace(std::move(bridge));
         };
 
         auto bridge_type = lua.new_usertype<Bridge>("Bridge");
@@ -156,7 +164,7 @@ int main() {
     audio->setAssets(assets);
 
     auto techTree = std::make_shared<rip::TechTree>(*assets, *registry);
-    rip::makeLuaClientBindings(*lua, assets, registry, techTree, audio);
+    rip::makeLuaClientBindings(lua, assets, registry, techTree, audio);
 
     lua->script_file("client/main.lua");
 
