@@ -692,6 +692,10 @@ namespace rip {
         auto theGame = MapGenerator().generate(gameOptions.mapwidth(), gameOptions.mapheight(), registry, techTree, this);
         game = std::make_unique<Game>(std::move(theGame));
 
+
+        StartGame startGame;
+        BROADCAST(startGame, startgame, 0);
+
         absl::flat_hash_set<PlayerId> humanPlayers;
         for (auto &conn : connections) {
             conn.sendGameData(*game);

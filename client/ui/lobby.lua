@@ -141,6 +141,18 @@ function Lobby:buildRootWidget()
 
     root:addFlexChild(bottom, 1)
 
+    -- Footer
+    local footer = Flex:row()
+
+    if self.isTheHost then
+        footer:addFixedChild(Button:new(Padding:new(Text:new("@size{20}{Start Game}"), 10), function()
+            self.client:adminStartGame()
+            enterGame(self.server.bridge, true)
+        end))
+    end
+
+    root:addFixedChild(footer)
+
     return UiUtils.createWindowContainer(root)
 end
 
@@ -157,6 +169,8 @@ end
 function Lobby:handlePacket(packet)
     if packet.serverInfo ~= nil then
         self:handleServerInfo(packet.serverInfo)
+    elseif packet.startGame ~= nil then
+        self:handleStartGame(packet.startGame)
     end
 end
 
@@ -172,6 +186,10 @@ function Lobby:handleServerInfo(packet)
     self:rebuild()
 end
 
+function Lobby:handleStartGame(packet)
+    enterGame(self.server.bridge, true)
+end
+
 function Lobby:getNumHumanPlayers()
     local count = 0
     for _, player in ipairs(self.players or {}) do
@@ -180,6 +198,10 @@ function Lobby:getNumHumanPlayers()
         end
     end
     return count
+end
+
+function Lobby:isReadyToStart()
+    return self:getNumHumanPlayers() == self.settings.numHumanPlayers
 end
 
 function Lobby:waitForNextClient()
