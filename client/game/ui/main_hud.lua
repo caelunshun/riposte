@@ -43,6 +43,8 @@ function Hud:new(game)
         tasks = TaskSequence:new(),
         timeSinceLastSelect = nil,
         promptQueue = prompts.PromptQueue:new(),
+        waitingOnTurnEnd = false,
+        waitingOnPath = false,
     }
 
     game.eventBus:registerHandler("globalDataUpdated", function()
@@ -67,6 +69,7 @@ function Hud:new(game)
     game.eventBus:registerHandler("turnChanged", function()
         o.readyForNextTurn = false
         o.timeSinceLastSelect = nil
+        o.waitingOnTurnEnd = false
     end)
 
     game.eventBus:registerHandler("unitDeleted", function(unit)
@@ -145,6 +148,7 @@ function Hud:handleEvent(event)
             and event.key == dume.Key.Return and self.readyForNextTurn then
         self.game.client:endTurn()
         self.readyForNextTurn = false
+        self.waitingOnTurnEnd = true
     end
 
     if event.type == dume.EventType.Key then
@@ -182,8 +186,12 @@ function Hud:handleEvent(event)
                     self:moveSelectionAlongStagedPath()
                 end
 
-                self.stagedPath = nil
-                self.hasStagedPath = false
+                if not self.waitingOnPath then
+                    self.stagedPath = nil
+                    self.hasStagedPath = false
+                else
+                    self.moveSelectionWhenPathIsComputed = true
+                end
             end
         end
     elseif event.type == dume.EventType.CursorMove and self.hasStagedPath
@@ -209,10 +217,17 @@ function Hud:computePath(from, to)
 
     local unitKindID = self.selectedUnits[1].kind.id
 
+    self.waitingOnPath = true
+
     self.tasks:enqueue(coroutine.create(function()
         local path = self.game.client:requestComputePath(from, to, unitKindID)
         self.stagedPath = path
         self.hasStagedPath = true
+        self.waitingOnPath = false
+
+        if self.moveSelectionWhenPathIsComputed then
+            self:moveSelectionAlongStagedPath()
+        end
     end))
 end
 
@@ -387,7 +402,13 @@ function Hud:renderNextTurnPrompt(cv, time)
 
     -- animate alpha
     local alpha = math.floor((math.cos(time * math.pi) + 1) / 2 * 255)
-    local text = cv:parseTextMarkup("@color{%color}{@size{18}{Press <ENTER> to end turn....}}", style.default.text.defaultTextStyle, {
+    local text
+    if self.waitingOnTurnEnd then
+        text = "Waiting on other players...."
+    else
+        text = "Press <ENTER> to end turn...."
+    end
+    local text = cv:parseTextMarkup("@color{%color}{@size{18}{" .. text .. "}}", style.default.text.defaultTextStyle, {
         color = dumeColorToString(dume.rgb(255, 255, 255, alpha)),
     })
     local paragraph = cv:createParagraph(text, {

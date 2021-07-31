@@ -42,6 +42,8 @@ function Unit:updateData(data, game)
         baseline = dume.Baseline.Top,
     })
 
+    print(self.ownerID, self.game.thePlayer.id)
+
     self.owner = game.players[self.ownerID]
     if self.owner == nil then error("invalid unit owner ID") end
 end
