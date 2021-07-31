@@ -58,6 +58,7 @@ function Lobby:new(server, lobbyServerConn)
     self.__index = self
 
     o:waitForNextClient()
+    o:sendGameOptions()
 
     return o
 end
@@ -214,6 +215,10 @@ end
 
 function Lobby:isReadyToStart()
     return self:getNumHumanPlayers() == self.settings.numHumanPlayers
+end
+
+function Lobby:sendGameOptions()
+    self.client:sendGameOptions(self.settings)
 end
 
 function Lobby:waitForNextClient()

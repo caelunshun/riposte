@@ -676,7 +676,7 @@ namespace rip {
     }
 
     void Server::startGame() {
-        const int minMapWidth = 64, minMapHeight = 64;
+        const int minMapWidth = 16, minMapHeight = 16;
 
         if (gameOptions.mapwidth() < minMapWidth) {
             gameOptions.set_mapwidth(minMapWidth);
@@ -689,23 +689,14 @@ namespace rip {
             gameOptions.set_numhumanplayers(1);
         }
 
-        auto theGame = MapGenerator().generate(gameOptions.mapwidth(), gameOptions.mapheight(), registry, techTree, this);
+        auto theGame = MapGenerator().generate(gameOptions, registry, techTree, this);
         game = std::make_unique<Game>(std::move(theGame));
-
 
         StartGame startGame;
         BROADCAST(startGame, startgame, 0);
 
-        absl::flat_hash_set<PlayerId> humanPlayers;
         for (auto &conn : connections) {
             conn.sendGameData(*game);
-            humanPlayers.insert(conn.getPlayerID());
-        }
-
-        for (auto &player : game->getPlayers()) {
-            if (!humanPlayers.contains(player.getID())) {
-                player.enableAI();
-            }
         }
     }
 

@@ -32,6 +32,10 @@ function Client:sendClientInfo(username)
     })
 end
 
+function Client:sendGameOptions(options)
+    self:sendPacket("gameOptions", options)
+end
+
 -- Requests that the server compute the shortest path the given unit
 -- can take between two points.
 --

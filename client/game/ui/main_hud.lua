@@ -467,6 +467,7 @@ function Hud:onCityUpdated(city)
 end
 
 function Hud:onThePlayerUpdated()
+    print(self.game.thePlayer.researchingTech, self.game.turn)
     if self.game.thePlayer.researchingTech == nil and self.game.turn ~= 0 then
         local co = coroutine.create(function()
             self.promptQueue:push(prompts.ResearchPrompt:new(self.game))

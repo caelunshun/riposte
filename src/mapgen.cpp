@@ -106,10 +106,9 @@ namespace rip {
     // whether generating was successful. If not, we need
     // to start over with a new seed.
 
-    const auto numPlayers = 7;
-
     // CIVILIZATION GENERATOR
-    void seedPlayers(Game &game, const std::shared_ptr<TechTree> &techTree, Rng &rng) {
+    void seedPlayers(Game &game, const std::shared_ptr<TechTree> &techTree, Rng &rng, const GameOptions &gameOptions) {
+        const auto numPlayers = gameOptions.numhumanplayers() + gameOptions.numaiplayers();
         absl::flat_hash_set<std::string> usedCivIDs;
         while (game.getNumPlayers() < numPlayers) {
             const auto &civs = game.getRegistry().getCivs();
@@ -130,11 +129,9 @@ namespace rip {
             auto &p = game.getPlayer(playerID);
             p.setID(playerID);
 
-           if (game.getNumPlayers() == 1) {
-                game.setThePlayerID(playerID);
-            } else { // DEBUG - AI
-                p.enableAI();
-            }
+           if (game.getNumPlayers() >= gameOptions.numhumanplayers()) {
+               p.enableAI();
+           }
         }
     }
 
@@ -364,20 +361,20 @@ namespace rip {
         return true;
     }
 
-    bool tryGenerate(Game &game, Rng &rng, const std::shared_ptr<TechTree> &techTree) {
+    bool tryGenerate(Game &game, Rng &rng, const std::shared_ptr<TechTree> &techTree, const GameOptions &options) {
         if (!buildTerrain(game, rng)) return false;
-        seedPlayers(game, techTree, rng);
+        seedPlayers(game, techTree, rng, options);
         if (!placeCities(game, rng)) return false;
         if (!placeResources(game, rng)) return false;
         return true;
     }
 
-    Game MapGenerator::generate(uint32_t mapWidth, uint32_t mapHeight, std::shared_ptr<Registry> registry,
+    Game MapGenerator::generate(GameOptions gameOptions, std::shared_ptr<Registry> registry,
                                 const std::shared_ptr<TechTree> &techTree, Server *server) {
         while (true) {
-            Game game(mapWidth, mapHeight, registry, techTree);
+            Game game(gameOptions.mapwidth(), gameOptions.mapheight(), registry, techTree);
             game.setServer(server);
-            if (tryGenerate(game, rng, techTree)) {
+            if (tryGenerate(game, rng, techTree, gameOptions)) {
                 for (auto &player : game.getPlayers()) {
                     player.recomputeVisibility(game);
                 }
