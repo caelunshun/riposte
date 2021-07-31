@@ -17,6 +17,7 @@ local Table = require("widget/table")
 local Spacer = require("widget/spacer")
 local Empty = require("widget/empty")
 local Divider = require("widget/divider")
+local Tooltip = require("widget/tooltip")
 
 local UiUtils = require("ui/utils")
 local Client = require("game/client")
@@ -145,10 +146,19 @@ function Lobby:buildRootWidget()
     local footer = Flex:row()
 
     if self.isTheHost then
-        footer:addFixedChild(Button:new(Padding:new(Text:new("@size{20}{Start Game}"), 10), function()
-            self.client:adminStartGame()
-            enterGame(self.server.bridge, true)
-        end))
+        local canStartGame = self:isReadyToStart()
+        local startGame = Button:new(Padding:new(Text:new("@size{20}{Start Game}"), 10), function()
+            if canStartGame then
+                self.client:adminStartGame()
+                enterGame(self.server.bridge, true)
+            end
+        end)
+
+        if not canStartGame then
+            startGame = Tooltip:new(startGame, Container:new(Padding:new(Text:new("@color{rgb(200,40,70)}{The game cannot start until enough human players have joined.}"), 10)))
+        end
+
+        footer:addFixedChild(startGame)
     end
 
     root:addFixedChild(footer)

@@ -23,7 +23,7 @@ local Lobby = require("ui/lobby")
 
 local json = require("lunajson")
 
-lobbyIP = "127.0.0.1"
+lobbyIP = "35.217.91.71"
 lobbyPort = 19836
 
 local function enterLobby(lobby)
