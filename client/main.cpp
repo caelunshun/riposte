@@ -59,6 +59,7 @@ namespace rip {
 
         std::shared_ptr<Asset> loadAsset(const std::string &id, const std::string &data) override {
             loadFunction.call<void>(id, luaRegistry, data);
+            return std::shared_ptr<Asset>(); // null
         }
     };
 
@@ -209,8 +210,8 @@ int main() {
             cursorY = event.data.cursor_pos[1];
         } else if (event.kind == EventKind::Resized) {
             int oldWidth = width, oldHeight = height;
-            width = event.data.new_size[0];
-            height = event.data.new_size[1];
+            width = event.data.new_size.dims[0] / event.data.new_size.scale_factor;
+            height = event.data.new_size.dims[1] / event.data.new_size.scale_factor;
             resizeFunction.call<void>(lua->create_table_with("x", oldWidth, "y", oldHeight), lua->create_table_with("x", width, "y", height));
         }
 
@@ -223,5 +224,5 @@ int main() {
         }
     });
 
-    winit_event_loop_run(eventLoop, &invokeFunction, (void *) (&callbackFunction));
+    winit_event_loop_run(eventLoop, &invokeFunction, (void *) (&callbackFunction), window);
 }

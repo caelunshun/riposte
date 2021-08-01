@@ -8,8 +8,12 @@ conan_basic_setup()
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/)
+
 include(FindProtobuf)
 find_package(Protobuf REQUIRED)
+
+find_package(LuaJIT REQUIRED)
 
 include(FetchContent)
 
@@ -54,7 +58,8 @@ target_include_directories(riposte PRIVATE
         external/sol2/include
         crodio/include
         ${CMAKE_CURRENT_BINARY_DIR} // for protobuf files
-        ${PROTOBUF_INCLUDE_DIR})
+        ${PROTOBUF_INCLUDE_DIR}
+        ${LuaJIT_INCLUDE_DIR})
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
@@ -73,4 +78,4 @@ elseif(UNIX)
     SET(NATIVE_AUDIO_LIBS rt ${ALSA_LIBRARIES} Threads::Threads)
 endif()
 
-target_link_libraries(riposte dume ${CONAN_LIBS} ${PROTOBUF_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} crodio pb)
+target_link_libraries(riposte dume ${CONAN_LIBS} ${PROTOBUF_LIBRARY} ${LuaJIT_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} crodio)
