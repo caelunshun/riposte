@@ -32,7 +32,7 @@ set(LuaJIT_INCLUDE_DIR ${LuaJIT_INCLUDE_DIR})
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set LUAJIT_FOUND to TRUE
 # if all listed variables are TRUE
-find_package_handle_standard_args(LuaJit DEFAULT_MSG
+find_package_handle_standard_args(LuaJIT DEFAULT_MSG
                                   LuaJIT_LIBRARY LuaJIT_INCLUDE_DIR)
 
 mark_as_advanced(LuaJIT_INCLUDE_DIR LuaJIT_LIBRARY)
