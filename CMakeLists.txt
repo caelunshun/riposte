@@ -59,7 +59,7 @@ target_include_directories(riposte PRIVATE
         crodio/include
         ${CMAKE_CURRENT_BINARY_DIR} // for protobuf files
         ${PROTOBUF_INCLUDE_DIR}
-        ${LuaJIT_INCLUDE_DIR})
+        ${LUA_INCLUDE_DIR})
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
@@ -78,4 +78,4 @@ elseif(UNIX)
     SET(NATIVE_AUDIO_LIBS rt ${ALSA_LIBRARIES} Threads::Threads)
 endif()
 
-target_link_libraries(riposte dume ${CONAN_LIBS} ${PROTOBUF_LIBRARY} ${LuaJIT_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} crodio)
+target_link_libraries(riposte dume ${CONAN_LIBS} ${PROTOBUF_LIBRARY} ${LUA_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} crodio)
