@@ -1,8 +1,8 @@
 # - Try to find luajit
 # Once done this will define
 #  LUAJIT_FOUND - System has luajit
-#  LUAJIT_INCLUDE_DIRS - The luajit include directories
-#  LUAJIT_LIBRARIES - The libraries needed to use luajit
+#  LUAJIT_INCLUDE_DIR - The luajit include directories
+#  LUAJIT_LIBRARY - The libraries needed to use luajit
 
 find_package(PkgConfig)
 if (PKG_CONFIG_FOUND)
@@ -26,8 +26,8 @@ endif()
 find_library(LUAJIT_LIBRARY NAMES ${LUAJIT_NAMES}
              PATHS ${PC_LUAJIT_LIBDIR} ${PC_LUAJIT_LIBRARY_DIRS})
 
-set(LUAJIT_LIBRARIES ${LUAJIT_LIBRARY})
-set(LUAJIT_INCLUDE_DIRS ${LUAJIT_INCLUDE_DIR})
+set(LUAJIT_LIBRARY ${LUAJIT_LIBRARY})
+set(LUAJIT_INCLUDE_DIR ${LUAJIT_INCLUDE_DIR})
 
 include(FindPackageHandleStandardArgs)
 # handle the QUIETLY and REQUIRED arguments and set LUAJIT_FOUND to TRUE
