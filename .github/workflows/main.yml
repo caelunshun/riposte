@@ -1,20 +1,25 @@
 name: Build
 
-on:
-  push:
-    tags:
-      - '*'
+on: [push, pull_request]
+  #push:
+    #tags:
+      #- '*'
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    strategy:
+      matrix: 
+        os: [ubuntu-18.04, macos-latest]
+        
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
 
-      - name: Install Conan
+      - name: Install Conan (Linux)
+        if: matrix.os == 'ubuntu-18.04'
         run: |
            pwd
            pip3 install wheel setuptools
@@ -25,12 +30,16 @@ jobs:
            conan --version
            ls
            
+      - name: Install Conan (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install conan
+           
         # Caching
 
         # Work around https://github.com/actions/cache/issues/403 by using GNU tar
         # instead of BSD tar.
       - name: Install GNU tar
-        if: matrix.os == 'macos-10.15'
+        if: matrix.os == 'macos-latest'
         run: |
           brew install gnu-tar
           echo PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH" >> $GITHUB_ENV
@@ -59,12 +68,13 @@ jobs:
       - name: Cache protobuf library
         id: cache-protobuf
         uses: actions/cache@v2
+        if: matrix.os == 'ubuntu-18.04'
         with:
           path: protobuf
           key: ${{ runner.os }}-protobuf
           
       - name: Build protobuf library
-        if: steps.cache-protobuf.outputs.cache-hit != 'true'
+        if: steps.cache-protobuf.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-18.04'
         run: |
            git clone https://github.com/protocolbuffers/protobuf.git
            cd protobuf
@@ -74,15 +84,23 @@ jobs:
            ./configure
            make -j2
            
-      - name: Install protobuf library
+      - name: Install protobuf library (Linux)
+        if: matrix.os == 'ubuntu-18.04'
         run: |
            cd protobuf
            sudo make install
            sudo ldconfig
            
+      - name: Install protobuf library (macOS)
+        if: matrix.os == 'macos-latest'
+        run: brew install protobuf
+        
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-18.04'
+        run: sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
+           
       - name: Prepare build
         run: |
-            sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
             mkdir -p cmake-build-release
             cd cmake-build-release
             conan install ..
@@ -90,7 +108,7 @@ jobs:
             cd ..
 
       - name: Build
-        run: cd cmake-build-release && cmake --build . --target riposte
+        run: cd cmake-build-release && cmake --build . --target riposte -j2
         
       - name: Build riposte-bundler
         run: |
