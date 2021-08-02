@@ -1,38 +1,54 @@
-# - Try to find luajit
-# Once done this will define
-#  LUAJIT_FOUND - System has luajit
-#  LUAJIT_INCLUDE_DIR - The luajit include directories
-#  LUAJIT_LIBRARY - The libraries needed to use luajit
 
-find_package(PkgConfig)
-if (PKG_CONFIG_FOUND)
-  pkg_check_modules(PC_LUAJIT QUIET luajit)
-endif()
+# Locate LuaJIT library
+# This module defines
+#  LUAJIT_FOUND, if false, do not try to link to Lua
+#  LUA_LIBRARY, where to find the lua library
+#  LUA_INCLUDE_DIR, where to find lua.h
+#
+# This module is similar to FindLua51.cmake except that it finds LuaJit instead.
 
-set(LUAJIT_DEFINITIONS ${PC_LUAJIT_CFLAGS_OTHER})
+FIND_PATH(LUA_INCLUDE_DIR luajit.h
+	HINTS
+	$ENV{LUA_DIR}
+	PATH_SUFFIXES include/luajit-2.1 include/luajit-2.0 include/luajit-5_1-2.1 include/luajit-5_1-2.0 include luajit
+	PATHS
+	~/Library/Frameworks
+	/Library/Frameworks
+	/sw # Fink
+	/opt/local # DarwinPorts
+	/opt/csw # Blastwave
+	/opt
+)
 
-find_path(LuaJIT_INCLUDE_DIR luajit.h
-          PATHS ${PC_LUAJIT_INCLUDEDIR} ${PC_LUAJIT_INCLUDE_DIRS}
-          PATH_SUFFIXES luajit-2.0 luajit-2.1)
-
-if(MSVC)
-  list(APPEND LuaJIT_NAMES lua51)
-elseif(MINGW)
-  list(APPEND LuaJIT_NAMES libluajit libluajit-5.1)
+# Test if running on vcpkg toolchain
+if(DEFINED VCPKG_TARGET_TRIPLET AND DEFINED VCPKG_APPLOCAL_DEPS)
+	# On vcpkg luajit is 'lua51' and normal lua is 'lua'
+	FIND_LIBRARY(LUA_LIBRARY
+		NAMES lua51
+		HINTS
+		$ENV{LUA_DIR}
+		PATH_SUFFIXES lib
+	)
 else()
-  list(APPEND LuaJIT_NAMES luajit-5.1)
+	FIND_LIBRARY(LUA_LIBRARY
+		NAMES luajit-5.1
+		HINTS
+		$ENV{LUA_DIR}
+		PATH_SUFFIXES lib64 lib
+		PATHS
+		~/Library/Frameworks
+		/Library/Frameworks
+		/sw
+		/opt/local
+		/opt/csw
+		/opt
+	)
 endif()
 
-find_library(LuaJIT_LIBRARY NAMES ${LuaJIT_NAMES}
-             PATHS ${PC_LUAJIT_LIBDIR} ${PC_LUAJIT_LIBRARY_DIRS})
+INCLUDE(FindPackageHandleStandardArgs)
+# handle the QUIETLY and REQUIRED arguments and set LUAJIT_FOUND to TRUE if
+# all listed variables exist
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(LuaJIT
+	REQUIRED_VARS LUA_LIBRARY LUA_INCLUDE_DIR)
 
-set(LuaJIT_LIBRARY ${LuaJIT_LIBRARY})
-set(LuaJIT_INCLUDE_DIR ${LuaJIT_INCLUDE_DIR})
-
-include(FindPackageHandleStandardArgs)
-# handle the QUIETLY and REQUIRED arguments and set LUAJIT_FOUND to TRUE
-# if all listed variables are TRUE
-find_package_handle_standard_args(LuaJIT DEFAULT_MSG
-                                  LuaJIT_LIBRARY LuaJIT_INCLUDE_DIR)
-
-mark_as_advanced(LuaJIT_INCLUDE_DIR LuaJIT_LIBRARY)
+MARK_AS_ADVANCED(LUA_INCLUDE_DIR LUA_LIBRARY)
