@@ -97,11 +97,11 @@ jobs:
         
       - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-18.04'
-        run: sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev luajit -y
+        run: sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev luajit libluajit-5.1-2 -y
         
       - name: Install dependencies (macOS)
         if: matrix.os == 'macos-latest'
-        run: brew install luajit
+        run: brew install luajit --head
            
       - name: Prepare build
         run: |
