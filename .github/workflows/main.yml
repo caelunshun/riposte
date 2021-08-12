@@ -73,6 +73,13 @@ jobs:
           path: protobuf
           key: ${{ runner.os }}-protobuf
           
+      - name: Cache LuaJIT library
+        id: cache-luajit
+        uses: actions/cache@v2
+        with:
+          path: LuaJIT
+          key: ${{ runner.os }}-luajit
+          
       - name: Build protobuf library (Linux)
         if: steps.cache-protobuf.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-18.04'
         run: |
@@ -95,13 +102,20 @@ jobs:
         if: matrix.os == 'macos-latest'
         run: brew install protobuf
         
+      - name: Build LuaJIT
+        if: steps.cache-luajit.outputs.cache-hit != 'true'
+        run: |
+            git clone https://github.com/LuaJIT/LuaJIT
+            cd LuaJIT
+            make -j2
+            cd ..
+            
+      - name: Install LuaJIT
+        run: cd LuaJIT && sudo make install
+        
       - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-18.04'
-        run: sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev luajit libluajit-5.1-2 -y
-        
-      - name: Install dependencies (macOS)
-        if: matrix.os == 'macos-latest'
-        run: brew install luajit --head
+        run: sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
            
       - name: Prepare build
         run: |
