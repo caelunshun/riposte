@@ -168,7 +168,7 @@ function Lobby:buildRootWidget()
 end
 
 function Lobby:rebuild()
-    ui:createWindow("multiplayerLobby", Vector(0, 0), Vector(cv:getWidth(), cv:getHeight()), self:buildRootWidget())
+    ui:createWindow("multiplayerLobby", Vector(0, 0), Vector(cv:getWidth(), cv:getHeight()), self:buildRootWidget(), 1)
 end
 
 function Lobby:tick()
