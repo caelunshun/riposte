@@ -33,8 +33,8 @@ target_link_libraries(pb ${CONAN_LIBS})
 set(DUME_SOURCES external/dume/src/dume.cpp)
 add_library(dume ${DUME_SOURCES})
 target_include_directories(dume PUBLIC external/dume/include/ external/dume/renderer/include/)
-target_include_directories(dume PRIVATE external/sol2/include)
-target_link_libraries(dume ${CONAN_LIBS} dume-renderer)
+target_include_directories(dume PRIVATE external/sol2/include ${LUA_INCLUDE_DIR})
+target_link_libraries(dume ${LUA_LIBRARY} {CONAN_LIBS} dume-renderer)
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/riposte.proto)
 
