@@ -128,7 +128,7 @@ jobs:
             cd ..
 
       - name: Build
-        run: cd cmake-build-release && cmake --build . --target riposte -j2
+        run: cd cmake-build-release && cmake --build . --target riposte -j2 && cmake --build . --target pb
         
       - name: Build riposte-bundler
         run: |
