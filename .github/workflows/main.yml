@@ -109,6 +109,8 @@ jobs:
             cd LuaJIT
             make -j2
             cd ..
+        env:
+          MACOSX_DEPLOYMENT_TARGET: 10.14
             
       - name: Install LuaJIT
         run: cd LuaJIT && sudo make install
