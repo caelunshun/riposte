@@ -123,7 +123,8 @@ local YieldRenderer = {}
 
 function YieldRenderer:renderTile(cv, tile)
     local scale = 15
-    if tile.isWorked then scale = 25 end
+    local offsetY = 0
+    if tile.isWorked then scale = 25; offsetY = -10 end
 
     local icons = {}
     local cursor = 0
@@ -151,7 +152,7 @@ function YieldRenderer:renderTile(cv, tile)
     for i=1,#icons do
         local icon = icons[i]
         local posX = icon.pos + (50 - length / 2)
-        cv:drawSprite(icon.sprite, Vector(posX, 50 - scale / 2), scale)
+        cv:drawSprite(icon.sprite, Vector(posX, 50 - scale / 2 + offsetY), scale)
     end
 end
 

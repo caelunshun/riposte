@@ -71,6 +71,11 @@ function City:updateData(data, game)
             maxDimensions = Vector(20, 20)
         })
     end
+
+    self.happiness = 0
+    for _, entry in ipairs(self.happinessSources) do self.happiness = self.happiness + entry.count end
+    self.unhappiness = 0
+    for _, entry in ipairs(self.unhappinessSources) do self.unhappiness = self.unhappiness + entry.count end
 end
 
 function City:estimateTurnsToBuild(buildTask)
@@ -157,27 +162,27 @@ function City:renderBubble(cv)
     local bubbleWidth = 100
     local bubbleHeight = 20
     cv:beginPath()
-    cv:roundedRect(Vector(0, 10), Vector(bubbleWidth, bubbleHeight), 5)
-    cv:linearGradient(Vector(0, 10), Vector(0, 30), bubbleColorA, bubbleColorB)
+    cv:roundedRect(Vector(0, 70), Vector(bubbleWidth, bubbleHeight), 5)
+    cv:linearGradient(Vector(0, 70), Vector(0, 90), bubbleColorA, bubbleColorB)
     cv:fill()
 
     -- Production progress bar
     if self.buildTask ~= nil then
         local progress = self.buildTask.progress / self.buildTask.cost
         local projectedProgress = (self.buildTask.progress + self.yield.hammers) / self.buildTask.cost
-        renderProgressBar(cv, Vector(0, 20), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
+        renderProgressBar(cv, Vector(0, 80), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
             style.default.productionProgressBar.progressColor, style.default.productionProgressBar.positivePredictedProgressColor)
     end
 
     -- Population growth population bar
     local progress = self.storedFood / self.foodNeededForGrowth
     local projectedProgress = (self.storedFood + self.yield.food - self.consumedFood) / self.foodNeededForGrowth
-    renderProgressBar(cv, Vector(0, 10), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
+    renderProgressBar(cv, Vector(0, 70), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
         style.default.populationProgressBar.progressColor, style.default.populationProgressBar.positivePredictedProgressColor)
 
     -- Left circle, or five-point start if this is the capital
     local radius = 10
-    local center = Vector(radius - 5, radius + 10)
+    local center = Vector(radius - 5, radius + 70)
 
     cv:beginPath()
     if self.isCapital then
@@ -193,7 +198,7 @@ function City:renderBubble(cv)
 
     -- Right circle
     cv:beginPath()
-    cv:circle(Vector(-radius + 5 + bubbleWidth, radius + 10), radius)
+    cv:circle(Vector(-radius + 5 + bubbleWidth, radius + 70), radius)
     cv:solidColor(buildCircleColor)
     cv:fill()
     cv:solidColor(black)
@@ -201,21 +206,30 @@ function City:renderBubble(cv)
     cv:stroke()
 
     -- Left circle text (population)
-    cv:drawParagraph(self.populationParagraph, Vector(-5, 20))
+    cv:drawParagraph(self.populationParagraph, Vector(-5, 80))
 
     -- Right circle overlay, depending on the build task:
     -- * unit - unit head icon
     -- * building - first letter of building name (TODO: we should have icons for these)
     if self.buildTask ~= nil then
         if self.buildTask.kind.unit ~= nil then
-            cv:drawSprite("icon/unit_head/" .. self.buildTask.kind.unit.unitKindID, Vector(-radius * 2 + 5 + bubbleWidth, 10), radius * 2)
+            cv:drawSprite("icon/unit_head/" .. self.buildTask.kind.unit.unitKindID, Vector(-radius * 2 + 5 + bubbleWidth, 70), radius * 2)
         else
-            cv:drawParagraph(self.buildTaskParagraph, Vector(-radius * 2 + 5 + bubbleWidth, 10))
+            cv:drawParagraph(self.buildTaskParagraph, Vector(-radius * 2 + 5 + bubbleWidth, 70))
         end
     end
 
     -- City name
-    cv:drawParagraph(self.cityNameParagraph, Vector(0, 20))
+    cv:drawParagraph(self.cityNameParagraph, Vector(0, 80))
+
+    -- Status bar
+    local statusOffset = Vector(10, 55)
+
+    local happyIcon
+    if self.happiness >= self.unhappiness then happyIcon = "icon/happy"
+    else happyIcon = "icon/unhappy" end
+
+    cv:drawSprite(happyIcon, statusOffset, 15)
 end
 
 function City:render(cv)

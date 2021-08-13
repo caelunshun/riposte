@@ -12,6 +12,8 @@
 #include <utility>
 #include <iostream>
 #include "server.h"
+#include "stack.h"
+#include <riposte.pb.h>
 
 namespace rip {
     BuildTask::BuildTask(int cost) : cost(cost) {}
@@ -133,7 +135,7 @@ namespace rip {
         // The city's own tile is always worked.
         entries.emplace(entries.begin(), game.getTile(pos).getYield(game, pos, owner), pos, true);
 
-        for (int i = 0; i < std::min(population + 1, (int) entries.size()); i++) {
+        for (int i = 0; i < std::min((int) getNumWorkingCitizens() + 1, (int) entries.size()); i++) {
             workedTiles.push_back(entries[i].pos);
             game.setTileWorked(entries[i].pos, true, id);
         }
@@ -228,6 +230,9 @@ namespace rip {
                 buildTask = std::unique_ptr<BuildTask>();
             }
         }
+
+        updateHappiness(game);
+
         updateWorkedTiles(game);
         workTiles(game);
         doGrowth(game);
@@ -427,6 +432,7 @@ namespace rip {
     void City::onCreated(Game &game) {
         game.getCultureMap().onCityCreated(game, getID());
         game.getTradeRoutes().onCityCreated(game, *this);
+        updateHappiness(game);
         updateWorkedTiles(game);
 
         // Check coastal status.
@@ -556,6 +562,64 @@ namespace rip {
 
     std::vector<std::string> BuildingBuildTask::describe() const {
         return BuildTask::describe();
+    }
+
+    const std::vector<HappinessEntry> &City::getHappinessSources() const {
+        return happiness;
+    }
+
+    const std::vector<UnhappinessEntry> &City::getUnhappinessSources() const {
+        return unhappiness;
+    }
+
+    uint32_t City::getHappiness() const {
+        uint32_t sum = 0;
+        for (const auto &entry : happiness) sum += entry.count();
+        return sum;
+    }
+
+    uint32_t City::getUnhappiness() const {
+        uint32_t sum = 0;
+        for (const auto &entry : unhappiness) sum += entry.count();
+        return sum;
+    }
+
+    uint32_t City::getNumWorkingCitizens() const {
+        auto unhappyCitizens = std::max((int) 0, (int) (getUnhappiness() - getHappiness()));
+        return getPopulation() - unhappyCitizens;
+    }
+
+    void City::updateHappiness(Game &game) {
+        happiness.clear();
+        unhappiness.clear();
+
+        HappinessEntry baseHappiness;
+        baseHappiness.set_source(HappinessSource::DifficultyBonus);
+        baseHappiness.set_count(5);
+        happiness.emplace_back(std::move(baseHappiness));
+
+        UnhappinessEntry populationUnhappiness;
+        populationUnhappiness.set_source(UnhappinessSource::Population);
+        populationUnhappiness.set_count(getPopulation());
+        unhappiness.emplace_back(std::move(populationUnhappiness));
+
+        auto ourUnits = game.getStackByKey(owner, pos);
+        uint32_t undefendedCount = 0;
+        if (!ourUnits.has_value() || game.getStack(*ourUnits).getUnits().empty()) {
+            ++undefendedCount;
+        }
+
+        auto allStacks = game.getStacksAtPos(pos);
+        if (!ourUnits.has_value() && !allStacks.empty()) {
+            ++undefendedCount;
+        }
+
+        if (undefendedCount != 0) {
+            UnhappinessEntry undefended;
+            undefended.set_source(UnhappinessSource::Undefended);
+            undefended.set_count(undefendedCount);
+            unhappiness.emplace_back(std::move(undefended));
+        }
     }
 }
 

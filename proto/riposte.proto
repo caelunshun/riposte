@@ -278,6 +278,29 @@ message BuildTask {
   int32 cost = 3;
 }
 
+// A source of happiness in a city.
+enum HappinessSource {
+  // Free base happiness
+  DifficultyBonus = 0;
+  Buildings = 1;
+}
+
+// A source of unhappiness in a city.
+enum UnhappinessSource {
+  Population = 0;
+  Undefended = 1;
+}
+
+message HappinessEntry {
+  HappinessSource source = 1;
+  uint32 count = 2;
+}
+
+message UnhappinessEntry {
+  UnhappinessSource source = 1;
+  uint32 count = 2;
+}
+
 // Creates or updates a city.
 message UpdateCity {
   Pos pos = 1;
@@ -296,6 +319,8 @@ message UpdateCity {
   int32 consumedFood = 13;
   bool isCapital = 14;
   repeated Pos workedTiles = 15;
+  repeated HappinessEntry happinessSources = 16;
+  repeated UnhappinessEntry unhappinessSources = 17;
 }
 
 message Path {

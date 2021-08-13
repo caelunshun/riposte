@@ -236,6 +236,13 @@ namespace rip {
             pos->set_y(workedPos.y);
         }
 
+        for (const auto &entry : city.getHappinessSources()) {
+            packet.add_happinesssources()->CopyFrom(entry);
+        }
+        for (const auto &entry : city.getUnhappinessSources()) {
+            packet.add_unhappinesssources()->CopyFrom(entry);
+        }
+
         return packet;
     }
 

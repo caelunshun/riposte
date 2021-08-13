@@ -72,6 +72,9 @@ return {
             borderRadius = 0,
             minSize = Vector(300, 150),
         },
+        smallTooltipContainer = {
+            minSize = Vector(300, 100),
+        },
         unitHeadContainer = {
             backgroundColor = dume.rgb(80, 80, 80),
             borderColor = dume.rgb(0, 0, 0),

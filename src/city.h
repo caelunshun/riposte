@@ -15,6 +15,9 @@
 #include "culture.h"
 #include "yield.h"
 
+class HappinessEntry;
+class UnhappinessEntry;
+
 namespace rip {
     class City;
 
@@ -152,6 +155,11 @@ namespace rip {
         // Sum of the building effects present in the city.
         BuildingEffect buildingEffects;
 
+        // Sources of happiness in the city.
+        std::vector<HappinessEntry> happiness;
+        // Sources of unhapipiness in the city.
+        std::vector<UnhappinessEntry> unhappiness;
+
         bool coastal = false;
 
         bool capital = false;
@@ -226,6 +234,16 @@ namespace rip {
         int getStoredFood() const;
         int getFoodNeededForGrowth() const;
         int getConsumedFood() const;
+
+        const std::vector<HappinessEntry> &getHappinessSources() const;
+        const std::vector<UnhappinessEntry> &getUnhappinessSources() const;
+
+        uint32_t getHappiness() const;
+        uint32_t getUnhappiness() const;
+
+        uint32_t getNumWorkingCitizens() const;
+
+        void updateHappiness(Game &game);
 
         void transferControlTo(Game &game, PlayerId newOwner);
     };

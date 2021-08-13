@@ -105,6 +105,16 @@
     "loader": "image"
   },
   {
+    "path": "icon/happy.png",
+    "id": "icon/happy",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unhappy.png",
+    "id": "icon/unhappy",
+    "loader": "image"
+  },
+  {
     "path": "civ/greece.json",
     "id": "civ/greece",
     "loader": "civ"

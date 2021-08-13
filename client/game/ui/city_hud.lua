@@ -8,11 +8,12 @@ local ProgressBar = require("widget/progress_bar")
 local Spacer = require("widget/spacer")
 local Divider = require("widget/divider")
 local Padding = require("widget/padding")
+local Tooltip = require("widget/tooltip")
 
 local UiUtils = require("ui/utils")
 
 local leftWindowSize = Vector(200, 600)
-local topWindowSize = Vector(440, 150)
+local topWindowSize = Vector(600, 150)
 
 -- GUI opened when a city is double-clicked.
 local CityHud = {}
@@ -111,6 +112,43 @@ function TopWindow:new(game, cityHud)
     return o
 end
 
+function TopWindow:getHappinessTooltipText()
+    local text = ""
+    for _, entry in ipairs(self.city.happinessSources) do
+        local reason
+        if entry.source == "DifficultyBonus" then
+            reason = "Long live life!"
+        elseif entry.source == "Buildings" then
+            reason = "Buildings are making us happy!"
+        end
+
+        text = text .. "+" .. tostring(entry.count) .. " @icon{happy}: " .. reason .. "\n"
+    end
+    return text
+end
+
+function TopWindow:getUnhappinessTooltipText()
+    local text = ""
+    for _, entry in ipairs(self.city.unhappinessSources) do
+        local reason
+        if entry.source == "Population" then
+            reason = "It's too crowded!"
+        elseif entry.source == "Undefended" then
+            reason = "We fear for our safety!"
+        end
+
+        text = text .. "+" .. tostring(entry.count) .. " @icon{unhappy}: " .. reason .. "\n"
+    end
+    return text
+end
+
+function TopWindow:makeTooltip(text, child)
+    local container = Container:new(Padding:new(Text:new(text), 10))
+    table.insert(container.classes, "tooltipContainer")
+    table.insert(container.classes, "smallTooltipContainer")
+    return Tooltip:new(child, container)
+end
+
 function TopWindow:rebuild()
     local root = Flex:column()
     root:setCrossAlign(dume.Align.Center)
@@ -123,7 +161,7 @@ function TopWindow:rebuild()
     end
 
     -- Population growth progress bar
-    local progressBarSize = Vector(topWindowSize.x - 50, 20)
+    local progressBarSize = Vector(topWindowSize.x - 150, 20)
     do
         local progress = self.city.storedFood / self.city.foodNeededForGrowth
         local foodSurplus = self.city.yield.food - self.city.consumedFood
@@ -171,8 +209,31 @@ function TopWindow:rebuild()
                 function() return predictedProgress  end,
                 Text:new(productionSubtitle, {}, {alignH = dume.Align.Center})
         )
+        bar.minSize = Vector()
         table.insert(bar.classes, "productionProgressBar")
-        root:addFixedChild(bar)
+
+        local row = Flex:row()
+        row:addFixedChild(bar)
+
+        -- Happiness / unhappiness text
+        local sign
+        if self.city.happiness > self.city.unhappiness then sign = ">"
+        elseif self.city.happiness == self.city.unhappiness then sign = "="
+        else sign = "<"
+        end
+        local happyText = Text:new("%happy @icon{happy}", {
+            happy = tostring(self.city.happiness),
+        })
+        local signText = Text:new(sign)
+        local unhappyText = Text:new("%unhappy @icon{unhappy}", {
+            unhappy = tostring(self.city.unhappiness),
+        })
+
+        row:addFixedChild(self:makeTooltip(self:getHappinessTooltipText(), happyText))
+        row:addFixedChild(signText)
+        row:addFixedChild(self:makeTooltip(self:getUnhappinessTooltipText(), unhappyText))
+
+        root:addFixedChild(row)
     end
 
     ui:createWindow("cityHudTop", Vector(cv:getWidth() / 2 - topWindowSize.x / 2, 10), topWindowSize, UiUtils.createWindowContainer(root))

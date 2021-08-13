@@ -35,15 +35,6 @@ namespace rip {
         }
     };
 
-    // Functions defined in the script_bindings directory.
-    // They've been separated from this file to reduce compile times.
-    void bindCity(sol::state &state, std::shared_ptr<Game*> game);
-    void bindGame(sol::state &state);
-    void bindOther(sol::state &state, std::shared_ptr<Game*> game);
-    void bindPlayer(sol::state &state, std::shared_ptr<Game*> game);
-    void bindRegistry(sol::state &state);
-    void bindUnit(sol::state &state, std::shared_ptr<Game*> game);
-
     struct ScriptImpl {
         sol::state lua;
 
@@ -68,13 +59,6 @@ namespace rip {
             auto engine_type = lua.new_usertype<ScriptImpl>("Engine");
             engine_type["registerEventHandler"] = &ScriptImpl::registerEventHandler;
             lua["engine"] = std::ref(*this);
-
-            bindCity(lua, game);
-            bindGame(lua);
-            bindOther(lua, game);
-            bindPlayer(lua, game);
-            bindRegistry(lua);
-            bindUnit(lua, game);
         }
 
         void forEachHandler(const std::string &event, std::function<void(sol::function &)> callback) {
