@@ -89,7 +89,8 @@ function Unit:render(cv, game)
     local owner = self:getOwner(game)
     cv:beginPath()
     cv:rect(Vector(70, 35), Vector(20, 30))
-    cv:solidColor(owner.civ.color)
+    local color = owner.civ.color
+    cv:solidColor(dume.rgb(color[1], color[2], color[3], 200))
     cv:fill()
 
     -- Unit health bar if in combat (combat animation)
