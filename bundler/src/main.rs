@@ -87,7 +87,7 @@ impl LuaModule {
         self.contents = cpath_regex
             .replace(
                 std::str::from_utf8(&self.contents)?,
-                "package.cpath = \"client/?.so\"",
+                "package.cpath = \"client/?.so;client/?.dylib\"",
             )
             .to_string()
             .into_bytes();
@@ -238,7 +238,7 @@ fn find_assets(bundle: &mut Bundle) -> anyhow::Result<()> {
 }
 
 fn find_dynlibs(bundle: &mut Bundle) -> anyhow::Result<()> {
-    let libs_dir = Path::new(BUILD_DIR);
+    let mut libs_dir = Path::new(BUILD_DIR).to_owned();
     for entry in fs::read_dir(&libs_dir)? {
         let entry = entry?;
         let path = entry.path();
