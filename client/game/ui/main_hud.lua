@@ -952,9 +952,10 @@ function InfoWindow:new(game, hud)
 end
 
 function InfoWindow:rebuild()
-    local size = Vector(200, 60)
+    local size = Vector(300, 60)
 
     local root = Flex:row()
+    root:setMainAlign(dume.Align.Center)
 
     root:addFixedChild(Text:new("Turn %turn    •    %era Era", {
         turn = tostring(self.game.turn),

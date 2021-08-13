@@ -17,7 +17,7 @@ local MoveDir = {
 
 local minZoomFactor = 0.2
 local maxZoomFactor = 8
-local zoomSensitivity = 0.2
+local zoomSensitivity = 0.05
 
 function View:new()
     local o = {
