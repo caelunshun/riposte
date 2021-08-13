@@ -13,6 +13,8 @@ local Padding = require("widget/padding")
 local Clickable = require("widget/clickable")
 local ProgressBar = require("widget/progress_bar")
 
+local UiUtils = require("ui/utils")
+
 local style = require("ui/style")
 
 local TaskSequence = require("task_sequence")
@@ -30,6 +32,7 @@ local ScoreWindow = {}
 local UnitStackWindow = {}
 local ResearchBar = {}
 local EconomyWindow = {}
+local InfoWindow = {}
 
 function Hud:new(game)
     local o = {
@@ -102,6 +105,7 @@ function Hud:new(game)
         UnitStackWindow:new(game, o),
         ResearchBar:new(game, o),
         EconomyWindow:new(game, o),
+        InfoWindow:new(game, o),
     }
 
     setmetatable(o, self)
@@ -938,6 +942,30 @@ end
 
 function EconomyWindow:close()
     ui:deleteWindow("economy")
+end
+
+function InfoWindow:new(game, hud)
+    local o = { game = game, hud = hud }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function InfoWindow:rebuild()
+    local size = Vector(200, 60)
+
+    local root = Flex:row()
+
+    root:addFixedChild(Text:new("Turn %turn    •    %era Era", {
+        turn = tostring(self.game.turn),
+        era = self.game.era,
+    }))
+
+    ui:createWindow("info", Vector(cv:getWidth() - size.x, 0), size, UiUtils.createWindowContainer(root))
+end
+
+function InfoWindow:close()
+    ui:deleteWindow("info")
 end
 
 function dumeColorToString(color)
