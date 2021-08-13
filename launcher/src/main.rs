@@ -22,16 +22,17 @@ use tar::Archive;
 
 cfg_if::cfg_if! {
     if #[cfg(target_os = "macos")] {
-        const OS_SPECIFIER: &str = "macos";
+        const OS_SPECIFIER: &str = "macOS";
+        const LD_ENV: &str = "DYLD_LIBRARY_PATH";
     } else if #[cfg(unix)] {
         const OS_SPECIFIER: &str = "linux";
+        const LD_ENV: &str = "LD_LIBRARY_PATH";
     } else if #[cfg(windows)] {
         const OS_SPECIFIER: &str = "windows";
     }
 }
 
-// REMOVE
-const GITHUB_ACCESS_TOKEN: &str = "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";
+const GITHUB_ACCESS_TOKEN: &str = "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";
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 struct DownloadedVersion {
@@ -213,7 +214,7 @@ fn launch_game() -> anyhow::Result<()> {
 
     process::Command::new(executable)
         .current_dir(&game_dir)
-        .env("LD_LIBRARY_PATH", ".")
+        .env(LD_ENV, ".")
         .spawn()?
         .wait()?;
 

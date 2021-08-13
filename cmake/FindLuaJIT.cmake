@@ -1,42 +1,55 @@
-# Try to find LuaJIT
-# LuaJIT_FOUND - System has LuaJIT
-# LuaJIT_LIBRARY - The libraries needed to use LuaJIT
-# LuaJIT_INCLUDE_DIR - The LuaJIT include directories
 
-# Prefer static linking
-set(orig_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
-set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+# Locate LuaJIT library
+# This module defines
+#  LUAJIT_FOUND, if false, do not try to link to Lua
+#  LUA_LIBRARY, where to find the lua library
+#  LUA_INCLUDE_DIR, where to find lua.h
+#
+# This module is similar to FindLua51.cmake except that it finds LuaJit instead.
 
-find_library(LuaJIT_LIBRARY
-        NAMES
-        luajit luajit_64 luajit-5.1 libluajit libluajit_64
-        PATHS
-        ${PROJECT_SOURCE_DIR}/ext/lua/${libpath}
-        /usr/
-        /usr/bin/
-        /usr/include/
-        /usr/lib/
-        /usr/local/
-        /usr/local/bin/
-        /opt/)
 
-find_path(LuaJIT_INCLUDE_DIR
-        NAMES
-        lua.h
-        PATHS
-        ${PROJECT_SOURCE_DIR}/ext/lua/include/) # Only look internally
+FIND_PATH(LUA_INCLUDE_DIR luajit.h
+	HINTS
+	$ENV{LUA_DIR}
+	PATH_SUFFIXES include/luajit-2.1 include/luajit-2.0 include/luajit-5_1-2.1 include/luajit-5_1-2.0 include luajit
+	PATHS
+	~/Library/Frameworks
+	/Library/Frameworks
+	/sw # Fink
+	/opt/local # DarwinPorts
+	/opt/csw # Blastwave
+	/opt
+)
 
-include(FindPackageHandleStandardArgs)
-find_package_handle_standard_args(LuaJIT DEFAULT_MSG LuaJIT_LIBRARY LuaJIT_INCLUDE_DIR)
-
-message(STATUS "LuaJIT_FOUND: ${LuaJIT_FOUND}")
-message(STATUS "LuaJIT_LIBRARY: ${LuaJIT_LIBRARY}")
-message(STATUS "LuaJIT_INCLUDE_DIR: ${LuaJIT_INCLUDE_DIR}")
-
-if (${LuaJIT_FOUND})
-    link_libraries(${LuaJIT_LIBRARY})
-    include_directories(${LuaJIT_INCLUDE_DIR})
-    include_directories(${LuaJIT_INCLUDE_DIR}/../)
+# Test if running on vcpkg toolchain
+if(DEFINED VCPKG_TARGET_TRIPLET AND DEFINED VCPKG_APPLOCAL_DEPS)
+	# On vcpkg luajit is 'lua51' and normal lua is 'lua'
+	FIND_LIBRARY(LUA_LIBRARY
+		NAMES lua51
+		HINTS
+		$ENV{LUA_DIR}
+		PATH_SUFFIXES lib
+	)
+else()
+	FIND_LIBRARY(LUA_LIBRARY
+		NAMES luajit-5.1
+		HINTS
+		$ENV{LUA_DIR}
+		PATH_SUFFIXES lib64 lib
+		PATHS
+		~/Library/Frameworks
+		/Library/Frameworks
+		/sw
+		/opt/local
+		/opt/csw
+		/opt
+	)
 endif()
 
-set(CMAKE_FIND_LIBRARY_SUFFIXES ${orig_CMAKE_FIND_LIBRARY_SUFFIXES})
+INCLUDE(FindPackageHandleStandardArgs)
+# handle the QUIETLY and REQUIRED arguments and set LUAJIT_FOUND to TRUE if
+# all listed variables exist
+FIND_PACKAGE_HANDLE_STANDARD_ARGS(LuaJIT
+	REQUIRED_VARS LUA_LIBRARY LUA_INCLUDE_DIR)
+
+MARK_AS_ADVANCED(LUA_INCLUDE_DIR LUA_LIBRARY)

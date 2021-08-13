@@ -10,6 +10,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/)
 
+set(Protobuf_USE_STATIC_LIBS ON)
 include(FindProtobuf)
 find_package(Protobuf REQUIRED)
 
@@ -28,13 +29,14 @@ FetchContent_MakeAvailable(Corrosion)
 corrosion_import_crate(MANIFEST_PATH external/dume/renderer/Cargo.toml)
 
 add_library(pb SHARED external/lua-protobuf/pb.c)
-target_link_libraries(pb ${CONAN_LIBS})
+target_include_directories(pb PRIVATE ${LUA_INCLUDE_DIR})
+target_link_libraries(pb ${CONAN_LIBS} ${LUA_LIBRARY})
 
 set(DUME_SOURCES external/dume/src/dume.cpp)
 add_library(dume ${DUME_SOURCES})
 target_include_directories(dume PUBLIC external/dume/include/ external/dume/renderer/include/)
-target_include_directories(dume PRIVATE external/sol2/include)
-target_link_libraries(dume ${CONAN_LIBS} dume-renderer)
+target_include_directories(dume PRIVATE external/sol2/include ${LUA_INCLUDE_DIR})
+target_link_libraries(dume ${LUA_LIBRARY} ${CONAN_LIBS} dume-renderer)
 
 protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/riposte.proto)
 
@@ -59,7 +61,7 @@ target_include_directories(riposte PRIVATE
         crodio/include
         ${CMAKE_CURRENT_BINARY_DIR} // for protobuf files
         ${PROTOBUF_INCLUDE_DIR}
-        ${LuaJIT_INCLUDE_DIR})
+        ${LUA_INCLUDE_DIR})
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
@@ -78,4 +80,4 @@ elseif(UNIX)
     SET(NATIVE_AUDIO_LIBS rt ${ALSA_LIBRARIES} Threads::Threads)
 endif()
 
-target_link_libraries(riposte dume ${CONAN_LIBS} ${PROTOBUF_LIBRARY} ${LuaJIT_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} crodio)
+target_link_libraries(riposte dume ${CONAN_LIBS} ${PROTOBUF_LIBRARY} ${LUA_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} crodio)

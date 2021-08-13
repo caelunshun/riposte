@@ -7,14 +7,24 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-18.04
+    strategy:
+      matrix: 
+        os: [ubuntu-18.04, macos-10.15]
+        include:
+          - os: ubuntu-18.04
+            os-name: linux
+          - os: macos-10.15
+            os-name: macOS
+        
+    runs-on: ${{ matrix.os }}
 
     steps:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
 
-      - name: Install Conan
+      - name: Install Conan (Linux)
+        if: matrix.os == 'ubuntu-18.04'
         run: |
            pwd
            pip3 install wheel setuptools
@@ -25,12 +35,16 @@ jobs:
            conan --version
            ls
            
+      - name: Install Conan (macOS)
+        if: matrix.os-name == 'macOS'
+        run: brew install conan
+           
         # Caching
 
         # Work around https://github.com/actions/cache/issues/403 by using GNU tar
         # instead of BSD tar.
       - name: Install GNU tar
-        if: matrix.os == 'macos-10.15'
+        if: matrix.os-name == 'macOS'
         run: |
           brew install gnu-tar
           echo PATH="/usr/local/opt/gnu-tar/libexec/gnubin:$PATH" >> $GITHUB_ENV
@@ -54,17 +68,25 @@ jobs:
         uses: actions/cache@v2
         with:
           path: cmake-build-release
-          key: ${{ runner.os }}-cmake-build
+          key: ${{ runner.os }}-cmake-build-v4
            
       - name: Cache protobuf library
         id: cache-protobuf
         uses: actions/cache@v2
+        if: matrix.os == 'ubuntu-18.04'
         with:
           path: protobuf
           key: ${{ runner.os }}-protobuf
           
-      - name: Build protobuf library
-        if: steps.cache-protobuf.outputs.cache-hit != 'true'
+      - name: Cache LuaJIT library
+        id: cache-luajit
+        uses: actions/cache@v2
+        with:
+          path: LuaJIT
+          key: ${{ runner.os }}-luajit
+          
+      - name: Build protobuf library (Linux)
+        if: steps.cache-protobuf.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-18.04'
         run: |
            git clone https://github.com/protocolbuffers/protobuf.git
            cd protobuf
@@ -74,15 +96,36 @@ jobs:
            ./configure
            make -j2
            
-      - name: Install protobuf library
+      - name: Install protobuf library (Linux)
+        if: matrix.os == 'ubuntu-18.04'
         run: |
            cd protobuf
            sudo make install
            sudo ldconfig
            
+      - name: Install protobuf library (macOS)
+        if: matrix.os-name == 'macOS'
+        run: brew install protobuf
+        
+      - name: Build LuaJIT
+        if: steps.cache-luajit.outputs.cache-hit != 'true'
+        run: |
+            git clone https://github.com/LuaJIT/LuaJIT
+            cd LuaJIT
+            make -j2
+            cd ..
+        env:
+          MACOSX_DEPLOYMENT_TARGET: 10.14
+            
+      - name: Install LuaJIT
+        run: cd LuaJIT && sudo make install
+        
+      - name: Install dependencies (Linux)
+        if: matrix.os == 'ubuntu-18.04'
+        run: sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
+           
       - name: Prepare build
         run: |
-            sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
             mkdir -p cmake-build-release
             cd cmake-build-release
             conan install ..
@@ -90,7 +133,7 @@ jobs:
             cd ..
 
       - name: Build
-        run: cd cmake-build-release && cmake --build . --target riposte
+        run: cd cmake-build-release && cmake --build . --target riposte -j2 && cmake --build . --target pb
         
       - name: Build riposte-bundler
         run: |
@@ -101,6 +144,17 @@ jobs:
       - name: Bundle
         run: bundler/target/release/riposte-bundler
         
+      - name: Upload temporary artifact
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.os-name }}
+          path: cmake-build-release/riposte.tar.zst
+          
+  publish:
+    runs-on: ubuntu-18.04
+    name: Publish artifacts to GitHub Releases
+    needs: [build]
+    steps:      
       - name: Get tag name
         id: get_tag
         run: echo ::set-output name=TAG::$(echo $GITHUB_REF | cut -d / -f 3)
@@ -113,6 +167,16 @@ jobs:
         with:
           tag_name: ${{ steps.get_tag.outputs.TAG }}
           release_name: Release ${{ steps.get_tag.outputs.TAG }}
+          
+      - name: Download Linux build
+        uses: actions/download-artifact@v1
+        with:
+          name: linux
+
+      - name: Download macOS build
+        uses: actions/download-artifact@v1
+        with:
+          name: macOS
         
       - name: Upload Linux package
         uses: actions/upload-release-asset@v1
@@ -120,6 +184,16 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: cmake-build-release/riposte.tar.zst
+          asset_path: linux/riposte.tar.zst
           asset_name: riposte-linux.tar.zst
+          asset_content_type: application/zstd
+          
+      - name: Upload macOS package
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: macOS/riposte.tar.zst
+          asset_name: riposte-macOS.tar.zst
           asset_content_type: application/zstd
