@@ -3,6 +3,10 @@
 # LuaJIT_LIBRARY - The libraries needed to use LuaJIT
 # LuaJIT_INCLUDE_DIR - The LuaJIT include directories
 
+# Prefer static linking
+set(orig_CMAKE_FIND_LIBRARY_SUFFIXES ${CMAKE_FIND_LIBRARY_SUFFIXES})
+set(CMAKE_FIND_LIBRARY_SUFFIXES .lib .a ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
 find_library(LuaJIT_LIBRARY
         NAMES
         luajit luajit_64 luajit-5.1 libluajit libluajit_64
@@ -34,3 +38,5 @@ if (${LuaJIT_FOUND})
     include_directories(${LuaJIT_INCLUDE_DIR})
     include_directories(${LuaJIT_INCLUDE_DIR}/../)
 endif()
+
+set(CMAKE_FIND_LIBRARY_SUFFIXES ${orig_CMAKE_FIND_LIBRARY_SUFFIXES})
