@@ -528,7 +528,7 @@ function BottomControlWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(cv:getWidth() - unitDisplayWindowWidth - turnIndicatorWindowWidth, 100)
-    ui:createWindow("bottomControls", Vector(unitDisplayWindowWidth, cv:getHeight() - size.y), size, container, true, true)
+    ui:createWindow("bottomControls", Vector(unitDisplayWindowWidth, cv:getHeight() - size.y), size, container, 0, true, true)
 end
 
 function BottomControlWindow:close()
@@ -595,7 +595,7 @@ function UnitDisplayWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(unitDisplayWindowWidth, 150)
-    ui:createWindow("unitDisplay", Vector(0, cv:getHeight() - size.y), size, container, false, false)
+    ui:createWindow("unitDisplay", Vector(0, cv:getHeight() - size.y), size, container, 0,false, false)
 end
 
 function UnitDisplayWindow:close()
@@ -620,7 +620,7 @@ function TurnIndicatorWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(turnIndicatorWindowWidth, 150)
-    ui:createWindow("turnIndicator", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y), size, container, false, true)
+    ui:createWindow("turnIndicator", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y), size, container, 0, false, true)
 end
 
 function TurnIndicatorWindow:close()
@@ -681,7 +681,7 @@ function ScoreWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(250, 225)
-    ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container, false, true)
+    ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container,  0, false, true)
 end
 
 function ScoreWindow:close()
@@ -800,7 +800,7 @@ function UnitStackWindow:rebuild()
     end
 
     local size = Vector(cv:getWidth() - unitDisplayWindowWidth - turnIndicatorWindowWidth - 200, 100)
-    ui:createWindow("unitStack", Vector(unitDisplayWindowWidth + 100, cv:getHeight() - 120 - size.y), size, root, false, true)
+    ui:createWindow("unitStack", Vector(unitDisplayWindowWidth + 100, cv:getHeight() - 120 - size.y), size, root, 0,false, true)
 end
 
 function UnitStackWindow:close()
@@ -933,7 +933,7 @@ function EconomyWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(275, 150)
-    ui:createWindow("economy", Vector(0, 0), size, container, false, false)
+    ui:createWindow("economy", Vector(0, 0), size, container, 0, false, false)
 end
 
 function EconomyWindow:close()

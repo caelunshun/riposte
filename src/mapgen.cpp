@@ -129,7 +129,7 @@ namespace rip {
             auto &p = game.getPlayer(playerID);
             p.setID(playerID);
 
-           if (game.getNumPlayers() >= gameOptions.numhumanplayers()) {
+           if (game.getNumPlayers() > gameOptions.numhumanplayers()) {
                p.enableAI();
            }
         }
