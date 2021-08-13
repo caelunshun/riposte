@@ -1,5 +1,6 @@
 {
   "name": "Construction",
   "cost": 420,
-  "prerequisites": ["Mathematics"]
+  "prerequisites": ["Mathematics"],
+  "era": "classical"
 }

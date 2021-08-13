@@ -1,6 +1,7 @@
 {
   "name": "Alphabet",
   "cost": 330,
+  "era": "ancient",
 
   "prerequisites": ["Writing"]
 }

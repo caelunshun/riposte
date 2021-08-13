@@ -1,5 +1,6 @@
 {
   "name": "Sailing",
   "cost": 110,
-  "prerequisites": ["Pottery", "Fishing"]
+  "prerequisites": ["Pottery", "Fishing"],
+  "era": "ancient"
 }

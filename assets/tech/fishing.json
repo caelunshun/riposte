@@ -1,6 +1,5 @@
 {
   "name": "Fishing",
-  "cost": 70
-
-
+  "cost": 70,
+  "era": "ancient"
 }

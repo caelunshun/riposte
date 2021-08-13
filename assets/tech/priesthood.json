@@ -1,6 +1,6 @@
 {
   "name": "Priesthood",
   "cost": 140,
-  "prerequisites": ["Meditation", "Polytheism"]
-
+  "prerequisites": ["Meditation", "Polytheism"],
+  "era": "ancient"
 }

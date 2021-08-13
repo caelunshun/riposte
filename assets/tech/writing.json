@@ -1,6 +1,6 @@
 {
   "name": "Writing",
   "cost": 140,
-  "prerequisites": ["Pottery", "Animal Husbandry"]
-
+  "prerequisites": ["Pottery", "Animal Husbandry"],
+  "era": "ancient"
 }

@@ -1,6 +1,7 @@
 {
   "name": "Mining",
   "cost": 70,
+  "era": "ancient",
 
   "unlocksImprovements": ["Mine"]
 }

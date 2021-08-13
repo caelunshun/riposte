@@ -1,6 +1,7 @@
 {
   "name": "The Wheel",
   "cost": 40,
+  "era": "ancient",
 
   "unlocksImprovements": ["Road"]
 }

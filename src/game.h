@@ -116,8 +116,6 @@ namespace rip {
         TradeRoutes &getTradeRoutes();
         const TradeRoutes &getTradeRoutes() const;
 
-        Era getEra() const;
-
         void onUnitMoved(UnitId unitID, std::optional<glm::uvec2> oldPos, glm::uvec2 newPos);
 
         // Creates a new stack. If a stack with the same owner and position exists,

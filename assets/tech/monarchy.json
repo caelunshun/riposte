@@ -1,6 +1,6 @@
 {
   "name": "Monarchy",
   "cost": 300,
-  "prerequisites": ["Priesthood", "Monotheism"]
-
+  "prerequisites": ["Priesthood", "Monotheism"],
+  "era": "classical"
 }

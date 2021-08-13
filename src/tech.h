@@ -11,6 +11,7 @@
 #include <absl/container/flat_hash_map.h>
 #include <absl/container/flat_hash_set.h>
 #include "registry.h"
+#include "era.h"
 
 namespace rip {
     struct JSONTech;
@@ -34,7 +35,10 @@ namespace rip {
         std::vector<std::shared_ptr<Tech>> prerequisites;
         std::vector<std::shared_ptr<Tech>> leadsTo;
 
-        Tech(const std::string &name, int cost, const std::vector<std::string> &unlocksImprovements);
+        // The era this tech is unlocked in.
+        Era era;
+
+        Tech(const std::string &name, int cost, const std::vector<std::string> &unlocksImprovements, Era era);
 
         int estimateResearchTurns(int beakersPerTurn) const;
     };

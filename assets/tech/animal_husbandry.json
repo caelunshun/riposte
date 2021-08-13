@@ -2,6 +2,7 @@
   "name": "Animal Husbandry",
   "cost": 80,
   "prerequisites": ["Agriculture"],
+  "era": "ancient",
 
   "unlocksImprovements": ["Pasture"]
 }

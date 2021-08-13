@@ -11,6 +11,7 @@ namespace rip {
         int cost = 0;
         std::vector<std::string> prerequisites;
         std::vector<std::string> unlocksImprovements;
+        Era era;
 
         friend void from_json(const nlohmann::json &nlohmann_json_j, JSONTech &nlohmann_json_t) {
             nlohmann_json_j.at("name").get_to(nlohmann_json_t.name);
@@ -21,6 +22,9 @@ namespace rip {
             if (nlohmann_json_j.contains("unlocksImprovements")) {
                 nlohmann_json_j.at("unlocksImprovements").get_to(nlohmann_json_t.unlocksImprovements);
             }
+            std::string era;
+            nlohmann_json_j.at("era").get_to(era);
+            nlohmann_json_t.era = eraFromID(era);
         }
     };
 
@@ -29,14 +33,14 @@ namespace rip {
         return (cost + beakersPerTurn - 1) / beakersPerTurn;
     }
 
-    Tech::Tech(const std::string &name, int cost, const std::vector<std::string> &unlocksImprovements) : name(name), cost(cost),
-                                                                          unlocksImprovements(unlocksImprovements) {}
+    Tech::Tech(const std::string &name, int cost, const std::vector<std::string> &unlocksImprovements, Era era) : name(name), cost(cost),
+                                                                          unlocksImprovements(unlocksImprovements), era(era) {}
 
     TechTree::TechTree(const Assets &assets, const Registry &registry) {
         // Step 1: add all techs.
         auto jsonTechs = assets.getAll<JSONTech>();
         for (const auto &jsonTech : jsonTechs) {
-            techs.emplace(jsonTech->name, std::make_shared<Tech>(jsonTech->name, jsonTech->cost, jsonTech->unlocksImprovements));
+            techs.emplace(jsonTech->name, std::make_shared<Tech>(jsonTech->name, jsonTech->cost, jsonTech->unlocksImprovements, jsonTech->era));
         }
 
         // Step 2: resolve dependencies (leadsTo and prerequisites)

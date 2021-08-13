@@ -88,6 +88,10 @@ namespace rip {
          PlayerTechs techs;
          std::optional<ResearchingTech> researchingTech;
 
+         // Current era for the player, determined by the highest
+         // era unlocked by techs.
+         Era era = Era::Ancient;
+
          int baseRevenue = 0;
          int beakerRevenue = 0;
          int goldRevenue = 0;
@@ -135,6 +139,7 @@ namespace rip {
          const CivKind &getCiv() const;
          const Leader &getLeader() const;
          CityId getCapital() const;
+         Era getEra() const;
 
          void setUsername(std::string username);
 

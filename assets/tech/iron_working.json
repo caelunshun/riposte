@@ -1,5 +1,6 @@
 {
   "name": "Iron Working",
   "cost": 450,
-  "prerequisites": ["Bronze Working"]
+  "prerequisites": ["Bronze Working"],
+  "era": "classical"
 }

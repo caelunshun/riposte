@@ -1,6 +1,6 @@
 {
   "name": "Mathematics",
   "cost": 250,
-  "prerequisites": ["Writing"]
-
+  "prerequisites": ["Writing"],
+  "era": "classical"
 }

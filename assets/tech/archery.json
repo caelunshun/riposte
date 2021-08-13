@@ -1,5 +1,6 @@
 {
   "name": "Archery",
   "cost": 80,
-  "prerequisites": ["Hunting"]
+  "prerequisites": ["Hunting"],
+  "era": "ancient"
 }

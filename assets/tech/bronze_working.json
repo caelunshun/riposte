@@ -1,5 +1,6 @@
 {
   "name": "Bronze Working",
   "cost": 300,
-  "prerequisites": ["Mining"]
+  "prerequisites": ["Mining"],
+  "era": "ancient"
 }

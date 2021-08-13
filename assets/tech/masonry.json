@@ -1,6 +1,6 @@
 {
   "name": "Masonry",
   "cost": 150,
-  "prerequisites": ["Mining", "Mysticism"]
-
+  "prerequisites": ["Mining", "Mysticism"],
+  "era": "ancient"
 }

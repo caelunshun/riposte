@@ -1,6 +1,6 @@
 {
   "name": "Meditation",
   "cost": 70,
-  "prerequisites": ["Mysticism"]
-
+  "prerequisites": ["Mysticism"],
+  "era": "ancient"
 }

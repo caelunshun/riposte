@@ -30,7 +30,7 @@ namespace rip {
     UpdateGlobalData getUpdateGlobalDataPacket(Game &game, PlayerId thePlayerID) {
         UpdateGlobalData packet;
         packet.set_turn(game.getTurn());
-        packet.set_era(static_cast<::Era>(static_cast<int>(game.getEra())));
+        packet.set_era(static_cast<::Era>(static_cast<int>(game.getPlayer(thePlayerID).getEra())));
 
         for (const auto &player : game.getPlayers()) {
             auto *protoPlayer = packet.add_players();

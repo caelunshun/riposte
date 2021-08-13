@@ -310,6 +310,11 @@ namespace rip {
     void Player::updateResearch(Game &game) {
         if (researchingTech.has_value() && researchingTech->isFinished()) {
             techs.unlockTech(researchingTech->tech);
+
+            if (researchingTech->tech->era > era) {
+                era = researchingTech->tech->era;
+            }
+
             researchingTech = {};
         }
     }
@@ -416,5 +421,9 @@ namespace rip {
         dead = true;
 
         game.getServer().markPlayerDirty(id);
+    }
+
+    Era Player::getEra() const {
+        return era;
     }
 }

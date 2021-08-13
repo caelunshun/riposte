@@ -342,25 +342,6 @@ namespace rip {
         return impl->tradeRoutes;
     }
 
-    Era Game::getEra() const {
-        const auto turn = impl->turn;
-        if (turn < 50) {
-            return Era::Ancient;
-        } else if (turn < 150) {
-            return Era::Classical;
-        } else if (turn < 250) {
-            return Era::Medieval;
-        } else if (turn < 300) {
-            return Era::Renaissance;
-        } else if (turn < 400) {
-            return Era::Industrial;
-        } else if (turn < 450) {
-            return Era::Modern;
-        } else {
-            return Era::Future;
-        }
-    }
-
     void Game::onUnitMoved(UnitId unitID, std::optional<glm::uvec2> oldPos, glm::uvec2 newPos) {
         const auto &unit = getUnit(unitID);
 
