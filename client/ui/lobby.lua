@@ -173,7 +173,7 @@ end
 
 function Lobby:tick()
     self.client:handleReceivedPacketsWithHandler(function(packet)
-        self:handlePacket(packet)
+        return self:handlePacket(packet)
     end)
 end
 

@@ -2,3 +2,5 @@
 
 proto/riposte.pb.cc linguist-generated
 proto/riposte.pb.h linguist-generated
+
+client/inspect.lua linguist-vendored

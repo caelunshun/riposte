@@ -1,6 +1,8 @@
 -- Handles packets.
 local Client = {}
 
+local inspect = require("inspect")
+
 local pb = require("pb")
 local protoc = require("protoc")
 

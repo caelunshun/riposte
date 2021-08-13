@@ -84,6 +84,7 @@ function enterLobby(l)
 end
 
 function enterGame(bridge, isMultiplayer)
+    lobby.client = nil
     lobby = nil
 
     -- Clear the UI to get rid of the menu.
@@ -184,4 +185,3 @@ function callSafe(f, arg)
     end
     if not status then print("LUA ERROR: " .. err) end
 end
-
