@@ -153,6 +153,7 @@ jobs:
   publish:
     runs-on: ubuntu-18.04
     name: Publish artifacts to GitHub Releases
+    needs: [build]
     steps:      
       - name: Get tag name
         id: get_tag
