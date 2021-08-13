@@ -28,7 +28,8 @@ FetchContent_MakeAvailable(Corrosion)
 corrosion_import_crate(MANIFEST_PATH external/dume/renderer/Cargo.toml)
 
 add_library(pb SHARED external/lua-protobuf/pb.c)
-target_link_libraries(pb ${CONAN_LIBS})
+target_include_directories(pb PRIVATE ${LUA_INCLUDE_DIR})
+target_link_libraries(pb ${CONAN_LIBS} ${LUA_LIBRARY})
 
 set(DUME_SOURCES external/dume/src/dume.cpp)
 add_library(dume ${DUME_SOURCES})
