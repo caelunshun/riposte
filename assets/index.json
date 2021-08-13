@@ -575,6 +575,11 @@
     "loader": "image"
   },
   {
+    "path": "music/menu/baba_yetu.ogg",
+    "id": "music/menu",
+    "loader": "sound"
+  },
+  {
     "path": "music/ancient/tribal1.ogg",
     "id": "music/ancient/tribal1",
     "loader": "sound"

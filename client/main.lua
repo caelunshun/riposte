@@ -18,6 +18,7 @@ local Renderer = require("game/renderer")
 
 local Scheduler = require("scheduler")
 local Networking = require("networking")
+local MenuMusicPlayer = require("menu_music")
 
 scheduler = Scheduler:new()
 networking = Networking:new()
@@ -71,6 +72,8 @@ end
 
 local lobby = nil
 
+local menuMusic = MenuMusicPlayer:new()
+
 local game = nil
 local client = nil
 
@@ -88,6 +91,9 @@ function enterGame(bridge, isMultiplayer)
     game = Game:new()
     client = Client:new(game, bridge)
     game.client = client
+
+    menuMusic:close()
+    menuMusic = nil
 
     if not isMultiplayer then
         client:adminStartGame()
@@ -131,6 +137,10 @@ function render(dt)
 
         if lobby ~= nil then
             lobby:tick(dt)
+        end
+
+        if menuMusic ~= nil then
+            menuMusic:tick()
         end
 
         ui:render()

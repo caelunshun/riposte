@@ -17,7 +17,7 @@ end
 local currentCityHudSound
 
 local function handleEnterCityHud()
-    currentCityHudSound = playSound("sound/ambient/city1", 1)
+    currentCityHudSound = playSound("sound/ambient/city1", 2)
 end
 
 local function handleCloseCityHud()
