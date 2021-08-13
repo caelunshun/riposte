@@ -68,7 +68,7 @@ jobs:
         uses: actions/cache@v2
         with:
           path: cmake-build-release
-          key: ${{ runner.os }}-cmake-build-v3
+          key: ${{ runner.os }}-cmake-build-v4
            
       - name: Cache protobuf library
         id: cache-protobuf
