@@ -610,6 +610,11 @@
     "loader": "sound"
   },
   {
+    "path": "music/classical/lux_aeterna.ogg",
+    "id": "music/classical/lux_aeterna",
+    "loader": "sound"
+  },
+  {
     "path": "music/medieval/christian1.ogg",
     "id": "music/medieval/christian1",
     "loader": "sound"
