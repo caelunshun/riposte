@@ -314,7 +314,7 @@ namespace rip {
     }
 
     PlayerId Connection::getPlayerID() const {
-        return rip::PlayerId();
+        return playerID;
     }
 
     void Connection::sendGlobalData(Game &game) {
@@ -623,10 +623,10 @@ namespace rip {
 
     Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)
         : registry(registry), techTree(techTree) {
-        gameOptions.set_mapwidth(64);
-        gameOptions.set_mapheight(64);
+        gameOptions.set_mapwidth(16);
+        gameOptions.set_mapheight(16);
         gameOptions.set_numhumanplayers(1);
-        gameOptions.set_numaiplayers(6);
+        gameOptions.set_numaiplayers(1);
     }
 
     void Server::addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin) {

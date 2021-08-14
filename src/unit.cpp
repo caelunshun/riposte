@@ -297,8 +297,11 @@ namespace rip {
     }
 
     void Unit::teleportTo(glm::uvec2 target, Game &game) {
+         if (!game.containsTile(target)) return;
+
          const auto oldPos = pos;
         pos = target;
+
 
         // Unit has moved; update visibility
         game.getPlayer(owner).recomputeVisibility(game);

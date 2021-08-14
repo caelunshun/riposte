@@ -229,7 +229,7 @@ namespace rip {
         // Generate land/ocean map based on continents.
         const auto dim = 16;
         LandMap landMap(dim, dim);
-        const auto numContinents = 3;
+        const auto numContinents = 1;
         const auto minSpacing = 7;
         const auto minDistFromEdge = 1;
         std::vector<glm::uvec2> continentCenters;
