@@ -1,6 +1,6 @@
 local MenuMusic = {}
 
-local volume = 1
+local volume = 0.3
 
 function MenuMusic:new()
     local o = {
