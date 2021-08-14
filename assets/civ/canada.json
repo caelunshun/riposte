@@ -16,7 +16,17 @@
       "paranoia": 7,
       "expansiveness": 4,
       "religious": 2
+    },
+    {
+      "name": "Selzman",
+      "aggressive": 6,
+      "nukemonger": 10,
+      "submissive": 0,
+      "paranoia": 10,
+      "expansiveness": 7,
+      "religious": 5
     }
+
   ],
   "startingTechs": ["The Wheel", "Pottery"],
   "cities": [

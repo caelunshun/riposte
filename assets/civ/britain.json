@@ -21,7 +21,17 @@
       "paranoia": 7,
       "expansiveness": 5,
       "religious": 5
+    },
+    {
+      "name": "Fenton",
+      "aggressive": 10,
+      "nukemonger": 8,
+      "submissive": 1,
+      "paranoia": 7,
+      "expansiveness": 10,
+      "religious": 6
     }
+
   ],
   "startingTechs": ["The Wheel", "Agriculture"],
   "cities": [
