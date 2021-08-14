@@ -175,6 +175,7 @@ namespace rip {
                     int att = 0;
                     while (true) {
                         warriorPos = rng.choose(neighbors);
+                        if (!game.containsTile(warriorPos)) continue;
                         if (game.getTile(warriorPos).getTerrain() != Terrain::Ocean) {
                            break;
                         }
