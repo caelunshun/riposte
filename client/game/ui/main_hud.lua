@@ -204,7 +204,7 @@ function Hud:handleEvent(event)
             shouldComputePath = true
     end
 
-    if shouldComputePath and #self.selectedUnits ~= 0 then
+    if shouldComputePath and #self.selectedUnits ~= 0 and not self.waitingOnPath then
         self:computePath(self.selectedStack.pos, clickedPos)
     end
 
@@ -226,12 +226,17 @@ function Hud:computePath(from, to)
 
     self.tasks:enqueue(coroutine.create(function()
         local path = self.game.client:requestComputePath(from, to, unitKindID)
+        self.waitingOnPath = false
+        if #self.selectedUnits == 0 then
+            self.stagedPath = nil
+            self.hasStagedPath = false
+        end
         self.stagedPath = path
         self.hasStagedPath = true
-        self.waitingOnPath = false
 
         if self.moveSelectionWhenPathIsComputed then
             self:moveSelectionAlongStagedPath()
+            self.moveSelectionWhenPathIsComputed = false
         end
     end))
 end
@@ -340,6 +345,9 @@ function Hud:clearSelectionNow()
     if didDeselect then
         self.game.eventBus:trigger("selectedUnitsUpdated", nil)
     end
+
+    self.stagedPath = nil
+    self.hasStagedPath = false
     return didDeselect
 end
 
