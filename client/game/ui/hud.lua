@@ -63,7 +63,7 @@ function HUD:onDoubleClick(pos)
     -- Attempt to open the city HUD.
     local clickedTilePos = self.game.view:getTilePosForScreenOffset(pos)
     local city = self.game:getCityAtPos(clickedTilePos)
-    if city ~= nil then
+    if city ~= nil and city.owner == self.game.thePlayer then
         local cityHud = CityHud:new(self.game, city)
         self:setCurrent(cityHud)
         self.game.eventBus:trigger("cityHudOpened")

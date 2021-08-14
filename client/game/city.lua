@@ -169,7 +169,7 @@ local function renderProgressBar(cv, pos, size, progress, projectedProgress, pro
     cv:fill()
 end
 
-function City:renderBubble(cv)
+function City:renderBubble(cv, game)
     -- Rounded rectangle (bubble background)
     local bubbleWidth = 100
     local bubbleHeight = 20
@@ -178,21 +178,23 @@ function City:renderBubble(cv)
     cv:linearGradient(Vector(0, 70), Vector(0, 90), bubbleColorA, bubbleColorB)
     cv:fill()
 
-    -- Production progress bar
-    if self.buildTask ~= nil then
-        local progress = self.buildTask.progress / self.buildTask.cost
-        local projectedProgress = (self.buildTask.progress + self.yield.hammers) / self.buildTask.cost
-        renderProgressBar(cv, Vector(0, 80), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
-            style.default.productionProgressBar.progressColor, style.default.productionProgressBar.positivePredictedProgressColor)
+    if self.owner == game.thePlayer then
+        -- Production progress bar
+        if self.buildTask ~= nil then
+            local progress = self.buildTask.progress / self.buildTask.cost
+            local projectedProgress = (self.buildTask.progress + self.yield.hammers) / self.buildTask.cost
+            renderProgressBar(cv, Vector(0, 80), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
+                style.default.productionProgressBar.progressColor, style.default.productionProgressBar.positivePredictedProgressColor)
+        end
+
+        -- Population growth population bar
+        local progress = self.storedFood / self.foodNeededForGrowth
+        local projectedProgress = (self.storedFood + self.yield.food - self.consumedFood) / self.foodNeededForGrowth
+        renderProgressBar(cv, Vector(0, 70), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
+            style.default.populationProgressBar.progressColor, style.default.populationProgressBar.positivePredictedProgressColor)
     end
 
-    -- Population growth population bar
-    local progress = self.storedFood / self.foodNeededForGrowth
-    local projectedProgress = (self.storedFood + self.yield.food - self.consumedFood) / self.foodNeededForGrowth
-    renderProgressBar(cv, Vector(0, 70), Vector(bubbleWidth, bubbleHeight / 2), progress, projectedProgress,
-        style.default.populationProgressBar.progressColor, style.default.populationProgressBar.positivePredictedProgressColor)
-
-    -- Left circle, or five-point start if this is the capital
+    -- Left circle, or five-point star if this is the capital
     local radius = 10
     local center = Vector(radius - 5, radius + 70)
 
@@ -208,50 +210,56 @@ function City:renderBubble(cv)
     cv:strokeWidth(1.5)
     cv:stroke()
 
-    -- Right circle
-    cv:beginPath()
-    cv:circle(Vector(-radius + 5 + bubbleWidth, radius + 70), radius)
-    cv:solidColor(buildCircleColor)
-    cv:fill()
-    cv:solidColor(black)
-    cv:strokeWidth(1.5)
-    cv:stroke()
+    if self.owner == game.thePlayer then
+        -- Right circle
+        cv:beginPath()
+        cv:circle(Vector(-radius + 5 + bubbleWidth, radius + 70), radius)
+        cv:solidColor(buildCircleColor)
+        cv:fill()
+        cv:solidColor(black)
+        cv:strokeWidth(1.5)
+        cv:stroke()
+    end
 
     -- Left circle text (population)
     cv:drawParagraph(self.populationParagraph, Vector(-5, 80))
 
-    -- Right circle overlay, depending on the build task:
-    -- * unit - unit head icon
-    -- * building - first letter of building name (TODO: we should have icons for these)
-    if self.buildTask ~= nil then
-        if self.buildTask.kind.unit ~= nil then
-            cv:drawSprite("icon/unit_head/" .. self.buildTask.kind.unit.unitKindID, Vector(-radius * 2 + 5 + bubbleWidth, 70), radius * 2)
-        else
-            cv:drawParagraph(self.buildTaskParagraph, Vector(-radius * 2 + 5 + bubbleWidth, 70))
+    if self.owner == game.thePlayer then
+        -- Right circle overlay, depending on the build task:
+        -- * unit - unit head icon
+        -- * building - first letter of building name (TODO: we should have icons for these)
+        if self.buildTask ~= nil then
+            if self.buildTask.kind.unit ~= nil then
+                cv:drawSprite("icon/unit_head/" .. self.buildTask.kind.unit.unitKindID, Vector(-radius * 2 + 5 + bubbleWidth, 70), radius * 2)
+            else
+                cv:drawParagraph(self.buildTaskParagraph, Vector(-radius * 2 + 5 + bubbleWidth, 70))
+            end
         end
     end
 
     -- City name
     cv:drawParagraph(self.cityNameParagraph, Vector(0, 80))
 
-    -- Status bar
-    local statusOffset = Vector(10, 55)
+    if self.owner == game.thePlayer then
+        -- Status bar
+        local statusOffset = Vector(10, 55)
 
-    local happyIcon
-    if self.happiness >= self.unhappiness then happyIcon = "icon/happy"
-    else happyIcon = "icon/unhappy" end
+        local happyIcon
+        if self.happiness >= self.unhappiness then happyIcon = "icon/happy"
+        else happyIcon = "icon/unhappy" end
 
-    cv:drawSprite(happyIcon, statusOffset, 15)
+        cv:drawSprite(happyIcon, statusOffset, 15)
 
-    statusOffset.x = statusOffset.x + 20
-    if self.cultureDefenseBonus ~= 0 then
-        cv:drawParagraph(self.cultureDefenseParagraph, statusOffset)
+        statusOffset.x = statusOffset.x + 20
+        if self.cultureDefenseBonus ~= 0 then
+            cv:drawParagraph(self.cultureDefenseParagraph, statusOffset)
+        end
     end
 end
 
-function City:render(cv)
+function City:render(cv, game)
     self:renderHouses(cv)
-    self:renderBubble(cv)
+    self:renderBubble(cv, game)
 end
 
 return City

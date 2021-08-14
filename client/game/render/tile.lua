@@ -114,7 +114,7 @@ local CityRenderer = {}
 function CityRenderer:renderTile(cv, tile, tilePos, game)
     local city = game:getCityAtPos(tilePos)
     if city ~= nil then
-        city:render(cv)
+        city:render(cv, game)
     end
 end
 
