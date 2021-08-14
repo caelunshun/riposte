@@ -60,7 +60,7 @@ return {
             borderRadius = 0,
         },
         container = {
-            backgroundColor = dume.rgb(50, 50, 50, 128),
+            backgroundColor = dume.rgb(50, 50, 50, 240),
             borderWidth = 1,
             borderColor = dume.rgb(65, 65, 65),
             borderRadius = 0,
