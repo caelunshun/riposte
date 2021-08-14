@@ -1,7 +1,6 @@
 use std::{
     convert::TryInto,
     fs,
-    hash::{Hash, Hasher},
     io::Cursor,
     path::PathBuf,
     process::{self, exit},
@@ -9,16 +8,19 @@ use std::{
 
 use anyhow::anyhow;
 use directories_next::ProjectDirs;
-use iced::{
-    executor,
-    window::{self, Position},
-    Align, Application, Clipboard, Column, Command, Element, Length, ProgressBar, Settings, Text,
-};
-use iced_futures::subscription::Recipe;
+use duit::{Rect, Spec, Ui, Vec2, WindowPositioner};
+use generated::RiposteLauncher;
 use octocrab::{models::repos::Asset, Octocrab};
 use reqwest::header;
 use serde::{Deserialize, Serialize};
 use tar::Archive;
+use winit::{
+    dpi::LogicalSize,
+    event_loop::EventLoop,
+    window::{Window, WindowBuilder},
+};
+
+mod generated;
 
 cfg_if::cfg_if! {
     if #[cfg(target_os = "macos")] {
@@ -49,8 +51,7 @@ impl DownloadedVersion {
 
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
-    let github = octocrab::OctocrabBuilder::new()
-        .build()?;
+    let github = octocrab::OctocrabBuilder::new().build()?;
 
     let asset = get_latest_tarball_info(&github).await?;
 
@@ -73,7 +74,7 @@ async fn main() -> anyhow::Result<()> {
             exit(0);
         });
 
-        show_launcher_window(download_size, progress_updates_rx).expect("failed to open GUI");
+        show_launcher_window(download_size, progress_updates_rx);
     } else {
         println!("Up to date");
         launch_game().expect("failed to launch game");
@@ -176,32 +177,71 @@ async fn download_new_version(
     Ok(())
 }
 
-fn show_launcher_window(
-    download_size: u64,
-    progress_updates: flume::Receiver<Message>,
-) -> anyhow::Result<()> {
-    RiposteLauncher::run(Settings {
-        window: window::Settings {
-            size: (1920 / 4, 1080 / 4),
-            resizable: false,
-            decorations: false,
-            position: Position::Centered,
-            ..Default::default()
+struct Positioner;
+
+impl WindowPositioner for Positioner {
+    fn compute_position(&self, available_space: Vec2) -> Rect {
+        Rect::new(Vec2::ZERO, available_space)
+    }
+}
+
+fn show_launcher_window(_download_size: u64, progress_updates: flume::Receiver<Message>) {
+    let event_loop = EventLoop::new();
+    let window = build_window(&event_loop);
+
+    let mut ui = Ui::new();
+    ui.add_spec(Spec::deserialize_from_str(include_str!("../assets/root.yml")).unwrap());
+    ui.add_stylesheet(r#"
+styles:
+  text:
+    default_font_family: Merriweather
+  no_border:
+    border_width: 0
+  progress_bar:
+    border_radius: 3
+    "#.as_bytes())
+.unwrap();
+
+    let (root, widget) = ui.create_spec_instance::<RiposteLauncher>();
+    ui.create_window(widget, Positioner, 1);
+
+    duit_platform::run(
+        event_loop,
+        window,
+        ui,
+        |cv| {
+            cv.load_font(include_bytes!("../../assets/font/Merriweather-Regular.ttf").to_vec());
         },
-        flags: (
-            DownloadProgress {
-                needed: download_size,
-                downloaded: 0,
-            },
-            progress_updates,
-        ),
-        default_font: Some(include_bytes!("../../assets/font/Merriweather-Regular.ttf")),
-        antialiasing: true,
-        default_text_size: 20,
-        text_multithreading: false,
-        exit_on_close_request: true,
-    })?;
-    Ok(())
+        move |_| {
+            if let Some(latest_progress) = progress_updates.try_iter().last() {
+                match latest_progress {
+                    Message::DownloadProgress(progress) => {
+                        root.progress_bar
+                            .get_mut()
+                            .set_progress(progress.downloaded as f32 / progress.needed as f32);
+                        root.progress_text.get_mut().set_text(
+                            format!(
+                                "{:.1} / {:.1} MiB",
+                                mib(progress.downloaded),
+                                mib(progress.needed)
+                            ),
+                            Default::default(),
+                        );
+                    }
+                }
+            }
+        },
+    );
+}
+
+fn build_window(event_loop: &EventLoop<()>) -> Window {
+    WindowBuilder::new()
+        .with_title("Riposte Launcher")
+        .with_inner_size(LogicalSize::new(1920 / 4, 1080 / 4))
+        .with_resizable(false)
+        .with_decorations(false)
+        .build(event_loop)
+        .expect("failed to create window ")
 }
 
 fn launch_game() -> anyhow::Result<()> {
@@ -226,87 +266,6 @@ struct DownloadProgress {
 #[derive(Debug, Clone)]
 enum Message {
     DownloadProgress(DownloadProgress),
-}
-
-struct RiposteLauncher {
-    download_progress: DownloadProgress,
-    progress_updates: flume::Receiver<Message>,
-}
-
-impl Application for RiposteLauncher {
-    type Executor = executor::Default;
-    type Message = Message;
-    type Flags = (DownloadProgress, flume::Receiver<Message>);
-
-    fn new(flags: Self::Flags) -> (Self, Command<Self::Message>) {
-        (
-            Self {
-                download_progress: flags.0,
-                progress_updates: flags.1,
-            },
-            Command::none(),
-        )
-    }
-
-    fn title(&self) -> String {
-        "Riposte Launcher".to_owned()
-    }
-
-    fn update(
-        &mut self,
-        message: Self::Message,
-        _clipboard: &mut Clipboard,
-    ) -> Command<Self::Message> {
-        match message {
-            Message::DownloadProgress(progress) => self.download_progress = progress,
-        }
-
-        Command::none()
-    }
-
-    fn view(&mut self) -> Element<'_, Self::Message> {
-        Column::new()
-            .align_items(Align::Center)
-            .width(Length::Fill)
-            .height(Length::Fill)
-            .padding(10)
-            .push(Text::new("Updating Riposte").size(30))
-            .push(Text::new(format!(
-                "{:.1} / {:.1} MiB",
-                mib(self.download_progress.downloaded),
-                mib(self.download_progress.needed)
-            )))
-            .push(ProgressBar::new(
-                0.0..=1.0,
-                self.download_progress.downloaded as f32 / self.download_progress.needed as f32,
-            ))
-            .into()
-    }
-
-    fn subscription(&self) -> iced::Subscription<Self::Message> {
-        iced::Subscription::from_recipe(DownloadRecipe {
-            receiver: self.progress_updates.clone(),
-        })
-    }
-}
-
-struct DownloadRecipe {
-    receiver: flume::Receiver<Message>,
-}
-
-impl<H: Hasher, E> Recipe<H, E> for DownloadRecipe {
-    type Output = Message;
-
-    fn hash(&self, state: &mut H) {
-        0u8.hash(state);
-    }
-
-    fn stream(
-        self: Box<Self>,
-        _input: iced_futures::BoxStream<E>,
-    ) -> iced_futures::BoxStream<Self::Output> {
-        Box::pin(self.receiver.into_stream())
-    }
 }
 
 fn mib(bytes: u64) -> f64 {

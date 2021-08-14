@@ -7,13 +7,14 @@ edition = "2018"
 anyhow = "1"
 cfg-if = "1"
 directories-next = "2"
+duit = { git = "https://github.com/caelunshun/duit" }
+duit-platform = { git = "https://github.com/caelunshun/duit" }
 flume = "0.10"
-iced = { git = "https://github.com/hecrj/iced", rev = "a08e4ebccbb72f9cf6fca01047e0b46a482ca9ea", default-features = false, features = [ "glow", "tokio" ] }
-iced_futures = { git = "https://github.com/hecrj/iced", rev = "a08e4ebccbb72f9cf6fca01047e0b46a482ca9ea", default-features = false }
 octocrab = { version = "0.10", default-features = false, features = [ "rustls"] }
 reqwest = { version = "0.11", default-features = false }
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"
 tar = "0.4"
 tokio = { version = "1", features = [ "full" ] }
+winit = { version = "0.25", default-features = false, features = [ "x11" ] }
 zstd = "0.9"

@@ -1,0 +1,27 @@
+name: RiposteLauncher
+child:
+  Container:
+    mode: FillParent
+    child:
+      Container:
+        classes:
+          - no_border
+        mode:
+          Pad: 20
+        child:
+          Column:
+            spacing: 30
+            align_h: Center
+            align_v: Center
+            children:
+              - Text: "@size{24}{Updating Riposte}"
+              - ProgressBar:
+                  id: progress_bar
+                  height: 20
+                  child:
+                    Row:
+                      align_h: Center
+                      children:
+                        - Text:
+                            id: progress_text
+                            text: ""
