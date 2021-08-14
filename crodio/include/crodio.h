@@ -17,6 +17,8 @@ extern "C" {
 
 SoundHandle *rodio_create_sound(const uint8_t *data, size_t length);
 
+void rodio_free_sound(InstanceHandle *sound);
+
 bool rodio_is_sound_done(InstanceHandle *sound);
 
 OutputDevice *rodio_new();

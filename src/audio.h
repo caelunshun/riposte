@@ -8,9 +8,12 @@
 #include <crodio.h>
 #include <optional>
 #include "assets.h"
+#include "slot_map.h"
 
 namespace rip {
     class Game;
+
+    typedef ID SoundId;
 
     struct SoundAsset : public Asset {
         SoundHandle *handle;
@@ -18,26 +21,34 @@ namespace rip {
         SoundAsset(SoundHandle *handle);
     };
 
+    struct Sound {
+        SoundId id;
+        InstanceHandle *handle;
+    };
+
     class AudioManager {
         std::shared_ptr<Assets> assets;
-        std::optional<InstanceHandle*> currentMusic;
 
-        std::vector<InstanceHandle*> playingSounds;
+        slot_map<Sound> playingSounds;
+
+        OutputDevice *rodio;
 
         InstanceHandle *playSound(const SoundAsset &sound, float volume);
 
-    public:
-        OutputDevice *rodio;
+        void deleteSound(SoundId sound);
 
+    public:
         AudioManager();
 
         void setAssets(std::shared_ptr<Assets> assets);
 
-        InstanceHandle *playSound(const std::string &id, float volume);
+        SoundId playSound(const std::string &id, float volume);
 
         void update();
 
-        bool isSoundPlaying(InstanceHandle *sound) const;
+        bool isSoundPlaying(SoundId sound) const;
+
+        void stopSound(SoundId sound);
     };
 
     class AudioLoader : public AssetLoader {

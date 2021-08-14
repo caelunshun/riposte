@@ -92,14 +92,14 @@ namespace rip {
         bridge_type["sendPacket"] = &Bridge::sendPacket;
 
         lua["playSound"] = [=](const std::string &soundID, float volume) {
-            auto *sound = audio->playSound(soundID, volume);
-            return sol::light<InstanceHandle>(sound);
+            const auto sound = audio->playSound(soundID, volume);
+            return sound.encode();
         };
-        lua["isSoundPlaying"] = [=](sol::light<InstanceHandle> handle) {
-            return audio->isSoundPlaying(&*handle);
+        lua["isSoundPlaying"] = [=](uint32_t id) {
+            return audio->isSoundPlaying(SoundId(id));
         };
-        lua["stopSound"] = [=](sol::light<InstanceHandle> handle) {
-            rodio_stop_sound(&*handle);
+        lua["stopSound"] = [=](uint32_t id) {
+            audio->stopSound(SoundId(id));
         };
 
         lua["getAssetIDsWithPrefix"] = [=](const std::string &prefix) {

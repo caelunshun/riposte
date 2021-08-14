@@ -13,42 +13,57 @@ namespace rip {
 
     SoundAsset::SoundAsset(SoundHandle *handle) : handle(handle) {}
 
-    AudioManager::AudioManager() {
-        rodio = rodio_new();
+    InstanceHandle *AudioManager::playSound(const SoundAsset &sound, float volume) {
+        return rodio_start_sound(rodio, sound.handle, volume);
     }
 
-    InstanceHandle *AudioManager::playSound(const std::string &id, float volume) {
-        auto sound = std::dynamic_pointer_cast<SoundAsset>(assets->get(id));
-        return playSound(*sound, volume);
+    void AudioManager::deleteSound(SoundId sound) {
+        if (playingSounds.contains(sound)) {
+            rodio_free_sound(playingSounds[sound].handle);
+        }
+        playingSounds.erase(sound);
+    }
+
+    AudioManager::AudioManager() {
+        rodio = rodio_new();
     }
 
     void AudioManager::setAssets(std::shared_ptr<Assets> assets) {
         this->assets = std::move(assets);
     }
 
+    SoundId AudioManager::playSound(const std::string &id, float volume) {
+        const auto &handle = std::dynamic_pointer_cast<SoundAsset>(assets->get(id));
+        auto *h = playSound(*handle, volume);
+        const auto soundId = playingSounds.insert(Sound {
+            .id = {},
+            .handle = h,
+        });
+        playingSounds[soundId].id = soundId;
+        return soundId;
+    }
+
     void AudioManager::update() {
-        // check for completed sounds
-        if (!playingSounds.empty()) {
-            for (int i = playingSounds.size() - 1; i >= 0; i--) {
-                if (rodio_is_sound_done(playingSounds[i])) {
-                    playingSounds.erase(playingSounds.begin() + i);
-                }
+        // Check for completed sounds and delete them
+        std::vector<SoundId> toDelete;
+        for (auto &sound : playingSounds) {
+            if (rodio_is_sound_done(sound.handle)) {
+                toDelete.push_back(sound.id);
             }
         }
-    }
 
-    bool AudioManager::isSoundPlaying(InstanceHandle *sound) const {
-        return !rodio_is_sound_done(sound);
-    }
-
-    InstanceHandle *AudioManager::playSound(const SoundAsset &sound, float volume) {
-        const auto maxSounds = 16;
-        if (playingSounds.size() > maxSounds) {
-            return nullptr;
+        for (const auto id : toDelete) {
+            deleteSound(id);
         }
+    }
 
-        auto *instance = rodio_start_sound(rodio, sound.handle, volume);
-        playingSounds.push_back(instance);
-        return instance;
+    bool AudioManager::isSoundPlaying(SoundId sound) const {
+        return playingSounds.contains(sound);
+    }
+
+    void AudioManager::stopSound(SoundId sound) {
+        if (!playingSounds.contains(sound)) return;
+        rodio_stop_sound(playingSounds[sound].handle);
+        deleteSound(sound);
     }
 }
