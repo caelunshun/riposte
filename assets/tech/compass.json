@@ -1,0 +1,6 @@
+{
+  "name": "Compass",
+  "cost": 350,
+  "prerequisites": ["Sailing", "Iron Working"],
+  "era": "classical"
+}

@@ -570,6 +570,32 @@
     "loader": "tech"
   },
   {
+    "path": "tech/aesthetics.json",
+    "id": "tech/aesthetics",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/code_of_laws.json",
+    "id": "tech/code_of_laws",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/compass.json",
+    "id": "tech/compass",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/feudalism.json",
+    "id": "tech/feudalism",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/machinery.json",
+    "id": "tech/machinery",
+    "loader": "tech"
+  },
+
+  {
     "path": "resource/copper.json",
     "id": "resource/copper",
     "loader": "resource"

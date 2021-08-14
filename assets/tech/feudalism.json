@@ -1,0 +1,6 @@
+{
+  "name": "Feudalism",
+  "cost": 650,
+  "prerequisites": ["Writing", "Monarchy"],
+  "era": "medieval"
+}

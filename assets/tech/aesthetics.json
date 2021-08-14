@@ -1,0 +1,6 @@
+{
+  "name": "Aesthetics",
+  "cost": 250,
+  "prerequisites": ["Writing"],
+  "era": "classical"
+}

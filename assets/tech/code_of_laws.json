@@ -1,0 +1,6 @@
+{
+  "name": "Code of Laws",
+  "cost": 375,
+  "prerequisites": ["Writing", "Priesthood", "Currency"],
+  "era": "classical"
+}
