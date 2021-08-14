@@ -32,8 +32,6 @@ cfg_if::cfg_if! {
     }
 }
 
-const GITHUB_ACCESS_TOKEN: &str = "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";
-
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
 struct DownloadedVersion {
     id: u64,
@@ -52,7 +50,6 @@ impl DownloadedVersion {
 #[tokio::main]
 async fn main() -> anyhow::Result<()> {
     let github = octocrab::OctocrabBuilder::new()
-        .personal_token(GITHUB_ACCESS_TOKEN.to_owned())
         .build()?;
 
     let asset = get_latest_tarball_info(&github).await?;
@@ -144,7 +141,6 @@ async fn download_new_version(
         .get(asset.url.clone())
         .header(header::ACCEPT, "application/octet-stream")
         .header(header::USER_AGENT, "riposte")
-        .basic_auth("caelunshun", Some(GITHUB_ACCESS_TOKEN))
         .send()
         .await?;
 
