@@ -13,8 +13,10 @@ jobs:
         include:
           - os: ubuntu-18.04
             os-name: linux
+            dylib-ext: so
           - os: macos-10.15
             os-name: macOS
+            dylib-ext: dylib
         
     runs-on: ${{ matrix.os }}
 
@@ -131,6 +133,9 @@ jobs:
             conan install ..
             cmake .. -DCMAKE_BUILD_TYPE=Release
             cd ..
+
+      - name: Copy LuaJIT shared library
+        run: cp /usr/local/lib/libluajit-5.1.${{ matrix.dylib-ext }} cmake-build-release/
 
       - name: Build
         run: cd cmake-build-release && cmake --build . --target riposte -j2 && cmake --build . --target pb
