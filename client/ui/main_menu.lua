@@ -67,9 +67,9 @@ build = function (ui)
 
     local root = Container:new(Padding:new(main, 50))
 
-    ui:createWindow("mainMenu", Vector(0, 0), Vector(ui.cv:getWidth(), ui.cv:getHeight()), root, 1, true)
+    ui:createWindow("mainMenu", dume.FillScreen, root, 1)
 
-    ui:createWindow("menuBackgroundImage", Vector(0, 0), Vector(ui.cv:getWidth(), ui.cv:getHeight()), Image:new("icon/menu"), -1, true)
+    ui:createWindow("menuBackgroundImage", dume.FillScreen, Image:new("icon/menu"), -1)
 end
 
 return build

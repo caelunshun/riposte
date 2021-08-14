@@ -41,7 +41,7 @@ function showError(message)
     root:setCrossAlign(dume.Align.Center)
     local size = Vector(300, 100)
     local container = UiUtils.createWindowContainer(root)
-    ui:createWindow("errorDialogue", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2), size, container, 2)
+    ui:createWindow("errorDialogue", UiUtils.centerWindow(size), container, 2)
 end
 
 local function joinGame(gameID)
@@ -175,7 +175,7 @@ function ServerList:buildRootWidget()
 end
 
 function ServerList:rebuild()
-    ui:createWindow("multiplayerList", Vector(0, 0), Vector(cv:getWidth(), cv:getHeight()), Container:new(Padding:new(self:buildRootWidget(), 50)), 1)
+    ui:createWindow("multiplayerList", dume.FillScreen, Container:new(Padding:new(self:buildRootWidget(), 50)), 1)
 end
 
 return ServerList

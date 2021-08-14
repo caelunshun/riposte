@@ -539,8 +539,13 @@ function BottomControlWindow:rebuild()
     container.fillParent = true
     table.insert(container.classes, "windowContainer")
 
-    local size = Vector(cv:getWidth() - unitDisplayWindowWidth - turnIndicatorWindowWidth, 100)
-    ui:createWindow("bottomControls", Vector(unitDisplayWindowWidth, cv:getHeight() - size.y), size, container, 0, true, true)
+    ui:createWindow("bottomControls", function(screenSize)
+        local size = Vector(screenSize.x - unitDisplayWindowWidth - turnIndicatorWindowWidth, 100)
+        return {
+            pos = Vector(unitDisplayWindowWidth, screenSize.y - size.y),
+            size = size,
+        }
+    end, container, 0)
 end
 
 function BottomControlWindow:close()
@@ -607,7 +612,12 @@ function UnitDisplayWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(unitDisplayWindowWidth, 150)
-    ui:createWindow("unitDisplay", Vector(0, cv:getHeight() - size.y), size, container, 0,false, false)
+    ui:createWindow("unitDisplay", function(screenSize)
+        return {
+            pos = Vector(0, screenSize.y - size.y),
+            size = size,
+        }
+    end, container, 0)
 end
 
 function UnitDisplayWindow:close()
@@ -632,7 +642,12 @@ function TurnIndicatorWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(turnIndicatorWindowWidth, 150)
-    ui:createWindow("turnIndicator", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y), size, container, 0, false, true)
+    ui:createWindow("turnIndicator", function(screenSize)
+        return {
+            pos = Vector(screenSize.x - size.x, screenSize.y - size.y),
+            size = size,
+        }
+    end, container, 0, false, true)
 end
 
 function TurnIndicatorWindow:close()
@@ -693,7 +708,12 @@ function ScoreWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(250, 225)
-    ui:createWindow("scores", Vector(cv:getWidth() - size.x, cv:getHeight() - size.y - 150), size, container,  0, false, true)
+    ui:createWindow("scores", function(screenSize)
+        return {
+            pos = Vector(screenSize.x - size.x, screenSize.y - size.y - 150),
+            size = size,
+        }
+    end, container,  0)
 end
 
 function ScoreWindow:close()
@@ -812,7 +832,12 @@ function UnitStackWindow:rebuild()
     end
 
     local size = Vector(cv:getWidth() - unitDisplayWindowWidth - turnIndicatorWindowWidth - 200, 100)
-    ui:createWindow("unitStack", Vector(unitDisplayWindowWidth + 100, cv:getHeight() - 120 - size.y), size, root, 0,false, true)
+    ui:createWindow("unitStack", function(screenSize)
+        return {
+            pos = Vector(unitDisplayWindowWidth + 100, screenSize.y - 120 - size.y),
+            size = size,
+        }
+    end, root, 0)
 end
 
 function UnitStackWindow:close()
@@ -860,7 +885,12 @@ function ResearchBar:rebuild()
     end, child)
     table.insert(root.classes, "researchProgressBar")
 
-    ui:createWindow("researchBar", Vector(cv:getWidth() / 2 - size.x / 2, 1), size, root)
+    ui:createWindow("researchBar", function(screenSize)
+        return {
+            pos = Vector(screenSize.x / 2 - size.x / 2, 1),
+            size = size,
+        }
+    end, root)
 end
 
 function ResearchBar:close()
@@ -945,7 +975,12 @@ function EconomyWindow:rebuild()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(275, 150)
-    ui:createWindow("economy", Vector(0, 0), size, container, 0, false, false)
+    ui:createWindow("economy", function(screenSize)
+        return {
+            pos = Vector(0, 0),
+            size = size,
+        }
+    end, container, 0)
 end
 
 function EconomyWindow:close()
@@ -970,7 +1005,12 @@ function InfoWindow:rebuild()
         era = self.game.era,
     }))
 
-    ui:createWindow("info", Vector(cv:getWidth() - size.x, 0), size, UiUtils.createWindowContainer(root))
+    ui:createWindow("info", function(screenSize)
+        return {
+            pos = Vector(screenSize.x - size.x, 0),
+            size = size,
+        }
+    end, UiUtils.createWindowContainer(root))
 end
 
 function InfoWindow:close()

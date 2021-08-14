@@ -170,6 +170,9 @@ end
 function resize(oldSize, newSize)
     callSafe(function()
         ui:resize(oldSize, newSize)
+        if game ~= nil then
+            game.view:resize(newSize)
+        end
     end)
 end
 

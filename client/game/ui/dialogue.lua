@@ -222,7 +222,7 @@ function DiplomacyDialogue:build()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(600, 750)
-    ui:createWindow("diplomacyDialogue", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2), size, container)
+    ui:createWindow("diplomacyDialogue", UIUtils.centerWindow(size), container)
 end
 
 return DiplomacyDialogue

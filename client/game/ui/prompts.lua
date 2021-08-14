@@ -157,7 +157,12 @@ function CityBuildPrompt:build()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(300, 500)
-    ui:createWindow("cityBuildPrompt", Vector(cv:getWidth() - size.x - 10, 50), size, container)
+    ui:createWindow("cityBuildPrompt", function(screenSize)
+        return {
+            pos = Vector(screenSize.x - size.x - 10, 50),
+            size = size,
+        }
+    end, container)
 end
 
 -- Asks the user what to research.
@@ -266,7 +271,12 @@ function ResearchPrompt:build()
     table.insert(container.classes, "windowContainer")
 
     local size = Vector(400, 400)
-    ui:createWindow("researchPrompt", Vector(cv:getWidth() / 2 - size.x / 2, cv:getHeight() / 2 - size.y / 2 - 200), size, container)
+    ui:createWindow("researchPrompt", function(screenSize)
+        return {
+            pos = Vector(screenSize.x / 2 - size.x / 2, screenSize.y / 2 - size.y / 2 - 100),
+            size = size,
+        }
+    end, container)
 end
 
 -- A queue of prompts to display at the start

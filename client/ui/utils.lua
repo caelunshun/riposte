@@ -26,13 +26,13 @@ function UiUtils.openConfirmationPrompt(title, confirmationText, negationText, o
     local options = Flex:row()
     options:setMainAlign(dume.Align.Center)
 
-    local confirmation = Button:new(Center:new(Text:new(confirmationText)), function()
+    local confirmation = Button:new(Text:new(confirmationText), function()
         ui:deleteWindow("confirmation")
         onconfirm()
     end)
     table.insert(confirmation.classes, "confirmationButton")
     options:addFlexChild(confirmation, 1)
-    local negation = Button:new(Center:new(Text:new(negationText)), function()
+    local negation = Button:new(Text:new(negationText), function()
         ui:deleteWindow("confirmation")
     end)
     table.insert(negation.classes, "confirmationButton")
@@ -43,7 +43,12 @@ function UiUtils.openConfirmationPrompt(title, confirmationText, negationText, o
     local container = UiUtils.createWindowContainer(root)
 
     local size = Vector(300, 100)
-    ui:createWindow("confirmation", Vector(cv:getWidth() - size.x - 10, 10), size, container)
+    ui:createWindow("confirmation", function(screenSize)
+        return {
+            pos = Vector(screenSize.x - size.x - 10, 10),
+            size = size,
+        }
+    end, container)
 end
 
 function maybeInfinity(x)
@@ -58,6 +63,15 @@ function maybePlural(noun, amount)
         return noun .. "s"
     else
         return noun
+    end
+end
+
+function UiUtils.centerWindow(size)
+    return function(screenSize)
+        return {
+            pos = Vector(screenSize.x / 2 - size.x / 2, screenSize.y / 2 - size.y / 2),
+            size = size,
+        }
     end
 end
 
