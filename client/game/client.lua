@@ -149,6 +149,13 @@ function Client:setTileWorkedManually(city, tilePos, worked)
     })
 end
 
+function Client:bombardCity(siegeUnit, targetCity)
+    self:sendPacket("bombardCity", {
+        siegeUnitID = siegeUnit.id,
+        targetCityID = targetCity.id,
+    })
+end
+
 function Client:endTurn()
     self:sendPacket("endTurn", {})
 end

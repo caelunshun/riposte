@@ -65,6 +65,7 @@ namespace rip {
         void handleSetWorkerTask(Game &game, const SetWorkerTask &packet);
         void handleDeclareWar(Game &game, const DeclareWar &packet);
         void handleConfigureWorkedTiles(Game &game, const ConfigureWorkedTiles &packet);
+        void handleBombardCity(Game &game, const BombardCity &packet);
 
         void handleClientInfo(const ClientInfo &packet);
         void handleGameOptions(const GameOptions &packet);

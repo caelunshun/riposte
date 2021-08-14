@@ -39,6 +39,21 @@ namespace rip {
          return UnitUIStatus::None;
      }
 
+    BombardCityCapability::BombardCityCapability(UnitId unitID) : Capability(unitID) {
+
+    }
+
+    void BombardCityCapability::bombardCity(Game &game, City &city) {
+         auto &unit = game.getUnit(unitID);
+         if (unit.getMovementLeft() == 0) return;
+         unit.setMovementLeft(0);
+
+         if (game.getPlayer(city.getOwner()).isAtWarWith(unit.getOwner())) {
+             city.bombardCultureDefenses(game, unit.getKind().maxBombardPerTurn);
+             game.getServer().markUnitDirty(unitID);
+         }
+    }
+
     void Unit::resetMovement() {
         movementLeft = kind->movement;
     }
@@ -59,6 +74,8 @@ namespace rip {
                 capabilities.push_back(std::make_unique<WorkerCapability>(id));
             } else if (capabilityName == "carry_units") {
                 capabilities.push_back(std::make_unique<CarryUnitsCapability>(id, kind->carryUnitCapacity));
+            } else if (capabilityName == "bombard_city_defenses") {
+                capabilities.push_back(std::make_unique<BombardCityCapability>(id));
             } else {
                 throw std::string("missing capability: " + capabilityName);
             }

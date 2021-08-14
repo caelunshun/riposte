@@ -1,0 +1,13 @@
+{
+  "id": "catapult",
+  "name": "Catapult",
+  "strength": 5,
+  "movement": 1,
+  "cost": 50,
+  "techs": ["Construction"],
+  "category": "siege",
+  "capabilities": [
+    "bombard_city_defenses"
+  ],
+  "maxBombardPerTurn": 8
+}

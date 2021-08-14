@@ -15,6 +15,7 @@ struct nk_context;
 namespace rip {
     class Game;
     class Hud;
+    class City;
 
     // Value returned by Capability::paintMainUI which determines whether the unit
     // should remain selected.
@@ -54,6 +55,14 @@ namespace rip {
         // Founds a city. If successful, the unit is killed.
         // Don't use it anymore.
         bool foundCity(Game &game);
+    };
+
+    // Capability attached to siege weapons.
+    class BombardCityCapability : public Capability {
+    public:
+        explicit BombardCityCapability(UnitId unitID);
+
+        void bombardCity(Game &game, City &city);
     };
 
     /**

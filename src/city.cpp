@@ -231,11 +231,13 @@ namespace rip {
             }
         }
 
+        regrowCultureDefense();
+
+        doGrowth(game);
         updateHappiness(game);
 
         updateWorkedTiles(game);
         workTiles(game);
-        doGrowth(game);
 
         culture.addCultureForPlayer(owner, getCulturePerTurn());
 
@@ -622,7 +624,7 @@ namespace rip {
         }
     }
 
-    int City::getCultureDefenseBonus() const {
+    int City::getMaxCultureDefenseBonus() const {
         auto level = getCultureLevel();
         switch (level.value) {
             case 0:
@@ -639,6 +641,24 @@ namespace rip {
             case 6:
                 return 100;
         }
+    }
+
+    void City::regrowCultureDefense() {
+        const auto growthRate = 5;
+        if (getHappiness() > getUnhappiness()) {
+            cultureDefenseBonus += growthRate;
+            cultureDefenseBonus = std::clamp(cultureDefenseBonus, 0, getMaxCultureDefenseBonus());
+        }
+    }
+
+    int City::getCultureDefenseBonus() const {
+        return cultureDefenseBonus;
+    }
+
+    void City::bombardCultureDefenses(Game &game, int maxPercent) {
+        cultureDefenseBonus -= maxPercent;
+        cultureDefenseBonus = std::max(cultureDefenseBonus, 0);
+        game.getServer().markCityDirty(id);
     }
 }
 

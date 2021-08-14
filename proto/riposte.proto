@@ -69,6 +69,7 @@ message AnyClient {
     GameOptions gameOptions = 15;
     AdminStartGame adminStartGame = 16;
     SetLeader setLeader = 17;
+    BombardCity bombardCity = 18;
   }
 }
 
@@ -359,11 +360,14 @@ message CarryUnitsCapability {
   repeated int32 carryingUnitIDs = 1;
 }
 
+message BombardCityCapability {}
+
 message Capability {
   oneof cap {
     FoundCityCapability foundCity = 1;
     WorkerCapability worker = 2;
     CarryUnitsCapability carryUnits = 3;
+    BombardCityCapability bombardCity = 4;
   }
 }
 
@@ -534,4 +538,9 @@ message ConfigureWorkedTiles {
   int32 cityID = 1;
   Pos tilePos = 2;
   bool shouldManuallyWork = 3;
+}
+
+message BombardCity {
+  int32 siegeUnitID = 1;
+  int32 targetCityID = 2;
 }

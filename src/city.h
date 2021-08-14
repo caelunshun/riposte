@@ -160,6 +160,11 @@ namespace rip {
         // Sources of unhapipiness in the city.
         std::vector<UnhappinessEntry> unhappiness;
 
+        // Current culture defense bonus.
+        // May be less than getMaxCultureDefenseBonus()
+        // if the city has been bombarded. Regrows each turn.
+        int cultureDefenseBonus = 0;
+
         bool coastal = false;
 
         bool capital = false;
@@ -243,7 +248,10 @@ namespace rip {
 
         uint32_t getNumWorkingCitizens() const;
 
+        void regrowCultureDefense();
+        int getMaxCultureDefenseBonus() const;
         int getCultureDefenseBonus() const;
+        void bombardCultureDefenses(Game &game, int maxPercent);
 
         void updateHappiness(Game &game);
 

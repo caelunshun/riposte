@@ -5,6 +5,21 @@ local Button = require("widget/button")
 
 local UiUtils = require("ui/utils")
 
+local Vector = require("brinevector")
+
+function getAdjacentTilePositions(tilePos)
+    return {
+        Vector(1, 0) + tilePos,
+        Vector(1, 1) + tilePos,
+        Vector(0, 1) + tilePos,
+        Vector(-1, 1) + tilePos,
+        Vector(-1, 0) + tilePos,
+        Vector(-1, -1) + tilePos,
+        Vector(0, -1) + tilePos,
+        Vector(1, -1) + tilePos,
+    }
+end
+
 -- Adds unit controls to a Flex row.
 return function(row, units, game, hud)
     if #units == 0 then return end
@@ -34,6 +49,22 @@ return function(row, units, game, hud)
             end)
             table.insert(foundCity.classes, "unitActionButton")
             row:addFixedChild(foundCity)
+        end
+
+        if unit:hasCapability("bombard_city_defenses") then
+            local city = nil
+            for _, adjacentTilePos in ipairs(getAdjacentTilePositions(unit.pos)) do
+                city = game:getCityAtPos(adjacentTilePos)
+                if city ~= nil then break end
+            end
+            if city ~= nil and unit.owner:isAtWarWith(city.owner) and unit.movementLeft > 0 then
+                local widget = Button:new(Text:new("@size{20}{Bombard City}"), function()
+                    game.client:bombardCity(unit, city)
+                    hud:clearSelection()
+                end)
+                table.insert(widget.classes, "unitActionButton")
+                row:addFixedChild(widget)
+            end
         end
 
         local workerCap = unit:getCapability("worker")

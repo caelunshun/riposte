@@ -121,6 +121,9 @@ namespace rip {
         // If the unit has the carry_units capability,
         // this is the number of units it can hold.
         int carryUnitCapacity = 0;
+        // If the unit has the bombard_city_defenses capability,
+        // this is the max damage per turn.
+        int maxBombardPerTurn = 0;
 
         friend void from_json(const nlohmann::json &json, UnitKind &unit) {
             json.at("id").get_to(unit.id);
@@ -148,6 +151,10 @@ namespace rip {
 
             if (json.contains("carryUnitCapacity")) {
                 json.at("carryUnitCapacity").get_to(unit.carryUnitCapacity);
+            }
+
+            if (json.contains("maxBombardPerTurn")) {
+                json.at("maxBombardPerTurn").get_to(unit.maxBombardPerTurn);
             }
         }
     };

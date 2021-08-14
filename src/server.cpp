@@ -163,6 +163,7 @@ namespace rip {
             const auto *foundCity = dynamic_cast<const FoundCityCapability*>(&*capability);
             const auto *worker = dynamic_cast<const WorkerCapability*>(&*capability);
             const auto *carryUnits = dynamic_cast<const CarryUnitsCapability*>(&*capability);
+            const auto *bombardCity = dynamic_cast<const BombardCityCapability*>(&*capability);
             if (foundCity) {
                 protoCap.mutable_foundcity();
             } else if (worker) {
@@ -178,6 +179,8 @@ namespace rip {
                 for (const auto unitID : carryUnits->getCarryingUnits()) {
                     protoCarryUnits->add_carryingunitids(unitID.encode());
                 }
+            } else if (bombardCity) {
+                protoCap.mutable_bombardcity();
             }
         }
 
@@ -513,6 +516,16 @@ namespace rip {
         game.getServer().markCityDirty(city.getID());
     }
 
+    void Connection::handleBombardCity(Game &game, const BombardCity &packet) {
+        auto &siegeUnit = game.getUnit(UnitId(packet.siegeunitid()));
+        auto &targetCity = game.getCity(CityId(packet.targetcityid()));
+
+        auto *cap = siegeUnit.getCapability<BombardCityCapability>();
+        if (cap) {
+            cap->bombardCity(game, targetCity);
+        }
+    }
+
     void Connection::handleGameOptions(const GameOptions &packet) {
         if (isAdmin) {
             server->setGameOptions(packet);
@@ -563,6 +576,8 @@ namespace rip {
                 handleDeclareWar(game, packet.declarewar());
             } else if (packet.has_configureworkedtiles()) {
                 handleConfigureWorkedTiles(game, packet.configureworkedtiles());
+            } else if (packet.has_bombardcity()) {
+                handleBombardCity(game, packet.bombardcity());
             }
         } else {
             // game hasn't started; we're in the lobby phase

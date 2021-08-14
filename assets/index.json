@@ -275,6 +275,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/catapult.json",
+    "id": "unit/catapult",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -375,6 +380,11 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/catapult.png",
+    "id": "texture/unit/catapult",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -427,6 +437,11 @@
   {
     "path": "icon/unit_head/galley.png",
     "id": "icon/unit_head/galley",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/catapult.png",
+    "id": "icon/unit_head/catapult",
     "loader": "image"
   },
   {
