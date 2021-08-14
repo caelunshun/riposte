@@ -199,7 +199,8 @@ function Hud:handleEvent(event)
             end
         end
     elseif event.type == dume.EventType.CursorMove and self.hasStagedPath
-        and clickedPos ~= self.stagedPathTarget then
+        and clickedPos ~= self.stagedPathTarget
+        and not self.moveSelectionWhenPathIsComputed then
             shouldComputePath = true
     end
 

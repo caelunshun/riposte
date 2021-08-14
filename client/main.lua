@@ -144,7 +144,6 @@ function render(dt)
         end
 
         ui:render()
-        cv:drawSprite("icon/cursor", cursorPos, 25)
     end)
 end
 

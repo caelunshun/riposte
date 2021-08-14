@@ -188,8 +188,6 @@ int main() {
     int width = windowWidth, height = windowHeight;
     double cursorX = 0, cursorY = 0;
 
-    winit_window_hide_cursor(window, true);
-
     std::function<CControlFlow(Event)> callbackFunction([&](Event event) {
         audio->update();
 
