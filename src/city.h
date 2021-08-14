@@ -243,6 +243,8 @@ namespace rip {
 
         uint32_t getNumWorkingCitizens() const;
 
+        int getCultureDefenseBonus() const;
+
         void updateHappiness(Game &game);
 
         void transferControlTo(Game &game, PlayerId newOwner);

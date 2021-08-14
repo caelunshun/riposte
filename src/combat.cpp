@@ -59,8 +59,9 @@ namespace rip {
             }
         }
 
-        if (city && city->getOwner() == unit.getOwner()) {
+        if (city && city->getOwner() == unit.getOwner() && defending) {
             percentBonus += city->getBuildingEffects().defenseBonusPercent;
+            percentBonus += city->getCultureDefenseBonus();
         }
 
         return baseStrength + (percentBonus / 100.0) * baseStrength;

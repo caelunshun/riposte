@@ -321,6 +321,7 @@ message UpdateCity {
   repeated Pos workedTiles = 15;
   repeated HappinessEntry happinessSources = 16;
   repeated UnhappinessEntry unhappinessSources = 17;
+  int32 cultureDefenseBonus = 18;
 }
 
 message Path {

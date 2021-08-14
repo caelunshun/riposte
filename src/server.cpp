@@ -243,6 +243,8 @@ namespace rip {
             packet.add_unhappinesssources()->CopyFrom(entry);
         }
 
+        packet.set_culturedefensebonus(city.getCultureDefenseBonus());
+
         return packet;
     }
 

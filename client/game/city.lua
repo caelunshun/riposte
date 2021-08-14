@@ -60,6 +60,18 @@ function City:updateData(data, game)
         maxDimensions = Vector(100, math.huge)
     })
 
+    self.cultureDefenseText = cv:parseTextMarkup("@size{12}{@color{rgb(255,255,255)}{+%bonus%percent}}", style.default.text.defaultTextStyle, {
+        bonus = tostring(self.cultureDefenseBonus),
+        percent = "%"
+    })
+    self.cultureDefenseParagraph = cv:createParagraph(self.cultureDefenseText, {
+        alignH = dume.Align.Start,
+        alignV = dume.Align.Start,
+        baseline = dume.Baseline.Top,
+        lineBreaks = false,
+        maxDimensions = Vector(100, math.huge)
+    })
+
     if self.buildTask ~= nil and self.buildTask.kind.building ~= nil then
         local c = string.sub(self.buildTask.kind.building.buildingName, 1, 1)
         local text = cv:parseTextMarkup("@bold{@size{18}{@color{rgb(0, 0, 0)}{%c}}}", style.default.text.defaultTextStyle, {c=c})
@@ -230,6 +242,11 @@ function City:renderBubble(cv)
     else happyIcon = "icon/unhappy" end
 
     cv:drawSprite(happyIcon, statusOffset, 15)
+
+    statusOffset.x = statusOffset.x + 20
+    if self.cultureDefenseBonus ~= 0 then
+        cv:drawParagraph(self.cultureDefenseParagraph, statusOffset)
+    end
 end
 
 function City:render(cv)

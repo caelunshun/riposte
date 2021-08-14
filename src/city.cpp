@@ -621,5 +621,24 @@ namespace rip {
             unhappiness.emplace_back(std::move(undefended));
         }
     }
+
+    int City::getCultureDefenseBonus() const {
+        auto level = getCultureLevel();
+        switch (level.value) {
+            case 0:
+            case 1:
+                return 0;
+            case 2:
+                return 20;
+            case 3:
+                return 40;
+            case 4:
+                return 60;
+            case 5:
+                return 80;
+            case 6:
+                return 100;
+        }
+    }
 }
 
