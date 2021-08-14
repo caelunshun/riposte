@@ -84,7 +84,6 @@ function enterLobby(l)
 end
 
 function enterGame(bridge, isMultiplayer)
-    lobby.client = nil
     lobby = nil
 
     -- Clear the UI to get rid of the menu.
