@@ -611,7 +611,11 @@ namespace rip {
                 continue;
             }
 
-            handlePacket(game, packet);
+            try {
+                handlePacket(game, packet);
+            } catch (std::exception &e) {
+                std::cout << "ERROR while handling packet: " << e.what() << std::endl;
+            }
         }
     }
 

@@ -136,7 +136,9 @@ namespace rip {
     }
 
     bool Mine::isCompatible(const Tile &tile) const {
-        return !tile.hasNonRoadImprovements() && tile.getTerrain() != Terrain::Desert && tile.isHilled();
+        return !tile.hasNonRoadImprovements() &&
+        ((tile.getTerrain() != Terrain::Desert && tile.isHilled())
+            || tile.hasImproveableResource(getName()));
     }
 
     Yield Mine::getYieldContribution(const Game &game) const {
