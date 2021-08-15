@@ -396,7 +396,7 @@ namespace rip {
     }
 
     int City::getConsumedFood() const {
-        return population * 2 + std::max((getSickness() - getHealth()), (uint32_t) 0);
+        return population * 2 + std::max((int) (getSickness() - getHealth()), 0);
     }
 
     const Culture &City::getCulture() const {
