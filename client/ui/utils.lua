@@ -48,7 +48,7 @@ function UiUtils.openConfirmationPrompt(title, confirmationText, negationText, o
             pos = Vector(screenSize.x - size.x - 10, 10),
             size = size,
         }
-    end, container)
+    end, container, 10)
 end
 
 function maybeInfinity(x)

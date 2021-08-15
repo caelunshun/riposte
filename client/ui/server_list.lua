@@ -41,7 +41,7 @@ function showError(message)
     root:setCrossAlign(dume.Align.Center)
     local size = Vector(300, 100)
     local container = UiUtils.createWindowContainer(root)
-    ui:createWindow("errorDialogue", UiUtils.centerWindow(size), container, 2)
+    ui:createWindow("errorDialogue", UiUtils.centerWindow(size), container, 10)
 end
 
 local function joinGame(gameID)

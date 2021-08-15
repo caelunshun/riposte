@@ -159,10 +159,10 @@ function CityBuildPrompt:build()
     local size = Vector(300, 500)
     ui:createWindow("cityBuildPrompt", function(screenSize)
         return {
-            pos = Vector(screenSize.x - size.x - 10, 50),
+            pos = Vector(screenSize.x - size.x - 10, 120),
             size = size,
         }
-    end, container)
+    end, container, 5)
 end
 
 -- Asks the user what to research.
@@ -276,7 +276,7 @@ function ResearchPrompt:build()
             pos = Vector(screenSize.x / 2 - size.x / 2, screenSize.y / 2 - size.y / 2 - 100),
             size = size,
         }
-    end, container)
+    end, container, 5)
 end
 
 -- A queue of prompts to display at the start

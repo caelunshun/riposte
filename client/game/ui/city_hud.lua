@@ -94,7 +94,12 @@ function LeftWindow:rebuild()
         )
     end
 
-    ui:createWindow("cityHudLeft", Vector(0, 100), leftWindowSize, UiUtils.createWindowContainer(root))
+    ui:createWindow("cityHudLeft", function(screenSize)
+        return {
+            pos = Vector(0, 100),
+            size = leftWindowSize,
+        }
+    end, UiUtils.createWindowContainer(root))
 end
 
 function LeftWindow:close()
@@ -236,7 +241,12 @@ function TopWindow:rebuild()
         root:addFixedChild(row)
     end
 
-    ui:createWindow("cityHudTop", Vector(cv:getWidth() / 2 - topWindowSize.x / 2, 10), topWindowSize, UiUtils.createWindowContainer(root))
+    ui:createWindow("cityHudTop", function(screenSize)
+        return {
+            pos = Vector(screenSize.x / 2 - topWindowSize.x / 2, 10),
+            size = topWindowSize
+        }
+    end, UiUtils.createWindowContainer(root))
 end
 
 function TopWindow:close()
