@@ -324,6 +324,7 @@ namespace rip {
         std::optional<CityId> val;
         if (worked) val = worker;
         impl->workedTiles[pos.x + pos.y * getMapWidth()] = val;
+        getServer().markTileDirty(pos);
     }
 
     CultureMap &Game::getCultureMap() {
