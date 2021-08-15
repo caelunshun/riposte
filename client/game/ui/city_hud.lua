@@ -127,7 +127,7 @@ function TopWindow:getHappinessTooltipText()
             reason = "Buildings are making us happy!"
         end
 
-        text = text .. "+" .. tostring(entry.count) .. " @icon{happy}: " .. reason .. "\n"
+        text = text .. "+" .. tostring(entry.count) .. " @icon{happy}: \"" .. reason .. "\"\n"
     end
     return text
 end
@@ -142,7 +142,7 @@ function TopWindow:getUnhappinessTooltipText()
             reason = "We fear for our safety!"
         end
 
-        text = text .. "+" .. tostring(entry.count) .. " @icon{unhappy}: " .. reason .. "\n"
+        text = text .. "+" .. tostring(entry.count) .. " @icon{unhappy}: \"" .. reason .. "\"\n"
     end
     return text
 end
