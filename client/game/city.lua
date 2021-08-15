@@ -261,7 +261,7 @@ function City:renderBubble(cv, game)
 
         local healthIcon
         if self.health >= self.sickness then healthIcon = "icon/health"
-        else happyIcon = "icon/sick" end
+        else healthIcon = "icon/sick" end
         cv:drawSprite(healthIcon, statusOffset, 13)
 
         statusOffset.x = statusOffset.x + 20
