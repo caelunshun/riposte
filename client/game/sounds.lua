@@ -27,6 +27,32 @@ local function handleCloseCityHud()
     end
 end
 
+local function handleBuildTaskCompleted(event)
+    local buildTask = event.buildTask
+    local sound
+    local volume = 0.3
+    if buildTask.kind.unit ~= nil then
+        local unitKind = registry.unitKinds[buildTask.kind.unit.unitKindID]
+        if unitKind.strength ~= 0 then
+            sound = "sound/event/build_military"
+        end
+    elseif buildTask.kind.building ~= nil then
+        local buildingName = buildTask.kind.building.buildingName
+        if buildingName == "Barracks" then
+            sound = "sound/event/build_military"
+        elseif buildingName == "Granary" then
+            sound = "sound/event/build_granary"
+        elseif buildingName == "Library" then
+            sound = "sound/event/build_library"
+            volume = 0.6
+        end
+    end
+
+    if sound ~= nil then
+        playSound(sound, volume)
+    end
+end
+
 local function registerSoundEvents(game)
     game.eventBus:registerHandler("unitMoved", function(event)
         handleUnitMovement(game, event)
@@ -36,6 +62,7 @@ local function registerSoundEvents(game)
     end)
     game.eventBus:registerHandler("cityHudOpened", handleEnterCityHud)
     game.eventBus:registerHandler("cityHudClosed", handleCloseCityHud)
+    game.eventBus:registerHandler("buildTaskCompleted", handleBuildTaskCompleted)
 end
 
 return registerSoundEvents

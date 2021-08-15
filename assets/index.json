@@ -751,6 +751,21 @@
     "loader": "sound"
   },
   {
+    "path": "sound/event/build_granary.wav",
+    "id": "sound/event/build_granary",
+    "loader": "sound"
+  },
+  {
+    "path": "sound/event/build_military.wav",
+    "id": "sound/event/build_military",
+    "loader": "sound"
+  },
+  {
+    "path": "sound/event/build_library.wav",
+    "id": "sound/event/build_library",
+    "loader": "sound"
+  },
+  {
     "path": "sound/ambient/city1.ogg",
     "id": "sound/ambient/city1",
     "loader": "sound"

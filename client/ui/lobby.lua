@@ -28,8 +28,8 @@ local json = require("lunajson")
 
 local function defaultSettings()
     return {
-        mapWidth = 16,
-        mapHeight = 16,
+        mapWidth = 32,
+        mapHeight = 32,
         numHumanPlayers = 2,
         numAIPlayers = 0,
     }
