@@ -633,8 +633,8 @@ namespace rip {
 
     Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)
         : registry(registry), techTree(techTree) {
-        gameOptions.set_mapwidth(16);
-        gameOptions.set_mapheight(16);
+        gameOptions.set_mapwidth(32);
+        gameOptions.set_mapheight(32);
         gameOptions.set_numhumanplayers(1);
         gameOptions.set_numaiplayers(1);
     }

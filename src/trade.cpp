@@ -135,7 +135,7 @@ namespace rip {
                 const auto &tile = game.getTile(pos);
                 if (tile.hasResource()) {
                     const auto &resource = *tile.getResource();
-                    if (tile.hasImprovement(resource->improvement)) {
+                    if (tile.hasImprovement(resource->improvement) || game.getCityAtLocation(pos)) {
                         accessibleResources.insert(resource);
                     }
                 }
