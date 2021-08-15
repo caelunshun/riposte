@@ -13,6 +13,7 @@ local Tooltip = require("widget/tooltip")
 local Image = require("widget/image")
 local Padding = require("widget/padding")
 local Clickable = require("widget/clickable")
+local Divider = require("widget/divider")
 
 local style = require("ui/style")
 
@@ -64,6 +65,8 @@ function CityBuildPrompt:build()
 
     local titleText = Text:new("@size{16}{" .. title .. "}", vars)
     root:addFixedChild(titleText)
+
+    root:addFixedChild(Divider:new(1))
 
     for _, possibleTask in ipairs(self.possibleTasks) do
         local name
@@ -189,6 +192,8 @@ function ResearchPrompt:build()
     local title = Text:new("@size{16}{What would you like to research next?}")
     table.insert(title.classes, "highlightedText")
     root:addFixedChild(title)
+
+    root:addFixedChild(Divider:new(1))
 
     for _, tech in ipairs(self.possibleTechs) do
         local entry = Text:new("@size{16}{%bullet %name    (%duration)}", {
