@@ -3,21 +3,21 @@ local function handleUnitMovement(game, event)
 
     local targetTile = game:getTile(event.newPos)
     if targetTile.forested then
-        playSound("sound/event/move_through_trees", 2)
+        playSound("sound/event/move_through_trees", 0.5)
     end
 
-    playSound("sound/event/move", 1.5)
+    playSound("sound/event/move", 0.375)
 end
 
 local function handleTurnChange(game)
     if game.turn == 0 then return end
-    playSound("sound/event/turn_end", 1)
+    playSound("sound/event/turn_end", 0.25)
 end
 
 local currentCityHudSound
 
 local function handleEnterCityHud()
-    currentCityHudSound = playSound("sound/ambient/city1", 2)
+    currentCityHudSound = playSound("sound/ambient/city1", 0.4)
 end
 
 local function handleCloseCityHud()

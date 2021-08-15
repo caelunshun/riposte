@@ -57,7 +57,7 @@ function MusicPlayer:selectNewSong()
 
     print("Soundtrack set to " .. newSong)
 
-    self.currentSound = playSound(newSong, 0.6)
+    self.currentSound = playSound(newSong, 0.1)
     self.previousSong = newSong
 end
 
