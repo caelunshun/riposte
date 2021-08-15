@@ -404,7 +404,7 @@ namespace rip {
     }
 
     int City::getCulturePerTurn() const {
-        int culture = 1;
+        int culture = 0;
         if (isCapital()) {
             culture += 1;
         }
