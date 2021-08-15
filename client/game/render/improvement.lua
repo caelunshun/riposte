@@ -36,13 +36,15 @@ local function renderRoad(cv, tilePos, game)
         local adjacentTilePos = tilePos + offset
         local adjacentTile = game:getTile(adjacentTilePos)
 
-        if tileHasImprovement(adjacentTile, "Road") or game:getCityAtPos(adjacentTilePos) ~= nil then
-            numConnections = numConnections + 1
+        if adjacentTile ~= nil then
+            if tileHasImprovement(adjacentTile, "Road") or game:getCityAtPos(adjacentTilePos) ~= nil then
+                numConnections = numConnections + 1
 
-            cv:beginPath()
-            cv:moveTo(Vector(50, 50))
-            cv:lineTo(offset * 100 + Vector(50, 50))
-            cv:stroke()
+                cv:beginPath()
+                cv:moveTo(Vector(50, 50))
+                cv:lineTo(offset * 100 + Vector(50, 50))
+                cv:stroke()
+            end
         end
     end
 
