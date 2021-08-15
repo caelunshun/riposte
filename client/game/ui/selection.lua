@@ -24,6 +24,14 @@ function SelectionGroups:new(game)
     return o
 end
 
+function SelectionGroups:checkAllUnitsAreInGroups(game)
+    for _, unit in pairs(game.units) do
+        if self.unitToGroup[unit.id] == nil then
+            self:createGroup({unit})
+        end
+    end
+end
+
 -- Creates a new group containing the given units.
 --
 -- Any units already in a group are removed from their current group.

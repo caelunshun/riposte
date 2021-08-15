@@ -2,6 +2,8 @@ package.path = "client/?.lua;external/dume/ui/?.lua;external/lunajson/src/?.lua;
 package.cpath = "cmake-build-release/lib/lib?.so;cmake-build-debug/lib/lib?.so;cmake-build-relwithdebinfo/lib/lib?.so;cmake-build-relwithdebinfo/lib/lib?.dylib;cmake-build-release/lib/lib?.dylib;cmake-build-debug/lib/lib?.dylib"
 jit.on()
 
+inspect = require("inspect")
+
 local profiler = require("profiler")
 local enableProfiling = false
 

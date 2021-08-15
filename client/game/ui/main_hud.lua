@@ -73,6 +73,7 @@ function Hud:new(game)
         o.readyForNextTurn = false
         o.timeSinceLastSelect = nil
         o.waitingOnTurnEnd = false
+        o.selectionGroups:checkAllUnitsAreInGroups(game)
     end)
 
     game.eventBus:registerHandler("unitDeleted", function(unit)
