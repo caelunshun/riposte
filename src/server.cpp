@@ -245,6 +245,12 @@ namespace rip {
         for (const auto &entry : city.getUnhappinessSources()) {
             packet.add_unhappinesssources()->CopyFrom(entry);
         }
+        for (const auto &entry : city.getHealthSources()) {
+            packet.add_healthsources()->CopyFrom(entry);
+        }
+        for (const auto &entry : city.getSicknessSources()) {
+            packet.add_sicknesssources()->CopyFrom(entry);
+        }
 
         packet.set_culturedefensebonus(city.getCultureDefenseBonus());
 

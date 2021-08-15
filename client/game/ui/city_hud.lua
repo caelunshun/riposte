@@ -117,8 +117,16 @@ function TopWindow:new(game, cityHud)
     return o
 end
 
-function TopWindow:getHappinessTooltipText()
+local function buildTooltipText(reasons, icon)
     local text = ""
+    for _, entry in ipairs(reasons) do
+        text = text .. "+" .. tostring(entry.count) .. " @icon{" .. icon .. "}: \"" .. entry.reason .. "\"\n"
+    end
+    return text
+end
+
+function TopWindow:getHappinessTooltipText()
+    local reasons = {}
     for _, entry in ipairs(self.city.happinessSources) do
         local reason
         if entry.source == "DifficultyBonus" then
@@ -126,14 +134,13 @@ function TopWindow:getHappinessTooltipText()
         elseif entry.source == "Buildings" then
             reason = "Buildings are making us happy!"
         end
-
-        text = text .. "+" .. tostring(entry.count) .. " @icon{happy}: \"" .. reason .. "\"\n"
+        reasons[#reasons + 1] = { reason = reason, count = entry.count }
     end
-    return text
+    return buildTooltipText(reasons, "happy")
 end
 
 function TopWindow:getUnhappinessTooltipText()
-    local text = ""
+    local reasons = {}
     for _, entry in ipairs(self.city.unhappinessSources) do
         local reason
         if entry.source == "Population" then
@@ -141,10 +148,48 @@ function TopWindow:getUnhappinessTooltipText()
         elseif entry.source == "Undefended" then
             reason = "We fear for our safety!"
         end
-
-        text = text .. "+" .. tostring(entry.count) .. " @icon{unhappy}: \"" .. reason .. "\"\n"
+        reasons[#reasons + 1] = {
+            reason = reason,
+            count = entry.count,
+        }
     end
-    return text
+    return buildTooltipText(reasons, "unhappy")
+end
+
+function TopWindow:getHealthTooltipText()
+    local reasons = {}
+    for _, entry in ipairs(self.city.healthSources) do
+        local reason
+        if entry.source == "BaseHealth" then
+            reason = "Long live our health"
+        elseif entry.source == "ResourceHealth" then
+            reason = "We love our food"
+        elseif entry.source == "BuildingHealth" then
+            reason = "Long live infrastructure"
+        elseif entry.source == "ForestHealth" then
+            reason = "Long live local forests"
+        end
+        reasons[#reasons + 1] = {
+            reason = reason,
+            count = entry.count,
+        }
+    end
+    return buildTooltipText(reasons, "health")
+end
+
+function TopWindow:getSicknessTooltipText()
+    local reasons = {}
+    for _, entry in ipairs(self.city.sicknessSources) do
+        local reason
+        if entry.source == "PopulationSickness" then
+            reason = "Overpopulation"
+        end
+        reasons[#reasons + 1] = {
+            reason = reason,
+            count = entry.count,
+        }
+    end
+    return buildTooltipText(reasons, "sick")
 end
 
 function TopWindow:makeTooltip(text, child)
@@ -152,6 +197,16 @@ function TopWindow:makeTooltip(text, child)
     table.insert(container.classes, "tooltipContainer")
     table.insert(container.classes, "smallTooltipContainer")
     return Tooltip:new(child, container)
+end
+
+local function getComparisonSign(a, b)
+    if a > b then
+        return ">"
+    elseif a < b then
+        return "<"
+    else
+        return "="
+    end
 end
 
 function TopWindow:rebuild()
@@ -189,7 +244,24 @@ function TopWindow:rebuild()
                 Text:new(populationSubtitle, {}, {alignH = dume.Align.Center})
         )
         table.insert(bar.classes, "populationProgressBar")
-        root:addFixedChild(bar)
+
+        local row = Flex:row()
+        row:addFixedChild(bar)
+
+        -- Health / sickness text
+        local healthyText = Text:new("%healthy @icon{health}", {
+            healthy = tostring(self.city.health),
+        })
+        local sign = getComparisonSign(self.city.health, self.city.sickness)
+        local signText = Text:new(sign)
+        local sickText = Text:new("%sick @icon{sick}", {
+            sick = tostring(self.city.sickness),
+        })
+        row:addFixedChild(self:makeTooltip(self:getHealthTooltipText(), healthyText))
+        row:addFixedChild(signText)
+        row:addFixedChild(self:makeTooltip(self:getSicknessTooltipText(), sickText))
+
+        root:addFixedChild(row)
     end
 
     -- Production progress bar
@@ -221,14 +293,10 @@ function TopWindow:rebuild()
         row:addFixedChild(bar)
 
         -- Happiness / unhappiness text
-        local sign
-        if self.city.happiness > self.city.unhappiness then sign = ">"
-        elseif self.city.happiness == self.city.unhappiness then sign = "="
-        else sign = "<"
-        end
         local happyText = Text:new("%happy @icon{happy}", {
             happy = tostring(self.city.happiness),
         })
+        local sign = getComparisonSign(self.city.happiness, self.city.unhappiness)
         local signText = Text:new(sign)
         local unhappyText = Text:new("%unhappy @icon{unhappy}", {
             unhappy = tostring(self.city.unhappiness),

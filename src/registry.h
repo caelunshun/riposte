@@ -179,6 +179,8 @@ namespace rip {
         // Units are in resources/1000 tiles.
         float scarcity;
 
+        uint32_t healthBonus = 0;
+
         friend void from_json(const nlohmann::json &nlohmann_json_j, Resource &nlohmann_json_t) {
             nlohmann_json_j.at("id").get_to(nlohmann_json_t.id);
             nlohmann_json_j.at("name").get_to(nlohmann_json_t.name);
@@ -187,6 +189,9 @@ namespace rip {
             nlohmann_json_j.at("improvement").get_to(nlohmann_json_t.improvement);
             nlohmann_json_j.at("improvedBonus").get_to(nlohmann_json_t.improvedBonus);
             nlohmann_json_j.at("scarcity").get_to(nlohmann_json_t.scarcity);
+            if (nlohmann_json_j.contains("healthBonus")) {
+                nlohmann_json_j.at("healthBonus").get_to(nlohmann_json_t.healthBonus);
+            }
         }
     };
 

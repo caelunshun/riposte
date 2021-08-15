@@ -17,6 +17,8 @@
 
 class HappinessEntry;
 class UnhappinessEntry;
+class HealthEntry;
+class SicknessEntry;
 
 namespace rip {
     class City;
@@ -157,8 +159,12 @@ namespace rip {
 
         // Sources of happiness in the city.
         std::vector<HappinessEntry> happiness;
-        // Sources of unhapipiness in the city.
+        // Sources of unhappiness in the city.
         std::vector<UnhappinessEntry> unhappiness;
+        // Sources of health in the city.
+        std::vector<HealthEntry> health;
+        // Sources of sickness in the city.
+        std::vector<SicknessEntry> sickness;
 
         // Current culture defense bonus.
         // May be less than getMaxCultureDefenseBonus()
@@ -246,6 +252,12 @@ namespace rip {
         uint32_t getHappiness() const;
         uint32_t getUnhappiness() const;
 
+        uint32_t getHealth() const;
+        uint32_t getSickness() const;
+
+        const std::vector<HealthEntry> &getHealthSources() const;
+        const std::vector<SicknessEntry> &getSicknessSources() const;
+
         uint32_t getNumWorkingCitizens() const;
 
         void regrowCultureDefense();
@@ -254,6 +266,7 @@ namespace rip {
         void bombardCultureDefenses(Game &game, int maxPercent);
 
         void updateHappiness(Game &game);
+        void updateHealth(Game &game);
 
         void transferControlTo(Game &game, PlayerId newOwner);
     };

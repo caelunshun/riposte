@@ -292,6 +292,20 @@ enum UnhappinessSource {
   Undefended = 1;
 }
 
+// A source of health in a city.
+enum HealthSource {
+  // Same as DifficultyBonus, but protobuf doesn't namespace enums.
+  BaseHealth = 0;
+  ResourceHealth = 1;
+  BuildingHealth = 2;
+  ForestHealth = 3;
+}
+
+// A source of sickness in a city.
+enum SicknessSource {
+  PopulationSickness = 0;
+}
+
 message HappinessEntry {
   HappinessSource source = 1;
   uint32 count = 2;
@@ -299,6 +313,16 @@ message HappinessEntry {
 
 message UnhappinessEntry {
   UnhappinessSource source = 1;
+  uint32 count = 2;
+}
+
+message HealthEntry {
+  HealthSource source = 1;
+  uint32 count = 2;
+}
+
+message SicknessEntry {
+  SicknessSource source = 1;
   uint32 count = 2;
 }
 
@@ -323,6 +347,8 @@ message UpdateCity {
   repeated HappinessEntry happinessSources = 16;
   repeated UnhappinessEntry unhappinessSources = 17;
   int32 cultureDefenseBonus = 18;
+  repeated HealthEntry healthSources = 19;
+  repeated SicknessEntry sicknessSources = 20;
 }
 
 message Path {

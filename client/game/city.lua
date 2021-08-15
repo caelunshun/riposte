@@ -88,6 +88,10 @@ function City:updateData(data, game)
     for _, entry in ipairs(self.happinessSources) do self.happiness = self.happiness + entry.count end
     self.unhappiness = 0
     for _, entry in ipairs(self.unhappinessSources) do self.unhappiness = self.unhappiness + entry.count end
+    self.health = 0
+    for _, entry in ipairs(self.healthSources) do self.health = self.health + entry.count end
+    self.sickness = 0
+    for _, entry in ipairs(self.sicknessSources) do self.sickness = self.sickness + entry.count end
 end
 
 function City:estimateTurnsToBuild(buildTask)
@@ -247,8 +251,14 @@ function City:renderBubble(cv, game)
         local happyIcon
         if self.happiness >= self.unhappiness then happyIcon = "icon/happy"
         else happyIcon = "icon/unhappy" end
-
         cv:drawSprite(happyIcon, statusOffset, 15)
+
+        statusOffset.x = statusOffset.x + 20
+
+        local healthIcon
+        if self.health >= self.sickness then healthIcon = "icon/health"
+        else happyIcon = "icon/sick" end
+        cv:drawSprite(healthIcon, statusOffset, 13)
 
         statusOffset.x = statusOffset.x + 20
         if self.cultureDefenseBonus ~= 0 then

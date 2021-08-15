@@ -9,5 +9,6 @@
   "improvedBonus": {
     "food": 2
   },
-  "scarcity": 6
+  "scarcity": 6,
+  "healthBonus": 1
 }

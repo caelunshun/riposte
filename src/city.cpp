@@ -235,6 +235,7 @@ namespace rip {
 
         doGrowth(game);
         updateHappiness(game);
+        updateHealth(game);
 
         updateWorkedTiles(game);
         workTiles(game);
@@ -395,7 +396,7 @@ namespace rip {
     }
 
     int City::getConsumedFood() const {
-        return population * 2;
+        return population * 2 + std::max((getSickness() - getHealth()), (uint32_t) 0);
     }
 
     const Culture &City::getCulture() const {
@@ -435,6 +436,7 @@ namespace rip {
         game.getCultureMap().onCityCreated(game, getID());
         game.getTradeRoutes().onCityCreated(game, *this);
         updateHappiness(game);
+        updateHealth(game);
         updateWorkedTiles(game);
 
         // Check coastal status.
@@ -659,6 +661,71 @@ namespace rip {
         cultureDefenseBonus -= maxPercent;
         cultureDefenseBonus = std::max(cultureDefenseBonus, 0);
         game.getServer().markCityDirty(id);
+    }
+
+    uint32_t City::getHealth() const {
+        uint32_t sum = 0;
+        for (const auto &entry : health) {
+            sum += entry.count();
+        }
+        return sum;
+    }
+
+    uint32_t City::getSickness() const {
+        uint32_t sum = 0;
+        for (const auto &entry : sickness) {
+            sum += entry.count();
+        }
+        return sum;
+    }
+
+    const std::vector<HealthEntry> &City::getHealthSources() const {
+        return health;
+    }
+
+    const std::vector<SicknessEntry> &City::getSicknessSources() const {
+        return sickness;
+    }
+
+    void City::updateHealth(Game &game) {
+        health.clear();
+        sickness.clear();
+
+        SicknessEntry population;
+        population.set_source(SicknessSource::PopulationSickness);
+        population.set_count(getPopulation());
+        sickness.emplace_back(std::move(population));
+
+        HealthEntry difficultyBonus;
+        difficultyBonus.set_source(HealthSource::BaseHealth);
+        difficultyBonus.set_count(5);
+        health.emplace_back(std::move(difficultyBonus));
+
+        uint32_t resourceHealth = 0;
+        for (const auto &resource : resources) {
+            resourceHealth += resource->healthBonus;
+        }
+        if (resourceHealth != 0) {
+            HealthEntry bonus;
+            bonus.set_source(HealthSource::ResourceHealth);
+            bonus.set_count(resourceHealth);
+            health.emplace_back(std::move(bonus));
+        }
+
+        // Forest health
+        double forestHealth = 0;
+        for (const auto tilePos : getBigFatCross(pos)) {
+            if (!game.containsTile(tilePos)) continue;
+            if (game.getTile(tilePos).isForested() && game.getCultureMap().getTileOwner(tilePos) == owner) {
+                forestHealth += 0.5;
+            }
+        }
+        if (forestHealth >= 1) {
+            HealthEntry bonus;
+            bonus.set_source(HealthSource::ForestHealth);
+            bonus.set_count(static_cast<uint32_t>(std::floor(forestHealth)));
+            health.emplace_back(std::move(bonus));
+        }
     }
 }
 
