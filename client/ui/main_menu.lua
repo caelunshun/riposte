@@ -69,7 +69,7 @@ build = function (ui)
 
     ui:createWindow("mainMenu", dume.FillScreen, root, 1)
 
-    ui:createWindow("menuBackgroundImage", dume.FillScreen, Image:new("icon/menu"), -1)
+    ui:createWindow("menuBackgroundImage", dume.FillScreen, Image:new("icon/menu", nil, nil, true), -1)
 end
 
 return build
