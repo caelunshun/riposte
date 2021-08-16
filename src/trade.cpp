@@ -93,7 +93,9 @@ namespace rip {
     void TradeRoutes::deleteRoute(TradeRouteId id) {
         const auto &route = getRoute(id);
         for (const auto tilePos : route.getTiles()) {
-            routesByPos.erase(tilePos);
+            if (routesByPos[tilePos] == id) {
+                routesByPos.erase(tilePos);
+            }
         }
 
         routes.erase(id);
