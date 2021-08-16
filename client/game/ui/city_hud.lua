@@ -14,6 +14,7 @@ local UiUtils = require("ui/utils")
 
 local leftWindowSize = Vector(200, 600)
 local topWindowSize = Vector(600, 150)
+local rightWindowSize = Vector(200, 600)
 
 -- GUI opened when a city is double-clicked.
 local CityHud = {}
@@ -21,6 +22,7 @@ local CityHud = {}
 local LeftWindow = {}
 local TopWindow = {}
 local WorkedTilesHud = {}
+local RightWindow = {}
 
 function CityHud:new(game, city)
     local o = {
@@ -33,6 +35,7 @@ function CityHud:new(game, city)
     o.windows = {
         LeftWindow:new(game, o),
         TopWindow:new(game, o),
+        RightWindow:new(game, o),
     }
 
     o.workedTileHud = WorkedTilesHud:new(game, o)
@@ -359,6 +362,48 @@ function WorkedTilesHud:handleEvent(event)
             self.game.client:setTileWorkedManually(self.city, clickedTilePos, not self.city:isTileWorked(clickedTilePos))
         end
     end
+end
+
+function RightWindow:new(game, hud)
+    local o = {
+        game = game,
+        hud = hud,
+    }
+    setmetatable(o, self)
+    self.__index = self
+    return o
+end
+
+function RightWindow:rebuild()
+    local root = Flex:column()
+    root:addFixedChild(Text:new("@size{18}{Resources}"))
+    root:addFixedChild(Divider:new(1))
+    root:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
+
+    for _, resourceID in ipairs(self.hud.city.resources) do
+        local resource = registry.resources[resourceID]
+
+        local markup = "%bullet %name"
+        if resource.healthBonus ~= nil and resource.healthBonus > 0 then
+            markup = markup .. ", +" .. tostring(resource.healthBonus) .. "@icon{health}"
+        end
+        root:addFixedChild(Text:new(markup, {
+            name = resource.name,
+            bullet = "•",
+        }))
+    end
+
+    local root = UiUtils.createWindowContainer(root)
+    ui:createWindow("cityHudRight", function(screenSize)
+        return {
+            pos = Vector(screenSize.x - rightWindowSize.x, 100),
+            size = rightWindowSize
+        }
+    end, root, 1)
+end
+
+function RightWindow:close()
+    ui:deleteWindow("cityHudRight")
 end
 
 function CityHud:handleEvent(event)
