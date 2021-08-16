@@ -121,10 +121,12 @@ end
 -- Renders icons to indicate tile yields.
 local YieldRenderer = {}
 
-function YieldRenderer:renderTile(cv, tile)
+function YieldRenderer:renderTile(cv, tile, tilePos, game)
     local scale = 15
     local offsetY = 0
-    if tile.isWorked then scale = 25; offsetY = -10 end
+    if tile.isWorked and tile.ownerID == game.thePlayer.id then
+        scale = 25; offsetY = -10
+    end
 
     local icons = {}
     local cursor = 0
