@@ -112,7 +112,7 @@ function Game:addUnit(data)
     if existingUnit == nil then
         self.eventBus:trigger("unitCreated", unit)
 
-        if unit.ownerID == self.thePlayer.id then
+        if unit.ownerID == self.thePlayer.id and self.turn == 0 then
             self.view.center = Vector(unit.pos.x * 100 + 50, unit.pos.y * 100 + 50)
         end
     end

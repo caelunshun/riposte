@@ -25,6 +25,9 @@ function CityBuildPrompt:new(game, city)
     local o = { game = game, city = city, possibleTasks = possibleTasks }
     setmetatable(o, self)
     self.__index = self
+
+    game.view:animateToTilePos(city.pos, 0.5)
+
     return o
 end
 
