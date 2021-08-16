@@ -3,6 +3,7 @@ package.cpath = "cmake-build-release/lib/lib?.so;cmake-build-debug/lib/lib?.so;c
 jit.on()
 
 inspect = require("inspect")
+utils = require("utils")
 
 local profiler = require("profiler")
 local enableProfiling = false

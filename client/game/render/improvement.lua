@@ -27,7 +27,15 @@ end
 
 local function renderRoad(cv, tilePos, game)
     cv:strokeWidth(5)
-    cv:solidColor(dume.rgb(80, 80, 80))
+
+    local color
+    if game.tradeDebugMode and game:getTradeNetworkAtPos(tilePos) ~= nil then
+        local network = game:getTradeNetworkAtPos(tilePos)
+        color = generatePastelColor(network.id)
+    else
+       color = dume.rgb(80, 80, 80)
+    end
+    cv:solidColor(color)
 
     -- Roads connect to other roads/cities on adjacent tiles (both straight and diagonal)
     local numConnections = 0

@@ -271,9 +271,24 @@ function City:renderBubble(cv, game)
     end
 end
 
+function City:renderTradeDebugOverlay(cv, game)
+    local network = game:getTradeNetworkAtPos(self.pos)
+    if network ~= nil then
+        local color = generatePastelColor(network.id)
+        cv:solidColor(color)
+        cv:beginPath()
+        cv:circle(Vector(50, 50), 50)
+        cv:strokeWidth(5)
+        cv:stroke()
+    end
+end
+
 function City:render(cv, game)
     self:renderHouses(cv)
     self:renderBubble(cv, game)
+    if game.tradeDebugMode then
+        self:renderTradeDebugOverlay(cv, game)
+    end
 end
 
 return City

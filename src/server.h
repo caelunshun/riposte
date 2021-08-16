@@ -53,6 +53,7 @@ namespace rip {
         void sendUpdateVisibility(Game &game);
         void sendPlayerData(Game &game);
         void sendGlobalData(Game &game);
+        void sendTradeNetworks(Game &game);
 
         void handleComputePath(Game &game, const ComputePath &packet);
         void handleMoveUnits(Game &game, const MoveUnits &packet);

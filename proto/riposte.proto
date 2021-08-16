@@ -96,6 +96,7 @@ message AnyServer {
     UpdateTile updateTile = 15;
     UpdateVisibility updateVisibility = 16;
     CombatEvent combatEvent = 17;
+    UpdateTradeNetworks updateTradeNetworks = 18;
   }
 }
 
@@ -491,6 +492,17 @@ message CombatRound {
   double attackerHealth = 1;
   // The defender's health (0..1) at the end of this round.
   double defenderHealth = 2;
+}
+
+// Used only for debugging trade networks on the client.
+message UpdateTradeNetworks {
+  repeated TradeNetwork networks = 1;
+}
+
+message TradeNetwork {
+  repeated Pos positions = 1;
+  int32 id = 2;
+  repeated int32 visitedCityIDs = 3;
 }
 
 // ---------------------

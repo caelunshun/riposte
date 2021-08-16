@@ -235,6 +235,8 @@ function Client:handlePacket(packet)
         self:handleDeleteUnit(packet.deleteUnit)
     elseif packet.combatEvent ~= nil then
         self:handleCombatEvent(packet.combatEvent)
+    elseif packet.updateTradeNetworks ~= nil then
+        self:handleUpdateTradeNetworks(packet.updateTradeNetworks)
     end
 end
 
@@ -285,6 +287,10 @@ end
 
 function Client:handleCombatEvent(packet)
     self.game:startCombatEvent(packet)
+end
+
+function Client:handleUpdateTradeNetworks(packet)
+    self.game:updateTradeNetworks(packet.networks)
 end
 
 return Client

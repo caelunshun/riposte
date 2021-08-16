@@ -35,7 +35,11 @@ function Game:new()
         cities = {},
         citiesByPos = {},
 
+        tradeNetworks = {},
+        tradeNetworksByPos = {},
+
         cheatMode = false,
+        tradeDebugMode = false,
 
         eventBus = EventBus:new(),
     }
@@ -142,9 +146,13 @@ function Game:getCityAtPos(pos)
 end
 
 function Game:handleEvent(event)
-    if event.type == dume.EventType.Key and event.key == dume.Key.L
+    if event.type == dume.EventType.Key
         and event.action == dume.Action.Press then
-        self.cheatMode = not self.cheatMode
+        if event.key == dume.Key.L then
+            self.cheatMode = not self.cheatMode
+        elseif event.key == dume.Key.T then
+            self.tradeDebugMode = not self.tradeDebugMode
+        end
     end
 end
 
@@ -167,6 +175,20 @@ end
 
 function Game:startCombatEvent(packet)
     self.currentCombatEvent = CombatEvent:new(self, packet)
+end
+
+function Game:updateTradeNetworks(networks)
+    self.tradeNetworks = networks
+    self.tradeNetworksByPos = {}
+    for _, network in ipairs(networks) do
+        for _, pos in ipairs(network.positions) do
+            self.tradeNetworksByPos[pos.x + pos.y * self.mapWidth] = network
+        end
+    end
+end
+
+function Game:getTradeNetworkAtPos(pos)
+    return self.tradeNetworksByPos[pos.x + pos.y * self.mapWidth]
 end
 
 return Game

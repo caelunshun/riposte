@@ -12,6 +12,7 @@
 #include "city.h"
 #include "ship.h"
 #include <thread>
+#include "trade.h"
 
 #define PACKET(packet, anyservername, id) AnyServer _anyServer; _anyServer.set_requestid(id); _anyServer.mutable_##anyservername()->CopyFrom(packet);
 #define SEND(packet, anyservername, id)  { PACKET(packet, anyservername, id); send(_anyServer); }
@@ -339,6 +340,23 @@ namespace rip {
         for (auto &city : game.getCities()) {
             SEND(getUpdateCityPacket(game, city), updatecity, 0);
         }
+    }
+
+    void Connection::sendTradeNetworks(Game &game) {
+        UpdateTradeNetworks packet;
+        for (const auto &route : game.getTradeRoutes().getTradeRoutes()) {
+            auto *network = packet.add_networks();
+            for (const auto pos : route.getTiles()) {
+                auto *p = network->add_positions();
+                p->set_x(pos.x);
+                p->set_y(pos.y);
+            }
+            for (const auto cityID : route.getVisitedCities()) {
+                network->add_visitedcityids(cityID.encode());
+            }
+            network->set_id(route.id.encode());
+        }
+        SEND(packet, updatetradenetworks, 0);
     }
 
     void Connection::handleComputePath(Game &game, const ComputePath &packet) {
@@ -694,6 +712,7 @@ namespace rip {
                     for (auto &connection : connections) {
                         connection.endedTurn = false;
                         connection.sendGlobalData(*game);
+                        connection.sendTradeNetworks(*game);
                     }
                 }
 
