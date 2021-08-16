@@ -35,11 +35,13 @@ local function handleBuildTaskCompleted(event)
         local unitKind = registry.unitKinds[buildTask.kind.unit.unitKindID]
         if unitKind.strength ~= 0 then
             sound = "sound/event/build_military"
+            volume = 0.15
         end
     elseif buildTask.kind.building ~= nil then
         local buildingName = buildTask.kind.building.buildingName
-        if buildingName == "Barracks" then
+        if buildingName == "Barracks" or buildingName == "Stable" then
             sound = "sound/event/build_military"
+            volume = 0.15
         elseif buildingName == "Granary" then
             sound = "sound/event/build_granary"
         elseif buildingName == "Library" then
