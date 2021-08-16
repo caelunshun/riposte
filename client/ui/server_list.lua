@@ -12,6 +12,7 @@ local Flex = require("widget/flex")
 local Clickable = require("widget/clickable")
 local Text = require("widget/text")
 local Padding = require("widget/padding")
+local Divider = require("widget/divider")
 local Button = require("widget/button")
 local Table = require("widget/table")
 local Spacer = require("widget/spacer")
@@ -127,7 +128,11 @@ function ServerList:buildRootWidget()
 
     root:addFixedChild(Text:new("@size{20}{Multiplayer Games}"))
 
+    root:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
+
     root:addFixedChild(Text:new("Available: " .. #self.availableGames))
+
+    root:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
 
     local rows = {}
 
@@ -164,7 +169,7 @@ function ServerList:buildRootWidget()
 
     root:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
 
-    root:addFixedChild(Button:new(Text:new("@size{18}{Create Game}"), function()
+    root:addFixedChild(Button:new(Padding:new(Text:new("@size{18}{Create Game}"), 5), function()
         self:createGame(function(conn)
             local server = createServer()
             enterLobby(Lobby:new(server, conn))
