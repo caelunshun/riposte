@@ -118,16 +118,8 @@ namespace rip {
                 touchingCities.erase(it);
             }
 
-            bool noTouchingCities = true;
-            for (const auto touchingCityID : touchingCities) {
-                if (game.getCity(touchingCityID).getOwner() != city.getOwner()) {
-                    noTouchingCities = false;
-                    break;
-                }
-            }
-
             auto &owner = owners[tilePos.x + tilePos.y * mapWidth];
-            if (owner == city.getOwner() && noTouchingCities) {
+            if (owner == city.getOwner() && touchingCities.empty()) {
                 owner = {};
                 game.getServer().markTileDirty(tilePos);
             }
