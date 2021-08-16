@@ -81,6 +81,13 @@ function Messages:onWarDeclared(event)
     })
 end
 
+function Messages:onUnitUnderAttack(unit)
+    self:push("@color{%color}{Your %unit is under attack!}", {
+        color = messageColorBad,
+        unit = unit.kind.name,
+    })
+end
+
 function Messages:push(messageMarkup, vars)
     local text = cv:parseTextMarkup(messageMarkup, style.default.text.defaultTextStyle, vars)
     local paragraph = cv:createParagraph(text, {
