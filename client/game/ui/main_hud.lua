@@ -252,6 +252,10 @@ function Hud:moveGroupAlongPath(units, path, successCallback, failureCallback)
                 table.remove(path.positions, 1)
             end
 
+            if #path.positions == 2 and path.positions[1] == units[1].pos.x and path.positions[2] == units[1].pos.y then
+                path = nil
+            end
+
             units.followingPath = path
 
             if successCallback ~= nil then successCallback() end
@@ -456,9 +460,11 @@ function Hud:doAutoSelect()
             self:moveGroupAlongPath(group, group.followingPath, function()
                 self.selectionGroups:createGroup(group)
             end, function()
+                self.game.view:animateToTilePos(group[1].pos, 0.5)
                 self:selectUnitGroup(group)
             end)
         else
+            self.game.view:animateToTilePos(group[1].pos, 0.5)
             self:selectUnitGroup(group)
         end
     end))

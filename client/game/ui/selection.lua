@@ -26,7 +26,7 @@ end
 
 function SelectionGroups:checkAllUnitsAreInGroups(game)
     for _, unit in pairs(game.units) do
-        if self.unitToGroup[unit.id] == nil then
+        if unit.owner == game.thePlayer and self.unitToGroup[unit.id] == nil then
             self:createGroup({unit})
         end
     end

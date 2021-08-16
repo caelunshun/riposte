@@ -27,11 +27,26 @@ function View:new()
         moveDir = 0,
 
         moveTime = Vector(0, 0),
-        centerVelocity = Vector(0, 0)
+        centerVelocity = Vector(0, 0),
+
+        currentAnimation = nil,
     }
     setmetatable(o, self)
     self.__index = self
     return o
+end
+
+function View:animateTo(target, overTime)
+    self.currentAnimation = {
+        from = self.center,
+        to = target,
+        totalTime = overTime,
+        startTime = time,
+    }
+end
+
+function View:animateToTilePos(tilePos, overTime)
+    self:animateTo(Vector(tilePos.x * 100 + 50, tilePos.y * 100 + 50), overTime)
 end
 
 function View:resize(newSize)
@@ -67,8 +82,32 @@ local function sampleVelocityCurve(time)
     return -(max / 2) * math.cos(time / (0.1 * math.pi)) + max / 2
 end
 
+function View:animateCenter()
+    local anim = self.currentAnimation
+    local from = anim.from
+    local to = anim.to
+
+    local time = (time - anim.startTime) / anim.totalTime
+
+    if time > 1 then
+        self.currentAnimation = nil
+    end
+
+    time = math.clamp(time, 0, 1)
+
+    -- Smooth interpolation
+    local x = (to.x - from.x) * -(math.cos(math.pi * time)) / 2 + (to.x - from.x) / 2
+    local y = (to.y - from.y) * -(math.cos(math.pi * time)) / 2 + (to.y - from.y) / 2
+
+    self.center = Vector(x, y) + from
+end
+
 function View:tick(dt, cursorPos)
     local threshold = 2
+
+    if self.currentAnimation ~= nil then
+        self:animateCenter()
+    end
 
     self.moveDir = 0
 
