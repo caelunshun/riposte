@@ -14,7 +14,7 @@ end
 -- Updates the city with data received from the server
 -- in an UpdateCity packet.
 function City:updateData(data, game)
-    if self.buildTask ~= nil and data.buildTask == nil then
+    if self.buildTask ~= nil and data.buildTask == nil and data.ownerID == game.thePlayer.id then
         self.previousBuildTask = self.buildTask
         game.eventBus:trigger("buildTaskCompleted", {
             city = self,
