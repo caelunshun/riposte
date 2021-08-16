@@ -581,8 +581,12 @@ function UnitDisplayWindow:rebuild()
         local header = Text:new("@size{20}{%unitName}", {unitName=unit.kind.name})
         table.insert(header.classes, "highlightedText")
         root:addFixedChild(header)
-        root:addFixedChild(Text:new("Strength: %strength", {strength=tostring(unit.strength)}))
-        root:addFixedChild(Text:new("Movement: %movement", {movement=tostring(unit.movementLeft)}))
+        root:addFixedChild(Text:new("Strength: %strength", {
+            strength=string.format("%.1f", unit.strength),
+        }))
+        root:addFixedChild(Text:new("Movement: %movement", {
+            movement=tostring(math.ceil(unit.movementLeft))
+        }))
 
         -- Display current worker task, if any
         local workerCap = unit:getCapability("worker")
