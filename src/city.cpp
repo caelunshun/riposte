@@ -603,6 +603,13 @@ namespace rip {
         baseHappiness.set_count(5);
         happiness.emplace_back(std::move(baseHappiness));
 
+        HappinessEntry buildingHappiness;
+        buildingHappiness.set_source(HappinessSource::Buildings);
+        buildingHappiness.set_count(buildingEffects.happiness);
+        if (buildingHappiness.count() > 0) {
+            happiness.emplace_back(std::move(buildingHappiness));
+        }
+
         UnhappinessEntry populationUnhappiness;
         populationUnhappiness.set_source(UnhappinessSource::Population);
         populationUnhappiness.set_count(getPopulation());

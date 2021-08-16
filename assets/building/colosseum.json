@@ -1,0 +1,11 @@
+{
+  "name": "Colosseum",
+  "cost": 80,
+  "techs": ["Construction"],
+  "effects": [
+    {
+      "type": "happiness",
+      "amount": 1
+    }
+  ]
+}

@@ -335,6 +335,11 @@
     "loader": "building"
   },
   {
+    "path": "building/colosseum.json",
+    "id": "building/colosseum",
+    "loader": "building"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"

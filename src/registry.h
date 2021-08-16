@@ -223,6 +223,8 @@ namespace rip {
 
         int oceanFoodBonus = 0;
 
+        int happiness = 0;
+
         void operator+=(const BuildingEffect &o) {
             bonusHammers += o.bonusHammers;
             bonusHammerPercent += o.bonusHammerPercent;
@@ -240,6 +242,7 @@ namespace rip {
             hasGranaryFoodStore |= o.hasGranaryFoodStore;
             oceanFoodBonus += o.oceanFoodBonus;
             minusMaintenancePercent += o.minusMaintenancePercent;
+            happiness += o.happiness;
         }
 
         friend void from_json(const nlohmann::json &json, BuildingEffect &e) {
@@ -280,6 +283,8 @@ namespace rip {
                     target = &e.oceanFoodBonus;
                 } else if (type == "minusMaintenancePercent") {
                     target = &e.minusMaintenancePercent;
+                } else if (type == "happiness") {
+                    target = &e.happiness;
                 } else {
                     throw ParseException("unknown building effect type '" + type + "'");
                 }
