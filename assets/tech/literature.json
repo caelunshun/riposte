@@ -1,0 +1,6 @@
+{
+  "name": "Literature",
+  "cost": 150,
+  "prerequisites": ["Polytheism", "Alphabet", "Aesthetics"],
+  "era": "classical"
+}

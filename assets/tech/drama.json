@@ -1,0 +1,6 @@
+{
+  "name": "Drama",
+  "cost": 250,
+  "prerequisites": ["Alphabet", "Aesthetics"],
+  "era": "classical"
+}

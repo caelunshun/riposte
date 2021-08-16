@@ -1,0 +1,6 @@
+{
+  "name": "Banking",
+  "cost": 650,
+  "prerequisites": ["Currency", "Guilds"],
+  "era": "medieval"
+}

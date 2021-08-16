@@ -604,6 +604,31 @@
     "id": "tech/machinery",
     "loader": "tech"
   },
+  {
+    "path": "tech/banking.json",
+    "id": "tech/banking",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/calendar.json",
+    "id": "tech/calendar",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/drama.json",
+    "id": "tech/drama",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/guilds.json",
+    "id": "tech/guilds",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/literature.json",
+    "id": "tech/literature",
+    "loader": "tech"
+  },
 
   {
     "path": "resource/copper.json",

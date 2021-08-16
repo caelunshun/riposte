@@ -1,0 +1,6 @@
+{
+  "name": "Guilds",
+  "cost": 950,
+  "prerequisites": ["Feudalism", "Machinery"],
+  "era": "medieval"
+}

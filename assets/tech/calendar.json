@@ -1,0 +1,6 @@
+{
+  "name": "Calendar",
+  "cost": 300,
+  "prerequisites": ["Sailing", "Mathematics"],
+  "era": "classical"
+}
