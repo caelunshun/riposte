@@ -85,7 +85,9 @@ namespace rip {
     }
 
     TradeRouteId TradeRoutes::createRoute() {
-        return routes.insert(TradeRoute());
+        const auto id = routes.insert(TradeRoute());
+        routes[id].mount(id);
+        return id;
     }
 
     void TradeRoutes::deleteRoute(TradeRouteId id) {
@@ -127,24 +129,47 @@ namespace rip {
     void TradeRoutes::onRoadBuilt(const Game &game, glm::uvec2 pos) {
         addNode(game, pos);
     }
+    
+    struct ResourceWithOwner {
+        std::shared_ptr<Resource> resource;
+        PlayerId owner;
+
+        friend bool operator==(const ResourceWithOwner &a, const ResourceWithOwner &b) {
+            return a.resource->id == b.resource->id;
+        }
+
+        friend bool operator!=(const ResourceWithOwner &a, const ResourceWithOwner &b) {
+            return !(a == b);
+        }
+
+        template<typename H>
+        friend H AbslHashValue(H h, const ResourceWithOwner &x) {
+            return H::combine(std::move(h), x.resource->id, x.owner);
+        }
+    };
 
     void TradeRoutes::updateResources(Game &game) {
         for (const auto &route : routes) {
-            absl::flat_hash_set<std::shared_ptr<Resource>, ResourceHash> accessibleResources;
+            absl::flat_hash_set<ResourceWithOwner> accessibleResources;
             for (const auto pos : route.getTiles()) {
                 const auto &tile = game.getTile(pos);
-                if (tile.hasResource()) {
+                if (tile.hasResource() && game.getCultureMap().getTileOwner(pos).has_value()) {
                     const auto &resource = *tile.getResource();
                     if (tile.hasImprovement(resource->improvement) || game.getCityAtLocation(pos)) {
-                        accessibleResources.insert(resource);
+                        accessibleResources.insert(ResourceWithOwner {
+                            .resource = resource,
+                            .owner = *game.getCultureMap().getTileOwner(pos),
+                        });
                     }
                 }
             }
             for (const auto cityID : route.getVisitedCities()) {
                 auto &city = game.getCity(cityID);
                 city.clearResources();
-                for (const auto &resource : accessibleResources) {
-                    city.addResource(resource);
+                for (const auto &entry : accessibleResources) {
+                    if (entry.owner == city.getOwner()) {
+                        city.addResource(entry.resource);
+                    }
                 }
             }
         }
@@ -152,5 +177,9 @@ namespace rip {
 
     TradeRoute &TradeRoutes::getRoute(TradeRouteId id) {
         return routes[id];
+    }
+
+    const slot_map<TradeRoute> &TradeRoutes::getTradeRoutes() const {
+        return routes;
     }
 }

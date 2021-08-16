@@ -23,9 +23,9 @@ namespace rip {
         // Cities on the trade route.
         absl::flat_hash_set<CityId> visitedCities;
 
+    public:
         TradeRouteId id;
 
-    public:
         void mount(TradeRouteId id);
 
         bool containsTile(glm::uvec2 pos) const;
@@ -71,6 +71,8 @@ namespace rip {
 
         // Updates resources accessible to each city.
         void updateResources(Game &game);
+
+        const slot_map<TradeRoute> &getTradeRoutes() const;
     };
 }
 
