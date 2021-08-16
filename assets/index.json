@@ -791,6 +791,11 @@
     "loader": "sound"
   },
   {
+    "path": "sound/event/war_declared.wav",
+    "id": "sound/event/war_declared",
+    "loader": "sound"
+  },
+  {
     "path": "sound/ambient/city1.ogg",
     "id": "sound/ambient/city1",
     "loader": "sound"

@@ -764,6 +764,20 @@ namespace rip {
         BROADCAST(packet, deleteunit, 0);
     }
 
+    void Server::broadcastCityCaptured(CityId id, PlayerId capturer) {
+        CityCaptured packet;
+        packet.set_cityid(id.encode());
+        packet.set_capturerid(capturer.encode());
+        BROADCAST(packet, citycaptured, 0);
+    }
+
+    void Server::broadcastWarDeclared(PlayerId declarer, PlayerId declared) {
+        WarDeclared packet;
+        packet.set_declarerid(declarer.encode());
+        packet.set_declaredid(declared.encode());
+        BROADCAST(packet, wardeclared, 0);
+    }
+
     void Server::flushDirtyItems() {
         auto &game = *this->game;
 
@@ -841,6 +855,8 @@ namespace rip {
         for (const auto &round : rounds) {
             packet.add_rounds()->CopyFrom(round);
         }
+
+        packet.set_attackerwon(winnerID == attackerID);
 
         AnyServer wrappedPacket;
         wrappedPacket.mutable_combatevent()->CopyFrom(packet);

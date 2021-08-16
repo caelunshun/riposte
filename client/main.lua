@@ -129,9 +129,11 @@ function render(dt)
 
         if game ~= nil then
             game.view:tick(dt, cursorPos)
+            game.messages:tick(dt)
             game.musicPlayer:tick()
             Renderer:render(cv, game)
             game.hud:render(cv, time, dt)
+            game.messages:render(cv)
 
             if game:hasCombatEvent() then
                 game:getCombatEvent():tick()

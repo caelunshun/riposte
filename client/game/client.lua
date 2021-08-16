@@ -207,7 +207,7 @@ function Client:handleReceivedPacketsWithHandler(handler)
             self.responseCallbacks[decodedPacket.requestID] = nil
         end
 
-        if game ~= nil and self.game:hasCombatEvent() then return end
+        if self.game ~= nil and self.game:hasCombatEvent() then return end
 
         if shouldStopHandlingPackets then return end
 
@@ -237,6 +237,10 @@ function Client:handlePacket(packet)
         self:handleCombatEvent(packet.combatEvent)
     elseif packet.updateTradeNetworks ~= nil then
         self:handleUpdateTradeNetworks(packet.updateTradeNetworks)
+    elseif packet.cityCaptured ~= nil then
+        self:handleCityCaptured(packet.cityCaptured)
+    elseif packet.warDeclared ~= nil then
+        self:handleWarDeclared(packet.warDeclared)
     end
 end
 
@@ -291,6 +295,20 @@ end
 
 function Client:handleUpdateTradeNetworks(packet)
     self.game:updateTradeNetworks(packet.networks)
+end
+
+function Client:handleCityCaptured(packet)
+    self.game.eventBus:trigger("cityCaptured", {
+        city = self.game.cities[packet.cityID],
+        capturer = self.game.players[packet.capturerID],
+    })
+end
+
+function Client:handleWarDeclared(packet)
+    self.game.eventBus:trigger("warDeclared", {
+        declarer = self.game.players[packet.declarerID],
+        declared = self.game.players[packet.declaredID],
+    })
 end
 
 return Client

@@ -10,7 +10,7 @@ local timeBetweenRounds = 0.3
 
 -- Creates a CombatEvent from the CombatEvent packet.
 function CombatEvent:new(game, packet)
-    for k, v in pairs(packet) do print(k, v) end
+    print(inspect(packet))
     local o = {
         game = game,
         defender = game.units[packet.defenderID],
@@ -19,6 +19,7 @@ function CombatEvent:new(game, packet)
         previousRoundTime = time,
         nextRound = 1,
         finished = false,
+        attackerWon = packet.attackerWon,
     }
     setmetatable(o, self)
     self.__index = self
@@ -57,6 +58,8 @@ function CombatEvent:finish()
     self.attacker.isInCombat = false
     self.defender.isInCombat = false
     self.game:clearCombatEvent()
+
+    self.game.messages:onCombatFinished(self.game, self)
 
     print("finished combat")
 end

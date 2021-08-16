@@ -55,6 +55,14 @@ local function handleBuildTaskCompleted(event)
     end
 end
 
+local function handleCityCaptured(event)
+    playSound("sound/event/city_capture", 0.1)
+end
+
+local function handleWarDeclared(event)
+    playSound("sound/event/war_declared", 0.4)
+end
+
 local function registerSoundEvents(game)
     game.eventBus:registerHandler("unitMoved", function(event)
         handleUnitMovement(game, event)
@@ -65,6 +73,8 @@ local function registerSoundEvents(game)
     game.eventBus:registerHandler("cityHudOpened", handleEnterCityHud)
     game.eventBus:registerHandler("cityHudClosed", handleCloseCityHud)
     game.eventBus:registerHandler("buildTaskCompleted", handleBuildTaskCompleted)
+    game.eventBus:registerHandler("cityCaptured", handleCityCaptured)
+    game.eventBus:registerHandler("warDeclared", handleWarDeclared)
 end
 
 return registerSoundEvents

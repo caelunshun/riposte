@@ -13,6 +13,7 @@ local dume = require("dume")
 local Vector = require("brinevector")
 
 local EventBus = require("game/event")
+local Messages = require("game/ui/messages")
 local HUD = require("game/ui/hud")
 local View = require("game/view")
 local City = require("game/city")
@@ -41,6 +42,7 @@ function Game:new()
         cheatMode = false,
         tradeDebugMode = false,
 
+        messages = Messages:new(),
         eventBus = EventBus:new(),
     }
 
@@ -49,6 +51,8 @@ function Game:new()
 
     o.hud = HUD:new(o)
     o.musicPlayer = MusicPlayer:new(o)
+
+    o.messages:registerHandlers(o)
 
     registerSoundEvents(o)
 

@@ -512,6 +512,7 @@ namespace rip {
         newOwner.recomputeScore(game);
         oldOwner.recomputeScore(game);
 
+        game.getServer().broadcastCityCaptured(id, newOwnerID);
         game.getServer().markCityDirty(id);
     }
 

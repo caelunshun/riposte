@@ -129,6 +129,8 @@ namespace rip {
                 UnitId winnerID,
                 const std::vector<CombatRound> &rounds
                 );
+        void broadcastCityCaptured(CityId id, PlayerId capturer);
+        void broadcastWarDeclared(PlayerId declarer, PlayerId declared);
 
         void run(std::shared_ptr<ReaderWriterQueue<std::unique_ptr<Bridge>>> newConnections);
 

@@ -386,6 +386,7 @@ namespace rip {
             game.onWarDeclared(*this, other);
             game.addEvent(std::make_unique<WarDeclaredEvent>(leader.name, other.leader.name));
 
+            game.getServer().broadcastWarDeclared(id, player);
             game.getServer().markPlayerDirty(id);
             game.getServer().markPlayerDirty(player);
         }

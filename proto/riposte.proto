@@ -97,6 +97,8 @@ message AnyServer {
     UpdateVisibility updateVisibility = 16;
     CombatEvent combatEvent = 17;
     UpdateTradeNetworks updateTradeNetworks = 18;
+    CityCaptured cityCaptured = 19;
+    WarDeclared warDeclared = 20;
   }
 }
 
@@ -484,6 +486,8 @@ message CombatEvent {
   // A list of rounds that occurred during combat.
   // Used to display the animation.
   repeated CombatRound rounds = 3;
+
+  bool attackerWon = 4;
 }
 
 // A round of combat during which one or both units suffered damage.
@@ -503,6 +507,16 @@ message TradeNetwork {
   repeated Pos positions = 1;
   int32 id = 2;
   repeated int32 visitedCityIDs = 3;
+}
+
+message CityCaptured {
+  int32 cityID = 1;
+  int32 capturerID = 2;
+}
+
+message WarDeclared {
+  int32 declarerID = 1;
+  int32 declaredID = 2;
 }
 
 // ---------------------
