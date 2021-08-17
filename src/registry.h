@@ -220,6 +220,7 @@ namespace rip {
         int bonusFood = 0;
         int bonusFoodPercent = 0;
 
+
         // Difference with bonusCommerce:
         // gold applies only to gold production after the
         // research slider is applied.
@@ -242,6 +243,7 @@ namespace rip {
         int happiness = 0;
 
         void operator+=(const BuildingEffect &o) {
+
             bonusHammers += o.bonusHammers;
             bonusHammerPercent += o.bonusHammerPercent;
             bonusCommerce += o.bonusCommerce;
@@ -259,6 +261,7 @@ namespace rip {
             oceanFoodBonus += o.oceanFoodBonus;
             minusMaintenancePercent += o.minusMaintenancePercent;
             happiness += o.happiness;
+
         }
 
         friend void from_json(const nlohmann::json &json, BuildingEffect &e) {

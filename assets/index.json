@@ -350,6 +350,11 @@
     "loader": "building"
   },
   {
+    "path": "building/bank.json",
+    "id": "building/bank",
+    "loader": "building"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"

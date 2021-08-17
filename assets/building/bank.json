@@ -1,0 +1,11 @@
+{
+  "name": "Market",
+  "cost": 150,
+  "techs": ["Banking"],
+  "effects": [
+    {
+      "type": "bonusCommercePercent",
+      "amount": 50
+    }
+  ]
+}
