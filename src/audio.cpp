@@ -34,10 +34,11 @@ namespace rip {
 
     SoundId AudioManager::playSound(const std::string &id, float volume) {
         const auto &handle = std::dynamic_pointer_cast<SoundAsset>(assets->get(id));
-        auto *h = playSound(*handle, volume);
+        auto *h = playSound(*handle, volume * globalVolume);
         const auto soundId = playingSounds.insert(Sound {
             .id = {},
             .handle = h,
+            .volume = volume,
         });
         playingSounds[soundId].id = soundId;
         return soundId;
@@ -65,5 +66,13 @@ namespace rip {
         if (!playingSounds.contains(sound)) return;
         rodio_stop_sound(playingSounds[sound].handle);
         deleteSound(sound);
+    }
+
+    void AudioManager::setGlobalVolume(float volume) {
+        globalVolume = volume;
+
+        for (auto &sound : playingSounds) {
+            rodio_sound_set_volume(sound.handle, globalVolume * sound.volume);
+        }
     }
 }

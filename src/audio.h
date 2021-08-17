@@ -24,6 +24,7 @@ namespace rip {
     struct Sound {
         SoundId id;
         InstanceHandle *handle;
+        float volume;
     };
 
     class AudioManager {
@@ -33,12 +34,16 @@ namespace rip {
 
         OutputDevice *rodio;
 
+        float globalVolume = 1;
+
         InstanceHandle *playSound(const SoundAsset &sound, float volume);
 
         void deleteSound(SoundId sound);
 
     public:
         AudioManager();
+
+        void setGlobalVolume(float volume);
 
         void setAssets(std::shared_ptr<Assets> assets);
 

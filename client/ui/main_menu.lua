@@ -18,6 +18,8 @@ local ServerList = require("ui/server_list")
 
 local build
 
+local isMuted = false
+
 function wrapWithMenuBackButton(widget)
     widget:addFixedChild(Spacer:new(dume.Axis.Vertical, 52))
     widget:addFixedChild(Button:new(Padding:new(Text:new("@size{20}{BACK}"), 10), function()
@@ -44,9 +46,20 @@ build = function (ui)
                 ui:deleteWindow("mainMenu")
             end
         },
+        --{
+            --name = "OPTIONS",
+            --onclick = function()  end
+        --},
         {
-            name = "OPTIONS",
-            onclick = function()  end
+            name = "TOGGLE MUTE",
+            onclick = function()
+                if isMuted then
+                    setGlobalVolume(1)
+                else
+                    setGlobalVolume(0)
+                end
+                isMuted = not isMuted
+            end
         }
     }
 

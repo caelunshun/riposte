@@ -101,6 +101,9 @@ namespace rip {
         lua["stopSound"] = [=](uint32_t id) {
             audio->stopSound(SoundId(id));
         };
+        lua["setGlobalVolume"] = [=](float volume) {
+            audio->setGlobalVolume(volume);
+        };
 
         lua["getAssetIDsWithPrefix"] = [=](const std::string &prefix) {
             auto list = assets->getAllIDs();
