@@ -180,6 +180,7 @@ namespace rip {
         float scarcity;
 
         uint32_t healthBonus = 0;
+        uint32_t happyBonus = 0;
 
         friend void from_json(const nlohmann::json &nlohmann_json_j, Resource &nlohmann_json_t) {
             nlohmann_json_j.at("id").get_to(nlohmann_json_t.id);
@@ -191,6 +192,9 @@ namespace rip {
             nlohmann_json_j.at("scarcity").get_to(nlohmann_json_t.scarcity);
             if (nlohmann_json_j.contains("healthBonus")) {
                 nlohmann_json_j.at("healthBonus").get_to(nlohmann_json_t.healthBonus);
+            }
+            if (nlohmann_json_j.contains("happyBonus")) {
+                nlohmann_json_j.at("happyBonus").get_to(nlohmann_json_t.happyBonus);
             }
         }
     };

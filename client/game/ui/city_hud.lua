@@ -136,6 +136,8 @@ function TopWindow:getHappinessTooltipText()
             reason = "Long live life!"
         elseif entry.source == "Buildings" then
             reason = "Buildings are making us happy!"
+        elseif entry.source == "Resources" then
+            reason = "We live in luxury!"
         end
         reasons[#reasons + 1] = { reason = reason, count = entry.count }
     end

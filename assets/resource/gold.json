@@ -1,0 +1,14 @@
+{
+  "id": "gold",
+  "name": "Gold",
+  "revealedBy": "Mining",
+  "yieldBonus": {
+    "commerce": 1
+  },
+  "improvement": "Mine",
+  "improvedBonus": {
+    "commerce": 5
+  },
+  "happyBonus": 1,
+  "scarcity": 2.5
+}

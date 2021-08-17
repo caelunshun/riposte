@@ -666,6 +666,11 @@
     "loader": "resource"
   },
   {
+    "path": "resource/gold.json",
+    "id": "resource/gold",
+    "loader": "resource"
+  },
+  {
     "path": "texture/resource/rice.png",
     "id": "texture/resource/rice",
     "loader": "image"
@@ -678,6 +683,11 @@
   {
     "path": "texture/resource/copper.png",
     "id": "texture/resource/copper",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/gold.png",
+    "id": "texture/resource/gold",
     "loader": "image"
   },
   {

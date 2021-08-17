@@ -607,6 +607,17 @@ namespace rip {
         baseHappiness.set_count(5);
         happiness.emplace_back(std::move(baseHappiness));
 
+        uint32_t resourceHappy = 0;
+        for (const auto &resource : resources) {
+            resourceHappy += resource->happyBonus;
+        }
+        if (resourceHappy != 0) {
+            HappinessEntry bonus;
+            bonus.set_source(HappinessSource::Resources);
+            bonus.set_count(resourceHappy);
+            happiness.emplace_back(std::move(bonus));
+        }
+
         HappinessEntry buildingHappiness;
         buildingHappiness.set_source(HappinessSource::Buildings);
         buildingHappiness.set_count(buildingEffects.happiness);
