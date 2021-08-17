@@ -658,7 +658,7 @@ namespace rip {
         gameOptions.set_mapwidth(80);
         gameOptions.set_mapheight(48);
         gameOptions.set_numhumanplayers(1);
-        gameOptions.set_numaiplayers(6);
+        gameOptions.set_numaiplayers(1);
     }
 
     void Server::addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin) {

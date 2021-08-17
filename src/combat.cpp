@@ -34,7 +34,7 @@ namespace rip {
         }
 
         const auto &defendingStack = game.getStack(*game.getStackByKey(defender.getOwner(), defender.getPos()));
-        const auto numCollateralTargets = std::min((int) defendingStack.getUnits().size(),
+        const auto numCollateralTargets = std::min((int) defendingStack.getUnits().size() - 1,
                                                    attacker.getKind().maxCollateralTargets);
 
         while (collateralDamageTargets.size() < numCollateralTargets) {
