@@ -267,7 +267,7 @@ namespace rip {
 
         auto continentNoiseGen = FastNoise::New<FastNoise::CellularValue>();
         std::vector<float> continentNoise(dim * dim);
-        continentNoiseGen->GenUniformGrid2D(continentNoise.data(), 0, 0, dim, dim, 0.2, rng.u32(0, 0xFFFFFFFF));
+        continentNoiseGen->GenUniformGrid2D(continentNoise.data(), 0, 0, dim, dim, 0.03, rng.u32(0, 0xFFFFFFFF));
 
         std::vector<glm::uvec2> landPositions;
 

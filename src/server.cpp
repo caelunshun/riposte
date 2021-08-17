@@ -655,10 +655,10 @@ namespace rip {
 
     Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)
         : registry(registry), techTree(techTree) {
-        gameOptions.set_mapwidth(32);
-        gameOptions.set_mapheight(32);
+        gameOptions.set_mapwidth(80);
+        gameOptions.set_mapheight(48);
         gameOptions.set_numhumanplayers(1);
-        gameOptions.set_numaiplayers(1);
+        gameOptions.set_numaiplayers(6);
     }
 
     void Server::addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin) {
