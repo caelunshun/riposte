@@ -94,8 +94,9 @@ namespace rip {
                     1024,
                     0
                     );
-            if (receivedBytes < 1) {
+            if (receivedBytes < 0) {
                 setError("failed to receive data (disconnected from server)");
+                std::cout << "ERROR" << strerror(errno) << std::endl;
                 return "";
             }
 
@@ -114,7 +115,10 @@ namespace rip {
     }
 
     NetworkConnection::~NetworkConnection() {
-        close(_impl->sock);
+        if (_impl->sock != 0) {
+            std::cout << "closing sock " << _impl->sock;
+            close(_impl->sock);
+        }
     }
 
     NetworkConnection::NetworkConnection(NetworkConnection &&other)  noexcept {
