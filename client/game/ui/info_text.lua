@@ -53,9 +53,11 @@ function InfoTextWindow:rebuild()
         return
     end
 
-    local root = Container:new(Padding:new(Text:new(self.text, {
+    local text = Text:new(self.text, {
         percent = "%"
-    }), 10))
+    })
+    table.insert(text.classes, "lightText")
+    local root = Container:new(Padding:new(text, 10))
     table.insert(root.classes, "lightContainer")
     root.fillParent = true
     ui:createWindow("infoText", function(screenSize)

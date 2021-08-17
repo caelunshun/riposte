@@ -120,6 +120,15 @@ return {
             cellBorderWidth = 2,
             cellBorderColor = dume.rgb(100, 100, 100),
             backgroundColor = dume.rgb(100, 100, 100, 100),
+        },
+        lightText = {
+            defaultTextStyle = {
+                family = "Merriweather",
+                size = 14,
+                weight = dume.FontWeight.Light,
+                style = dume.FontStyle.Normal,
+                color = dume.rgb(255, 255, 255),
+            }
         }
     },
     hovered = {

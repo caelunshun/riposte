@@ -77,12 +77,28 @@ local function getResource(game, tile)
     end
 end
 
+local function getImprovement(tile)
+    local s = ""
+    for i, improvement in ipairs(tile.improvements) do
+        s = s .. improvement.id
+        if i ~= #tile.improvements then
+            s = s .. "\n"
+        end
+    end
+    if #s == 0 then
+        return nil
+    else
+        return s
+    end
+end
+
 -- Gets info text (in Dume markup format) for the given tile.
 return function(tile, game)
     local lines = {}
 
     lines[1] = getHeader(tile)
     lines[#lines + 1] = getDefenseBonus(tile)
+    lines[#lines + 1] = getImprovement(tile)
     lines[#lines + 1] = getYield(tile)
     lines[#lines + 1] = getResource(game, tile)
 
