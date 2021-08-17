@@ -1,6 +1,6 @@
 {
   "name": "Market",
-  "cost": 150,
+  "cost": 200,
   "techs": ["Banking"],
   "effects": [
     {
