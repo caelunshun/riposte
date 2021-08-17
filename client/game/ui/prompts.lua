@@ -259,16 +259,26 @@ function ResearchPrompt:build()
             end
         end
 
+        local leadsTo = {}
         for _, t in pairs(registry.techs) do
             if type(t) == "table" then
                 for _, prerequisite in ipairs(t.prerequisites or {}) do
                     if prerequisite == tech.name then
-                        lines[#lines + 1] = "%bullet Leads to " .. t.name
+                        leadsTo[#leadsTo + 1] = t.name
                         break
                     end
                 end
             end
         end
+
+        local leadsToLine = "%bullet Leads to "
+        for i, s in ipairs(leadsTo) do
+            leadsToLine = leadsToLine .. s
+            if i ~= #leadsTo then
+                leadsToLine = leadsToLine .. ", "
+            end
+        end
+        lines[#lines + 1] = leadsToLine
 
         local tooltip = createTooltip(lines, vars, wrapper)
         root:addFixedChild(tooltip)
