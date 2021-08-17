@@ -355,11 +355,6 @@
     "loader": "building"
   },
   {
-    "path": "building/cultural_powerhouse.json",
-    "id": "building/cultural_powerhouse",
-    "loader": "building"
-  },
-  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"

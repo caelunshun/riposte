@@ -1,5 +1,5 @@
 {
-  "name": "Market",
+  "name": "Bank",
   "cost": 200,
   "techs": ["Banking"],
   "effects": [
