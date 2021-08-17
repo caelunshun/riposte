@@ -634,6 +634,11 @@
     "id": "tech/literature",
     "loader": "tech"
   },
+  {
+    "path": "tech/engineering.json",
+    "id": "tech/engineering",
+    "loader": "tech"
+  },
 
   {
     "path": "resource/copper.json",
