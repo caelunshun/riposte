@@ -352,6 +352,7 @@ message UpdateCity {
   int32 cultureDefenseBonus = 18;
   repeated HealthEntry healthSources = 19;
   repeated SicknessEntry sicknessSources = 20;
+  repeated string resources = 21;
 }
 
 message Path {

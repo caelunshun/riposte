@@ -232,6 +232,7 @@ namespace rip {
         bool hasResource(const std::shared_ptr<Resource> &resource) const;
         void addResource(std::shared_ptr<Resource> resource);
         void clearResources();
+        const absl::flat_hash_set<std::shared_ptr<Resource>, ResourceHash> &getResources() const;
 
         int getMaintenanceCost(const Game &game) const;
 

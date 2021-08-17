@@ -255,6 +255,10 @@ namespace rip {
 
         packet.set_culturedefensebonus(city.getCultureDefenseBonus());
 
+        for (const auto &resource : city.getResources()) {
+            packet.add_resources(resource->id);
+        }
+
         return packet;
     }
 

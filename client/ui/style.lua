@@ -65,6 +65,10 @@ return {
             borderColor = dume.rgb(65, 65, 65),
             borderRadius = 0,
         },
+        lightContainer = {
+            backgroundColor = dume.rgb(50, 50, 50, 180),
+            borderWidth = 0,
+        },
         tooltipContainer = {
             backgroundColor = dume.rgb(50, 50, 50, 254),
             borderWidth = 1,

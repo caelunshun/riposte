@@ -383,13 +383,10 @@ function RightWindow:rebuild()
     for _, resourceID in ipairs(self.hud.city.resources) do
         local resource = registry.resources[resourceID]
 
-        local markup = "%bullet %name"
-        if resource.healthBonus ~= nil and resource.healthBonus > 0 then
-            markup = markup .. ", +" .. tostring(resource.healthBonus) .. "@icon{health}"
-        end
+        local markup = "%bullet %text"
         root:addFixedChild(Text:new(markup, {
             name = resource.name,
-            bullet = "•",
+            text = getResourceDescription(resource),
         }))
     end
 

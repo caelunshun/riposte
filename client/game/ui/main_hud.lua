@@ -33,6 +33,7 @@ local UnitStackWindow = {}
 local ResearchBar = {}
 local EconomyWindow = {}
 local InfoWindow = {}
+local InfoTextWindow = require("game/ui/info_text")
 
 function Hud:new(game)
     local o = {
@@ -107,6 +108,7 @@ function Hud:new(game)
         ResearchBar:new(game, o),
         EconomyWindow:new(game, o),
         InfoWindow:new(game, o),
+        InfoTextWindow:new(game),
     }
 
     setmetatable(o, self)
@@ -148,6 +150,12 @@ end
 
 function Hud:handleEvent(event)
     if self.promptQueue:getCurrentPrompt() ~= nil then return end
+
+    for _, window in ipairs(self.windows) do
+        if window.handleEvent ~= nil then
+            window:handleEvent(event)
+        end
+    end
 
     if event.type == dume.EventType.Key and event.action == dume.Action.Press
             and event.key == dume.Key.Return and self.readyForNextTurn then

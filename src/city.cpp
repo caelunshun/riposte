@@ -467,6 +467,10 @@ namespace rip {
         resources.clear();
     }
 
+    const absl::flat_hash_set<std::shared_ptr<Resource>, ResourceHash> &City::getResources() const {
+        return resources;
+    }
+
     void City::setCapital(Game &game, bool isCapital) {
         this->capital = isCapital;
         if (isCapital) {
