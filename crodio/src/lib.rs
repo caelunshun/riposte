@@ -62,6 +62,11 @@ pub unsafe extern "C" fn rodio_is_sound_done(sound: &mut InstanceHandle) -> bool
 }
 
 #[no_mangle]
+pub unsafe extern "C" fn rodio_sound_set_volume(sound: &mut InstanceHandle, volume: f32) {
+    sound.sink.set_volume(volume);
+}
+
+#[no_mangle]
 pub unsafe extern "C" fn rodio_free_sound(sound: *mut InstanceHandle) {
     let _ = Box::from_raw(sound);
 }
