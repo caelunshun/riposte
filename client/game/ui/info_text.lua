@@ -33,7 +33,7 @@ function InfoTextWindow:handleEvent(event)
             self.hoveredTilePos = tilePos
 
             local tile = self.game:getTile(tilePos)
-            if tile ~= nil then
+            if tile ~= nil and self.game:getVisibility(tilePos) ~= "Hidden" then
                 self:setText(getTileInfoText(tile, self.game))
             else
                 self:setText("")
@@ -55,7 +55,7 @@ function InfoTextWindow:rebuild()
 
     local root = Container:new(Padding:new(Text:new(self.text, {
         percent = "%"
-    }), 5))
+    }), 10))
     table.insert(root.classes, "lightContainer")
     root.fillParent = true
     ui:createWindow("infoText", function(screenSize)

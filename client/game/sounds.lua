@@ -11,7 +11,7 @@ end
 
 local function handleTurnChange(game)
     if game.turn == 0 then return end
-    playSound("sound/event/turn_end", 0.25)
+    playSound("sound/event/turn_end", 0.1)
 end
 
 local currentCityHudSound
