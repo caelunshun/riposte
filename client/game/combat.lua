@@ -10,7 +10,6 @@ local timeBetweenRounds = 0.3
 
 -- Creates a CombatEvent from the CombatEvent packet.
 function CombatEvent:new(game, packet)
-    print(inspect(packet))
     local o = {
         game = game,
         defender = game.units[packet.defenderID],
@@ -20,6 +19,7 @@ function CombatEvent:new(game, packet)
         nextRound = 1,
         finished = false,
         attackerWon = packet.attackerWon,
+        numCollateralTargets = packet.numCollateralTargets,
     }
     setmetatable(o, self)
     self.__index = self

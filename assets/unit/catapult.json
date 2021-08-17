@@ -9,5 +9,7 @@
   "capabilities": [
     "bombard_city_defenses"
   ],
-  "maxBombardPerTurn": 8
+  "maxBombardPerTurn": 8,
+  "doesCollateralDamage": true,
+  "maxCollateralTargets": 5
 }

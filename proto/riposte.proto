@@ -490,6 +490,8 @@ message CombatEvent {
   repeated CombatRound rounds = 3;
 
   bool attackerWon = 4;
+
+  int32 numCollateralTargets = 5;
 }
 
 // A round of combat during which one or both units suffered damage.

@@ -127,7 +127,8 @@ namespace rip {
                 UnitId attackerID,
                 UnitId defenderID,
                 UnitId winnerID,
-                const std::vector<CombatRound> &rounds
+                const std::vector<CombatRound> &rounds,
+                int numCollateralTargets
                 );
         void broadcastCityCaptured(CityId id, PlayerId capturer);
         void broadcastWarDeclared(PlayerId declarer, PlayerId declared);

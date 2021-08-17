@@ -183,6 +183,8 @@ end
 function Game:startCombatEvent(packet)
     self.currentCombatEvent = CombatEvent:new(self, packet)
 
+    self.messages:onCombatStarted(self, self.currentCombatEvent)
+
     if self.currentCombatEvent.defender.owner == self.thePlayer then
         -- Animate the view to the defending unit
         self.view:animateToTilePos(self.currentCombatEvent.defender.pos, 0.5)

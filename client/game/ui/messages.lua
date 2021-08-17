@@ -22,6 +22,21 @@ function Messages:new()
     return o
 end
 
+function Messages:onCombatStarted(game, combat)
+    if combat.attacker.owner == game.thePlayer and combat.numCollateralTargets > 0 then
+        self:push("@color{%color}{Your %unit has dealt collateral damage! (%targets units)", {
+            color = messageColorGood,
+            unit = combat.attacker.kind.name,
+            targets = tostring(combat.numCollateralTargets),
+        })
+    elseif combat.defender.owner == game.thePlayer and combat.numCollateralTargets > 0 then
+        self:push("@color{%color}{You have suffered collateral damage! (%targets units)", {
+            color = messageColorBad,
+            targets = tostring(combat.numCollateralTargets),
+        })
+    end
+end
+
 function Messages:onCombatFinished(game, combat)
     local winner
     if combat.attackerWon then winner = combat.attacker

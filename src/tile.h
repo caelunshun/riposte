@@ -252,6 +252,8 @@ namespace rip {
         }
 
         std::vector<std::unique_ptr<Improvement>> getPossibleImprovements(Game &game, glm::uvec2 pos) const;
+
+        int getDefensiveBonus() const;
     };
 
 

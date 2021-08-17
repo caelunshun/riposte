@@ -7,6 +7,7 @@
 
 #include "rng.h"
 #include "ids.h"
+#include <absl/container/flat_hash_set.h>
 
 class CombatRound;
 
@@ -28,10 +29,14 @@ namespace rip {
 
         std::vector<CombatRound> rounds;
 
+        absl::flat_hash_set<UnitId> collateralDamageTargets;
+
         void doRound(Game &game);
 
         // Gets a unit's strength with all bonuses applied.
         double getUnitStrength(const Game &game, const Unit &unit, const Unit &opponent);
+
+        void doCollateralDamage(Game &game);
 
     public:
         Combat(UnitId attacker, UnitId defender, Game &game);

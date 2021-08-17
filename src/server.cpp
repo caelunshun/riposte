@@ -852,13 +852,16 @@ namespace rip {
     }
 
     void Server::broadcastCombatEvent(UnitId attackerID, UnitId defenderID, UnitId winnerID,
-                                      const std::vector<CombatRound> &rounds) {
+                                      const std::vector<CombatRound> &rounds,
+                                      int numCollateralTargets) {
         CombatEvent packet;
         packet.set_attackerid(attackerID.encode());
         packet.set_defenderid(defenderID.encode());
         for (const auto &round : rounds) {
             packet.add_rounds()->CopyFrom(round);
         }
+
+        packet.set_numcollateraltargets(numCollateralTargets);
 
         packet.set_attackerwon(winnerID == attackerID);
 

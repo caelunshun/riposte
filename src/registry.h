@@ -125,6 +125,11 @@ namespace rip {
         // this is the max damage per turn.
         int maxBombardPerTurn = 0;
 
+        // Whether the unit deals collateral damage.
+        bool doesCollateralDamage = false;
+        // Maximum number of targets for collateral damage.
+        int maxCollateralTargets = 0;
+
         friend void from_json(const nlohmann::json &json, UnitKind &unit) {
             json.at("id").get_to(unit.id);
             json.at("name").get_to(unit.name);
@@ -155,6 +160,13 @@ namespace rip {
 
             if (json.contains("maxBombardPerTurn")) {
                 json.at("maxBombardPerTurn").get_to(unit.maxBombardPerTurn);
+            }
+
+            if (json.contains("doesCollateralDamage")) {
+                json.at("doesCollateralDamage").get_to(unit.doesCollateralDamage);
+            }
+            if (json.contains("maxCollateralTargets")) {
+                json.at("maxCollateralTargets").get_to(unit.maxCollateralTargets);
             }
         }
     };

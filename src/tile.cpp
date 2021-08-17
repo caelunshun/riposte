@@ -332,4 +332,15 @@ namespace rip {
 
         return results;
     }
+
+    int Tile::getDefensiveBonus() const {
+        int result = 0;
+        if (forested) {
+            result += 50;
+        }
+        if (hilled) {
+            result += 25;
+        }
+        return result;
+    }
 }

@@ -7,9 +7,11 @@
 #include "game.h"
 #include "unit.h"
 #include "event.h"
+#include "stack.h"
 #include "city.h"
 #include <riposte.pb.h>
 #include "server.h"
+#include "tile.h"
 
 namespace rip {
     const float roundTime = 0.4;
@@ -29,6 +31,17 @@ namespace rip {
             }
             if (startingDefenderStrength == 0)
                 defender.setHealth(0);
+        }
+
+        const auto &defendingStack = game.getStack(*game.getStackByKey(defender.getOwner(), defender.getPos()));
+        const auto numCollateralTargets = std::min((int) defendingStack.getUnits().size(),
+                                                   attacker.getKind().maxCollateralTargets);
+
+        while (collateralDamageTargets.size() < numCollateralTargets) {
+            const auto unitID = defendingStack.getUnits()[rng.u32(0, defendingStack.getUnits().size())];
+            if (unitID != defenderID) {
+                collateralDamageTargets.insert(unitID);
+            }
         }
     }
 
@@ -63,6 +76,8 @@ namespace rip {
             percentBonus += city->getBuildingEffects().defenseBonusPercent;
             percentBonus += city->getCultureDefenseBonus();
         }
+
+        percentBonus += game.getTile(unit.getPos()).getDefensiveBonus();
 
         return baseStrength + (percentBonus / 100.0) * baseStrength;
     }
@@ -105,6 +120,8 @@ namespace rip {
             doRound(game);
         }
 
+        doCollateralDamage(game);
+
         auto &attacker = game.getUnit(attackerID);
         auto &defender = game.getUnit(defenderID);
 
@@ -131,7 +148,8 @@ namespace rip {
                     attacker.getID(),
                     defender.getID(),
                     winner,
-                    getRounds()
+                    getRounds(),
+                    collateralDamageTargets.size()
                     );
             game.addEvent(std::make_unique<CombatEvent>(
                         game.getUnit(winner).getOwner() == game.getThePlayerID(),
@@ -152,5 +170,25 @@ namespace rip {
 
     const std::vector<CombatRound> &Combat::getRounds() const {
         return rounds;
+    }
+
+    void Combat::doCollateralDamage(Game &game) {
+        auto &attacker = game.getUnit(attackerID);
+        for (int i = 0; i < collateralDamageTargets.size(); i++) {
+            auto start = collateralDamageTargets.cbegin();
+            std::advance(start, rng.u32(0, collateralDamageTargets.size()));
+            const auto targetID = *start;
+
+            auto &target = game.getUnit(targetID);
+
+            // intentionally not using getCombatStrength()
+            const auto a = attacker.getHealth() * attacker.getKind().strength;
+            const auto d = target.getHealth() * target.getKind().strength;
+
+            const auto damage = 0.1 * (3 * a + d) / (3 * d + a);
+            target.setHealth(target.getHealth() - damage);
+
+            game.getServer().markUnitDirty(targetID);
+        }
     }
 }
