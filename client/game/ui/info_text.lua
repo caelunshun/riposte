@@ -33,8 +33,8 @@ function InfoTextWindow:handleEvent(event)
             self.hoveredTilePos = tilePos
 
             local tile = self.game:getTile(tilePos)
-            if tile ~= nil and self.game:getVisibility(tilePos) ~= "Hidden" then
-                self:setText(getTileInfoText(tile, self.game))
+            if tile ~= nil and (self.game.cheatMode or self.game:getVisibility(tilePos) ~= "Hidden") then
+                self:setText(getTileInfoText(tile, tilePos, self.game))
             else
                 self:setText("")
             end

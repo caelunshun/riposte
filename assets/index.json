@@ -125,6 +125,16 @@
     "loader": "image"
   },
   {
+    "path": "icon/movement.png",
+    "id": "icon/movement",
+    "loader": "image"
+  },
+  {
+    "path": "icon/strength.png",
+    "id": "icon/strength",
+    "loader": "image"
+  },
+  {
     "path": "civ/greece.json",
     "id": "civ/greece",
     "loader": "civ"

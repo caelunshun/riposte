@@ -10,14 +10,33 @@ function generatePastelColor(seed)
     return dume.rgb(r, g, b)
 end
 
+-- Converts a number to a string, rounded to
+-- one decimal place. Unlike string.format, does
+-- not pad with zeroes.
+function tostringRounded(x)
+    local s = string.format("%.1f", x)
+
+    -- remove ending zeroes
+    while string.sub(s, #s, #s) == "0" or string.sub(s, #s, #s) == "." do
+        s = string.sub(s, 1, #s - 1)
+    end
+
+    return s
+end
+
 function mergeTextLines(lines)
     local text = ""
-    for _, line in ipairs(lines) do
+    for i, line in ipairs(lines) do
         if line ~= nil then
-            text = text .. line .. "\n"
+            text = text .. line
+        end
+        if i ~= #lines then
+            text = text .. "\n"
         end
     end
-    return text
+
+    if #text == 0 then return nil
+    else return text end
 end
 
 function getResourceDescription(resource)

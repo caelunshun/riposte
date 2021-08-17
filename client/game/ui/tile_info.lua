@@ -1,3 +1,27 @@
+local function getUnits(game, tile, tilePos)
+    local lines = {}
+
+    for _, unit in ipairs(game:getStackAtPos(tilePos).units) do
+        lines[#lines + 1] = "@color{rgb(255,205,0)}{" .. unit.kind.name .. "}"
+        if unit.kind.strength > 0 then
+            local strength = tostringRounded(unit.strength)
+            if unit.strength ~= unit.kind.strength then
+                strength = strength .. "/" .. tostringRounded(unit.kind.strength)
+            end
+            lines[#lines] = lines[#lines] .. ", " .. strength .. " @icon{strength}"
+        end
+
+        local movement = tostring(math.ceil(unit.movementLeft))
+        if math.ceil(unit.movementLeft) ~= unit.kind.movement then
+            movement = movement .. "/" .. tostring(unit.kind.movement)
+        end
+
+        lines[#lines] = lines[#lines] ..  ", " .. movement .. " @icon{movement}"
+    end
+
+    return mergeTextLines(lines)
+end
+
 local function getHeader(tile)
     local header = tile.terrain
     if tile.hilled then
@@ -93,10 +117,11 @@ local function getImprovement(tile)
 end
 
 -- Gets info text (in Dume markup format) for the given tile.
-return function(tile, game)
+return function(tile, tilePos, game)
     local lines = {}
 
-    lines[1] = getHeader(tile)
+    lines[#lines + 1] = getUnits(game, tile, tilePos)
+    lines[#lines + 1] = getHeader(tile)
     lines[#lines + 1] = getDefenseBonus(tile)
     lines[#lines + 1] = getImprovement(tile)
     lines[#lines + 1] = getYield(tile)
