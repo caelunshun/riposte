@@ -6,6 +6,12 @@
     {
       "type": "defenseBonusPercent",
       "amount": 50
+    },
+
+    {
+      "type": "bonusCulture",
+      "amount": 1
     }
+
   ]
 }

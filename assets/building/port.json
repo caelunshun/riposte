@@ -1,0 +1,12 @@
+{
+  "name": "Port",
+  "cost": 200,
+  "techs": ["Currency", "Sailing"],
+  "onlyCoastal": true,
+  "effects": [
+    {
+      "type": "bonusCommercePercent",
+      "amount": 50
+    }
+  ]
+}

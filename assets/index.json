@@ -355,6 +355,11 @@
     "loader": "building"
   },
   {
+    "path": "building/port.json",
+    "id": "building/port",
+    "loader": "building"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"
