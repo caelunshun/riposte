@@ -1,6 +1,6 @@
 {
   "name": "Walls",
-  "cost": 50,
+  "cost": 60,
   "techs": ["Masonry"],
   "effects": [
     {
