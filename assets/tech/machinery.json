@@ -2,5 +2,5 @@
   "name": "Machinery",
   "cost": 650,
   "prerequisites": ["Metal Casting"],
-  "era": "Medieval"
+  "era": "medieval"
 }
