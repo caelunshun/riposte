@@ -107,6 +107,14 @@ function Messages:onGameSaved()
     self:push("Game saved")
 end
 
+function Messages:onBordersExpanded(game, event)
+    if event.city.owner == game.thePlayer then
+        self:push("The borders of %city have expanded!", {
+            city = event.city.name
+        })
+    end
+end
+
 function Messages:push(messageMarkup, vars)
     local text = cv:parseTextMarkup(messageMarkup, style.default.text.defaultTextStyle, vars)
     local paragraph = cv:createParagraph(text, {
@@ -164,6 +172,9 @@ function Messages:registerHandlers(game)
     end)
     game.eventBus:registerHandler("gameSaved", function()
         self:onGameSaved()
+    end)
+    game.eventBus:registerHandler("bordersExpanded", function(event)
+        self:onBordersExpanded(game, event)
     end)
 end
 

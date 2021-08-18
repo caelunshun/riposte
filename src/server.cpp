@@ -651,4 +651,10 @@ namespace rip {
 
         std::cout << "Saved game to " << path << std::endl;
     }
+
+    void Server::broadcastBordersExpanded(CityId cityID) {
+        BordersExpanded packet;
+        packet.set_cityid(cityID.encode());
+        BROADCAST(packet, bordersexpanded, 0);
+    }
 }

@@ -107,6 +107,7 @@ message AnyServer {
     CityCaptured cityCaptured = 19;
     WarDeclared warDeclared = 20;
     GameSaved gameSaved = 21;
+    BordersExpanded bordersExpanded = 22;
   }
 }
 
@@ -550,6 +551,10 @@ message WarDeclared {
 }
 
 message GameSaved {}
+
+message BordersExpanded {
+  uint32 cityID = 1;
+}
 
 // ---------------------
 // CLIENT

@@ -247,6 +247,8 @@ function Client:handlePacket(packet)
         self:handleWarDeclared(packet.warDeclared)
     elseif packet.gameSaved ~= nil then
         self:handleGameSaved(packet.gameSaved)
+    elseif packet.bordersExpanded ~= nil then
+        self:handleBordersExpanded(packet.bordersExpanded)
     end
 end
 
@@ -319,6 +321,12 @@ end
 
 function Client:handleGameSaved()
     self.game.eventBus:trigger("gameSaved", {})
+end
+
+function Client:handleBordersExpanded(packet)
+    self.game.eventBus:trigger("bordersExpanded", {
+        city = self.game.cities[packet.cityID]
+    })
 end
 
 return Client

@@ -831,6 +831,11 @@
     "loader": "sound"
   },
   {
+    "path": "sound/event/borders_expand.ogg",
+    "id": "sound/event/borders_expand",
+    "loader": "sound"
+  },
+  {
     "path": "sound/ambient/city1.ogg",
     "id": "sound/ambient/city1",
     "loader": "sound"

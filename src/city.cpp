@@ -277,7 +277,11 @@ namespace rip {
         updateWorkedTiles(game);
         workTiles(game);
 
+        const auto oldCultureLevel = getCultureLevel();
         culture.addCultureForPlayer(owner, getCulturePerTurn());
+        if (getCultureLevel().value > oldCultureLevel.value) {
+            game.getServer().broadcastBordersExpanded(id);
+        }
 
         game.getServer().markCityDirty(id);
     }

@@ -63,6 +63,10 @@ local function handleWarDeclared(event)
     playSound("sound/event/war_declared", 0.4)
 end
 
+local function handleBordersExpanded(event)
+    playSound("sound/event/borders_expand", 0.2)
+end
+
 local function registerSoundEvents(game)
     game.eventBus:registerHandler("unitMoved", function(event)
         handleUnitMovement(game, event)
@@ -75,6 +79,11 @@ local function registerSoundEvents(game)
     game.eventBus:registerHandler("buildTaskCompleted", handleBuildTaskCompleted)
     game.eventBus:registerHandler("cityCaptured", handleCityCaptured)
     game.eventBus:registerHandler("warDeclared", handleWarDeclared)
+    game.eventBus:registerHandler("bordersExpanded", function(event)
+        if event.city.owner == game.thePlayer then
+            handleBordersExpanded(event)
+        end
+    end)
 end
 
 return registerSoundEvents

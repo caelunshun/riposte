@@ -144,6 +144,7 @@ namespace rip {
                 );
         void broadcastCityCaptured(CityId id, PlayerId capturer);
         void broadcastWarDeclared(PlayerId declarer, PlayerId declared);
+        void broadcastBordersExpanded(CityId cityID);
 
         void run(std::shared_ptr<ReaderWriterQueue<std::unique_ptr<Bridge>>> newConnections);
 
