@@ -166,9 +166,18 @@ namespace rip {
                 }
 
                 if (game.getCityAtLocation(pos) == nullptr) {
-                    // DEBUG - LUA CLIENT
                     Unit settler(game.getRegistry().getUnits().at(0), pos, player.getID());
                     game.addUnit(std::move(settler));
+
+                    // Place at least one rice next to the capital.
+                    std::vector<glm::uvec2> riceCandidates;
+                    for (const auto tilePos : getBigFatCross(pos)) {
+                        if (game.containsTile(tilePos) && game.getTile(tilePos).getTerrain() != Terrain::Ocean) {
+                            riceCandidates.push_back(tilePos);
+                        }
+                    }
+                    const auto ricePos = riceCandidates[rng.u32(0, riceCandidates.size())];
+                    game.getTile(ricePos).setResource(game.getRegistry().getResource("rice"));
 
                     glm::uvec2 warriorPos;
                     auto neighbors = getNeighbors(pos);
@@ -184,7 +193,6 @@ namespace rip {
                         }
                     }
 
-                    // DEBUG - LUA CLIENT
                     Unit warrior(game.getRegistry().getUnit("warrior"), warriorPos, player.getID());
                     game.addUnit(std::move(warrior));
 
