@@ -106,6 +106,7 @@ message AnyServer {
     UpdateTradeNetworks updateTradeNetworks = 18;
     CityCaptured cityCaptured = 19;
     WarDeclared warDeclared = 20;
+    GameSaved gameSaved = 21;
   }
 }
 
@@ -547,6 +548,8 @@ message WarDeclared {
   int32 declarerID = 1;
   int32 declaredID = 2;
 }
+
+message GameSaved {}
 
 // ---------------------
 // CLIENT

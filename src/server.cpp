@@ -646,6 +646,9 @@ namespace rip {
 
         f.close();
 
+        GameSaved packet;
+        BROADCAST(packet, gamesaved, 0);
+
         std::cout << "Saved game to " << path << std::endl;
     }
 }

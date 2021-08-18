@@ -103,6 +103,10 @@ function Messages:onUnitUnderAttack(unit)
     })
 end
 
+function Messages:onGameSaved()
+    self:push("Game saved")
+end
+
 function Messages:push(messageMarkup, vars)
     local text = cv:parseTextMarkup(messageMarkup, style.default.text.defaultTextStyle, vars)
     local paragraph = cv:createParagraph(text, {
@@ -157,6 +161,9 @@ function Messages:registerHandlers(game)
     end)
     game.eventBus:registerHandler("cityCaptured", function(event)
         self:onCityCaptured(event)
+    end)
+    game.eventBus:registerHandler("gameSaved", function()
+        self:onGameSaved()
     end)
 end
 

@@ -245,6 +245,8 @@ function Client:handlePacket(packet)
         self:handleCityCaptured(packet.cityCaptured)
     elseif packet.warDeclared ~= nil then
         self:handleWarDeclared(packet.warDeclared)
+    elseif packet.gameSaved ~= nil then
+        self:handleGameSaved(packet.gameSaved)
     end
 end
 
@@ -313,6 +315,10 @@ function Client:handleWarDeclared(packet)
         declarer = self.game.players[packet.declarerID],
         declared = self.game.players[packet.declaredID],
     })
+end
+
+function Client:handleGameSaved()
+    self.game.eventBus:trigger("gameSaved", {})
 end
 
 return Client

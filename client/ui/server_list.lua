@@ -20,6 +20,7 @@ local Empty = require("widget/empty")
 
 local UiUtils = require("ui/utils")
 
+local SavesListWindow = require("ui/saves_list")
 local Lobby = require("ui/lobby")
 
 local json = require("lunajson")
@@ -169,18 +170,38 @@ function ServerList:buildRootWidget()
 
     root:addFixedChild(Spacer:new(dume.Axis.Vertical, 20))
 
-    root:addFixedChild(Button:new(Padding:new(Text:new("@size{18}{Create Game}"), 5), function()
+    local createRow = Flex:row(10)
+
+    createRow:addFixedChild(Button:new(Padding:new(Text:new("@size{18}{Create Game}"), 5), function()
         self:createGame(function(conn)
             local server = createServer("multiplayer")
             enterLobby(Lobby:new(server, conn))
         end)
     end))
+    createRow:addFixedChild(Button:new(Padding:new(Text:new("@size{18}{Load Game}"), 5), function()
+        SavesListWindow:new("multiplayer", function(save)
+            if save == nil then
+                self:rebuild()
+            else
+                self:createGame(function(conn)
+                    local server = createServer("multiplayer", save)
+                    enterLobby(Lobby:new(server, conn))
+                end)
+            end
+        end):rebuild()
+        self:close()
+    end))
+    root:addFixedChild(createRow)
 
     return wrapWithMenuBackButton(root)
 end
 
 function ServerList:rebuild()
     ui:createWindow("multiplayerList", dume.FillScreen, Container:new(Padding:new(self:buildRootWidget(), 50)), 1)
+end
+
+function ServerList:close()
+    ui:deleteWindow("multiplayerList")
 end
 
 return ServerList
