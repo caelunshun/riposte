@@ -15,6 +15,8 @@
 #include <ghc/filesystem.hpp>
 #include <sstream>
 
+#include <zstd.h>
+
 namespace fs = ghc::filesystem;
 
 namespace rip {
@@ -106,7 +108,16 @@ namespace rip {
             data.push_back(0);
         }
 
-        packet.AppendToString(&data);
+        std::string packetData;
+        packet.AppendToString(&packetData);
+
+        // Compress only the packet - not the header
+        std::string compressedPacketData(ZSTD_compressBound(packetData.size()), '\0');
+        const auto compressedSize = ZSTD_compress(compressedPacketData.data(), compressedPacketData.size(),
+                      packetData.data(), packetData.size(), 6);
+        compressedPacketData.erase(compressedSize, std::string::npos);
+
+        data.append(compressedPacketData);
 
         return data;
     }
@@ -122,8 +133,14 @@ namespace rip {
         // skip header
         data.erase(data.begin(), data.begin() + headerSize);
 
+        // decompress
+        const auto decompressedSize = ZSTD_getFrameContentSize(data.data(), data.size());
+        std::string decompressedData(decompressedSize, '\0');
+        ZSTD_decompress(decompressedData.data(), decompressedData.size(),
+                        data.data(), data.size());
+
         GameSave packet;
-        packet.ParseFromString(data);
+        packet.ParseFromString(decompressedData);
 
         // First pass: compute ID mappings
         IdConverter playerIDs;
