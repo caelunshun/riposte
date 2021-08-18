@@ -139,6 +139,10 @@ function Game:getStackAtPos(pos)
 end
 
 function Game:addCity(data)
+    if self.cities[data.id] == nil and data.isCapital then
+        self.view:animateToTilePos(data.pos, 0.1)
+    end
+
     local city = self.cities[data.id] or City:new()
     self.cities[data.id] = city
     city:updateData(data, self)
