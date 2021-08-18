@@ -64,7 +64,7 @@ local function handleWarDeclared(event)
 end
 
 local function handleBordersExpanded(event)
-    playSound("sound/event/borders_expand", 0.2)
+    playSound("sound/event/borders_expand", 0.3)
 end
 
 local function registerSoundEvents(game)
