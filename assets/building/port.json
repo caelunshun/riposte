@@ -6,7 +6,7 @@
   "effects": [
     {
       "type": "bonusCommercePercent",
-      "amount": 50
+      "amount": 25
     }
   ]
 }
