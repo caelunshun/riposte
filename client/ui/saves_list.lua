@@ -40,7 +40,12 @@ function SavesListWindow:rebuild()
         load = Empty:new(),
         delete = Empty:new()
     }
-    for _, saveFile in ipairs(getAllSaves(self.category)) do
+
+    local saves = getAllSaves(self.category)
+    table.sort(saves, function(a, b)
+        return a.turn > b.turn
+    end)
+    for _, saveFile in ipairs(saves) do
         rows[#rows + 1] = {
             name = Text:new("%name", {
                 name = saveFile.name
@@ -65,6 +70,11 @@ function SavesListWindow:rebuild()
         "load",
         "delete",
     }, rows))
+
+    root:addFixedChild(Button:new(Padding:new(Text:new("@size{20}{Back}"), 10), function()
+        self.onSelect(nil)
+        self:close()
+    end))
 
     local root = UiUtils.createWindowContainer(root)
     ui:createWindow("savesList", dume.FillScreen, root, 1)

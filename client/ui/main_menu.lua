@@ -94,10 +94,21 @@ build = function (ui)
             onclick = function()
                 ui:deleteWindow("mainMenu")
                 SavesListMenu:new("singleplayer", function(save)
-                    print("Selected save " .. save.name)
-                    local bridge = createServer("singleplayer", save).bridge
-                    enterGame(bridge, false)
+                    if save == nil then
+                        build(ui)
+                        navigator:setPage("singleplayerMenu")
+                    else
+                        print("Selected save " .. save.name)
+                        local bridge = createServer("singleplayer", save).bridge
+                        enterGame(bridge, false)
+                    end
                 end):rebuild()
+            end
+        },
+        {
+            name = "BACK",
+            onclick = function()
+                navigator:setPage("rootMenu")
             end
         }
     }
