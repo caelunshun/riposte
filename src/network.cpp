@@ -96,7 +96,6 @@ namespace rip {
                     );
             if (receivedBytes < 0) {
                 setError("failed to receive data (disconnected from server)");
-                std::cout << "ERROR" << strerror(errno) << std::endl;
                 return "";
             }
 

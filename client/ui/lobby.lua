@@ -30,7 +30,7 @@ local function defaultSettings()
     return {
         mapWidth = 32,
         mapHeight = 32,
-        numHumanPlayers = 2,
+        numHumanPlayers = 3,
         numAIPlayers = 0,
     }
 end
