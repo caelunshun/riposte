@@ -172,7 +172,7 @@ function ServerList:buildRootWidget()
 
     local createRow = Flex:row(10)
 
-    createRow:addFixedChild(Button:new(Padding:new(Text:new("@size{18}{Create Game}"), 5), function()
+    createRow:addFixedChild(Button:new(Padding:new(Text:new("@size{18}{New Game}"), 5), function()
         self:createGame(function(conn)
             local server = createServer("multiplayer")
             enterLobby(Lobby:new(server, conn))
