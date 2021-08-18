@@ -22,6 +22,12 @@ namespace rip {
         return tiles[pos.x + pos.y * mapWidth];
     }
 
+    void Culture::sort() {
+        std::sort(values.begin(), values.end(), [](const CultureValue &a, const CultureValue &b) {
+            return a.amount > b.amount;
+        });
+    }
+
     CultureValue &Culture::getCultureValue(PlayerId player) {
        for (auto &value : values) {
            if (value.owner == player) return value;
@@ -43,11 +49,13 @@ namespace rip {
 
     void Culture::addCultureForPlayer(PlayerId player, int amount) {
         getCultureValue(player).amount += amount;
+        sort();
     }
 
     void Culture::clearCultureForPlayer(PlayerId player) {
         auto &culture = getCultureValue(player);
         culture.amount = 0;
+        sort();
     }
 
     const absl::InlinedVector<CultureValue, 3> &Culture::getValues() const {

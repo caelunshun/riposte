@@ -30,6 +30,8 @@ namespace rip {
 
         CultureValue &getCultureValue(PlayerId player);
         int getCultureAmount(PlayerId player) const;
+
+        void sort();
     public:
         // Gets the culture value for the given civ at this tile.
         int getCultureForPlayer(PlayerId player) const;

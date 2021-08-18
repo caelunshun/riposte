@@ -1,3 +1,23 @@
+local function getCulture(game, tile)
+    local totalCulture = 0
+    for _, x in ipairs(tile.cultureValues.amounts) do
+        totalCulture = totalCulture + x
+    end
+
+    local lines = {}
+    for i=1, #tile.cultureValues.playerIDs do
+        local player = game.players[tile.cultureValues.playerIDs[i]]
+        local amount = tile.cultureValues.amounts[i]
+        local percent = math.floor(amount / totalCulture * 100)
+
+        if percent ~= 0 then
+            lines[#lines + 1] = string.format("%d%%percent @color{%s}{%s}",
+                    tostring(percent), dumeColorToString(player.civ.color), player.civ.adjective)
+        end
+    end
+    return mergeTextLines(lines)
+end
+
 local function getUnits(game, tile, tilePos)
     local lines = {}
 
@@ -120,6 +140,7 @@ end
 return function(tile, tilePos, game)
     local lines = {}
 
+    lines[#lines + 1] = getCulture(game, tile)
     lines[#lines + 1] = getUnits(game, tile, tilePos)
     lines[#lines + 1] = getHeader(tile)
     lines[#lines + 1] = getDefenseBonus(tile)
