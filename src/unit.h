@@ -12,10 +12,13 @@
 
 struct nk_context;
 
+class UpdateUnit;
+
 namespace rip {
     class Game;
     class Hud;
     class City;
+    class IdConverter;
 
     // Value returned by Capability::paintMainUI which determines whether the unit
     // should remain selected.
@@ -90,18 +93,20 @@ namespace rip {
         // Capabilities attached to the unit.
         std::vector<std::unique_ptr<Capability>> capabilities;
 
+        void resetMovement();
+
+    public:
         bool fortified = false;
         bool skippingTurn = false;
         bool fortifiedUntilHeal = false;
 
-        void resetMovement();
-
-    public:
         // Used by the renderer to animate the unit's position between two tiles.
         float moveTime = -1;
         glm::uvec2 moveFrom = glm::uvec2(0);
 
         Unit(std::shared_ptr<UnitKind> kind, glm::uvec2 pos, PlayerId owner);
+
+        Unit(const UpdateUnit &packet, const IdConverter &playerIDs, const IdConverter &unitIDs, const Registry &registry, UnitId id);
 
         void setID(UnitId id);
 

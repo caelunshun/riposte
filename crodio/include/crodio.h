@@ -15,6 +15,8 @@ struct SoundHandle;
 
 extern "C" {
 
+const char *riposte_data_dir();
+
 SoundHandle *rodio_create_sound(const uint8_t *data, size_t length);
 
 void rodio_free_sound(InstanceHandle *sound);

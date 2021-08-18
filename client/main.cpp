@@ -16,6 +16,7 @@
 #include <memory>
 #include <thread>
 #include <network.h>
+#include "saveload.h"
 
 const int windowWidth = 1920 / 2;
 const int windowHeight = 1080 / 2;
@@ -67,10 +68,19 @@ namespace rip {
                                std::shared_ptr<Registry> registry,
                                std::shared_ptr<TechTree> techTree, std::shared_ptr<AudioManager> audio) {
         auto &lua = *luaPtr;
-        lua["createServer"] = [=]() {
+        lua["createServer"] = [=](const std::string &gameType, std::optional<SaveFile> saveFile) {
             auto bridges = newLocalBridgePair();
-            auto server = std::make_shared<Server>(registry, techTree);
+            auto server = std::make_shared<Server>(registry, techTree, gameType);
             server->addConnection(std::move(bridges.first), true);
+
+            if (saveFile.has_value()) {
+                try {
+                    server->setSaveFileToLoadFrom(std::move(*saveFile));
+                } catch (std::exception &e) {
+                    std::cout << e.what() << std::endl;
+                    throw e;
+                }
+            }
 
             auto newConnections = std::make_shared<moodycamel::ReaderWriterQueue<std::unique_ptr<Bridge>>>();
 
@@ -114,6 +124,15 @@ namespace rip {
                 }
             }
             return result;
+        };
+
+        auto save_type = lua.new_usertype<SaveFile>("SaveFile");
+        save_type["name"] = &SaveFile::name;
+        save_type["turn"] = &SaveFile::turn;
+        save_type["path"] = &SaveFile::path;
+
+        lua["getAllSaves"] = [=](const std::string &category) {
+            return sol::as_table(getAllSaves(category));
         };
     }
 }

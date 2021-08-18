@@ -15,6 +15,7 @@ local Button = require("widget/button")
 local Spacer = require("widget/spacer")
 
 local ServerList = require("ui/server_list")
+local SavesListMenu = require("ui/saves_list")
 
 local build
 
@@ -30,39 +31,7 @@ function wrapWithMenuBackButton(widget)
     return widget
 end
 
-build = function (ui)
-    local entries = {
-        {
-            name = "SINGLEPLAYER",
-            onclick = function()
-                local bridge = createServer().bridge
-                enterGame(bridge, false)
-            end
-        },
-        {
-            name = "MULTIPLAYER",
-            onclick = function()
-                ServerList:new():rebuild()
-                ui:deleteWindow("mainMenu")
-            end
-        },
-        --{
-            --name = "OPTIONS",
-            --onclick = function()  end
-        --},
-        {
-            name = "TOGGLE MUTE",
-            onclick = function()
-                if isMuted then
-                    setGlobalVolume(1)
-                else
-                    setGlobalVolume(0)
-                end
-                isMuted = not isMuted
-            end
-        }
-    }
-
+local function buildFromEntries(entries)
     local main = Flex:column()
     main:setMainAlign(dume.Align.Center)
     main:setCrossAlign(dume.Align.Center)
@@ -79,8 +48,69 @@ build = function (ui)
     end
 
     local root = Container:new(Padding:new(main, 50))
+    return root
+end
 
-    ui:createWindow("mainMenu", dume.FillScreen, root, 1)
+local navigator
+
+build = function (ui)
+    local rootEntries = {
+        {
+            name = "SINGLEPLAYER",
+            onclick = function()
+                navigator:setPage("singleplayerMenu")
+            end
+        },
+        {
+            name = "MULTIPLAYER",
+            onclick = function()
+                ServerList:new():rebuild()
+                ui:deleteWindow("mainMenu")
+            end
+        },
+        {
+            name = "TOGGLE MUTE",
+            onclick = function()
+                if isMuted then
+                    setGlobalVolume(1)
+                else
+                    setGlobalVolume(0)
+                end
+                isMuted = not isMuted
+            end
+        }
+    }
+
+    local singleplayerEntries = {
+        {
+            name = "NEW GAME",
+            onclick = function()
+                local bridge = createServer("singleplayer").bridge
+                enterGame(bridge, false)
+            end
+        },
+        {
+            name = "LOAD GAME",
+            onclick = function()
+                ui:deleteWindow("mainMenu")
+                SavesListMenu:new("singleplayer", function(save)
+                    print("Selected save " .. save.name)
+                    local bridge = createServer("singleplayer", save).bridge
+                    enterGame(bridge, false)
+                end):rebuild()
+            end
+        }
+    }
+
+    local rootMenu = buildFromEntries(rootEntries)
+    local singleplayerMenu = buildFromEntries(singleplayerEntries)
+
+    navigator = Navigator:new({
+        rootMenu = rootMenu,
+        singleplayerMenu = singleplayerMenu,
+    }, "rootMenu")
+
+    ui:createWindow("mainMenu", dume.FillScreen, navigator, 1)
 
     ui:createWindow("menuBackgroundImage", dume.FillScreen, Image:new("icon/menu", nil, nil, true), -1)
 end

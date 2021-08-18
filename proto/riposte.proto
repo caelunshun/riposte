@@ -41,6 +41,12 @@
 // When the client ends its turn, it sends EndTurn. Alternatively, the server
 // can force-end a turn by sending the same packet to the client. After the turn
 // ends, the client must wait for StartTurn before making further actions.
+//
+// # Game Saves
+// The same packets that are used to update game data on the client are used
+// to serialize game data to disk.
+//
+// Some fields are not used in game saves.
 
 syntax = "proto3";
 
@@ -70,6 +76,7 @@ message AnyClient {
     AdminStartGame adminStartGame = 16;
     SetLeader setLeader = 17;
     BombardCity bombardCity = 18;
+    SaveGame saveGame = 19;
   }
 }
 
@@ -234,6 +241,7 @@ message Tile {
   bool hasOwner = 7;
   bool isWorked = 8;
   string resourceID = 9;
+  CultureValues cultureValues = 10;
 }
 
 // Sends all map tiles.
@@ -354,6 +362,8 @@ message UpdateCity {
   repeated HealthEntry healthSources = 19;
   repeated SicknessEntry sicknessSources = 20;
   repeated string resources = 21;
+  CultureValues cultureValues = 22;
+  repeated Pos manualWorkedTiles = 23;
 }
 
 message Path {
@@ -414,6 +424,10 @@ message UpdateUnit {
   int32 id = 8;
   double strength = 9;
   bool isFortified = 10;
+
+  bool fortifiedForever = 11;
+  bool skippingTurn = 12;
+  bool fortifiedUntilHeal = 13;
 }
 
 message ResearchingTech {
@@ -443,6 +457,17 @@ message UpdatePlayer {
   int32 beakerPercent = 12;
 
   repeated int32 atWarWithIDs = 13;
+
+  // Saveload-specific. Not set in protocol
+  Era era = 14;
+  bool hasAI = 15;
+  UpdateVisibility visibility = 16;
+
+  string leaderName = 17;
+  string civID = 18;
+
+  repeated uint32 cityIDs = 19;
+  int32 score = 20;
 }
 
 message PathComputed {
@@ -599,4 +624,32 @@ message ConfigureWorkedTiles {
 message BombardCity {
   int32 siegeUnitID = 1;
   int32 targetCityID = 2;
+}
+
+message SaveGame {}
+
+// GAME SAVE / LOAD
+
+// A game save. Contains the entire game state, serialized.
+message GameSave {
+  uint32 mapWidth = 1;
+  uint32 mapHeight = 2;
+  repeated Tile tiles = 3;
+  uint32 turn = 4;
+  repeated UpdatePlayer players = 5;
+  repeated UpdateCity cities = 6;
+  repeated UpdateUnit units = 7;
+}
+
+// Culture values for a tile or city.
+message CultureValues {
+  // SoA representation
+  repeated uint32 playerIDs = 1;
+  repeated uint32 amounts = 2;
+}
+
+// Occupies the first 128 bytes (zero-padded) of a save file.
+message SaveFileHeader {
+  string name = 1;
+  uint32 turn = 2;
 }

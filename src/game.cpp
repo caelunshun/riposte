@@ -136,6 +136,10 @@ namespace rip {
         return impl->theMap[pos.x + pos.y * getMapWidth()];
     }
 
+    void Game::setTile(glm::uvec2 pos, Tile tile) {
+        impl->theMap[pos.x + pos.y * getMapWidth()] = std::move(tile);
+    }
+
     Cursor &Game::getCursor() {
         return impl->cursor;
     }
@@ -250,7 +254,9 @@ namespace rip {
     }
 
     PlayerId Game::addPlayer(Player player) {
-        return impl->players.insert(std::move(player));
+        auto id = impl->players.insert(std::move(player));
+        getPlayer(id).setID(id);
+        return id;
     }
 
     slot_map<Player> &Game::getPlayers() {
@@ -302,6 +308,10 @@ namespace rip {
 
     const slot_map<Unit> &Game::getUnits() const {
         return impl->units;
+    }
+
+    void Game::setTurn(int turn) {
+        impl->turn = turn;
     }
 
     int Game::getTurn() const {

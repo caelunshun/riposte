@@ -12,6 +12,7 @@ local Image = require("widget/image")
 local Padding = require("widget/padding")
 local Clickable = require("widget/clickable")
 local ProgressBar = require("widget/progress_bar")
+local Spacer = require("widget/spacer")
 
 local UiUtils = require("ui/utils")
 
@@ -1024,13 +1025,18 @@ function InfoWindow:rebuild()
         era = self.game.era,
     }))
 
+    root:addFixedChild(Spacer:new(dume.Axis.Horizontal, 15))
+    root:addFixedChild(Button:new(Padding:new(Text:new("Save"), 5), function()
+        self.game.client:saveGame()
+    end))
+
     ui:createWindow("info", function(screenSize)
-        return {
-            pos = Vector(screenSize.x - size.x, 0),
-            size = size,
-        }
+    return {
+    pos = Vector(screenSize.x - size.x, 0),
+    size = size,
+    }
     end, UiUtils.createWindowContainer(root))
-end
+    end
 
 function InfoWindow:close()
     ui:deleteWindow("info")

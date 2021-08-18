@@ -171,7 +171,7 @@ function ServerList:buildRootWidget()
 
     root:addFixedChild(Button:new(Padding:new(Text:new("@size{18}{Create Game}"), 5), function()
         self:createGame(function(conn)
-            local server = createServer()
+            local server = createServer("multiplayer")
             enterLobby(Lobby:new(server, conn))
         end)
     end))

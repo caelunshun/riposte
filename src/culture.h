@@ -69,6 +69,8 @@ namespace rip {
 
         // Gets the owner of the given tile.
         std::optional<PlayerId> getTileOwner(glm::uvec2 pos) const;
+
+        void setCulture(glm::uvec2 tilePos, Culture culture);
     };
 }
 

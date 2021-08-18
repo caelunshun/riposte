@@ -376,7 +376,7 @@ namespace rip {
         }
 
         void addResource(std::shared_ptr<Resource> r) {
-            resources.emplace(r->name, std::move(r));
+            resources.emplace(r->id, std::move(r));
         }
 
         void addBuilding(std::shared_ptr<Building> b) {

@@ -12,6 +12,7 @@
 #include "bridge.h"
 #include "game.h"
 #include "tech.h"
+#include "saveload.h"
 
 using namespace moodycamel;
 
@@ -67,6 +68,7 @@ namespace rip {
         void handleDeclareWar(Game &game, const DeclareWar &packet);
         void handleConfigureWorkedTiles(Game &game, const ConfigureWorkedTiles &packet);
         void handleBombardCity(Game &game, const BombardCity &packet);
+        void handleSaveGame();
 
         void handleClientInfo(const ClientInfo &packet);
         void handleGameOptions(const GameOptions &packet);
@@ -99,14 +101,24 @@ namespace rip {
 
         GameOptions gameOptions;
 
+        // fields used for saving
+        std::string gameName;
+        std::string gameCategory;
+
+        std::optional<SaveFile> saveFileToLoadFrom;
+
     public:
+        bool inLobby = true;
+
         // NB: may be null if we're still in the lobby phase.
         std::unique_ptr<Game> game;
         std::shared_ptr<Registry> registry;
         std::shared_ptr<TechTree> techTree;
 
-        Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree);
+        Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree, std::string gameCategory);
         void setGameOptions(GameOptions gameOptions);
+        void setSaveFileToLoadFrom(SaveFile f);
+
         void startGame();
 
         void addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin);
@@ -136,6 +148,8 @@ namespace rip {
         void run(std::shared_ptr<ReaderWriterQueue<std::unique_ptr<Bridge>>> newConnections);
 
         bool hasPlayerWithCiv(const std::string &civID) const;
+
+        void saveGame();
     };
 }
 

@@ -8,6 +8,7 @@
 #include <riposte.pb.h>
 
 #include "game.h"
+#include "saveload.h"
 
 namespace rip {
     class WorkerTask;
@@ -28,6 +29,8 @@ namespace rip {
     void writeBuildTask(const BuildTask &task, ::BuildTask &protoTask);
     UpdateCity getUpdateCityPacket(Game &game, City &city);
     UpdatePlayer getUpdatePlayerPacket(Game &game, Player &player);
+
+    Culture getCultureFromProto(const CultureValues &proto, const IdConverter &playerIDs);
 }
 
 #endif //RIPOSTE_PROTOCOL_H

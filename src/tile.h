@@ -15,12 +15,16 @@
 
 struct NVGcontext;
 
+class Tile; // protobuf version
+
 namespace rip {
     struct Yield;
 
     class Game;
 
     class Tile;
+
+    class IdConverter;
 
     // A tile improvement (usually created by a worker)
     class Improvement {
@@ -72,6 +76,8 @@ namespace rip {
         Town = 4,
     };
 
+    CottageLevel cottageLevelFromStr(const std::string &s);
+
     class Cottage : public Improvement {
         CottageLevel level = CottageLevel::Cottage;
         int turnsUntilGrowth = 10;
@@ -91,6 +97,8 @@ namespace rip {
 
         CottageLevel getLevel() const;
         const char *getLevelName() const;
+
+        void setLevel(CottageLevel level);
 
         int getTurnsUntilGrowth() const;
 
@@ -166,8 +174,12 @@ namespace rip {
     public:
         Tile(Terrain terrain) : terrain(terrain) {}
         Tile() : terrain(Terrain::Grassland) {}
+        Tile(const ::Tile &packet, const IdConverter &playerIDs, const Registry &registry, glm::uvec2 pos);
 
         Tile(const Tile &other) = delete;
+        Tile(Tile &&other) noexcept = default;
+
+        Tile &operator=(Tile &&other) noexcept = default;
 
         Terrain getTerrain() const {
             return terrain;

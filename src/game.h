@@ -58,6 +58,7 @@ namespace rip {
         bool containsTile(glm::uvec2 pos) const;
         Tile &getTile(glm::uvec2 pos);
         const Tile &getTile(glm::uvec2 pos) const;
+        void setTile(glm::uvec2 pos, Tile tile);
 
         Cursor &getCursor();
         const Cursor &getCursor() const;
@@ -102,6 +103,7 @@ namespace rip {
         slot_map<Unit> &getUnits();
         const slot_map<Unit> &getUnits() const;
 
+        void setTurn(int turn);
         int getTurn() const;
 
         void toggleCheatMode();

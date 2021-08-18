@@ -70,3 +70,24 @@ pub unsafe extern "C" fn rodio_sound_set_volume(sound: &mut InstanceHandle, volu
 pub unsafe extern "C" fn rodio_free_sound(sound: *mut InstanceHandle) {
     let _ = Box::from_raw(sound);
 }
+
+use std::ffi::CString;
+use std::os::raw::c_char;
+
+static DATA_DIR: once_cell::sync::Lazy<CString> = once_cell::sync::Lazy::new(|| {
+    use directories_next::ProjectDirs;
+    let project_dirs =
+        ProjectDirs::from("me.caelunshun", "", "Riposte").expect("failed to get project dir");
+    CString::new(
+        project_dirs
+            .data_dir()
+            .to_str()
+            .expect("path contains invalid UTF-8"),
+    )
+    .unwrap()
+});
+
+#[no_mangle]
+pub unsafe extern "C" fn riposte_data_dir() -> *const c_char {
+    DATA_DIR.as_ptr()
+}

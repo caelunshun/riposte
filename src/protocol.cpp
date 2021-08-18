@@ -193,6 +193,10 @@ namespace rip {
 
         packet.set_id(unit.getID().encode());
 
+        packet.set_fortifiedforever(unit.fortified);
+        packet.set_skippingturn(unit.skippingTurn);
+        packet.set_fortifieduntilheal(unit.fortifiedUntilHeal);
+
         return packet;
     }
 
@@ -267,6 +271,12 @@ namespace rip {
 
         writeCultureValues(city.getCulture(), *packet.mutable_culturevalues());
 
+        for (const auto tilePos : city.getManualWorkedTiles()) {
+            auto *p = packet.add_manualworkedtiles();
+            p->set_x(tilePos.x);
+            p->set_y(tilePos.y);
+        }
+
         return packet;
     }
 
@@ -304,6 +314,27 @@ namespace rip {
         packet.set_hasai(player.hasAI());
         packet.mutable_visibility()->CopyFrom(getUpdateVisibilityPacket(game, player.getID()));
 
+        for (const auto cityID : player.getCities()) {
+            packet.add_cityids(cityID.encode());
+        }
+
+        packet.set_score(player.getScore());
+
+        packet.set_civid(player.getCiv().id);
+        packet.set_leadername(player.getLeader().name);
+
         return packet;
+    }
+
+    Culture getCultureFromProto(const CultureValues &proto, const IdConverter &playerIDs) {
+        Culture c;
+
+        for (int i = 0; i < proto.amounts_size(); i++) {
+            const auto amount = proto.amounts()[i];
+            const auto owner = playerIDs.get(proto.playerids()[i]);
+            c.addCultureForPlayer(owner, amount);
+        }
+
+        return c;
     }
 }

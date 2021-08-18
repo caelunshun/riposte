@@ -14,6 +14,8 @@
 #include "server.h"
 #include "stack.h"
 #include <riposte.pb.h>
+#include "saveload.h"
+#include "protocol.h"
 
 namespace rip {
     BuildTask::BuildTask(int cost) : cost(cost) {}
@@ -40,6 +42,41 @@ namespace rip {
 
     City::City(glm::uvec2 pos, std::string name, PlayerId owner) : pos(pos), name(std::move(name)), owner(owner), culture() {
         culture.addCultureForPlayer(owner, 1);
+    }
+
+    City::City(UpdateCity &packet, const Registry &registry, const IdConverter &playerIDs) {
+        pos = glm::uvec2(packet.pos().x(), packet.pos().y());
+        name = packet.name();
+        owner = playerIDs.get(packet.ownerid());
+
+        if (packet.has_buildtask()) {
+            const auto &buildTaskProto = packet.buildtask().kind();
+            if (buildTaskProto.has_unit()) {
+                buildTask = std::make_unique<UnitBuildTask>(registry.getUnit(buildTaskProto.unit().unitkindid()));
+            } else if (buildTaskProto.has_building()) {
+                buildTask = std::make_unique<BuildingBuildTask>(registry.getBuilding(buildTaskProto.building().buildingname()));
+            }
+            buildTask->spendHammers(packet.buildtask().progress());
+        }
+
+        culture = getCultureFromProto(packet.culturevalues(), playerIDs);
+
+        for (const auto &buildingName : packet.buildingnames()) {
+            buildings.push_back(registry.getBuilding(buildingName));
+        }
+
+        population = packet.population();
+        storedFood = packet.storedfood();
+        capital = packet.iscapital();
+
+        for (const auto &p : packet.workedtiles()) {
+            workedTiles.emplace_back(p.x(), p.y());
+        }
+        for (const auto &p : packet.manualworkedtiles()) {
+            manualWorkedTiles.emplace_back(p.x(), p.y());
+        }
+
+        cultureDefenseBonus = packet.culturedefensebonus();
     }
 
     void City::setID(CityId id) {

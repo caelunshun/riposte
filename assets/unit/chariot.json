@@ -5,7 +5,7 @@
   "movement": 2,
   "cost": 40,
   "techs": ["Animal Husbandry"],
-  "resources": ["Horse"],
+  "resources": ["horse"],
   "category": "mounted",
   "combatBonuses": [
     {

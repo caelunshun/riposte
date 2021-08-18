@@ -14,8 +14,11 @@
 #include "ids.h"
 #include "tech.h"
 
+class UpdatePlayer;
+
 namespace rip {
     class Game;
+    class IdConverter;
 
     enum Visibility : uint8_t {
         // The tile is completely hidden (black).
@@ -120,6 +123,13 @@ namespace rip {
 
      public:
          Player(std::string username, std::shared_ptr<CivKind> civ, Leader leader, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree);
+
+         Player(const UpdatePlayer &packet, const Registry &registry, const std::shared_ptr<TechTree> &techTree,
+                const IdConverter &cityIDs,
+                const IdConverter &playerIDs,
+                uint32_t mapWidth, uint32_t mapHeight);
+
+         void onLoaded(Game &game);
 
          Player(Player &&other) = default;
          Player(const Player &other) = delete;

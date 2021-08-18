@@ -10,6 +10,8 @@
 #include "unit.h"
 #include "event.h"
 #include "server.h"
+#include "saveload.h"
+#include <riposte.pb.h>
 
 namespace rip {
     Player::Player(std::string username, std::shared_ptr<CivKind> civ, Leader leader, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree)
@@ -18,6 +20,64 @@ namespace rip {
         for (const auto &startingTechName : civ->startingTechs) {
             techs.unlockTech(techTree->getTechs().at(startingTechName));
         }
+    }
+
+    Player::Player(const UpdatePlayer &packet, const Registry &registry, const std::shared_ptr<TechTree> &techTree,
+                   const IdConverter &cityIDs,
+                   const IdConverter &playerIDs,
+                   uint32_t mapWidth, uint32_t mapHeight)
+        : username(packet.username()), gold(packet.gold()), visibilityMap(mapWidth, mapHeight), techs(techTree) {
+        if (packet.has_researchingtech()) {
+            researchingTech = ResearchingTech(techTree->getTechs().at(packet.researchingtech().techid()));
+            researchingTech->beakersAccumulated = packet.researchingtech().progress();
+        }
+
+        if (packet.capitalcityid() != 0) {
+            capital = cityIDs.get(packet.capitalcityid());
+        }
+
+        for (const auto &techID : packet.unlockedtechids()) {
+            techs.unlockTech(techTree->getTechs().at(techID));
+        }
+
+        sciencePercent = packet.beakerpercent();
+
+        for (const auto opponentID : packet.atwarwithids()) {
+            atWarWith.insert(playerIDs.get(opponentID));
+        }
+
+        civ = registry.getCiv(packet.civid());
+        for (auto &leader : civ->leaders) {
+            if (leader.name == packet.leadername()) {
+                this->leader = leader;
+                break;
+            }
+        }
+
+        era = static_cast<Era>(static_cast<int>(packet.era()));
+        if (packet.hasai()) {
+            id = PlayerId(packet.id());
+            enableAI();
+        }
+
+        for (const auto cityID : packet.cityids()) {
+            cities.push_back(cityIDs.get(cityID));
+        }
+
+        score = packet.score();
+
+        for (int x = 0; x < mapWidth; x++) {
+            for (int y = 0; y < mapHeight; y++) {
+                visibilityMap[glm::uvec2(x, y)] =
+                        static_cast<Visibility>(static_cast<int>(
+                                packet.visibility().visibility(x + y * mapWidth)));
+            }
+        }
+    }
+
+    void Player::onLoaded(Game &game) {
+        recomputeRevenue(game);
+        recomputeExpenses(game);
     }
 
     void Player::setID(PlayerId id) {

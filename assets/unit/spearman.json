@@ -5,7 +5,7 @@
   "movement": 1,
   "cost": 35,
   "techs": ["Bronze Working"],
-  "resources": ["Copper"],
+  "resources": ["copper"],
   "category": "melee",
   "combatBonuses": [
     {

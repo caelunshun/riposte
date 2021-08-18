@@ -8,8 +8,52 @@
 #include "game.h"
 #include "rng.h"
 #include "server.h"
+#include "protocol.h"
+#include "saveload.h"
 
 namespace rip {
+    void Cottage::setLevel(CottageLevel level) {
+        this->level = level;
+    }
+
+    CottageLevel cottageLevelFromStr(const std::string &s)  {
+        if (s == "Cottage") return CottageLevel::Cottage;
+        if (s == "Hamlet") return CottageLevel::Hamlet;
+        if (s == "Village") return CottageLevel::Village;
+        if (s == "Town") return CottageLevel::Town;
+        return CottageLevel::Cottage;
+    }
+
+    Tile::Tile(const ::Tile &packet, const IdConverter &playerIDs, const Registry &registry, glm::uvec2 pos) {
+        terrain = static_cast<Terrain>(static_cast<int>(packet.terrain()));
+        forested = packet.forested();
+        hilled = packet.hilled();
+
+        if (!packet.resourceid().empty()) {
+            resource = registry.getResource(packet.resourceid());
+        }
+
+        for (const auto &improvement : packet.improvements()) {
+            std::unique_ptr<Improvement> imp;
+            const auto &id = improvement.id();
+            if (id == "Cottage") {
+                auto cottage = std::make_unique<Cottage>(pos);
+                cottage->setLevel(cottageLevelFromStr(improvement.cottagelevel()));
+                imp = std::move(cottage);
+            } else if (id == "Mine") {
+                imp = std::make_unique<Mine>(pos);
+            } else if (id == "Pasture") {
+                imp = std::make_unique<Pasture>(pos);
+            } else if (id == "Road") {
+                imp = std::make_unique<Road>(pos);
+            } else if (id == "Farm") {
+                imp = std::make_unique<Farm>(pos);
+            }
+
+            improvements.emplace_back(std::move(imp));
+        }
+    }
+
     float Tile::getMovementCost() const {
         float cost = (forested || hilled) ? 2 : 1;
 

@@ -19,9 +19,12 @@ class HappinessEntry;
 class UnhappinessEntry;
 class HealthEntry;
 class SicknessEntry;
+class UpdateCity;
 
 namespace rip {
     class City;
+
+    class IdConverter;
 
     // Something a city is producing right now: a unit, a building,
     // etc. This is an abstract class.
@@ -181,6 +184,8 @@ namespace rip {
 
     public:
         City(glm::uvec2 pos, std::string name, PlayerId owner);
+
+        City(UpdateCity &packet, const Registry &registry, const IdConverter &playerIDs);
 
         void setID(CityId id);
         void setCapital(Game &game, bool isCapital);

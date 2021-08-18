@@ -14,6 +14,8 @@
 #include <nuklear.h>
 #include <iostream>
 #include "server.h"
+#include "protocol.h"
+#include "saveload.h"
 
 namespace rip {
      FoundCityCapability::FoundCityCapability(UnitId unitID) : Capability(unitID) {}
@@ -62,6 +64,60 @@ namespace rip {
                                                                                  owner(owner) {
         health = 1;
         movementLeft = this->kind->movement;
+    }
+
+    Unit::Unit(const UpdateUnit &packet, const IdConverter &playerIDs, const IdConverter &unitIDs, const Registry &registry, UnitId id) {
+         id = id;
+        pos = glm::uvec2(packet.pos().x(), packet.pos().y());
+
+        kind = registry.getUnit(packet.kindid());
+        owner = playerIDs.get(packet.ownerid());
+
+        health = packet.health();
+        movementLeft = packet.movementleft();
+        fortified = packet.fortifiedforever();
+        skippingTurn = packet.skippingturn();
+        fortifiedUntilHeal = packet.fortifieduntilheal();
+
+        for (const auto &protoCap : packet.capabilities()) {
+            if (protoCap.has_worker()) {
+                auto workerCap = std::make_unique<WorkerCapability>(id);
+                if (protoCap.worker().has_currenttask()) {
+                    const auto &task = protoCap.worker().currenttask();
+                    if (task.kind().has_buildimprovement()) {
+                        std::unique_ptr<Improvement> improvement;
+                        const auto &id = task.kind().buildimprovement().improvementid();
+                        if (id == "Cottage") {
+                            improvement = std::make_unique<Cottage>(pos);
+                        } else if (id == "Mine") {
+                            improvement = std::make_unique<Mine>(pos);
+                        } else if (id == "Pasture") {
+                            improvement = std::make_unique<Pasture>(pos);
+                        } else if (id == "Road") {
+                            improvement = std::make_unique<Road>(pos);
+                        } else if (id == "Farm") {
+                            improvement = std::make_unique<Farm>(pos);
+                        }
+                        workerCap->setTask(std::make_unique<BuildImprovementTask>(
+                                task.turnsleft(),
+                                pos,
+                                std::move(improvement)
+                                ));
+                    }
+                }
+                capabilities.emplace_back(std::move(workerCap));
+            } else if (protoCap.has_foundcity()) {
+                capabilities.push_back(std::make_unique<FoundCityCapability>(id));
+            } else if (protoCap.has_bombardcity()) {
+                capabilities.push_back(std::make_unique<BombardCityCapability>(id));
+            } else if (protoCap.has_carryunits()) {
+                auto cap = std::make_unique<CarryUnitsCapability>(id, kind->carryUnitCapacity);
+                for (const auto unitID : protoCap.carryunits().carryingunitids()) {
+                    cap->addCarryingUnit(unitIDs.get(unitID));
+                }
+                capabilities.emplace_back(std::move(cap));
+            }
+        }
     }
 
     void Unit::setID(UnitId id) {

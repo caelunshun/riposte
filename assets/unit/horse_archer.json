@@ -5,6 +5,6 @@
   "movement": 2,
   "cost": 50,
   "techs": ["Horseback Riding"],
-  "resources": ["Horse"],
+  "resources": ["horse"],
   "category": "mounted"
 }

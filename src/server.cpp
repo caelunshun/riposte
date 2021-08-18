@@ -14,14 +14,13 @@
 #include <thread>
 #include "trade.h"
 #include "protocol.h"
+#include <fstream>
 
 #define PACKET(packet, anyservername, id) AnyServer _anyServer; _anyServer.set_requestid(id); _anyServer.mutable_##anyservername()->CopyFrom(packet);
 #define SEND(packet, anyservername, id)  { PACKET(packet, anyservername, id); send(_anyServer); }
 #define BROADCAST(packet, anyservername, id) { PACKET(packet, anyservername, id); for (auto &connection : connections) { connection.send(_anyServer); }}
 
 namespace rip {
-
-
     Connection::Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID, bool isAdmin, Server *server)
         : bridge(std::move(bridge)), playerID(playerID), isAdmin(isAdmin), server(server) {
         // choose random initial civ and leader
@@ -281,6 +280,12 @@ namespace rip {
         }
     }
 
+    void Connection::handleSaveGame() {
+        if (isAdmin) {
+            server->saveGame();
+        }
+    }
+
     void Connection::handleGameOptions(const GameOptions &packet) {
         if (isAdmin) {
             server->setGameOptions(packet);
@@ -305,7 +310,7 @@ namespace rip {
 
     void Connection::handlePacket(Game *gamePtr, AnyClient &packet) {
         currentRequestID = packet.requestid();
-        if (gamePtr) {
+        if (gamePtr && !server->inLobby) {
             auto &game = *gamePtr;
             if (packet.has_computepath()) {
                 handleComputePath(game, packet.computepath());
@@ -333,6 +338,8 @@ namespace rip {
                 handleConfigureWorkedTiles(game, packet.configureworkedtiles());
             } else if (packet.has_bombardcity()) {
                 handleBombardCity(game, packet.bombardcity());
+            } else if (packet.has_savegame()) {
+                handleSaveGame();
             }
         } else {
             // game hasn't started; we're in the lobby phase
@@ -380,12 +387,14 @@ namespace rip {
         return isAdmin;
     }
 
-    Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree)
-        : registry(registry), techTree(techTree) {
+    Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree, std::string gameCategory)
+        : registry(registry), techTree(techTree), gameCategory(std::move(gameCategory)) {
         gameOptions.set_mapwidth(32);
         gameOptions.set_mapheight(32);
         gameOptions.set_numhumanplayers(1);
         gameOptions.set_numaiplayers(1);
+
+        gameName = "Beta Game - #" + std::to_string(Rng().u32(0, 10000));
     }
 
     void Server::addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin) {
@@ -429,7 +438,7 @@ namespace rip {
                 connection.update(game.get());
             }
 
-            if (game) {
+            if (!inLobby) {
                 bool haveAllTurnsEnded = true;
                 for (auto &connection : connections) {
                     if (!connection.endedTurn) {
@@ -478,8 +487,13 @@ namespace rip {
             gameOptions.set_numhumanplayers(1);
         }
 
-        auto theGame = MapGenerator().generate(gameOptions, registry, techTree, this);
-        game = std::make_unique<Game>(std::move(theGame));
+        if (!game) {
+            // Generate a new game.
+            auto theGame = MapGenerator().generate(gameOptions, registry, techTree, this);
+            game = std::make_unique<Game>(std::move(theGame));
+        }
+
+        inLobby = false;
 
         StartGame startGame;
         BROADCAST(startGame, startgame, 0);
@@ -612,5 +626,26 @@ namespace rip {
             }
         }
         return false;
+    }
+
+    void Server::setSaveFileToLoadFrom(SaveFile f) {
+        saveFileToLoadFrom = std::move(f);
+
+        auto loadedGame = loadGameFromSave(this, *saveFileToLoadFrom, registry, techTree);
+        game = std::make_unique<Game>(std::move(loadedGame.game));
+    }
+
+    void Server::saveGame() {
+        if (!game) return;
+
+        const auto path = getSavePath(gameCategory, gameName, game->getTurn());
+        std::ofstream f(path);
+
+        const auto data = serializeGameToSave(*game, gameName);
+        f << data;
+
+        f.close();
+
+        std::cout << "Saved game to " << path << std::endl;
     }
 }

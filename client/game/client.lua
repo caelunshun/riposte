@@ -156,6 +156,10 @@ function Client:bombardCity(siegeUnit, targetCity)
     })
 end
 
+function Client:saveGame()
+    self:sendPacket("saveGame", {})
+end
+
 function Client:endTurn()
     self:sendPacket("endTurn", {})
 end

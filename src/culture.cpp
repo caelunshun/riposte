@@ -132,4 +132,8 @@ namespace rip {
     std::optional<PlayerId> CultureMap::getTileOwner(glm::uvec2 pos) const {
         return owners[pos.x + pos.y * mapWidth];
     }
+
+    void CultureMap::setCulture(glm::uvec2 tilePos, Culture culture) {
+        tiles[tilePos.x + tilePos.y * mapWidth] = std::move(culture);
+    }
 }
