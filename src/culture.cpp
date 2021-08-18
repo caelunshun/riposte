@@ -85,20 +85,16 @@ namespace rip {
 
             // Update the tile owner.
             auto currentOwner = getTileOwner(pos);
-            bool changed = false;
             for (const auto touchingCityID : touchingCities) {
                 const auto &touchingCity = game.getCity(touchingCityID);
                 if (!currentOwner.has_value() || cultureTile.getCultureForPlayer(touchingCity.getOwner())
                     > cultureTile.getCultureForPlayer(*currentOwner)) {
                     currentOwner = touchingCity.getOwner();
-                    changed = true;
                 }
             }
             owners[pos.x + pos.y * mapWidth] = currentOwner;
 
-            if (changed) {
-                game.getServer().markTileDirty(pos);
-            }
+            game.getServer().markTileDirty(pos);
         }, [&] (Tile &tile, glm::uvec2 pos) {
             auto d = dist(pos, city.getPos());
             return static_cast<int>(round(d)) <= level;

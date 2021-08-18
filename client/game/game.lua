@@ -139,7 +139,7 @@ function Game:getStackAtPos(pos)
 end
 
 function Game:addCity(data)
-    if self.cities[data.id] == nil and data.isCapital then
+    if self.cities[data.id] == nil and data.isCapital and data.ownerID == self.thePlayer.id then
         self.view:animateToTilePos(data.pos, 0.1)
     end
 

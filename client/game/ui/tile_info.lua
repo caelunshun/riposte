@@ -4,6 +4,8 @@ local function getCulture(game, tile)
         totalCulture = totalCulture + x
     end
 
+    if totalCulture == 0 then return nil end
+
     local lines = {}
     for i=1, #tile.cultureValues.playerIDs do
         local player = game.players[tile.cultureValues.playerIDs[i]]
