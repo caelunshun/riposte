@@ -278,7 +278,9 @@ function ResearchPrompt:build()
                 leadsToLine = leadsToLine .. ", "
             end
         end
-        lines[#lines + 1] = leadsToLine
+        if #leadsTo > 0 then
+            lines[#lines + 1] = leadsToLine
+        end
 
         local tooltip = createTooltip(lines, vars, wrapper)
         root:addFixedChild(tooltip)
