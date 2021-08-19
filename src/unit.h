@@ -90,6 +90,8 @@ namespace rip {
         std::optional<Path> currentPath;
         bool inCombat = false;
 
+        bool usedAttack = false;
+
         // Capabilities attached to the unit.
         std::vector<std::unique_ptr<Capability>> capabilities;
 
@@ -125,7 +127,7 @@ namespace rip {
         bool canFight() const;
         bool shouldDie() const;
 
-        void setMovementLeft(int movement);
+        void setMovementLeft(float movement);
 
         // Determines whether the unit can move to the given target
         // this turn.
@@ -133,10 +135,6 @@ namespace rip {
         // Attempts to move the unit to a target position.
         // Does nothing if canMove(target) is false.
         void moveTo(glm::uvec2 target, Game &game, bool allowCombat);
-
-        // Determines whether this unit will attack another unit.
-        bool wouldAttack(const Game &game, const Unit &other) const;
-        std::optional<UnitId> wouldAttackPos(const Game &game, glm::uvec2 target) const;
 
         bool hasPath() const;
         const Path &getPath() const;
@@ -154,6 +152,12 @@ namespace rip {
         void skipTurn();
 
         void teleportTo(glm::uvec2 newPos, Game &game);
+
+        double getModifiedDefendingStrength(const Unit &attacker, const Game &game) const;
+        double getModifiedAttackingStrength(const Game &game) const;
+
+        bool hasUsedAttack() const;
+        void useAttack();
 
         template<class T>
         T *getCapability() {

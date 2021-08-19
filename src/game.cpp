@@ -459,6 +459,27 @@ namespace rip {
         return *impl->techTree;
     }
 
+    std::optional<UnitId> Game::getStrongestDefender(const Unit &attacker, glm::uvec2 targetPos) const {
+        std::optional<UnitId> bestUnit;
+        double bestStrength = 0;
+        for (const auto stack : getStacksAtPos(targetPos)) {
+            for (const auto unitID : getStack(stack).getUnits()) {
+                auto &unit = getUnit(unitID);
+
+                if (!getPlayer(unit.getOwner()).isAtWarWith(attacker.getOwner())) continue;
+
+                if (unit.shouldDie()) continue;
+
+                const auto strength = unit.getModifiedDefendingStrength(attacker, *this);
+                if (!bestUnit.has_value() || strength > bestStrength) {
+                    bestUnit = unitID;
+                    bestStrength = strength;
+                }
+            }
+        }
+        return bestUnit;
+    }
+
     // EVENTS
 
     void Game::onWarDeclared(Player &declarer, Player &declared) {

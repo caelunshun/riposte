@@ -6,10 +6,14 @@
 -- if a combat animation is currently being displayed.
 local CombatEvent = {}
 
-local timeBetweenRounds = 0.3
+local function getTimePerRound(numRounds)
+    local desiredCombatTime = 4
+    return desiredCombatTime / numRounds
+end
 
 -- Creates a CombatEvent from the CombatEvent packet.
 function CombatEvent:new(game, packet)
+    print(inspect(packet))
     local o = {
         game = game,
         defender = game.units[packet.defenderID],
@@ -20,6 +24,11 @@ function CombatEvent:new(game, packet)
         finished = false,
         attackerWon = packet.attackerWon,
         numCollateralTargets = packet.numCollateralTargets,
+        timePerRound = getTimePerRound(#packet.rounds),
+    }
+    o.prevRound = {
+        attackerHealth = o.attacker.health,
+        defenderHealth = o.defender.health,
     }
     setmetatable(o, self)
     self.__index = self
@@ -39,13 +48,15 @@ function CombatEvent:tick()
         return
     end
 
-    if time - self.previousRoundTime >= timeBetweenRounds then
+    -- interpolate health values
+    local elapsed = math.clamp((time - self.previousRoundTime) / self.timePerRound, 0, 1)
+    self.attacker.health = self.prevRound.attackerHealth * (1 - elapsed) + self.rounds[self.nextRound].attackerHealth * elapsed
+    self.defender.health = self.prevRound.defenderHealth * (1 - elapsed) + self.rounds[self.nextRound].defenderHealth * elapsed
+
+    if time - self.previousRoundTime >= self.timePerRound then
         self.previousRoundTime = time
 
-        -- update attacker and defender healths
-        self.attacker.health = self.rounds[self.nextRound].attackerHealth
-        self.defender.health = self.rounds[self.nextRound].defenderHealth
-
+        self.prevRound = self.rounds[self.nextRound]
         self.nextRound = self.nextRound + 1
 
         if self.nextRound > #self.rounds then

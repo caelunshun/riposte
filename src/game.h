@@ -142,6 +142,8 @@ namespace rip {
         Server &getServer();
 
         const TechTree &getTechTree() const;
+
+        std::optional<UnitId> getStrongestDefender(const Unit &attacker, glm::uvec2 targetPos) const;
     };
 }
 

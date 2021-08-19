@@ -35,10 +35,10 @@ namespace rip {
         NVGcolor color;
         bool wouldAttack = false;
         for (const auto unitID : selectedUnits) {
-            if (game.getUnit(unitID).wouldAttackPos(game, path.getDestination())) {
+            /*if (game.getUnit(unitID).wouldAttackPos(game, path.getDestination())) {
                 wouldAttack = true;
                 break;
-            }
+            }*/
         }
         if (wouldAttack) {
             color = nvgRGBA(225, 82, 62, 180);

@@ -160,6 +160,7 @@ namespace rip {
         packet.set_movementleft(unit.getMovementLeft());
         packet.set_strength(unit.getCombatStrength());
         packet.set_isfortified(unit.isFortified());
+        packet.set_usedattack(unit.hasUsedAttack());
 
         if (unit.hasPath()) {
             writePath(unit.getPath(), *packet.mutable_followingpath());

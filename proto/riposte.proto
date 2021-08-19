@@ -430,6 +430,8 @@ message UpdateUnit {
   bool fortifiedForever = 11;
   bool skippingTurn = 12;
   bool fortifiedUntilHeal = 13;
+
+  bool usedAttack = 14;
 }
 
 message ResearchingTech {

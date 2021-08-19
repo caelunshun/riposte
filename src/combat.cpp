@@ -20,9 +20,10 @@ namespace rip {
         assert(attackerID != defenderID);
         auto &attacker = game.getUnit(attackerID);
         auto &defender = game.getUnit(defenderID);
-        startingAttackerStrength = getUnitStrength(game, attacker, defender);
-        startingDefenderStrength = getUnitStrength(game, defender, attacker);
+        startingAttackerStrength = attacker.getModifiedAttackingStrength(game);
+        startingDefenderStrength = defender.getModifiedDefendingStrength(attacker, game);
 
+        std::cout << startingAttackerStrength << " attacks " << startingDefenderStrength << std::endl;
         if (startingDefenderStrength == 0 || startingAttackerStrength == 0) {
             finished = true;
 
@@ -43,43 +44,6 @@ namespace rip {
                 collateralDamageTargets.insert(unitID);
             }
         }
-    }
-
-    double Combat::getUnitStrength(const Game &game, const Unit &unit, const Unit &opponent) {
-        double baseStrength = unit.getCombatStrength();
-
-        bool defending = unit.getID() == defenderID;
-        bool attacking = unit.getID() == attackerID;
-        assert(defending || attacking);
-
-        const auto *city = game.getCityAtLocation(unit.getPos());
-
-        // Apply a percent bonus to the base strength,
-        // based on the unit's combatBonuses.
-        int percentBonus = 0;
-        for (const CombatBonus &bonus : unit.getKind().combatBonuses) {
-            if ((defending && bonus.onlyOnAttack) || (attacking && bonus.onlyOnDefense)) {
-                continue;
-            }
-            if (city) {
-                percentBonus += bonus.whenInCityBonus;
-            }
-            if (opponent.getKind().id == bonus.unit) {
-                percentBonus += bonus.againstUnitBonus;
-            }
-            if (opponent.getKind().category == bonus.unitCategory) {
-                percentBonus += bonus.againstUnitCategoryBonus;
-            }
-        }
-
-        if (city && city->getOwner() == unit.getOwner() && defending) {
-            percentBonus += city->getBuildingEffects().defenseBonusPercent;
-            percentBonus += city->getCultureDefenseBonus();
-        }
-
-        percentBonus += game.getTile(unit.getPos()).getDefensiveBonus();
-
-        return baseStrength + (percentBonus / 100.0) * baseStrength;
     }
 
 
@@ -131,33 +95,28 @@ namespace rip {
         UnitId winner;
 
         if (attacker.shouldDie() || attacker.getCombatStrength() == 0) {
-            game.deferKillUnit(attackerID);
             winner = defenderID;
         } else if (defender.shouldDie() || defender.getCombatStrength() == 0) {
-            game.deferKillUnit(defenderID);
-            attacker.moveTo(defender.getPos(), game, false);
             winner = attackerID;
         }
 
-        if (attacker.getOwner() == game.getThePlayerID() || defender.getOwner() == game.getThePlayerID()) {
-            UnitId enemy;
-            UnitId ours;
-            if (attacker.getOwner() == game.getThePlayerID()) { enemy = defenderID; ours = attackerID; }
-            else { enemy = attackerID; ours = defenderID; }
-            game.getServer().broadcastCombatEvent(
-                    attacker.getID(),
-                    defender.getID(),
-                    winner,
-                    getRounds(),
-                    collateralDamageTargets.size()
-                    );
-            game.addEvent(std::make_unique<CombatEvent>(
-                        game.getUnit(winner).getOwner() == game.getThePlayerID(),
-                        game.getPlayer(game.getUnit(enemy).getOwner()).getCiv().adjective,
-                        game.getUnit(ours).getKind().name,
-                        game.getUnit(enemy).getKind().name
-                    ));
+        game.getServer().broadcastCombatEvent(
+                attacker.getID(),
+                defender.getID(),
+                winner,
+                getRounds(),
+                collateralDamageTargets.size());
+
+        if (winner == defenderID) {
+            game.deferKillUnit(attackerID);
+        } else {
+            game.deferKillUnit(defenderID);
+            attacker.moveTo(defender.getPos(), game, false);
+            attacker.setMovementLeft(attacker.getMovementLeft() - 1);
         }
+
+        game.getServer().markUnitDirty(attackerID);
+        game.getServer().markUnitDirty(defenderID);
     }
 
     UnitId Combat::getAttacker() {

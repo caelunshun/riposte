@@ -372,11 +372,15 @@ function Hud:clearSelection()
 end
 
 local white = dume.rgb(255, 255, 255)
+local yellow = dume.rgb(237, 139, 0)
+local red = dume.rgb(252, 76, 2)
 local spinningColor = dume.rgb(255, 255, 255, 200)
 
 function Hud:renderStagedPath(cv)
     if not self.hasStagedPath then return end
     if self.stagedPath == nil then return end
+
+    local lastPos
 
     cv:beginPath()
     local first = true
@@ -391,10 +395,30 @@ function Hud:renderStagedPath(cv)
         else
             cv:lineTo(dst)
         end
+
+        lastPos = Vector(x, y)
     end
 
     cv:strokeWidth(5)
-    cv:solidColor(white)
+
+    local color = white
+
+    if lastPos ~= nil then
+        local targetStack = self.game:getStackAtPos(lastPos)
+        for _, unit in ipairs(targetStack.units) do
+            if self.game.thePlayer:isAtWarWith(unit.owner) then
+                if self.selectedUnits[1].kind.strength == 0 or self.selectedUnits[1].usedAttack then
+                    color = red
+                else
+                    color = yellow
+                end
+                break
+            end
+        end
+    end
+
+    cv:solidColor(color)
+
     cv:stroke()
 end
 
@@ -572,6 +596,11 @@ function UnitDisplayWindow:new(game, hud)
     local o = { game = game, hud = hud }
     game.eventBus:registerHandler("selectedUnitsUpdated", function()
         if hud.active then
+            o:rebuild()
+        end
+    end)
+    game.eventBus:registerHandler("unitUpdated", function(unit)
+        if #hud.selectedUnits == 1 and hud.selectedUnits[1] == unit then
             o:rebuild()
         end
     end)

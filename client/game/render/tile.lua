@@ -95,7 +95,14 @@ function UnitRenderer:renderTile(cv, tile, tilePos, game)
     local stack = game:getStackAtPos(tilePos)
     if #stack.units == 0 then return end
 
-    if game.hud.mainHud.selectedStack == stack then
+    for i=1,#stack.units do
+        if stack.units[i].isInCombat then
+            unit = stack.units[i]
+            break
+        end
+    end
+
+    if game.hud.mainHud.selectedStack == stack and unit == nil then
         for i=1,#stack.units do
             if stack.units[i].isSelected then
                 unit = stack.units[i]

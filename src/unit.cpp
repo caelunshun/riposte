@@ -78,6 +78,7 @@ namespace rip {
         fortified = packet.fortifiedforever();
         skippingTurn = packet.skippingturn();
         fortifiedUntilHeal = packet.fortifieduntilheal();
+        usedAttack = packet.usedattack();
 
         for (const auto &protoCap : packet.capabilities()) {
             if (protoCap.has_worker()) {
@@ -183,32 +184,18 @@ namespace rip {
             return false;
         }
 
-        if (!canFight() && wouldAttackPos(game, target)) {
+        const auto strongestDefender = game.getStrongestDefender(*this, target);
+
+        if (!canFight() && strongestDefender.has_value()) {
+            return false;
+        }
+
+        if (hasUsedAttack() && strongestDefender.has_value()
+            && game.getUnit(*strongestDefender).canFight()) {
             return false;
         }
 
         return true;
-    }
-
-    bool Unit::wouldAttack(const Game &game, const Unit &other) const {
-        return
-            other.getID() != id
-            && !other.shouldDie()
-            && owner != other.getOwner()
-            && game.getPlayer(owner).isAtWarWith(other.getOwner());
-    }
-
-    std::optional<UnitId> Unit::wouldAttackPos(const Game &game, glm::uvec2 target) const {
-        for (const auto stackID : game.getStacksAtPos(target)) {
-            const auto &stack = game.getStack(stackID);
-            for (const auto otherUnitID : stack.getUnits()) {
-                auto &otherUnit = game.getUnit(otherUnitID);
-                if (wouldAttack(game, otherUnit)) {
-                    return otherUnitID;
-                }
-            }
-        }
-        return {};
     }
 
     void Unit::moveTo(glm::uvec2 target, Game &game, bool allowCombat) {
@@ -217,12 +204,14 @@ namespace rip {
         auto oldPos = pos;
 
         // Check for attacks.
-        auto otherUnit = wouldAttackPos(game, target);
+        auto otherUnit = game.getStrongestDefender(*this, target);
         if (otherUnit.has_value()) {
             if (!allowCombat && game.getUnit(*otherUnit).canFight()) return;
             Combat combat(getID(), *otherUnit, game);
             combat.finish(game);
-            std::cout << "attack" << std::endl;
+            if (game.getUnit(*otherUnit).canFight()) {
+                useAttack();
+            }
             return;
         }
 
@@ -259,7 +248,7 @@ namespace rip {
         if (currentPath.has_value()) {
             while (currentPath->getNumPoints() > 0 && movementLeft != 0) {
                 auto point = currentPath->popNextPoint();
-                if (!allowCombat && wouldAttackPos(game, *point)) {
+                if (!allowCombat && game.getStrongestDefender(*this, *point).has_value()) {
                     currentPath = {};
                     return;
                 }
@@ -301,8 +290,9 @@ namespace rip {
         return capabilities;
     }
 
-    void Unit::setMovementLeft(int movement) {
+    void Unit::setMovementLeft(float movement) {
         movementLeft = movement;
+        if (movementLeft < 0) movementLeft = 0;
     }
 
     double Unit::getHealth() const {
@@ -376,5 +366,68 @@ namespace rip {
         inCombat = false;
 
         game.getServer().markUnitDirty(id);
+    }
+
+    double Unit::getModifiedDefendingStrength(const Unit &attacker, const Game &game) const {
+         int percentBonus = 0;
+
+         // Tile defense bonus
+         const auto &tile = game.getTile(pos);
+         percentBonus += tile.getDefensiveBonus();
+
+         // City defense bonuses
+         const auto *city = game.getCityAtLocation(pos);
+         if (city) {
+             percentBonus += city->getCultureDefenseBonus();
+             percentBonus += city->getBuildingEffects().defenseBonusPercent;
+         }
+
+         // Subtract opponent bonuses
+         for (const auto &bonus : attacker.getKind().combatBonuses) {
+             if (bonus.onlyOnDefense) continue;
+             if (bonus.unit == kind->id) {
+                 percentBonus -= bonus.againstUnitBonus;
+             }
+             if (bonus.unitCategory == kind->category) {
+                 percentBonus -= bonus.againstUnitCategoryBonus;
+             }
+             if (game.getCityAtLocation(attacker.getPos())) {
+                 percentBonus -= bonus.whenInCityBonus;
+             }
+         }
+
+         // Add our bonuses
+         for (const auto &bonus : kind->combatBonuses) {
+             if (bonus.onlyOnAttack) continue;
+             if (bonus.unit == attacker.getKind().id) {
+                 percentBonus += bonus.againstUnitBonus;
+             }
+             if (bonus.unitCategory == attacker.getKind().category) {
+                 percentBonus += bonus.againstUnitCategoryBonus;
+             }
+             percentBonus += bonus.whenInCityBonus;
+         }
+
+         double result = health * kind->strength;
+
+         if (percentBonus >= 0) {
+             result *= 1 + (static_cast<double>(percentBonus) / 100);
+         } else {
+             result /= 1 + (abs(static_cast<double>(percentBonus)) / 100);
+         }
+
+         return result;
+    }
+
+    double Unit::getModifiedAttackingStrength(const Game &game) const {
+         return health * kind->strength;
+    }
+
+    bool Unit::hasUsedAttack() const {
+        return usedAttack;
+    }
+
+    void Unit::useAttack() {
+        usedAttack = true;
     }
 }

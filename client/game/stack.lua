@@ -21,7 +21,7 @@ function Stack:addUnit(unit)
     assert(unit.pos == self.pos, "unit added to a stack at the wrong position")
 
     -- Insert at correct sorted position
-    local pos = 1
+    local pos = #self.units + 1
     for i=1,#self.units do
         if self.units[i].strength <= unit.strength then
             pos = i

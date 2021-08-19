@@ -33,9 +33,6 @@ namespace rip {
 
         void doRound(Game &game);
 
-        // Gets a unit's strength with all bonuses applied.
-        double getUnitStrength(const Game &game, const Unit &unit, const Unit &opponent);
-
         void doCollateralDamage(Game &game);
 
     public:
