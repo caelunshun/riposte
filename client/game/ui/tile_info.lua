@@ -23,6 +23,10 @@ end
 local function getUnits(game, tile, tilePos)
     local lines = {}
 
+    if game:getVisibility(tilePos) ~= "Visible" then
+        return nil
+    end
+
     for _, unit in ipairs(game:getStackAtPos(tilePos).units) do
         lines[#lines + 1] = "@color{rgb(255,205,0)}{" .. unit.kind.name .. "}"
         if unit.kind.strength > 0 then
