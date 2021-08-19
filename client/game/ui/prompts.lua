@@ -144,13 +144,10 @@ function CityBuildPrompt:build()
             end
         else
             local building = registry.buildings[possibleTask.kind.building.buildingName]
-            lines = {
-                "%name",
-                "%cost @icon{hammer}"
-            }
+            lines = getBuildingTooltip(building)
             tooltipVars = {
-                name = building.name,
-                cost = building.cost,
+                percent = "%",
+                bullet = "•"
             }
         end
 

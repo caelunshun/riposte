@@ -52,3 +52,61 @@ function getResourceDescription(resource)
 
     return s
 end
+
+local function getBonusLine(effect, expectedType, icon)
+    if effect.type ~= expectedType then return end
+
+    return string.format("%%bullet +%d @icon{%s}", effect.amount, icon)
+end
+
+local function getBonusPercentLine(effect, expectedType, icon)
+    if effect.type ~= expectedType then return end
+
+    return string.format("%%bullet +%d%%percent @icon{%s}", effect.amount, icon)
+end
+
+function getBuildingTooltip(building)
+    local lines = {}
+
+    lines[#lines + 1] = building.name
+    lines[#lines + 1] = string.format("%d @icon{hammer}", building.cost)
+
+    for _, effect in ipairs(building.effects or {}) do
+        lines[#lines + 1] = getBonusLine(effect, "bonusHammers", "hammer")
+        lines[#lines + 1] = getBonusLine(effect, "bonusBeakers", "beaker")
+        lines[#lines + 1] = getBonusLine(effect, "bonusCommerce", "coin")
+        lines[#lines + 1] = getBonusLine(effect, "bonusFood", "bread")
+        lines[#lines + 1] = getBonusLine(effect, "bonusGold", "gold")
+
+        lines[#lines + 1] = getBonusPercentLine(effect, "bonusHammerPercent", "hammer")
+        lines[#lines + 1] = getBonusPercentLine(effect, "bonusBeakerPercent", "beaker")
+        lines[#lines + 1] = getBonusPercentLine(effect, "bonusCommercePercent", "coin")
+        lines[#lines + 1] = getBonusPercentLine(effect, "bonusFoodPercent", "bread")
+        lines[#lines + 1] = getBonusPercentLine(effect, "bonusGoldPercent", "gold")
+
+        if effect.type == "oceanFoodBonus" then
+            lines[#lines + 1] = string.format("%%bullet +%d @icon{bread} on ocean tiles", effect.amount)
+        end
+
+        if effect.type == "granaryFoodStore" then
+            lines[#lines + 1] = "%bullet Retains 50%percent of stored food after growth"
+        end
+
+        if effect.type == "defenseBonusPercent" then
+            lines[#lines + 1] = string.format("%%bullet +%d%%percent city defense", effect.amount)
+        end
+
+        if effect.type == "minusMaintenancePercent" then
+            lines[#lines + 1] = string.format("%%bullet -%d%%percent city maintenance costs", effect.amount)
+        end
+
+        if effect.type == "happiness" then
+            lines[#lines + 1] = string.format("%%bullet +%d @icon{happy}", effect.amount)
+        end
+        if effect.type == "health" then
+            lines[#lines + 1] = string.format("%%bullet +%d @icon{healthy}", effect.amount)
+        end
+    end
+
+    return lines
+end
