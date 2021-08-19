@@ -449,7 +449,7 @@ namespace rip {
 
                 if (haveAllTurnsEnded) {
                     game->advanceTurn();
-                    saveGame();
+                    // saveGame();
                     for (auto &connection : connections) {
                         connection.endedTurn = false;
                         connection.sendGlobalData(*game);
