@@ -18,6 +18,7 @@ using namespace moodycamel;
 
 namespace rip {
     class Server;
+    class BuildTask;
 
     // Represents a connection to the server from a client.
     class Connection {
@@ -145,6 +146,9 @@ namespace rip {
         void broadcastCityCaptured(CityId id, PlayerId capturer);
         void broadcastWarDeclared(PlayerId declarer, PlayerId declared);
         void broadcastBordersExpanded(CityId cityID);
+
+        void sendBuildTaskFinished(CityId cityID, const BuildTask *task);
+        void sendBuildTaskFailed(CityId cityID, const BuildTask &task);
 
         void run(std::shared_ptr<ReaderWriterQueue<std::unique_ptr<Bridge>>> newConnections);
 

@@ -20,9 +20,9 @@ local style = require("ui/style")
 -- Asks the user what to build in a city.
 local CityBuildPrompt = {}
 
-function CityBuildPrompt:new(game, city)
+function CityBuildPrompt:new(game, city, task, wasSuccessful)
     local possibleTasks = game.client:getPossibleBuildTasks(city)
-    local o = { game = game, city = city, possibleTasks = possibleTasks }
+    local o = { game = game, city = city, possibleTasks = possibleTasks, task = task, wasSuccessful = wasSuccessful }
     setmetatable(o, self)
     self.__index = self
 
@@ -42,26 +42,38 @@ local function createTooltip(lines, vars, child)
     return tooltip
 end
 
+local function getTaskName(task)
+    if task.kind.unit ~= nil then
+        return registry.unitKinds[task.kind.unit.unitKindID].name
+    else
+        return task.kind.building.buildingName
+    end
+end
+
 function CityBuildPrompt:build()
     self.game.view:animateToTilePos(self.city.pos, 0.5)
 
     local root = Flex:column(10)
 
     local title, vars
-    if self.city.previousBuildTask ~= nil then
+    if self.wasSuccessful and self.task ~= nil then
         local verb
-        if self.city.previousBuildTask.kind.unit ~= nil then
+        vars = { name = getTaskName(self.task) }
+        if self.task.kind.unit ~= nil then
             verb = "trained"
-            vars = { name = registry.unitKinds[self.city.previousBuildTask.kind.unit.unitKindID].name }
         else
             verb = "constructed"
-            vars = { name = self.city.previousBuildTask.kind.building.buildingName }
         end
 
         title = "You have " .. verb .. " a @color{%highlight}{%name} in %city. What would you like to work on next?"
-    else
+    elseif self.task == nil then
         vars = {}
         title = "What would you like to work on in %city?"
+    else
+        vars = {
+            name = getTaskName(self.task)
+        }
+        title = "You can no longer continue constructing " .. article(vars.name) .. " @color{%highlight}{%name} in %city. What would you like to work on instead?"
     end
     vars.city = self.city.name
     vars.highlight = dumeColorToString(style.default.highlightedText.defaultTextStyle.color)

@@ -249,6 +249,10 @@ function Client:handlePacket(packet)
         self:handleGameSaved(packet.gameSaved)
     elseif packet.bordersExpanded ~= nil then
         self:handleBordersExpanded(packet.bordersExpanded)
+    elseif packet.buildTaskFinished ~= nil then
+        self:handleBuildTaskFinished(packet.buildTaskFinished)
+    elseif packet.buildTaskFailed ~= nil then
+        self:handleBuildTaskFailed(packet.buildTaskFailed)
     end
 end
 
@@ -326,6 +330,20 @@ end
 function Client:handleBordersExpanded(packet)
     self.game.eventBus:trigger("bordersExpanded", {
         city = self.game.cities[packet.cityID]
+    })
+end
+
+function Client:handleBuildTaskFinished(packet)
+    self.game.eventBus:trigger("buildTaskFinished", {
+        city = self.game.cities[packet.cityID],
+        task = packet.task,
+    })
+end
+
+function Client:handleBuildTaskFailed(packet)
+    self.game.eventBus:trigger("buildTaskFailed", {
+        city = self.game.cities[packet.cityID],
+        task = packet.task,
     })
 end
 

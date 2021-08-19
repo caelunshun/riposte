@@ -27,8 +27,11 @@ local function handleCloseCityHud()
     end
 end
 
-local function handleBuildTaskCompleted(event)
-    local buildTask = event.buildTask
+local function handleBuildTaskCompleted(game, event)
+    if event.city.owner ~= game.thePlayer then return end
+    if event.task == nil then return end
+
+    local buildTask = event.task
     local sound
     local volume = 0.3
     if buildTask.kind.unit ~= nil then
@@ -76,7 +79,9 @@ local function registerSoundEvents(game)
     end)
     game.eventBus:registerHandler("cityHudOpened", handleEnterCityHud)
     game.eventBus:registerHandler("cityHudClosed", handleCloseCityHud)
-    game.eventBus:registerHandler("buildTaskCompleted", handleBuildTaskCompleted)
+    game.eventBus:registerHandler("buildTaskFinished", function(event)
+        handleBuildTaskCompleted(game, event)
+    end)
     game.eventBus:registerHandler("cityCaptured", handleCityCaptured)
     game.eventBus:registerHandler("warDeclared", handleWarDeclared)
     game.eventBus:registerHandler("bordersExpanded", function(event)

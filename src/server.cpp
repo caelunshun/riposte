@@ -19,6 +19,7 @@
 #define PACKET(packet, anyservername, id) AnyServer _anyServer; _anyServer.set_requestid(id); _anyServer.mutable_##anyservername()->CopyFrom(packet);
 #define SEND(packet, anyservername, id)  { PACKET(packet, anyservername, id); send(_anyServer); }
 #define BROADCAST(packet, anyservername, id) { PACKET(packet, anyservername, id); for (auto &connection : connections) { connection.send(_anyServer); }}
+#define SENDTOCONN(packet, anyservername, id, playerID) { PACKET(packet, anyservername, id); for (auto &connection : connections) { if (connection.getPlayerID() == playerID) { connection.send(_anyServer); } } }
 
 namespace rip {
     Connection::Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID, bool isAdmin, Server *server)
@@ -657,5 +658,26 @@ namespace rip {
         BordersExpanded packet;
         packet.set_cityid(cityID.encode());
         BROADCAST(packet, bordersexpanded, 0);
+    }
+
+    void Server::sendBuildTaskFinished(CityId cityID, const BuildTask *task) {
+        // ensure UpdateCity is sent first if the city was just created
+        flushDirtyItems();
+
+        BuildTaskFinished packet;
+        packet.set_cityid(cityID.encode());
+
+        if (task) {
+            writeBuildTask(*task, *packet.mutable_task());
+        }
+
+        SENDTOCONN(packet, buildtaskfinished, 0, game->getCity(cityID).getOwner());
+    }
+
+    void Server::sendBuildTaskFailed(CityId cityID, const BuildTask &task) {
+        BuildTaskFailed packet;
+        packet.set_cityid(cityID.encode());
+        writeBuildTask(task, *packet.mutable_task());
+        SENDTOCONN(packet, buildtaskfailed, 0, game->getCity(cityID).getOwner());
     }
 }

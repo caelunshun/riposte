@@ -58,9 +58,14 @@ function Hud:new(game)
         end
     end)
 
-    game.eventBus:registerHandler("cityUpdated", function(city)
+    game.eventBus:registerHandler("buildTaskFinished", function(event)
         if o.active then
-            o:onCityUpdated(city)
+            o:onBuildTaskFinished(event)
+        end
+    end)
+    game.eventBus:registerHandler("buildTaskFailed", function(event)
+        if o.active then
+            o:onBuildTaskFailed(event)
         end
     end)
 
@@ -530,11 +535,21 @@ function Hud:render(cv, time, dt)
     end
 end
 
-function Hud:onCityUpdated(city)
-    if city.owner == self.game.thePlayer and city.buildTask == nil then
+function Hud:onBuildTaskFinished(event)
+    if event.city.owner == self.game.thePlayer then
         -- Prompt the user to set the new build task.
         local co = coroutine.create(function()
-            self.promptQueue:push(prompts.CityBuildPrompt:new(self.game, city))
+            self.promptQueue:push(prompts.CityBuildPrompt:new(self.game, event.city, event.task, true))
+        end)
+        callSafe(co)
+    end
+end
+
+function Hud:onBuildTaskFailed(event)
+    if event.city.owner == self.game.thePlayer then
+        -- Prompt the user to set the new build task.
+        local co = coroutine.create(function()
+            self.promptQueue:push(prompts.CityBuildPrompt:new(self.game, event.city, event.task, false))
         end)
         callSafe(co)
     end

@@ -108,6 +108,8 @@ message AnyServer {
     WarDeclared warDeclared = 20;
     GameSaved gameSaved = 21;
     BordersExpanded bordersExpanded = 22;
+    BuildTaskFinished buildTaskFinished = 23;
+    BuildTaskFailed buildTaskFailed = 24;
   }
 }
 
@@ -556,6 +558,16 @@ message GameSaved {}
 
 message BordersExpanded {
   uint32 cityID = 1;
+}
+
+message BuildTaskFinished {
+  uint32 cityID = 1;
+  BuildTask task = 2;
+}
+
+message BuildTaskFailed {
+  uint32 cityID = 1;
+  BuildTask task = 2;
 }
 
 // ---------------------

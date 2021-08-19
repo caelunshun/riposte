@@ -263,8 +263,13 @@ namespace rip {
 
             if (buildTask->isFinished()) {
                 buildTask->onCompleted(game, *this);
-                previousBuildTask = buildTask->getName();
-                buildTask = std::unique_ptr<BuildTask>();
+                game.getServer().sendBuildTaskFinished(id, &*buildTask);
+                buildTask = {};
+            } else if (!buildTask->canBuild(game, *this)) {
+                // We can no longer build - e.g. because we don't have the necessary resources
+                // anymore.
+                game.getServer().sendBuildTaskFailed(id, *buildTask);
+                buildTask = {};
             }
         }
 
@@ -479,6 +484,10 @@ namespace rip {
         updateHappiness(game);
         updateHealth(game);
         updateWorkedTiles(game);
+
+        // Cause the client to prompt for a new build task
+        game.getServer().markCityDirty(id);
+        game.getServer().sendBuildTaskFinished(id, nullptr);
 
         // Check coastal status.
         for (const auto neighborPos : getNeighbors(pos)) {
