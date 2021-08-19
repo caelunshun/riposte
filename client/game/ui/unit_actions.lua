@@ -43,12 +43,22 @@ return function(row, units, game, hud)
     if #units == 1 then
         local unit = units[1]
 
-        if unit:hasCapability("found_city") and game:getCityAtPos(unit.pos) == nil then
-            local foundCity = Button:new(Text:new("@size{20}{Found City}"), function()
-                game.client:doUnitAction(unit, "FoundCity")
-            end)
-            table.insert(foundCity.classes, "unitActionButton")
-            row:addFixedChild(foundCity)
+        if unit:hasCapability("found_city") then
+            local canBuildCity = true
+            for _, city in pairs(game.cities) do
+                if (city.pos - unit.pos).length2 < 9 then
+                    canBuildCity = false
+                    break
+                end
+            end
+
+            if canBuildCity then
+                local foundCity = Button:new(Text:new("@size{20}{Found City}"), function()
+                    game.client:doUnitAction(unit, "FoundCity")
+                end)
+                table.insert(foundCity.classes, "unitActionButton")
+                row:addFixedChild(foundCity)
+            end
         end
 
         if unit:hasCapability("bombard_city_defenses") then

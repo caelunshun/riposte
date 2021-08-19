@@ -23,13 +23,17 @@ namespace rip {
      bool FoundCityCapability::foundCity(Game &game) {
          const auto &unit = game.getUnit(unitID);
          auto &player = game.getPlayer(unit.getOwner());
-         if (game.getCityAtLocation(unit.getPos())) {
-             return false;
-         } else {
-             player.createCity(unit.getPos(), game);
-             game.deferKillUnit(unitID);
-             return true;
+
+         // No cities allowed within a radius of 3.
+         for (const auto &city : game.getCities()) {
+             if (dist(city.getPos(), unit.getPos()) < 3) {
+                 return false;
+             }
          }
+
+         player.createCity(unit.getPos(), game);
+         game.deferKillUnit(unitID);
+         return true;
      }
 
      UnitUIStatus FoundCityCapability::paintMainUI(Game &game, Hud &hud, nk_context *nk) {
