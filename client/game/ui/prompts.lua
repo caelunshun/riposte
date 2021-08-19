@@ -26,8 +26,6 @@ function CityBuildPrompt:new(game, city)
     setmetatable(o, self)
     self.__index = self
 
-    game.view:animateToTilePos(city.pos, 0.5)
-
     return o
 end
 
@@ -45,6 +43,8 @@ local function createTooltip(lines, vars, child)
 end
 
 function CityBuildPrompt:build()
+    self.game.view:animateToTilePos(self.city.pos, 0.5)
+
     local root = Flex:column(10)
 
     local title, vars
