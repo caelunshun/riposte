@@ -109,6 +109,11 @@ namespace rip {
 
     void CultureMap::onCityCreated(Game &game, CityId city) {
         updateForCity(game, city);
+
+        // Add 1 initial culture per adjacent tile
+        for (const auto tilePos : getNeighbors(game.getCity(city).getPos())) {
+            getTileCulture(tilePos).addCultureForPlayer(game.getCity(city).getOwner(), 1);
+        }
     }
 
     void CultureMap::onCityDestroyed(Game &game, CityId cityID) {
