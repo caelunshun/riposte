@@ -559,6 +559,7 @@ namespace rip {
 
         game.getServer().broadcastCityCaptured(id, newOwnerID);
         game.getServer().markCityDirty(id);
+        game.getServer().markTileDirty(pos);
     }
 
     const std::vector<std::shared_ptr<Building>> &City::getBuildings() const {

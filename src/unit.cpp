@@ -277,6 +277,7 @@ namespace rip {
         }
 
         resetMovement();
+        usedAttack = false;
 
         for (auto &capability : getCapabilities()) {
             capability->onTurnEnd(game);
