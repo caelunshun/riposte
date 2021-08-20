@@ -337,7 +337,11 @@ namespace rip {
         bool hasTech = game.getPlayer(builder.getOwner()).getTechs().isUnitUnlocked(*unitKind);
         bool isCoastal = !unitKind->ship || builder.isCoastal();
 
-        return hasTech && isCoastal;
+        bool uniqueUnit = (unitKind->onlyForCivs.empty() || unitKind->onlyForCivs.contains(
+                game.getPlayer(builder.getOwner()).getCiv().id
+                ));
+
+        return hasTech && isCoastal && uniqueUnit;
     }
 
     std::vector<std::string> UnitBuildTask::describe() const {
@@ -611,7 +615,9 @@ namespace rip {
         return
                 !builder.hasBuilding(building->name)
                 && (!building->onlyCoastal || builder.isCoastal())
-                && game.getPlayer(builder.getOwner()).getTechs().isBuildingUnlocked(*building);
+                && game.getPlayer(builder.getOwner()).getTechs().isBuildingUnlocked(*building)
+                && (building->onlyForCivs.empty()
+                    || building->onlyForCivs.contains(game.getPlayer(builder.getOwner()).getCiv().id));
     }
 
     void BuildingBuildTask::onCompleted(Game &game, City &builder) {

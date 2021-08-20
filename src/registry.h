@@ -9,6 +9,7 @@
 #include <vector>
 #include <array>
 #include <absl/container/flat_hash_map.h>
+#include <absl/container/flat_hash_set.h>
 #include <nlohmann/json.hpp>
 #include "assets.h"
 #include "yield.h"
@@ -130,6 +131,10 @@ namespace rip {
         // Maximum number of targets for collateral damage.
         int maxCollateralTargets = 0;
 
+        // The civs that are able to build this unit.
+        // If empty, defaults to all civs.
+        absl::flat_hash_set<std::string> onlyForCivs;
+
         friend void from_json(const nlohmann::json &json, UnitKind &unit) {
             json.at("id").get_to(unit.id);
             json.at("name").get_to(unit.name);
@@ -167,6 +172,14 @@ namespace rip {
             }
             if (json.contains("maxCollateralTargets")) {
                 json.at("maxCollateralTargets").get_to(unit.maxCollateralTargets);
+            }
+
+            if (json.contains("onlyForCivs")) {
+                std::vector<std::string> civs;
+                json.at("onlyForCivs").get_to(civs);
+                for (auto &c : civs) {
+                    unit.onlyForCivs.insert(std::move(c));
+                }
             }
         }
     };
@@ -327,6 +340,9 @@ namespace rip {
         // Effects of the building when built
         std::vector<BuildingEffect> effects;
 
+        // Same as UnitKind.onlyForCivs
+        absl::flat_hash_set<std::string> onlyForCivs;
+
         friend void from_json(const nlohmann::json &json, Building &b) {
             json.at("name").get_to(b.name);
             json.at("cost").get_to(b.cost);
@@ -338,6 +354,14 @@ namespace rip {
                 json.at("onlyCoastal").get_to(b.onlyCoastal);
             }
             json.at("effects").get_to(b.effects);
+
+            if (json.contains("onlyForCivs")) {
+                std::vector<std::string> civs;
+                json.at("onlyForCivs").get_to(civs);
+                for (auto &c : civs) {
+                    b.onlyForCivs.insert(std::move(c));
+                }
+            }
         }
     };
 
