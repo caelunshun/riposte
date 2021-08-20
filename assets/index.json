@@ -370,6 +370,21 @@
     "loader": "building"
   },
   {
+    "path": "building/the_great_wall_of_china.json",
+    "id": "building/the_great_wall_of_china",
+    "loader": "building"
+  },
+  {
+    "path": "building/great_library_of_baghdad.json",
+    "id": "building/great_library_of_baghdad",
+    "loader": "building"
+  },
+  {
+    "path": "building/roman_colosseum.json",
+    "id": "building/roman_colosseum",
+    "loader": "building"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"

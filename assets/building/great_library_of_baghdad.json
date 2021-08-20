@@ -1,0 +1,16 @@
+{
+  "name": "Great Library of Baghdad",
+  "cost": 110,
+  "techs": ["Writing"],
+  "onlyForCivs": ["arabia"],
+  "effects": [
+    {
+      "type": "bonusCulture",
+      "amount": 2
+    },
+    {
+      "type": "bonusBeakerPercent",
+      "amount": 50
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Roman Colosseum",
+  "cost": 90,
+  "techs": ["Construction"],
+  "onlyForCivs": ["rome"],
+  "effects": [
+    {
+      "type": "happiness",
+      "amount": 2
+    },
+    {
+      "type": "bonusCulture",
+      "amount": 1
+    }
+  ]
+}
