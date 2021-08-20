@@ -172,10 +172,13 @@ namespace rip {
                     // Place at least one rice next to the capital.
                     std::vector<glm::uvec2> riceCandidates;
                     for (const auto tilePos : getBigFatCross(pos)) {
-                        if (game.containsTile(tilePos) && game.getTile(tilePos).getTerrain() != Terrain::Ocean) {
+                        if (game.containsTile(tilePos)
+                            && game.getTile(tilePos).getTerrain() != Terrain::Ocean
+                            && game.getTile(tilePos).getTerrain() != Terrain::Desert) {
                             riceCandidates.push_back(tilePos);
                         }
                     }
+                    if (riceCandidates.empty()) return false;
                     const auto ricePos = riceCandidates[rng.u32(0, riceCandidates.size())];
                     game.getTile(ricePos).setResource(game.getRegistry().getResource("rice"));
 
