@@ -257,6 +257,9 @@ namespace rip {
     }
 
     void City::onTurnEnd(Game &game) {
+        if (!buildTask) {
+            game.getServer().sendBuildTaskFinished(id, nullptr);
+        }
         auto yield = computeYield(game);
         if (hasBuildTask()) {
             buildTask->spendHammers(yield.hammers);
@@ -478,7 +481,7 @@ namespace rip {
         }
     }
 
-    void City::onCreated(Game &game) {
+    void City::onCreated(Game &game, bool isLoading) {
         game.getCultureMap().onCityCreated(game, getID());
         game.getTradeRoutes().onCityCreated(game, *this);
         updateHappiness(game);
@@ -486,8 +489,10 @@ namespace rip {
         updateWorkedTiles(game);
 
         // Cause the client to prompt for a new build task
-        game.getServer().markCityDirty(id);
-        game.getServer().sendBuildTaskFinished(id, nullptr);
+        if (!isLoading) {
+            game.getServer().markCityDirty(id);
+            game.getServer().sendBuildTaskFinished(id, nullptr);
+        }
 
         // Check coastal status.
         for (const auto neighborPos : getNeighbors(pos)) {
@@ -569,6 +574,8 @@ namespace rip {
         game.getServer().broadcastCityCaptured(id, newOwnerID);
         game.getServer().markCityDirty(id);
         game.getServer().markTileDirty(pos);
+
+        game.getServer().sendBuildTaskFinished(id, nullptr);
     }
 
     const std::vector<std::shared_ptr<Building>> &City::getBuildings() const {

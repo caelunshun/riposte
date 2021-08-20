@@ -165,7 +165,7 @@ namespace rip {
             game.addPlayer(Player(player, *registry, techTree, cityIDs, playerIDs, game.getMapWidth(), game.getMapHeight()));
         }
         for (auto &city : *packet.mutable_cities()) {
-            game.addCity(City(city, *registry, playerIDs));
+            game.loadCity(City(city, *registry, playerIDs));
         }
         for (const auto &unit : packet.units()) {
             game.addUnit(Unit(unit, playerIDs, unitIDs, *registry, UnitId(unit.id())));

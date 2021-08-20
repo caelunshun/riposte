@@ -76,6 +76,7 @@ namespace rip {
 
         const slot_map<City> &getCities() const;
         slot_map<City> &getCities();
+        CityId loadCity(City city);
         CityId addCity(City city);
         City *getCityAtLocation(glm::uvec2 location);
         const City *getCityAtLocation(glm::uvec2 location) const;

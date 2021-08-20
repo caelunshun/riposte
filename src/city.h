@@ -220,7 +220,7 @@ namespace rip {
 
         int getGoldProduced(Game &game) const;
 
-        void onCreated(Game &game);
+        void onCreated(Game &game, bool isLoading);
         void onTurnEnd(Game &game);
 
         bool hasBuildTask() const;

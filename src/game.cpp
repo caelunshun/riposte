@@ -191,10 +191,18 @@ namespace rip {
         return impl->cities;
     }
 
+    CityId Game::loadCity(City city) {
+        auto id = getCities().insert(std::move(city));
+        getCity(id).setID(id);
+        getCity(id).onCreated(*this, true);
+        getServer().markCityDirty(id);
+        return id;
+    }
+
     CityId Game::addCity(City city) {
         auto id = getCities().insert(std::move(city));
         getCity(id).setID(id);
-        getCity(id).onCreated(*this);
+        getCity(id).onCreated(*this, false);
         getServer().markCityDirty(id);
         return id;
     }
