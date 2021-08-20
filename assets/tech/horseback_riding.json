@@ -2,5 +2,5 @@
   "name": "Horseback Riding",
   "cost": 200,
   "prerequisites": ["Animal Husbandry"],
-  "era": "ancient"
+  "era": "classical"
 }

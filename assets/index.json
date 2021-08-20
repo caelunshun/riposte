@@ -200,6 +200,16 @@
     "loader": "civ"
   },
   {
+    "path": "civ/arabia.json",
+    "id": "civ/arabia",
+    "loader": "civ"
+  },
+  {
+    "path": "civ/babylonia.json",
+    "id": "civ/babylonia",
+    "loader": "civ"
+  },
+  {
     "path": "font/Merriweather-Regular.ttf",
     "id": "font/merriweather/regular",
     "loader": "font"

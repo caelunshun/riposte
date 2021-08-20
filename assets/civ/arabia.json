@@ -1,0 +1,42 @@
+{
+  "id": "arabia",
+  "name": "Arabian Empire",
+  "adjective": "Arabian",
+  "color": [108, 194, 74],
+  "leaders": [
+    {
+      "name": "Saladin",
+      "aggressive": 5,
+      "nukemonger": 3,
+      "submissive": 2,
+      "paranoia": 3,
+      "expansiveness": 5,
+      "religious": 8
+    }
+
+  ],
+  "startingTechs": ["Mysticism", "The Wheel", "Hunting"],
+  "cities": [
+    "Mecca",
+    "Medina",
+    "Damascus",
+    "Baghdad",
+    "Najran",
+    "Kufah",
+    "Basra",
+    "Khurasan",
+    "Anjar",
+    "Fustat",
+    "Aden",
+    "Yamama",
+    "Muscat",
+    "Mansura",
+    "Bukhara",
+    "Fez",
+    "Shiraz",
+    "Merw",
+    "Balkh",
+    "Mosul",
+    "Aydab"
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "id": "babylonia",
+  "name": "Babylonian Empire",
+  "adjective": "Babylonian",
+  "color": [223, 25, 149],
+  "leaders": [
+    {
+      "name": "Hammurabi",
+      "aggressive": 5,
+      "nukemonger": 1,
+      "submissive": 3,
+      "paranoia": 2,
+      "expansiveness": 4,
+      "religious": 5
+    }
+
+  ],
+  "startingTechs": ["Mysticism", "Agriculture"],
+  "cities": [
+    "Babylon",
+    "Akkad",
+    "Dur Kurigalzu",
+    "Nippur",
+    "Borsippa",
+    "Sippar",
+    "Opis",
+    "Mari",
+    "Shushan",
+    "Eshnunna",
+    "Ellasar",
+    "Erech",
+    "Kutha",
+    "Sirpurla",
+    "Neribtum",
+    "Ashur",
+    "Nineveh",
+    "Nimrud",
+    "Arbela",
+    "Nuzi",
+    "Arrapkha"
+  ]
+}

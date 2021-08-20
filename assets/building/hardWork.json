@@ -1,0 +1,11 @@
+{
+  "name": "Hard Work",
+  "cost": 50,
+  "techs": ["Agriculture"],
+  "effects": [
+    {
+      "type": "happiness",
+      "amount": -2
+    }
+  ]
+}
