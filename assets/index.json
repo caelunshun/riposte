@@ -919,5 +919,15 @@
     "path": "icon/flag/china.png",
     "id": "icon/flag/china",
     "loader": "image"
+  },
+  {
+    "path": "icon/flag/arabia.png",
+    "id": "icon/flag/arabia",
+    "loader": "image"
+  },
+  {
+    "path": "icon/flag/babylonia.png",
+    "id": "icon/flag/babylonia",
+    "loader": "image"
   }
 ]
