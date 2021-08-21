@@ -3,7 +3,7 @@
   "name": "Hwacha",
   "strength": 5,
   "movement": 1,
-  "cost": 45,
+  "cost": 60,
   "techs": ["Construction"],
   "onlyForCivs": ["korea"],
   "replaces": "catapult",
