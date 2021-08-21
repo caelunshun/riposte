@@ -194,6 +194,15 @@ namespace rip {
         auto worker = game.isTileWorked(tilePos);
         if (!(!worker.has_value() || worker == id)) return false;
         if (game.getCultureMap().getTileOwner(tilePos) != std::make_optional<PlayerId>(getOwner())) return false;
+
+        // Check for enemy units
+        for (const auto stackID : game.getStacksAtPos(tilePos)) {
+            const auto &stack = game.getStack(stackID);
+            if (game.getPlayer(stack.getOwner()).isAtWarWith(owner) && !stack.getUnits().empty()) {
+                return false;
+            }
+        }
+
         return true;
     }
 
