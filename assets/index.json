@@ -505,6 +505,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/unit_head/war_chariot.png",
+    "id": "icon/unit_head/war_chariot",
+    "loader": "image"
+  },
+  {
     "path": "tech/agriculture.json",
     "id": "tech/agriculture",
     "loader": "tech"

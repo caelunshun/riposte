@@ -1,0 +1,20 @@
+
+{
+  "id": "chariot",
+  "name": "Chariot",
+  "strength": 5,
+  "movement": 2,
+  "cost": 40,
+  "onlyForCivs": ["egypt"],
+  "techs": ["Animal Husbandry"],
+  "resources": ["horse"],
+  "category": "mounted",
+  "combatBonuses": [
+    {
+      "type": "againstUnit",
+      "unit": "axeman",
+      "onlyOnAttack": true,
+      "bonusPercent": 100
+    }
+  ]
+}
