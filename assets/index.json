@@ -330,6 +330,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/hwacha.json",
+    "id": "unit/hwacha",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -485,8 +490,13 @@
     "loader": "image"
   },
   {
-    "path": "texture/unit/bowman.png",
-    "id": "texture/unit/bowman",
+  "path": "texture/unit/bowman.png",
+  "id": "texture/unit/bowman",
+  "loader": "image"
+},
+  {
+    "path": "texture/unit/hwacha.png",
+    "id": "texture/unit/hwacha",
     "loader": "image"
   },
   {
@@ -567,6 +577,11 @@
   {
     "path": "icon/unit_head/bowman.png",
     "id": "icon/unit_head/bowman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/hwacha.png",
+    "id": "icon/unit_head/hwacha",
     "loader": "image"
   },
   {

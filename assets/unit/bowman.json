@@ -5,6 +5,7 @@
   "movement": 1,
   "cost": 25,
   "techs": ["Archery"],
+  "onlyForCivs": ["babylonia"],
   "category": "archery",
   "combatBonuses": [
     {
