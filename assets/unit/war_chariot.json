@@ -1,7 +1,7 @@
 
 {
-  "id": "chariot",
-  "name": "Chariot",
+  "id": "war chariot",
+  "name": "War Chariot",
   "strength": 5,
   "movement": 2,
   "cost": 40,
