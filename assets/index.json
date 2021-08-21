@@ -335,6 +335,16 @@
     "loader": "unit"
   },
   {
+    "path": "unit/fast_worker.json",
+    "id": "unit/fast_worker",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/jaguar_axeman.json",
+    "id": "unit/jaguar_axeman",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -500,6 +510,16 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/fast_worker.png",
+    "id": "texture/unit/fast_worker",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/jaguar_axeman.png",
+    "id": "texture/unit/jaguar_axeman",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -580,8 +600,18 @@
     "loader": "image"
   },
   {
-    "path": "icon/unit_head/hwacha.png",
-    "id": "icon/unit_head/hwacha",
+  "path": "icon/unit_head/hwacha.png",
+  "id": "icon/unit_head/hwacha",
+  "loader": "image"
+},
+  {
+    "path": "icon/unit_head/fast_worker.png",
+    "id": "icon/unit_head/fast_worker",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/jaguar_axeman.png",
+    "id": "icon/unit_head/jaguar_axeman",
     "loader": "image"
   },
   {

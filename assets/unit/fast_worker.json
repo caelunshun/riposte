@@ -1,0 +1,13 @@
+{
+  "id": "fast_worker",
+  "name": "Fast Worker",
+  "strength": 0,
+  "movement": 4,
+  "onlyForCivs": ["india"],
+  "cost": 25,
+  "techs": [],
+  "capabilities": [
+    "do_work"
+  ],
+  "category": "auxilary"
+}
