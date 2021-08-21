@@ -425,8 +425,8 @@
     "loader": "building"
   },
   {
-    "path": "building/trajans_market.json",
-    "id": "building/trajans_market",
+    "path": "building/stock_market.json",
+    "id": "building/stock_market",
     "loader": "building"
   },
   {

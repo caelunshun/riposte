@@ -1,8 +1,8 @@
 {
-  "name": "Market",
+  "name": "Stock Market",
   "cost": 115,
   "techs": ["Currency"],
-  "onlyForCivs": ["holy_rome"],
+  "onlyForCivs": ["dutch"],
   "replaces": "Market",
   "effects": [
     {
