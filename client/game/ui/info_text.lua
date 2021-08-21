@@ -3,19 +3,18 @@ local InfoTextWindow = {}
 local Vector = require("brinevector")
 
 local dume = require("dume")
-local Flex = require("widget/flex")
-local Text = require("widget/text")
-local Container = require("widget/container")
-local Padding = require("widget/padding")
 
+local style = require("ui/style")
 local getTileInfoText = require("game/ui/tile_info")
 
-local size = Vector(200, 150)
+local width = 200
+local padding = 10
 
 function InfoTextWindow:new(game)
     local o = {
         game = game,
         text = "",
+        paragraph = nil,
     }
     setmetatable(o, self)
     self.__index = self
@@ -48,28 +47,36 @@ function InfoTextWindow:setText(text)
 end
 
 function InfoTextWindow:rebuild()
-    if self.text == "" then
-        self:close()
+    if #self.text == 0 then
+        self.paragraph = nil
         return
     end
 
-    local text = Text:new(self.text, {
-        percent = "%"
+    local text = cv:parseTextMarkup(self.text, style.default.lightText.defaultTextStyle, {
+        percent = "%",
     })
-    table.insert(text.classes, "lightText")
-    local root = Container:new(Padding:new(text, 10))
-    table.insert(root.classes, "lightContainer")
-    root.fillParent = true
-    ui:createWindow("infoText", function(screenSize)
-        return {
-            pos = Vector(0, screenSize.y - size.y - 150),
-            size = size,
-        }
-    end, root, 3)
+    self.paragraph = cv:createParagraph(text, {
+        alignH = dume.Align.Start,
+        alignV = dume.Align.Start,
+        baseline = dume.Baseline.Top,
+        lineBreaks = true,
+        maxDimensions = Vector(width - padding * 2, math.huge)
+    })
 end
 
-function InfoTextWindow:close()
-    ui:deleteWindow("infoText")
+function InfoTextWindow:render(cv)
+    if self.paragraph == nil then return end
+
+    local textHeight = cv:getParagraphHeight(self.paragraph)
+
+    local totalHeight = textHeight + padding * 2
+
+    cv:beginPath()
+    cv:rect(Vector(0, cv:getHeight() - totalHeight - 150), Vector(width, totalHeight))
+    cv:solidColor(dume.rgb(50, 50, 50, 180))
+    cv:fill()
+
+    cv:drawParagraph(self.paragraph, Vector(padding, cv:getHeight() - 150 - totalHeight + padding))
 end
 
 return InfoTextWindow

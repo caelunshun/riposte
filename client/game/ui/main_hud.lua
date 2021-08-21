@@ -533,6 +533,12 @@ function Hud:render(cv, time, dt)
 
     cv:resetTransform()
 
+    for _, window in ipairs(self.windows) do
+        if window.render ~= nil then
+            window:render(cv)
+        end
+    end
+
     if self.readyForNextTurn then
         self:renderNextTurnPrompt(cv, time)
     end
