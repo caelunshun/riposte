@@ -79,4 +79,8 @@ function InfoTextWindow:render(cv)
     cv:drawParagraph(self.paragraph, Vector(padding, cv:getHeight() - 150 - totalHeight + padding))
 end
 
+function InfoTextWindow:close()
+
+end
+
 return InfoTextWindow
