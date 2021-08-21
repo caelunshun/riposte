@@ -13,6 +13,12 @@
       "unit": "axeman",
       "onlyOnAttack": true,
       "bonusPercent": 100
+    },
+    {
+      "type": "againstUnit",
+      "unit": "phalanx",
+      "onlyOnAttack": true,
+      "bonusPercent": 100
     }
   ]
 }

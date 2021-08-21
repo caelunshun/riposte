@@ -4,7 +4,7 @@
   "name": "Phalanx",
   "strength": 6,
   "movement": 1,
-  "cost": 45,
+  "cost": 50,
   "techs": ["Bronze Working"],
   "onlyForCivs": ["greece"],
   "replaces": "axeman",

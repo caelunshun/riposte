@@ -4,7 +4,7 @@
   "name": "War Chariot",
   "strength": 5,
   "movement": 2,
-  "cost": 30,
+  "cost": 35,
   "onlyForCivs": ["egypt"],
   "replaces": "chariot",
   "techs": ["Animal Husbandry"],
@@ -14,6 +14,12 @@
     {
       "type": "againstUnit",
       "unit": "axeman",
+      "onlyOnAttack": true,
+      "bonusPercent": 100
+    },
+    {
+      "type": "againstUnit",
+      "unit": "phalanx",
       "onlyOnAttack": true,
       "bonusPercent": 100
     }
