@@ -1,6 +1,6 @@
 {
   "name": "The Great Wall of China",
-  "cost": 80,
+  "cost": 100,
   "techs": ["Masonry"],
   "onlyForCivs": ["china"],
   "effects": [

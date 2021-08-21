@@ -305,8 +305,13 @@
     "loader": "unit"
   },
   {
-    "path": "unit/catapult.json",
-    "id": "unit/catapult",
+  "path": "unit/catapult.json",
+  "id": "unit/catapult",
+  "loader": "unit"
+},
+  {
+    "path": "unit/war_chariot.json",
+    "id": "unit/war_chariot",
     "loader": "unit"
   },
   {
@@ -440,8 +445,13 @@
     "loader": "image"
   },
   {
-    "path": "texture/unit/catapult.png",
-    "id": "texture/unit/catapult",
+  "path": "texture/unit/catapult.png",
+  "id": "texture/unit/catapult",
+  "loader": "image"
+},
+  {
+    "path": "texture/unit/war_chariot.png",
+    "id": "texture/unit/war_chariot",
     "loader": "image"
   },
   {
