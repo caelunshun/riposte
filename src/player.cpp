@@ -80,6 +80,10 @@ namespace rip {
         for (const auto &city : game.getCities()) {
             if (city.getOwner() == id) {
                 cities.push_back(city.getID());
+
+                if (city.isCapital()) {
+                    capital = city.getID();
+                }
             }
         }
 
