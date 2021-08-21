@@ -107,7 +107,7 @@ namespace rip {
     // to start over with a new seed.
 
     // CIVILIZATION GENERATOR
-    void seedPlayers(Game &game, const std::shared_ptr<TechTree> &techTree, Rng &rng, const GameOptions &gameOptions) {
+    void seedPlayers(Game &game, const std::shared_ptr<TechTree> &techTree, Rng &rng, const proto::GameOptions &gameOptions) {
         const auto numPlayers = gameOptions.numhumanplayers() + gameOptions.numaiplayers();
         absl::flat_hash_set<std::string> usedCivIDs;
         while (game.getNumPlayers() < numPlayers) {
@@ -374,7 +374,7 @@ namespace rip {
         return true;
     }
 
-    bool tryGenerate(Game &game, Rng &rng, const std::shared_ptr<TechTree> &techTree, const GameOptions &options) {
+    bool tryGenerate(Game &game, Rng &rng, const std::shared_ptr<TechTree> &techTree, const proto::GameOptions &options) {
         if (!buildTerrain(game, rng)) return false;
         seedPlayers(game, techTree, rng, options);
         if (!placeCities(game, rng)) return false;
@@ -382,7 +382,7 @@ namespace rip {
         return true;
     }
 
-    Game MapGenerator::generate(GameOptions gameOptions, std::shared_ptr<Registry> registry,
+    Game MapGenerator::generate(proto::GameOptions gameOptions, std::shared_ptr<Registry> registry,
                                 const std::shared_ptr<TechTree> &techTree, Server *server) {
         while (true) {
             Game game(gameOptions.mapwidth(), gameOptions.mapheight(), registry, techTree);

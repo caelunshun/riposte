@@ -37,7 +37,7 @@ namespace rip {
         return packet;
     }
 
-    void writeYield(const Yield &yield, ::Yield &protoYield) {
+    void writeYield(const Yield &yield, proto::Yield &protoYield) {
         protoYield.set_commerce(yield.commerce);
         protoYield.set_food(yield.food);
         protoYield.set_hammers(yield.hammers);
@@ -50,7 +50,7 @@ namespace rip {
         }
     }
 
-    void setTile(const Game &game, PlayerId player, glm::uvec2 pos, const Tile &tile, ::Tile &protoTile) {
+    void setTile(const Game &game, PlayerId player, glm::uvec2 pos, const Tile &tile, proto::Tile &protoTile) {
         protoTile.set_terrain(static_cast<::Terrain>(static_cast<int>(tile.getTerrain())));
         protoTile.set_forested(tile.isForested());
         protoTile.set_hilled(tile.isHilled());
@@ -129,14 +129,14 @@ namespace rip {
         return packet;
     }
 
-    void writePath(const Path &path, ::Path &protoPath) {
+    void writePath(const Path &path, proto::Path &protoPath) {
         for (const auto pos : path.getPoints()) {
             protoPath.add_positions(pos.x);
             protoPath.add_positions(pos.y);
         }
     }
 
-    void writeWorkerTask(const rip::WorkerTask &task, ::WorkerTask &protoTask) {
+    void writeWorkerTask(const rip::WorkerTask &task, proto::WorkerTask &protoTask) {
         protoTask.set_name(task.getName());
         protoTask.set_turnsleft(task.getRemainingTurns());
         protoTask.set_presentparticiple(task.getPresentParticiple());
@@ -201,7 +201,7 @@ namespace rip {
         return packet;
     }
 
-    void writeBuildTask(const BuildTask &task, ::BuildTask &protoTask) {
+    void writeBuildTask(const BuildTask &task, proto::BuildTask &protoTask) {
         protoTask.set_progress(task.getProgress());
         protoTask.set_cost(task.getCost());
 

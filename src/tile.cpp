@@ -24,7 +24,7 @@ namespace rip {
         return CottageLevel::Cottage;
     }
 
-    Tile::Tile(const ::Tile &packet, const IdConverter &playerIDs, const Registry &registry, glm::uvec2 pos) {
+    Tile::Tile(const proto::Tile &packet, const IdConverter &playerIDs, const Registry &registry, glm::uvec2 pos) {
         terrain = static_cast<Terrain>(static_cast<int>(packet.terrain()));
         forested = packet.forested();
         hilled = packet.hilled();

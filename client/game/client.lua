@@ -172,7 +172,7 @@ function Client:sendPacket(packetKind, packet, callback)
         [packetKind] = packet,
         requestID = requestID,
     }
-    local data = pb.encode("AnyClient", p)
+    local data = pb.encode("rip.proto.AnyClient", p)
     self.bridge:sendPacket(data)
 
     if callback ~= nil then
@@ -192,7 +192,7 @@ function Client:handleReceivedPacketsWithHandler(handler)
 
     local packet = self.bridge:pollReceivedPacket()
     while packet ~= nil do
-        local decodedPacket = pb.decode("AnyServer", packet)
+        local decodedPacket = pb.decode("rip.proto.AnyServer", packet)
 
         local packetType = nil
         for k, v in pairs(decodedPacket) do

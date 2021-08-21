@@ -67,7 +67,7 @@ namespace rip {
 
         if (attacker.shouldDie() || defender.shouldDie()) finished = true;
 
-        CombatRound round;
+        proto::CombatRound round;
         round.set_attackerhealth(attacker.getHealth());
         round.set_defenderhealth(defender.getHealth());
         rounds.push_back(std::move(round));
@@ -127,7 +127,7 @@ namespace rip {
         return defenderID;
     }
 
-    const std::vector<CombatRound> &Combat::getRounds() const {
+    const std::vector<proto::CombatRound> &Combat::getRounds() const {
         return rounds;
     }
 

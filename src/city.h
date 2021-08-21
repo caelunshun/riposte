@@ -15,11 +15,15 @@
 #include "culture.h"
 #include "yield.h"
 
-class HappinessEntry;
-class UnhappinessEntry;
-class HealthEntry;
-class SicknessEntry;
-class UpdateCity;
+namespace rip {
+    namespace proto {
+        class HappinessEntry;
+        class UnhappinessEntry;
+        class HealthEntry;
+        class SicknessEntry;
+        class UpdateCity;
+    }
+}
 
 namespace rip {
     class City;
@@ -161,13 +165,13 @@ namespace rip {
         BuildingEffect buildingEffects;
 
         // Sources of happiness in the city.
-        std::vector<HappinessEntry> happiness;
+        std::vector<proto::HappinessEntry> happiness;
         // Sources of unhappiness in the city.
-        std::vector<UnhappinessEntry> unhappiness;
+        std::vector<proto::UnhappinessEntry> unhappiness;
         // Sources of health in the city.
-        std::vector<HealthEntry> health;
+        std::vector<proto::HealthEntry> health;
         // Sources of sickness in the city.
-        std::vector<SicknessEntry> sickness;
+        std::vector<proto::SicknessEntry> sickness;
 
         // Current culture defense bonus.
         // May be less than getMaxCultureDefenseBonus()
@@ -185,7 +189,7 @@ namespace rip {
     public:
         City(glm::uvec2 pos, std::string name, PlayerId owner);
 
-        City(UpdateCity &packet, const Registry &registry, const IdConverter &playerIDs);
+        City(proto::UpdateCity &packet, const Registry &registry, const IdConverter &playerIDs);
 
         void setID(CityId id);
         void setCapital(Game &game, bool isCapital);
@@ -252,8 +256,8 @@ namespace rip {
         int getFoodNeededForGrowth() const;
         int getConsumedFood() const;
 
-        const std::vector<HappinessEntry> &getHappinessSources() const;
-        const std::vector<UnhappinessEntry> &getUnhappinessSources() const;
+        const std::vector<proto::HappinessEntry> &getHappinessSources() const;
+        const std::vector<proto::UnhappinessEntry> &getUnhappinessSources() const;
 
         uint32_t getHappiness() const;
         uint32_t getUnhappiness() const;
@@ -261,8 +265,8 @@ namespace rip {
         uint32_t getHealth() const;
         uint32_t getSickness() const;
 
-        const std::vector<HealthEntry> &getHealthSources() const;
-        const std::vector<SicknessEntry> &getSicknessSources() const;
+        const std::vector<proto::HealthEntry> &getHealthSources() const;
+        const std::vector<proto::SicknessEntry> &getSicknessSources() const;
 
         uint32_t getNumWorkingCitizens() const;
 

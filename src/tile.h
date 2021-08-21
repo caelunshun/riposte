@@ -15,7 +15,9 @@
 
 struct NVGcontext;
 
-class Tile; // protobuf version
+namespace rip::proto {
+    class Tile; // protobuf version
+}
 
 namespace rip {
     struct Yield;
@@ -174,7 +176,7 @@ namespace rip {
     public:
         Tile(Terrain terrain) : terrain(terrain) {}
         Tile() : terrain(Terrain::Grassland) {}
-        Tile(const ::Tile &packet, const IdConverter &playerIDs, const Registry &registry, glm::uvec2 pos);
+        Tile(const proto::Tile &packet, const IdConverter &playerIDs, const Registry &registry, glm::uvec2 pos);
 
         Tile(const Tile &other) = delete;
         Tile(Tile &&other) noexcept = default;

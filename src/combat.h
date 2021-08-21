@@ -9,7 +9,9 @@
 #include "ids.h"
 #include <absl/container/flat_hash_set.h>
 
-class CombatRound;
+namespace rip::proto {
+    class CombatRound;
+}
 
 namespace rip {
     class Game;
@@ -27,7 +29,7 @@ namespace rip {
         double startingAttackerStrength;
         double startingDefenderStrength;
 
-        std::vector<CombatRound> rounds;
+        std::vector<proto::CombatRound> rounds;
 
         absl::flat_hash_set<UnitId> collateralDamageTargets;
 
@@ -48,7 +50,7 @@ namespace rip {
         UnitId getDefender();
 
         // Returns the rounds of simulated combat.
-        const std::vector<CombatRound> &getRounds() const;
+        const std::vector<proto::CombatRound> &getRounds() const;
     };
 }
 

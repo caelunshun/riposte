@@ -16,7 +16,7 @@ namespace rip {
     class MapGenerator {
         Rng rng;
     public:
-        Game generate(GameOptions gameOptions, std::shared_ptr<Registry> registry, const std::shared_ptr<TechTree> &techTree, Server *server);
+        Game generate(proto::GameOptions gameOptions, std::shared_ptr<Registry> registry, const std::shared_ptr<TechTree> &techTree, Server *server);
     };
 }
 

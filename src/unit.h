@@ -12,9 +12,10 @@
 
 struct nk_context;
 
-class UpdateUnit;
-
 namespace rip {
+    namespace proto {
+        class UpdateUnit;
+    }
     class Game;
     class Hud;
     class City;
@@ -108,7 +109,7 @@ namespace rip {
 
         Unit(std::shared_ptr<UnitKind> kind, glm::uvec2 pos, PlayerId owner);
 
-        Unit(const UpdateUnit &packet, const IdConverter &playerIDs, const IdConverter &unitIDs, const Registry &registry, UnitId id);
+        Unit(const proto::UpdateUnit &packet, const IdConverter &playerIDs, const IdConverter &unitIDs, const Registry &registry, UnitId id);
 
         void setID(UnitId id);
 

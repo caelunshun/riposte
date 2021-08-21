@@ -15,6 +15,7 @@
 #include "saveload.h"
 
 using namespace moodycamel;
+using namespace rip::proto;
 
 namespace rip {
     class Server;
@@ -33,7 +34,7 @@ namespace rip {
 
         Server *server;
 
-        LobbyPlayer lobbyPlayerInfo;
+        proto::LobbyPlayer lobbyPlayerInfo;
 
         std::string username;
 

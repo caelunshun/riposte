@@ -637,11 +637,11 @@ namespace rip {
         return BuildTask::describe();
     }
 
-    const std::vector<HappinessEntry> &City::getHappinessSources() const {
+    const std::vector<proto::HappinessEntry> &City::getHappinessSources() const {
         return happiness;
     }
 
-    const std::vector<UnhappinessEntry> &City::getUnhappinessSources() const {
+    const std::vector<proto::UnhappinessEntry> &City::getUnhappinessSources() const {
         return unhappiness;
     }
 
@@ -666,7 +666,7 @@ namespace rip {
         happiness.clear();
         unhappiness.clear();
 
-        HappinessEntry baseHappiness;
+        proto::HappinessEntry baseHappiness;
         baseHappiness.set_source(HappinessSource::DifficultyBonus);
         baseHappiness.set_count(5);
         happiness.emplace_back(std::move(baseHappiness));
@@ -676,20 +676,20 @@ namespace rip {
             resourceHappy += resource->happyBonus;
         }
         if (resourceHappy != 0) {
-            HappinessEntry bonus;
+            proto::HappinessEntry bonus;
             bonus.set_source(HappinessSource::Resources);
             bonus.set_count(resourceHappy);
             happiness.emplace_back(std::move(bonus));
         }
 
-        HappinessEntry buildingHappiness;
+        proto::HappinessEntry buildingHappiness;
         buildingHappiness.set_source(HappinessSource::Buildings);
         buildingHappiness.set_count(buildingEffects.happiness);
         if (buildingHappiness.count() > 0) {
             happiness.emplace_back(std::move(buildingHappiness));
         }
 
-        UnhappinessEntry populationUnhappiness;
+        proto::UnhappinessEntry populationUnhappiness;
         populationUnhappiness.set_source(UnhappinessSource::Population);
         populationUnhappiness.set_count(getPopulation());
         unhappiness.emplace_back(std::move(populationUnhappiness));
@@ -706,7 +706,7 @@ namespace rip {
         }
 
         if (undefendedCount != 0) {
-            UnhappinessEntry undefended;
+            proto::UnhappinessEntry undefended;
             undefended.set_source(UnhappinessSource::Undefended);
             undefended.set_count(undefendedCount);
             unhappiness.emplace_back(std::move(undefended));
@@ -766,11 +766,11 @@ namespace rip {
         return sum;
     }
 
-    const std::vector<HealthEntry> &City::getHealthSources() const {
+    const std::vector<proto::HealthEntry> &City::getHealthSources() const {
         return health;
     }
 
-    const std::vector<SicknessEntry> &City::getSicknessSources() const {
+    const std::vector<proto::SicknessEntry> &City::getSicknessSources() const {
         return sickness;
     }
 
@@ -778,12 +778,12 @@ namespace rip {
         health.clear();
         sickness.clear();
 
-        SicknessEntry population;
+        proto::SicknessEntry population;
         population.set_source(SicknessSource::PopulationSickness);
         population.set_count(getPopulation());
         sickness.emplace_back(std::move(population));
 
-        HealthEntry difficultyBonus;
+        proto::HealthEntry difficultyBonus;
         difficultyBonus.set_source(HealthSource::BaseHealth);
         difficultyBonus.set_count(5);
         health.emplace_back(std::move(difficultyBonus));
@@ -793,7 +793,7 @@ namespace rip {
             resourceHealth += resource->healthBonus;
         }
         if (resourceHealth != 0) {
-            HealthEntry bonus;
+            proto::HealthEntry bonus;
             bonus.set_source(HealthSource::ResourceHealth);
             bonus.set_count(resourceHealth);
             health.emplace_back(std::move(bonus));
@@ -808,7 +808,7 @@ namespace rip {
             }
         }
         if (forestHealth >= 1) {
-            HealthEntry bonus;
+            proto::HealthEntry bonus;
             bonus.set_source(HealthSource::ForestHealth);
             bonus.set_count(static_cast<uint32_t>(std::floor(forestHealth)));
             health.emplace_back(std::move(bonus));
