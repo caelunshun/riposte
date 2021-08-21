@@ -186,6 +186,8 @@ int main() {
 
     audio->setAssets(assets);
 
+    registry->init();
+
     auto techTree = std::make_shared<rip::TechTree>(*assets, *registry);
     rip::makeLuaClientBindings(lua, assets, registry, techTree, audio);
 

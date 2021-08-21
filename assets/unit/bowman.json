@@ -6,6 +6,7 @@
   "cost": 25,
   "techs": ["Archery"],
   "onlyForCivs": ["babylonia"],
+  "replaces": "archer",
   "category": "archery",
   "combatBonuses": [
     {

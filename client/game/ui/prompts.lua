@@ -119,12 +119,21 @@ function CityBuildPrompt:build()
                 category = unitKind.category,
             }
 
+            local uniqueUnitLine = nil
+
+            if unitKind.onlyForCivs ~= nil then
+                local civ = registry.civs[unitKind.onlyForCivs[1]]
+                local replaces = registry.unitKinds[unitKind.replaces]
+                uniqueUnitLine = "Unique Unit for " .. civ.name .. " (Replaces " .. replaces.name .. ")"
+            end
+
             lines = {
                 "%name (%category units)",
-                "%cost @icon{hammer}",
-                "Movement: %movement",
-                "Strength: %strength"
             }
+            lines[#lines + 1] = uniqueUnitLine
+            lines[#lines + 1] = "%cost @icon{hammer}"
+            lines[#lines + 1] = "Movement: %movement"
+            lines[#lines + 1] = "Strength: %strength"
 
             for _, capability in ipairs(unitKind.capabilities or {}) do
                 if capability == "found_city" then
@@ -198,6 +207,28 @@ function ResearchPrompt:new(game)
     return o
 end
 
+local function unitIsReplacedForCiv(civ, unit)
+    for _, u in pairs(registry.unitKinds) do
+        if type(u) == "table" then
+            if u.replaces == unit.id and u.onlyForCivs[1] == civ.id then
+                return true
+            end
+        end
+    end
+    return false
+end
+
+local function buildingIsReplacedForCiv(civ, building)
+    for _, b in pairs(registry.buildings) do
+        if type(b) == "table" then
+            if b.replaces == building.name and b.onlyForCivs[1] == civ.id then
+                return true
+            end
+        end
+    end
+    return false
+end
+
 function ResearchPrompt:build()
     local root = Flex:column(10)
 
@@ -238,9 +269,14 @@ function ResearchPrompt:build()
 
         for _, unit in pairs(registry.unitKinds) do
             if type(unit) == "table" then
-                for _, t in ipairs(unit.techs) do
-                    if t == tech.name then
-                        lines[#lines + 1] = "%bullet Can train " .. article(unit.name) .. " " .. unit.name
+                if (unit.onlyForCivs == nil
+                        or unit.onlyForCivs[1] == self.game.thePlayer.civ.id)
+                    and not unitIsReplacedForCiv(self.game.thePlayer.civ, unit)
+                then
+                    for _, t in ipairs(unit.techs) do
+                        if t == tech.name then
+                            lines[#lines + 1] = "%bullet Can train " .. article(unit.name) .. " " .. unit.name
+                        end
                     end
                 end
             end
@@ -248,9 +284,13 @@ function ResearchPrompt:build()
 
         for _, building in pairs(registry.buildings) do
             if type(building) == "table" then
-                for _, t in ipairs(building.techs) do
-                    if t == tech.name then
-                        lines[#lines + 1] = "%bullet Can build " .. article(building.name) .. " " .. building.name
+                if (building.onlyForCivs == nil
+                        or building.onlyForCivs[1] == self.game.thePlayer.civ.id)
+                        and not buildingIsReplacedForCiv(self.game.thePlayer.civ, building) then
+                    for _, t in ipairs(building.techs) do
+                        if t == tech.name then
+                            lines[#lines + 1] = "%bullet Can build " .. article(building.name) .. " " .. building.name
+                        end
                     end
                 end
             end

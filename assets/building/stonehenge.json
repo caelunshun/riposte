@@ -3,6 +3,7 @@
   "cost": 60,
   "techs": ["Mysticism"],
   "onlyForCivs": ["britain"],
+  "replaces": "Monument",
   "effects": [
     {
       "type": "bonusCulture",

@@ -118,6 +118,11 @@ namespace rip {
             if (usedCivIDs.contains(civ->id)) {
                 continue;
             }
+            // For fairness, all players need a unique unit or building.
+            // Disable once all civs have these.
+            if (civ->replacedBuildings.empty() && civ->replacedUnits.empty()) {
+                continue;
+            }
             usedCivIDs.insert(civ->id);
 
             assert(!civ->leaders.empty());

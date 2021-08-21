@@ -4,6 +4,7 @@
   "strength": 0,
   "movement": 3,
   "onlyForCivs": ["america"],
+  "replaces": "settler",
   "cost": 30,
   "techs": [],
   "capabilities": [

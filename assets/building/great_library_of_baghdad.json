@@ -3,6 +3,7 @@
   "cost": 110,
   "techs": ["Writing"],
   "onlyForCivs": ["arabia"],
+  "replaces": "Library",
   "effects": [
     {
       "type": "bonusCulture",

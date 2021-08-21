@@ -6,6 +6,7 @@
   "cost": 45,
   "techs": ["Construction"],
   "onlyForCivs": ["korea"],
+  "replaces": "catapult",
   "category": "siege",
   "combatBonuses": [
     {

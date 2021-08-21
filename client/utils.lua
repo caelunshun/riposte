@@ -71,6 +71,12 @@ function getBuildingTooltip(building)
     lines[#lines + 1] = building.name
     lines[#lines + 1] = string.format("%d @icon{hammer}", building.cost)
 
+    if building.onlyForCivs ~= nil then
+        local civ = registry.civs[building.onlyForCivs[1]]
+        local replaces = registry.buildings[building.replaces]
+        lines[#lines + 1] = "Unique Building for " .. civ.name .. " (Replaces " .. replaces.name .. ")"
+    end
+
     for _, effect in ipairs(building.effects or {}) do
         lines[#lines + 1] = getBonusLine(effect, "bonusHammers", "hammer")
         lines[#lines + 1] = getBonusLine(effect, "bonusBeakers", "beaker")

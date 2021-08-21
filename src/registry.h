@@ -47,6 +47,11 @@ namespace rip {
         // List of starting tech names
         std::vector<std::string> startingTechs;
 
+        // Units that are replaced by unique units and cannot be built
+        absl::flat_hash_set<std::string> replacedUnits;
+        // Buildings that are replaced by unique buildings and cannot be built
+        absl::flat_hash_set<std::string> replacedBuildings;
+
         NLOHMANN_DEFINE_TYPE_INTRUSIVE(CivKind, id, name, adjective, color, leaders, cities, startingTechs);
     };
 
@@ -135,6 +140,10 @@ namespace rip {
         // If empty, defaults to all civs.
         absl::flat_hash_set<std::string> onlyForCivs;
 
+        // Which unit this replaces as a unique unit
+        // (paired with onlyForCivs)
+        std::optional<std::string> replaces;
+
         friend void from_json(const nlohmann::json &json, UnitKind &unit) {
             json.at("id").get_to(unit.id);
             json.at("name").get_to(unit.name);
@@ -180,6 +189,11 @@ namespace rip {
                 for (auto &c : civs) {
                     unit.onlyForCivs.insert(std::move(c));
                 }
+            }
+            if (json.contains("replaces")) {
+                std::string r;
+                json.at("replaces").get_to(r);
+                unit.replaces = r;
             }
         }
     };
@@ -343,6 +357,10 @@ namespace rip {
         // Same as UnitKind.onlyForCivs
         absl::flat_hash_set<std::string> onlyForCivs;
 
+        // Which building this replaces as a unique building
+        // (paired with onlyForCivs)
+        std::optional<std::string> replaces;
+
         friend void from_json(const nlohmann::json &json, Building &b) {
             json.at("name").get_to(b.name);
             json.at("cost").get_to(b.cost);
@@ -361,6 +379,11 @@ namespace rip {
                 for (auto &c : civs) {
                     b.onlyForCivs.insert(std::move(c));
                 }
+            }
+            if (json.contains("replaces")) {
+                std::string r;
+                json.at("replaces").get_to(r);
+                b.replaces = r;
             }
         }
     };
@@ -409,6 +432,24 @@ namespace rip {
 
         const std::shared_ptr<Resource> &getResource(const std::string &name) const {
             return resources.at(name);
+        }
+
+        void init() {
+            // Set replacedUnits and replacedBuildings for civs
+            for (const auto &unit : units) {
+                if (unit->replaces.has_value()) {
+                    for (const auto &civID : unit->onlyForCivs) {
+                        getCiv(civID)->replacedUnits.insert(*unit->replaces);
+                    }
+                }
+            }
+            for (const auto &building : buildings) {
+                if (building->replaces.has_value()) {
+                    for (const auto &civID : building->onlyForCivs) {
+                        getCiv(civID)->replacedBuildings.insert(*building->replaces);
+                    }
+                }
+            }
         }
 
         const std::vector<std::shared_ptr<UnitKind>> &getUnits() const;

@@ -6,6 +6,7 @@
   "movement": 2,
   "cost": 30,
   "onlyForCivs": ["egypt"],
+  "replaces": "chariot",
   "techs": ["Animal Husbandry"],
   "resources": ["horse"],
   "category": "mounted",
