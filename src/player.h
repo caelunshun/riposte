@@ -5,7 +5,6 @@
 #ifndef RIPOSTE_PLAYER_H
 #define RIPOSTE_PLAYER_H
 
-#include <rea.h>
 #include <string>
 #include <vector>
 #include <glm/vec2.hpp>

@@ -7,7 +7,6 @@
 
 #include <memory>
 #include <glm/vec2.hpp>
-#include <rea.h>
 #include <absl/container/flat_hash_set.h>
 #include "player.h"
 #include "registry.h"

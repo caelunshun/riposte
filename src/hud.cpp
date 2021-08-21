@@ -10,7 +10,6 @@
 #include "city.h"
 #include "ripmath.h"
 #include "stack.h"
-#include "script.h"
 #include <nuklear.h>
 #include <sstream>
 #include <iomanip>
@@ -427,7 +426,6 @@ namespace rip {
 
         auto tilePos = game.getPosFromScreenOffset(game.getCursor().getPos());
         if (event.button == MouseButton::Left && event.action == MouseAction::Press) {
-            game.getScriptEngine().onPosClicked(tilePos);
         }
 
         if (hasFocus(game)) {

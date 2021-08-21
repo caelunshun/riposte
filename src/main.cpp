@@ -8,7 +8,6 @@
 #include "unit.h"
 #include "event.h"
 #include "player.h"
-#include "script.h"
 
 #include <iostream>
 #include <deque>

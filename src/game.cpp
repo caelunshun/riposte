@@ -13,7 +13,6 @@
 #include "tile.h"
 #include "stack.h"
 #include "event.h"
-#include "script.h"
 
 #include <absl/container/flat_hash_map.h>
 
@@ -56,8 +55,6 @@ namespace rip {
         std::vector<std::unique_ptr<Event>> events;
 
         bool inTurnEnd = false;
-
-        std::shared_ptr<ScriptEngine> scriptEngine;
 
         Server *server;
 
@@ -445,14 +442,6 @@ namespace rip {
 
     std::vector<std::unique_ptr<Event>> &Game::getEvents() {
         return impl->events;
-    }
-
-    void Game::setScriptEngine(std::shared_ptr<ScriptEngine> engine) {
-        impl->scriptEngine = engine;
-    }
-
-    ScriptEngine &Game::getScriptEngine() {
-        return *impl->scriptEngine;
     }
 
     Server &Game::getServer() {
