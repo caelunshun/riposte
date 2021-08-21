@@ -21,25 +21,73 @@ local function getCulture(game, tile)
 end
 
 local function getUnits(game, tile, tilePos)
+    -- Coalesce units with the same kind, strength, and movement
+    local entries = {
+
+    }
+    for _, unit in ipairs(game:getStackAtPos(tilePos).units) do
+        -- check for existing entry with the same type of unit
+        local entryFound = false
+        for _, entry in ipairs(entries) do
+            if entry.kind == unit.kind and entry.movementLeft == unit.movementLeft
+                and entry.strength == unit.strength then
+                entry.units[#entry.units + 1] = unit
+                entryFound = true
+                break
+            end
+        end
+
+        if not entryFound then
+            -- create new entry
+            entries[#entries + 1] = {
+                kind = unit.kind,
+                movementLeft = unit.movementLeft,
+                strength = unit.strength,
+                units = { unit },
+            }
+        end
+    end
+
+    -- Entries that have 3 or fewer units are expanded for clarity.
+    for i=#entries,1,-1 do
+        local entry = entries[i]
+        if #entry.units <= 3 then
+            for _, unit in ipairs(entry.units) do
+                entries[#entries + 1] = {
+                    units = { unit },
+                    strength = unit.strength,
+                    movementLeft = unit.movementLeft,
+                    kind = unit.kind,
+                }
+            end
+            table.remove(entries, i)
+        end
+    end
+
     local lines = {}
 
     if game:getVisibility(tilePos) ~= "Visible" then
         return nil
     end
 
-    for _, unit in ipairs(game:getStackAtPos(tilePos).units) do
-        lines[#lines + 1] = "@color{rgb(255,205,0)}{" .. unit.kind.name .. "}"
-        if unit.kind.strength > 0 then
-            local strength = tostringRounded(unit.strength)
-            if unit.strength ~= unit.kind.strength then
-                strength = strength .. "/" .. tostringRounded(unit.kind.strength)
+    for _, entry in ipairs(entries) do
+        lines[#lines + 1] = "@color{rgb(255,205,0)}{" .. entry.kind.name .. "}"
+
+        if #entry.units > 1 then
+            lines[#lines] = lines[#lines] .. " (" .. tostring(#entry.units) .. ")"
+        end
+
+        if entry.kind.strength > 0 then
+            local strength = tostringRounded(entry.strength)
+            if entry.strength ~= entry.kind.strength then
+                strength = strength .. "/" .. tostringRounded(entry.kind.strength)
             end
             lines[#lines] = lines[#lines] .. ", " .. strength .. " @icon{strength}"
         end
 
-        local movement = tostring(math.ceil(unit.movementLeft))
-        if math.ceil(unit.movementLeft) ~= unit.kind.movement then
-            movement = movement .. "/" .. tostring(unit.kind.movement)
+        local movement = tostring(math.ceil(entry.movementLeft))
+        if math.ceil(entry.movementLeft) ~= entry.kind.movement then
+            movement = movement .. "/" .. tostring(entry.kind.movement)
         end
 
         lines[#lines] = lines[#lines] ..  ", " .. movement .. " @icon{movement}"
