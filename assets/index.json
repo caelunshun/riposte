@@ -425,6 +425,11 @@
     "loader": "building"
   },
   {
+    "path": "building/trajans_market.json",
+    "id": "building/trajans_market",
+    "loader": "building"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"

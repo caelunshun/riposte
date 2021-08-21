@@ -1,0 +1,13 @@
+{
+  "name": "Market",
+  "cost": 115,
+  "techs": ["Currency"],
+  "onlyForCivs": ["holy_rome"],
+  "replaces": "Market",
+  "effects": [
+    {
+      "type": "bonusCommercePercent",
+      "amount": 40
+    }
+  ]
+}
