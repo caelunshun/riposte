@@ -16,7 +16,7 @@
       "type": "againstUnitCategory",
       "category": "melee",
       "bonusPercent": 50
-    },
+    }
 
   ]
 }
