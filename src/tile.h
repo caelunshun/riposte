@@ -216,7 +216,7 @@ namespace rip {
             }
         }
 
-        float getMovementCost() const;
+        float getMovementCost(const Game &game, PlayerId player, glm::uvec2 pos) const;
 
         Yield getYield(const Game &game, glm::uvec2 pos, PlayerId player) const;
 

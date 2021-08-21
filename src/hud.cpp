@@ -387,7 +387,7 @@ namespace rip {
         if (!game.isCheatMode()) {
             visMap = game.getThePlayer().getVisibilityMap();
         }
-        auto path = computeShortestPath(game, from, to, std::move(visMap), game.getUnit(selectedUnits.at(0)).getKind());
+        std::optional<Path> path;//computeShortestPath(game, from, to, std::move(visMap), game.getUnit(selectedUnits.at(0)).getKind());
         if (path.has_value()) {
             selectedUnitPath = std::move(*path);
             selectedUnitPathError = std::optional<glm::uvec2>();

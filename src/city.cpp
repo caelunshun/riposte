@@ -760,7 +760,7 @@ namespace rip {
 
     void City::regrowCultureDefense() {
         const auto growthRate = 5;
-        if (getHappiness() > getUnhappiness()) {
+        if (getHappiness() >= getUnhappiness()) {
             cultureDefenseBonus += growthRate;
             cultureDefenseBonus = std::clamp(cultureDefenseBonus, 0, getMaxCultureDefenseBonus());
         }

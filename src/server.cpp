@@ -93,7 +93,7 @@ namespace rip {
     void Connection::handleComputePath(Game &game, const ComputePath &packet) {
         auto &unitKind = game.getRegistry().getUnit(packet.unitkindid());
         auto path = computeShortestPath(game, glm::uvec2(packet.from().x(), packet.from().y()), glm::uvec2(packet.to().x(), packet.to().y()),
-                                        game.getPlayer(playerID).getVisibilityMap(), *unitKind);
+                                        game.getPlayer(playerID).getVisibilityMap(), *unitKind, playerID);
 
         PathComputed response;
         if (path.has_value()) {

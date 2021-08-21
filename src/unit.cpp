@@ -234,7 +234,7 @@ namespace rip {
         moveTime = 0;
         moveFrom = pos;
 
-        movementLeft -= game.getTile(target).getMovementCost();
+        movementLeft -= game.getTile(target).getMovementCost(game, owner, target);
         if (movementLeft <= 0.1) movementLeft = 0;
 
         teleportTo(target, game);
