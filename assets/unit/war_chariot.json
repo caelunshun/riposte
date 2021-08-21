@@ -4,7 +4,7 @@
   "name": "War Chariot",
   "strength": 5,
   "movement": 2,
-  "cost": 40,
+  "cost": 30,
   "onlyForCivs": ["egypt"],
   "techs": ["Animal Husbandry"],
   "resources": ["horse"],

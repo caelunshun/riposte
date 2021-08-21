@@ -3,7 +3,7 @@
   "name": "Warrior",
   "strength": 2,
   "movement": 1,
-  "cost": 20,
+  "cost": 15,
   "techs": [],
   "category": "melee"
 }

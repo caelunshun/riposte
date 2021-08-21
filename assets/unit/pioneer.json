@@ -1,0 +1,13 @@
+{
+  "id": "pioneer",
+  "name": "Pioneer",
+  "strength": 0,
+  "movement": 3,
+  "onlyForCivs": ["america"],
+  "cost": 30,
+  "techs": [],
+  "capabilities": [
+    "found_city"
+  ],
+  "category": "auxilary"
+}

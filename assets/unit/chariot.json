@@ -3,7 +3,7 @@
   "name": "Chariot",
   "strength": 4,
   "movement": 2,
-  "cost": 40,
+  "cost": 30,
   "techs": ["Animal Husbandry"],
   "resources": ["horse"],
   "category": "mounted",

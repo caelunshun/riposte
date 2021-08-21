@@ -1,6 +1,6 @@
 {
-  "id": "archer",
-  "name": "Archer",
+  "id": "bowman",
+  "name": "Bowman",
   "strength": 3,
   "movement": 1,
   "cost": 25,
@@ -10,6 +10,13 @@
     {
       "type": "whenInCity",
       "bonusPercent": 50
-    }
+    },
+
+    {
+      "type": "againstUnitCategory",
+      "category": "melee",
+      "bonusPercent": 50
+    },
+
   ]
 }
