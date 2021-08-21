@@ -5,6 +5,7 @@
   "movement": 1,
   "cost": 30,
   "techs": ["Bronze Working"],
+  "replaces": "axeman",
   "onlyForCivs": ["aztec"],
   "category": "melee",
   "combatBonuses": [

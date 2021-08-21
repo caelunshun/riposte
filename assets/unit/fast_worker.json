@@ -4,6 +4,7 @@
   "strength": 0,
   "movement": 4,
   "onlyForCivs": ["india"],
+  "replaces": "worker",
   "cost": 25,
   "techs": [],
   "capabilities": [
