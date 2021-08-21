@@ -76,6 +76,13 @@ namespace rip {
     }
 
     void Player::onLoaded(Game &game) {
+        cities = {};
+        for (const auto &city : game.getCities()) {
+            if (city.getOwner() == id) {
+                cities.push_back(city.getID());
+            }
+        }
+
         recomputeRevenue(game);
         recomputeExpenses(game);
     }
@@ -129,7 +136,18 @@ namespace rip {
         if (capital == id) {
             capital = {};
             if (!cities.empty()) {
-                capital = cities[0];
+                CityId biggestCity;
+                int biggestPop;
+                for (const auto cityID : getCities()) {
+                    const auto pop = game.getCity(cityID).getPopulation();
+                    if (pop > biggestPop) {
+                        biggestCity = cityID;
+                        biggestPop = pop;
+                    }
+                }
+                capital = biggestCity;
+                game.getCity(biggestCity).setCapital(game, true);
+                game.getServer().markCityDirty(biggestCity);
             } else {
                 die(game);
             }

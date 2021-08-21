@@ -71,9 +71,12 @@ function Game:getVisibility(tilePos)
 end
 
 function Game:updatePlayer(playerdata)
+    if self.thePlayer ~= nil and playerdata.id == self.thePlayer.id then
+        return
+    end
     local player = self.players[playerdata.id] or Player:new(playerdata)
     self.players[player.id] = player
-    player:updateData(playerdata)
+    player:updateData(playerdata, false)
 end
 
 function Game:setTurn(turn)
@@ -168,7 +171,7 @@ function Game:handleEvent(event)
 end
 
 function Game:updateThePlayer(packet)
-    self.thePlayer:updateData(packet)
+    self.thePlayer:updateData(packet, true)
     self.eventBus:trigger("thePlayerUpdated")
 end
 

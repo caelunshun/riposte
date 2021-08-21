@@ -661,6 +661,8 @@ namespace rip {
     }
 
     void Server::sendBuildTaskFinished(CityId cityID, const BuildTask *task) {
+        if (game->getPlayer(game->getCity(cityID).getOwner()).hasAI()) return;
+
         // ensure UpdateCity is sent first if the city was just created
         flushDirtyItems();
 

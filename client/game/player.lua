@@ -17,16 +17,20 @@ function Player:new(data)
     return data
 end
 
-function Player:updateData(newData)
+function Player:updateData(newData, isThePlayer)
     for k, v in pairs(newData) do
         self[k] = v
     end
 
-    if newData.researchingTech == nil then self.researchingTech = nil end
+    if isThePlayer then
+        if newData.researchingTech == nil then self.researchingTech = nil end
 
-    self.unlockedTechIDs = {}
-    for _, tech in ipairs(newData.unlockedTechIDs or {}) do
-        self.unlockedTechIDs[tech] = true
+        if newData.unlockedTechIDs ~= nil then
+            self.unlockedTechIDs = {}
+            for _, tech in ipairs(newData.unlockedTechIDs or {}) do
+                self.unlockedTechIDs[tech] = true
+            end
+        end
     end
 end
 
