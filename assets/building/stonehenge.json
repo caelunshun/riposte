@@ -1,5 +1,5 @@
 {
-  "name": "Monument",
+  "name": "Stonehenge",
   "cost": 60,
   "techs": ["Mysticism"],
   "onlyForCivs": ["britain"],
