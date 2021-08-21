@@ -1,0 +1,89 @@
+variables:
+  window: rgb(40, 40, 40)
+  background: rgb(65, 65, 65)
+  active: rgb(100, 105, 100)
+  foreground: rgb(160, 170, 160)
+  text_color: rgb(255, 255, 255)
+  emphasis: rgb(252, 76, 2)
+  
+  default_font_family: Merriweather
+
+styles:
+  text:
+    default_font_family: $default_font_family
+    default_size: 14
+    default_color: $text_color
+  text & hoverable_text & hovered:
+    default_color: rgb(255, 191, 63)
+  text & tooltip_text:
+    default_size: 15
+  h1:
+    default_size: 32
+  h2:
+    default_size: 24
+  h3:
+    default_size: 18.72
+  h4:
+    default_size: 16
+  h5:
+    default_size: 13.28
+  h6:
+    default_size: 10.72
+
+  text_input:
+    border_radius: 2
+    cursor_width: 1
+    padding: 5
+    font: $default_font_family
+    font_size: 16
+    font_color: $text_color
+    background_color: $background
+    cursor_color: $foreground
+    border_color: $emphasis
+    border_width: 0
+
+  text_input & active:
+    background_color: $active
+    cursor_color: $foreground
+    border_color: $emphasis
+    border_width: 1
+  
+  button:
+    padding: 5
+    border_radius: 4
+    border_width: 0
+    border_color: $emphasis
+    background_color: $background
+
+  button & hovered:
+    border_width: 0
+    border_color: $emphasis
+    background_color: $active
+
+  button & pressed:
+    border_width: 1
+    border_color: $emphasis
+    background_color: $active
+
+  container:
+    border_radius: 0
+    border_width: 1
+    background_color: rgba(50, 50, 50, 240)
+    border_color: $background
+
+  container & window_container:
+    background_color: rgba(45, 45, 45, 254)
+    border_color: rgb(120, 120, 120)
+
+  container & light_container:
+    border_width: 0
+    background_color: rgba(50, 50, 50, 254)
+    border_color: rgb(120, 120, 120)
+
+  progress_bar:
+    border_radius: 1
+    border_width: 1
+    border_color: rgb(0, 0, 0)
+    background_color: $background
+    progress_color: rgb(91, 197, 0)
+    projected_progress_color: rgb(62, 154, 44)

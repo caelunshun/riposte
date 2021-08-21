@@ -1,0 +1,5 @@
+name: MenuBackground
+child:
+  Image:
+    image: icon/menu
+    zoom_to_fill: true
