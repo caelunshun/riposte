@@ -1,0 +1,20 @@
+
+{
+  "id": "phalanx",
+  "name": "Phalanx",
+  "strength": 6,
+  "movement": 1,
+  "cost": 45,
+  "techs": ["Bronze Working"],
+  "onlyForCivs": ["greece"],
+  "resources": ["copper"],
+  "category": "melee",
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "category": "melee",
+      "bonusPercent": 50
+    }
+  ]
+}
+

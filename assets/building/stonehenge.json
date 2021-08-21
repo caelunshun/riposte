@@ -1,0 +1,16 @@
+{
+  "name": "Monument",
+  "cost": 60,
+  "techs": ["Mysticism"],
+  "onlyForCivs": ["britain"],
+  "effects": [
+    {
+      "type": "bonusCulture",
+      "amount": 3
+    },
+    {
+      "type": "happiness",
+      "amount": 1
+    }
+  ]
+}

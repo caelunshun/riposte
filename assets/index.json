@@ -315,6 +315,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/phalanx.json",
+    "id": "unit/phalanx",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -372,6 +377,11 @@
   {
     "path": "building/port.json",
     "id": "building/port",
+    "loader": "building"
+  },
+  {
+    "path": "building/stonehenge.json",
+    "id": "building/stonehenge",
     "loader": "building"
   },
   {
@@ -455,6 +465,11 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/phalanx.png",
+    "id": "texture/unit/phalanx",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -517,6 +532,11 @@
   {
     "path": "icon/unit_head/war_chariot.png",
     "id": "icon/unit_head/war_chariot",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/phalanx.png",
+    "id": "icon/unit_head/phalanx",
     "loader": "image"
   },
   {
