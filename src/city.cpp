@@ -696,8 +696,19 @@ namespace rip {
 
         auto ourUnits = game.getStackByKey(owner, pos);
         uint32_t undefendedCount = 0;
-        if (!ourUnits.has_value() || game.getStack(*ourUnits).getUnits().empty()) {
+        if (!ourUnits.has_value()) {
             ++undefendedCount;
+        } else {
+            bool hasNoDefenseUnits = true;
+            for (const auto unitID : game.getStack(*ourUnits).getUnits()) {
+                if (game.getUnit(unitID).getKind().strength > 0) {
+                    hasNoDefenseUnits = false;
+                    break;
+                }
+            }
+            if (hasNoDefenseUnits) {
+                ++undefendedCount;
+            }
         }
 
         auto allStacks = game.getStacksAtPos(pos);
