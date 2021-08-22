@@ -1,0 +1,128 @@
+syntax = "proto3";
+
+import "google/protobuf/empty.proto";
+
+package riposte;
+
+// =====================
+// gRPC service
+// =====================
+
+service RiposteBackend {
+    // Register an account. Returns an auth token.
+    rpc RegisterAccount(RegisterRequest) returns (Authenticated) {}
+
+    // Log in. Returns an auth token.
+    rpc LogIn(LogInRequest) returns (Authenticated) {}
+
+    // Fetch public user info.
+    rpc FetchUserInfo(UUID) returns (UserInfo) {}
+
+    rpc RequestGameList(GameListRequest) returns (GameList) {}
+
+    rpc CreateGame(CreateGameRequest) returns (CreateGameResponse) {}
+    rpc DeleteGame(DeleteGameRequest) returns (google.protobuf.Empty) {}
+    rpc UpdateGameSettings(UpdateGameSettingsRequest) returns (google.protobuf.Empty) {}
+
+    rpc JoinGame(JoinGameRequest) returns (JoinGameResponse) {}
+}
+
+message RegisterRequest {
+    string username = 1;
+    string password = 2;
+    string email = 3;
+}
+
+message Authenticated {
+    string username = 1;
+    UUID uuid = 2;
+    bytes authToken = 3;
+}
+
+message LogInRequest {
+    string username = 1;
+    string password = 2;
+}
+
+message UUID {
+    bytes bytes = 1;
+}
+
+message UserInfo {
+    string username = 1;
+}
+
+message GameSettings {
+    uint32 numHumanPlayers = 1;
+    uint32 numAIPlayers = 2;
+}
+
+message CreateGameRequest {
+    GameSettings initialSettings = 1;
+}
+
+message CreateGameResponse {
+    // ID used to connect and authenticate with the QUIC endpoint.
+    // Should be kept secret.
+    bytes sessionID = 1;
+}
+
+message UpdateGameSettingsRequest {
+    // The session ID received in CreateGameResponse.
+    bytes sessionID = 2;
+}
+
+message DeleteGameRequest {
+    // The session ID received in CreateGameResponse.
+    bytes sessionID = 1;
+}
+
+message GameListRequest {}
+
+message GameList {
+    repeated GameInfo games = 1;
+}
+
+message GameInfo {
+    UUID gameID = 1;
+    GameSettings settings = 2;
+}
+
+message JoinGameRequest {
+    UUID gameID = 1;
+    bytes authToken = 2;
+}
+
+message JoinGameResponse {
+    oneof result {
+        string errorMessage = 1;
+        // ID used to connect and authenticate with the QUIC endpoint.
+        bytes sessionID = 2;
+    }
+}
+
+// =====================
+// QUIC protocol
+// =====================
+
+// Every time the game server or the backend opens a new QUIC stream,
+// it must send this packet to indicate the stream's purpose.
+message OpenStream {
+    oneof inner {
+        // Notifies the game server that a new client is connected.
+        // The stream is closed immediately afterward.
+        NewConnection newConnection = 1;   
+        // Sets the stream to be proxied to the given client,
+        // indicated by the client's connection ID.
+        ProxiedStream proxiedStream = 2;
+    }
+}
+
+message NewConnection {
+    UUID playerUUID = 1;
+    UUID connectionID = 2;
+}
+
+message ProxiedStream {
+    UUID connectionID = 1;
+}

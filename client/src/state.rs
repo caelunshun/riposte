@@ -91,6 +91,8 @@ impl StateAttachment {
             .borrow_mut()
             .create_window(root, positioner, z_index);
 
+        self.state.borrow_mut().windows.push(window_id);
+
         (instance_handle, window_id)
     }
 }

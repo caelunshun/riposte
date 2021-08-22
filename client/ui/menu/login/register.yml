@@ -1,0 +1,58 @@
+name: RegisterPage
+child:
+  Container:
+    mode:
+      Pad: 50
+    child:
+      Row:
+        align_h: Center
+        children:
+          - Column:
+              align_v: Center
+              spacing: 20
+              children:
+                - Text: 
+                    text: "Register"
+                    classes:
+                      - h1
+                - Text:
+                    id: error_text
+                    classes:
+                      - h4
+                      - error_text
+                - TextInput:
+                    id: username_input
+                    placeholder: "Username"
+                    max_len: 20
+                    width: 400
+                - TextInput:
+                    id: email_input
+                    placeholder: "Email"
+                    max_len: 40
+                    width: 400
+                - TextInput:
+                    id: password_input
+                    placeholder: "Password"
+                    max_len: 32
+                    width: 400
+                    is_password: true
+                - TextInput:
+                    id: verify_password_input
+                    placeholder: "Verify Password"
+                    max_len: 32
+                    width: 400
+                    is_password: true
+                - Row:
+                    spacing: 300
+                    children:
+                      - Button:
+                          id: submit
+                          child:
+                            Text: "Register"
+                      - Clickable:
+                          id: login_link
+                          child:
+                            Text:
+                              text: "Log In"
+                              classes:
+                                - hoverable_text

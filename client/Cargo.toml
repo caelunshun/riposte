@@ -2,17 +2,15 @@
 name = "riposte"
 version = "0.1.0"
 edition = "2018"
-resolver = "2"
 
-[workspace]
-members = [".", "protocol"]
+default-run = "riposte"
 
 [dependencies]
 ahash = { version = "0.7", features = [ "serde" ] }
 anyhow = "1"
 arrayvec = { version = "0.7", features = [ "serde" ] }
 bytes = "1"
-duit = { path = "../duit/crates/duit" }
+duit = { path = "/Users/caelum/dev/duit/crates/duit" }
 dume = { path = "/Users/caelum/dev/dume/renderer", package = "dume-renderer" }
 flume = "0.10"
 fs-err = "2"
@@ -22,20 +20,15 @@ pollster = "0.2"
 prost = "0.8"
 prost-types = "0.8"
 protocol = { path = "protocol", package = "riposte-protocol" }
+riposte-backend-api = { path = "../backend/api" }
 rodio = { version = "0.14", default-features = false, features = [ "vorbis", "wav" ] }
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"
 simple_logger = "1"
 slotmap = "1"
 thiserror = "1"
-tokio = { version = "1", features = ["full"] }
+tokio = { version = "1", features = [ "full" ] }
+uuid = "0.8"
 walkdir = "2"
 wgpu = "0.10"
 winit = "0.25"
-
-# Build dependencies in release mode for better debug performance.
-[profile.dev.package."*"]
-opt-level = 3
-
-[patch.crates-io]
-slotmap = { git = "https://github.com/caelunshun/slotmap", branch = "feature/try_insert_with_key" }

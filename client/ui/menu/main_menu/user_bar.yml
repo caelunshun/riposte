@@ -1,0 +1,13 @@
+name: UserBar
+child:
+  Container:
+    mode:
+      Pad: 10
+    classes:
+        - light_container
+    child:
+      Row:
+        align_v: End
+        children:
+          - Text:
+              id: user_text

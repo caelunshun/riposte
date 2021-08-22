@@ -1,10 +1,14 @@
 variables:
   window: rgb(40, 40, 40)
   background: rgb(65, 65, 65)
+  lighter: rgb(80, 80, 80)
+  border: rgb(100, 100, 100)
   active: rgb(100, 105, 100)
-  foreground: rgb(160, 170, 160)
+  foreground: rgb(120, 120, 120)
   text_color: rgb(255, 255, 255)
-  emphasis: rgb(252, 76, 2)
+  faded_text_color: rgb(180, 180, 180)
+  emphasis: rgb(255, 191, 63)
+  border_active: rgb(0, 112, 150)
   
   default_font_family: Merriweather
 
@@ -14,7 +18,7 @@ styles:
     default_size: 14
     default_color: $text_color
   text & hoverable_text & hovered:
-    default_color: rgb(255, 191, 63)
+    default_color: $emphasis
   text & tooltip_text:
     default_size: 15
   h1:
@@ -29,6 +33,9 @@ styles:
     default_size: 13.28
   h6:
     default_size: 10.72
+  
+  error_text:
+    default_color: rgb(235, 51, 0)
 
   text_input:
     border_radius: 2
@@ -37,33 +44,31 @@ styles:
     font: $default_font_family
     font_size: 16
     font_color: $text_color
+    placeholder_font_color: $faded_text_color
     background_color: $background
     cursor_color: $foreground
-    border_color: $emphasis
-    border_width: 0
+    border_color: $border
+    border_width: 1
 
-  text_input & active:
-    background_color: $active
-    cursor_color: $foreground
-    border_color: $emphasis
+  text_input & focused:
+    background_color: $lighter
+    cursor_color: rgb(255, 255, 255)
+    border_color: $border_active
     border_width: 1
   
   button:
     padding: 5
-    border_radius: 4
-    border_width: 0
-    border_color: $emphasis
+    border_radius: 2
+    border_width: 1
+    border_color: $border
     background_color: $background
 
   button & hovered:
-    border_width: 0
-    border_color: $emphasis
     background_color: $active
 
   button & pressed:
-    border_width: 1
-    border_color: $emphasis
-    background_color: $active
+    border_color: $border_active
+    background_color: $foreground
 
   container:
     border_radius: 0

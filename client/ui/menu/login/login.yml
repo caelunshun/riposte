@@ -1,0 +1,48 @@
+name: LoginPage
+child:
+  Container:
+    mode:
+      Pad: 50
+    child:
+      Row:
+        align_h: Center
+        children:
+          - Column:
+              align_v: Center
+              spacing: 20
+              children:
+                - Text: 
+                    text: "Log in"
+                    classes:
+                      - h1
+                - Text:
+                    id: error_text
+                    classes:
+                      - h4
+                      - error_text
+                - TextInput:
+                    id: username_input
+                    placeholder: Username
+                    width: 400
+                    max_len: 20
+                - TextInput:
+                    id: password_input
+                    placeholder: Password
+                    width: 400
+                    is_password: true
+                    max_len: 32
+                - Row:
+                    spacing: 300
+                    children:
+                      - Button:
+                          id: submit
+                          child:
+                            Text: "Log In"
+                      - Clickable:
+                          id: register_link
+                          child:
+                            Text:
+                              text: "Register"
+                              classes:
+                                - hoverable_text
+

@@ -1,6 +1,7 @@
 use std::{
     cell::{Ref, RefCell, RefMut},
     ffi::OsStr,
+    future::Future,
     iter,
     rc::Rc,
     sync::Arc,
@@ -9,6 +10,7 @@ use std::{
 use anyhow::Context as _;
 use duit::{Spec, Ui, Vec2};
 use dume::Canvas;
+use flume::Receiver;
 use tokio::runtime::{self, Runtime};
 use walkdir::WalkDir;
 use winit::{dpi::PhysicalSize, event_loop::EventLoop, window::Window};
@@ -19,6 +21,8 @@ use crate::{
         Assets,
     },
     audio::Audio,
+    backend::BackendService,
+    options::Options,
     registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
     state::StateManager,
 };
@@ -51,6 +55,11 @@ pub struct Context {
 
     /// The Tokio runtime
     runtime: Runtime,
+    /// The connection to the backend service (gRPC)
+    backend: BackendService,
+
+    /// Persistent game settings
+    options: Options,
 }
 
 impl Context {
@@ -81,6 +90,11 @@ impl Context {
         let registry = Registry::new();
 
         let runtime = runtime::Builder::new_multi_thread().enable_all().build()?;
+        let rt_handle = runtime.handle().clone();
+
+        let backend = runtime.block_on(async move { BackendService::new(rt_handle).await })?;
+
+        let options = Options::default();
 
         Ok((
             Self {
@@ -96,6 +110,8 @@ impl Context {
                 registry,
                 state_manager,
                 runtime,
+                backend,
+                options,
             },
             event_loop,
         ))
@@ -108,7 +124,7 @@ impl Context {
     }
 
     pub fn load_ui_specs(&mut self) -> anyhow::Result<()> {
-        for entry in WalkDir::new("/Users/caelum/dev/riposte-client2/ui") {
+        for entry in WalkDir::new("/Users/caelum/CLionProjects/riposte/client/ui") {
             let entry = entry?;
             if entry.path().extension() != Some(OsStr::new("yml")) {
                 continue;
@@ -122,7 +138,9 @@ impl Context {
         }
 
         self.ui_mut()
-            .add_stylesheet(&fs::read("/Users/caelum/dev/riposte-client2/style.yml")?)
+            .add_stylesheet(&fs::read(
+                "/Users/caelum/CLionProjects/riposte/client/style.yml",
+            )?)
             .context("malformed stylehseet")?;
 
         Ok(())
@@ -168,6 +186,28 @@ impl Context {
         &self.runtime
     }
 
+    pub fn options(&self) -> &Options {
+        &self.options
+    }
+
+    pub fn options_mut(&mut self) -> &mut Options {
+        &mut self.options
+    }
+
+    /// Spawns a future to run asynchronously on the Tokio runtime.
+    ///
+    /// Returns a handle to the future that can be polled each frame.
+    pub fn spawn_future<T: Send + 'static>(
+        &self,
+        future: impl Future<Output = T> + Send + 'static,
+    ) -> FutureHandle<T> {
+        FutureHandle::spawn(self.runtime.handle(), future)
+    }
+
+    pub fn backend(&self) -> &BackendService {
+        &self.backend
+    }
+
     pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
         self.sample_texture = init::create_sample_texture(&self.device, new_size);
         self.surface.configure(
@@ -183,6 +223,8 @@ impl Context {
     }
 
     pub fn render(&mut self) {
+        self.state_manager.update();
+
         let window_logical_size = self
             .window
             .inner_size()
@@ -205,5 +247,35 @@ impl Context {
         );
 
         self.queue.submit(iter::once(encoder.finish()));
+    }
+}
+
+/// A handle to a future running asynchronously
+/// from the main thread.
+pub struct FutureHandle<T> {
+    receiver: Receiver<T>,
+}
+
+impl<T: Send + 'static> FutureHandle<T> {
+    pub fn spawn(
+        runtime: &runtime::Handle,
+        future: impl Future<Output = T> + Send + 'static,
+    ) -> Self {
+        let (sender, receiver) = flume::bounded(1);
+
+        runtime.spawn(async move {
+            let result = future.await;
+            sender.send(result).ok();
+        });
+
+        Self { receiver }
+    }
+
+    /// Polls for the return value from the future.
+    ///
+    /// If the future completed, returns `Some(output)`.
+    /// If the future is still running or panicked, returns `None`.
+    pub fn get(&self) -> Option<T> {
+        self.receiver.try_recv().ok()
     }
 }

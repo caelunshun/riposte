@@ -1,10 +1,8 @@
 use crate::{
-    audio::SoundHandle,
     context::Context,
-    generated::{MainMenu, MenuBackground, MenuEntry},
+    generated::{MainMenu, MenuBackground, MenuEntry, UserBar},
     state::StateAttachment,
     ui::{FillScreen, Z_BACKGROUND, Z_FOREGROUND},
-    volumes,
 };
 use ahash::AHashMap;
 
@@ -15,6 +13,7 @@ enum Page {
 }
 
 #[derive(Debug, Copy, Clone)]
+
 enum Message {
     SingleplayerClicked,
     BackClicked,
@@ -22,7 +21,6 @@ enum Message {
 
 pub struct MainMenuState {
     attachment: StateAttachment,
-    music: SoundHandle,
     handle: MainMenu,
     current_page: Page,
 }
@@ -31,15 +29,21 @@ impl MainMenuState {
     pub fn new(cx: &Context) -> Self {
         let attachment = cx.state_manager().create_state();
 
+        let (handle, _) = attachment.create_window::<UserBar, _>(FillScreen, Z_FOREGROUND);
+        handle.user_text.get_mut().set_text(
+            "Account: %username - %uuid",
+            vars! {
+                username => cx.options().account().username(),
+                uuid => cx.options().account().uuid().to_hyphenated(),
+            },
+        );
+
         attachment.create_window::<MenuBackground, _>(FillScreen, Z_BACKGROUND);
         let (handle, _) = attachment.create_window::<MainMenu, _>(FillScreen, Z_FOREGROUND);
-
-        let music = cx.audio().play_looping("music/menu", volumes::MENU_MUSIC);
 
         let this = Self {
             handle,
             attachment,
-            music,
             current_page: Page::Main,
         };
 
@@ -82,10 +86,7 @@ impl MainMenuState {
 
     fn add_entry(&self, cx: &Context, name: &str, message: Option<Message>) -> &Self {
         let (handle, entry) = cx.ui_mut().create_spec_instance::<MenuEntry>();
-        handle
-            .the_text
-            .get_mut()
-            .set_text(name.into(), AHashMap::new());
+        handle.the_text.get_mut().set_text(name, AHashMap::new());
 
         if let Some(msg) = message {
             handle.clickable.get_mut().on_click(move || msg.clone());

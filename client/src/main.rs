@@ -4,8 +4,22 @@ use anyhow::Context as _;
 use context::Context;
 use simple_logger::SimpleLogger;
 
+macro_rules! vars {
+    ($(
+        $name:ident => $val:expr
+    ),* $(,)?) => {{
+        #[allow(unused_mut)]
+        let mut map = ahash::AHashMap::new();
+        $(
+            map.insert(stringify!($name).to_owned(), $val.to_string());
+        )*
+        map
+    }}
+}
+
 mod assets;
 mod audio;
+mod backend;
 mod context;
 mod event_loop;
 mod game;
@@ -16,13 +30,14 @@ mod state;
 mod states;
 mod ui;
 mod volumes;
+mod options;
 
-use states::main_menu::MainMenuState;
+use states::menu::MenuState;
 
 extern crate fs_err as fs;
 
 pub enum RootState {
-    MainMenu(MainMenuState),
+    MainMenu(MenuState),
 }
 
 impl RootState {
@@ -51,7 +66,7 @@ fn main() -> anyhow::Result<()> {
     context.load_ui_specs().context("failed to load UI specs")?;
     context.load_assets().context("failed to load assets")?;
 
-    let state = RootState::MainMenu(MainMenuState::new(&context));
+    let state = RootState::MainMenu(MenuState::new(&context));
 
     self::event_loop::run(event_loop, context, state);
 
