@@ -1,12 +1,15 @@
 use riposte_backend_api::Authenticated;
 use uuid::Uuid;
 
+use crate::audio::SoundCategory;
+
 /// Persistent game options saved to disk.
 ///
 /// Includes authentication details.
 #[derive(Debug, Default)]
 pub struct Options {
     account: Option<Account>,
+    sound: SoundOptions,
 }
 
 impl Options {
@@ -24,6 +27,38 @@ impl Options {
 
     pub fn clear_account(&mut self) {
         self.account = None;
+    }
+
+    pub fn sound(&self) -> &SoundOptions {
+        &self.sound
+    }
+
+    pub fn sound_mut(&mut self) -> &mut SoundOptions {
+        &mut self.sound
+    }
+}
+
+#[derive(Debug)]
+pub struct SoundOptions {
+    pub music_volume: f32,
+    pub effects_volume: f32,
+}
+
+impl SoundOptions {
+    pub fn volume(&self, category: SoundCategory) -> f32 {
+        match category {
+            SoundCategory::Music => self.music_volume,
+            SoundCategory::Effects => self.effects_volume,
+        }
+    }
+}
+
+impl Default for SoundOptions {
+    fn default() -> Self {
+        Self {
+            music_volume: 0.5,
+            effects_volume: 0.75,
+        }
     }
 }
 

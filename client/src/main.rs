@@ -56,7 +56,7 @@ fn init_logging() {
         .unwrap();
 }
 
-fn main() -> anyhow::Result<()> {
+fn main() -> anyhow::Result<()> { 
     init_logging();
 
     // TEMP for testing

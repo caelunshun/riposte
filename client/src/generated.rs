@@ -1,5 +1,50 @@
 use duit::widgets::*;
 use duit::*;
+pub struct OptionsWindow {
+    pub music_volume_slider: WidgetHandle<Slider>,
+    pub effects_volume_slider: WidgetHandle<Slider>,
+    pub back_button: WidgetHandle<Button>,
+}
+impl ::duit::InstanceHandle for OptionsWindow {
+    fn name() -> &'static str {
+        "OptionsWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut music_volume_slider = None;
+        let mut effects_volume_slider = None;
+        let mut back_button = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "music_volume_slider" => music_volume_slider = Some(widget),
+                "effects_volume_slider" => effects_volume_slider = Some(widget),
+                "back_button" => back_button = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            music_volume_slider: WidgetHandle::new(music_volume_slider.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "music_volume_slider"
+                )
+            })),
+            effects_volume_slider: WidgetHandle::new(effects_volume_slider.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "effects_volume_slider"
+                )
+            })),
+            back_button: WidgetHandle::new(back_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "back_button"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct MenuEntry {
     pub clickable: WidgetHandle<Clickable>,
     pub the_text: WidgetHandle<Text>,

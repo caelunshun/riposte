@@ -59,7 +59,7 @@ pub struct Context {
     backend: BackendService,
 
     /// Persistent game settings
-    options: Options,
+    options: Rc<RefCell<Options>>,
 }
 
 impl Context {
@@ -72,8 +72,9 @@ impl Context {
         let ui = Rc::new(RefCell::new(Ui::new()));
         let state_manager = StateManager::new(Rc::clone(&ui));
 
+        let options = Rc::new(RefCell::new(Options::default()));
         let audio = Rc::new(RefCell::new(
-            Audio::new().context("failed to initialize audio player")?,
+            Audio::new(Rc::clone(&options)).context("failed to initialize audio player")?,
         ));
 
         let mut assets = Assets::new();
@@ -93,8 +94,6 @@ impl Context {
         let rt_handle = runtime.handle().clone();
 
         let backend = runtime.block_on(async move { BackendService::new(rt_handle).await })?;
-
-        let options = Options::default();
 
         Ok((
             Self {
@@ -170,6 +169,10 @@ impl Context {
         self.audio.borrow()
     }
 
+    pub fn audio_mut(&self) -> RefMut<Audio> {
+        self.audio.borrow_mut()
+    }
+
     pub fn registry(&self) -> &Registry {
         &self.registry
     }
@@ -186,12 +189,12 @@ impl Context {
         &self.runtime
     }
 
-    pub fn options(&self) -> &Options {
-        &self.options
+    pub fn options(&self) -> Ref<Options> {
+        self.options.borrow()
     }
 
-    pub fn options_mut(&mut self) -> &mut Options {
-        &mut self.options
+    pub fn options_mut(& self) -> RefMut<Options> {
+        self.options.borrow_mut()
     }
 
     /// Spawns a future to run asynchronously on the Tokio runtime.
@@ -224,6 +227,7 @@ impl Context {
 
     pub fn render(&mut self) {
         self.state_manager.update();
+        self.audio.borrow_mut().update();
 
         let window_logical_size = self
             .window

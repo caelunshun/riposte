@@ -6,6 +6,10 @@ use crate::{
 };
 use ahash::AHashMap;
 
+pub enum Action {
+    PushOptions,
+}
+
 #[derive(Copy, Clone, Debug)]
 enum Page {
     Main,
@@ -16,6 +20,7 @@ enum Page {
 
 enum Message {
     SingleplayerClicked,
+    OptionsClicked,
     BackClicked,
 }
 
@@ -52,19 +57,23 @@ impl MainMenuState {
         this
     }
 
-    pub fn update(&mut self, cx: &Context) {
+    pub fn update(&mut self, cx: &Context) -> Option<Action> {
         let mut updated = false;
+        let mut action = None;
         cx.ui_mut().handle_messages(|msg: &Message| {
             updated = true;
             match msg {
                 Message::SingleplayerClicked => self.current_page = Page::Singleplayer,
                 Message::BackClicked => self.current_page = Page::Main,
+                Message::OptionsClicked => action = Some(Action::PushOptions),
             }
         });
 
         if updated {
             self.update_entries(cx);
         }
+
+        action
     }
 
     fn update_entries(&self, cx: &Context) {
@@ -74,7 +83,7 @@ impl MainMenuState {
             Page::Main => {
                 self.add_entry(cx, "SINGLEPLAYER", Some(Message::SingleplayerClicked))
                     .add_entry(cx, "MULTIPLAYER", None)
-                    .add_entry(cx, "OPTIONS", None);
+                    .add_entry(cx, "OPTIONS", Some(Message::OptionsClicked));
             }
             Page::Singleplayer => {
                 self.add_entry(cx, "NEW GAME", None)
