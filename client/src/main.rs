@@ -27,6 +27,7 @@ mod game;
 mod generated;
 mod registry;
 mod state;
+mod paths;
 mod states;
 mod ui;
 mod volumes;

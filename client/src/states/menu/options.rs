@@ -38,7 +38,7 @@ impl OptionsState {
         let (handle, _) =
             attachment.create_window::<generated::OptionsWindow, _>(FillScreen, Z_FOREGROUND);
 
-            let options = cx.options();
+        let options = cx.options();
         let sound_options = options.sound();
         write_option_to_slider(sound_options.music_volume, &handle.music_volume_slider);
         write_option_to_slider(sound_options.effects_volume, &handle.effects_volume_slider);
@@ -50,6 +50,7 @@ impl OptionsState {
 
     pub fn update(&mut self, cx: &mut Context) -> Option<Action> {
         if cx.ui_mut().pop_message::<BackClicked>().is_some() {
+            cx.save_options_to_disk();
             return Some(Action::Close);
         }
 

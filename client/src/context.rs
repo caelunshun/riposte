@@ -23,6 +23,7 @@ use crate::{
     audio::Audio,
     backend::BackendService,
     options::Options,
+    paths::FilePaths,
     registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
     state::StateManager,
 };
@@ -60,6 +61,9 @@ pub struct Context {
 
     /// Persistent game settings
     options: Rc<RefCell<Options>>,
+
+    /// File path manager
+    paths: FilePaths,
 }
 
 impl Context {
@@ -72,7 +76,13 @@ impl Context {
         let ui = Rc::new(RefCell::new(Ui::new()));
         let state_manager = StateManager::new(Rc::clone(&ui));
 
-        let options = Rc::new(RefCell::new(Options::default()));
+        let paths = FilePaths::new()?;
+
+        let options = Options::load_from_disk(&paths)
+            .context("failed to load options")?
+            .unwrap_or_default();
+        let options = Rc::new(RefCell::new(options));
+
         let audio = Rc::new(RefCell::new(
             Audio::new(Rc::clone(&options)).context("failed to initialize audio player")?,
         ));
@@ -111,6 +121,7 @@ impl Context {
                 runtime,
                 backend,
                 options,
+                paths,
             },
             event_loop,
         ))
@@ -193,8 +204,23 @@ impl Context {
         self.options.borrow()
     }
 
-    pub fn options_mut(& self) -> RefMut<Options> {
+    pub fn options_mut(&self) -> RefMut<Options> {
         self.options.borrow_mut()
+    }
+
+    pub fn paths(&self) -> &FilePaths {
+        &self.paths
+    }
+
+    /// Asynchronously saves the Options to disk.
+    pub fn save_options_to_disk(&self) {
+        let paths = self.paths.clone();
+        let options = self.options.borrow().clone();
+        self.spawn_future(async move {
+            if let Err(e) = options.save_to_disk(&paths).await {
+                log::error!("Failed to save options: {}", e);
+            }
+        });
     }
 
     /// Spawns a future to run asynchronously on the Tokio runtime.

@@ -1,18 +1,48 @@
 use riposte_backend_api::Authenticated;
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::audio::SoundCategory;
+use crate::{audio::SoundCategory, paths::FilePaths};
 
 /// Persistent game options saved to disk.
 ///
 /// Includes authentication details.
-#[derive(Debug, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Options {
     account: Option<Account>,
     sound: SoundOptions,
 }
 
 impl Options {
+    pub async fn save_to_disk(&self, paths: &FilePaths) -> anyhow::Result<()> {
+        let path = paths.options_file();
+        let bytes = serde_json::to_vec_pretty(self)?;
+        tokio::fs::write(path, bytes).await?;
+        log::info!("Saved options to disk");
+        Ok(())
+    }
+
+    pub fn load_from_disk(paths: &FilePaths) -> anyhow::Result<Option<Self>> {
+        let path = paths.options_file();
+        if path.exists() {
+            let bytes = fs::read(&path)?;
+            let options: Self = match serde_json::from_slice(&bytes) {
+                Ok(o) => o,
+                Err(e) => {
+                    log::warn!(
+                        "Failed to load existing options: {}; reverting to defaults (this is likely caused by a recent update)",
+                        e
+                    );
+                    return Ok(Some(Self::default()));
+                }
+            };
+            log::info!("Loaded options from {}", path.display());
+            Ok(Some(options))
+        } else {
+            Ok(None)
+        }
+    }
+
     pub fn account(&self) -> &Account {
         self.account.as_ref().expect("account not set")
     }
@@ -38,7 +68,7 @@ impl Options {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SoundOptions {
     pub music_volume: f32,
     pub effects_volume: f32,
@@ -62,10 +92,11 @@ impl Default for SoundOptions {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Account {
     username: String,
     uuid: Uuid,
+    auth_token: Vec<u8>,
 }
 
 impl Account {
@@ -73,6 +104,7 @@ impl Account {
         Self {
             username: auth.username,
             uuid: auth.uuid.unwrap_or_default().into(),
+            auth_token: auth.auth_token,
         }
     }
 

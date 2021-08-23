@@ -36,8 +36,14 @@ impl MenuState {
             cx.audio()
                 .play_looping("music/menu", SoundCategory::Music, volumes::MENU_MUSIC);
 
+        let state = if cx.options().has_account() {
+            State::MainMenu(MainMenuState::new(cx))
+        } else {
+            State::Login(LoginState::new(cx))
+        };
+
         Self {
-            state: State::Login(LoginState::new(cx)),
+            state,
             attachment,
             music,
         }
