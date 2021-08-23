@@ -1,6 +1,8 @@
 //
 // Created by Caelum van Ispelen on 7/1/21.
 //
+// Revised on 08/23/21.
+//
 
 #include "network.h"
 
@@ -11,120 +13,68 @@
 #include <iostream>
 
 namespace rip {
-    struct NetworkConnection::impl {
-        std::optional<std::string> error;
-        int sock;
-        std::string receiveBuffer;
-        std::string outputBuffer;
-    };
-
-    void NetworkConnection::setError(std::string message) {
-        _impl->error = std::move(message);
+    NetworkingContext::NetworkingContext() {
+        inner = networkctx_create();
     }
 
-    NetworkConnection::NetworkConnection(const std::string &address, uint16_t port) : _impl(std::make_unique<impl>()) {
-        struct sockaddr_in addr = {0};
-        addr.sin_port = htons(port);
-        addr.sin_family = AF_INET;
-        addr.sin_addr.s_addr = inet_addr(address.c_str());
-
-        int sock = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
-        if (sock == -1) {
-            setError("failed to create socket");
-            return;
-        }
-
-        if (connect(sock, (sockaddr*) &addr, sizeof(addr)) == -1) {
-            setError("failed to connect to " + address + ":" + std::to_string(port));
-            return;
-        }
-
-        _impl->sock = sock;
+    NetworkingContext::~NetworkingContext() {
+        networkctx_free(inner);
     }
 
-    void NetworkConnection::sendMessage(const std::string &data) {
-        auto &output = _impl->outputBuffer;
-
-        // Encode length field
-        output.push_back((uint8_t) data.size() >> 24);
-        output.push_back((uint8_t) (data.size() >> 16));
-        output.push_back((uint8_t) (data.size() >> 8));
-        output.push_back((uint8_t) (data.size()));
-
-        // Encode data
-        output.append(data);
-
-        // Write to socket
-        if (!send(_impl->sock, (void*) output.data(), output.size(), 0)) {
-            setError("failed to send data");
-            return;
-        }
-
-        output.clear();
+    ConnectionHandle NetworkingContext::connectStdio() {
+        auto *handle = networkctx_connect_stdio(inner);
+        return ConnectionHandle(handle, inner);
     }
 
-    std::optional<uint32_t> NetworkConnection::decodeLengthField() {
-        if (_impl->receiveBuffer.size() < 4) return {};
-
-        auto *data = (unsigned char*) _impl->receiveBuffer.data();
-
-        return (((int) data[0]) << 24) | (((int) data[1]) << 16)
-            | (((int) data[2]) << 8) | ((int) data[3]);
+    void NetworkingContext::waitAndInvokeCallbacks() {
+        networkctx_wait(inner);
     }
 
-    std::optional<uint32_t> NetworkConnection::hasEnoughData() {
-        const auto length = decodeLengthField();
-        if (!length.has_value()) return {};
-
-        if (_impl->receiveBuffer.size() - 4 < length) return {};
-
-        return length;
+    RipNetworkingContext *NetworkingContext::getInner() {
+        return inner;
+    }
+   
+    void *callbackToUserdata(FnCallback callback) {
+        auto *c = new FnCallback();
+        *c = std::move(callback);
+        
+        return (void*) c;
+    }
+    
+    void callbackFunction(void *userdata, const RipResult *result) {
+        FnCallback &callback = *((FnCallback*) userdata);
+        callback(*result);
+        delete &callback;
     }
 
-    std::string NetworkConnection::recvMessage() {
-        // Wait until the four-byte length field and the remainder of the packet have been received.
-        auto dataLength = hasEnoughData();
-        while (!dataLength.has_value()) {
-            int pos = _impl->receiveBuffer.size();
-            _impl->receiveBuffer.resize(_impl->receiveBuffer.size() + 1024);
+    ConnectionHandle::ConnectionHandle(RipConnectionHandle *inner, RipNetworkingContext *ctx) : inner(inner), ctx(ctx) {}
 
-            int receivedBytes = recv(
-                    _impl->sock,
-                    (void*) (_impl->receiveBuffer.data() + pos),
-                    1024,
-                    0
-                    );
-            if (receivedBytes < 0) {
-                setError("failed to receive data (disconnected from server)");
-                return "";
-            }
-
-            _impl->receiveBuffer.erase(pos + receivedBytes, std::string::npos);
-
-            dataLength = hasEnoughData();
-        }
-
-        auto result = _impl->receiveBuffer.substr(4, *dataLength);
-        _impl->receiveBuffer.erase(0, *dataLength + 4);
-        return result;
-    }
-
-    std::optional<std::string> NetworkConnection::getError() {
-        return _impl->error;
-    }
-
-    NetworkConnection::~NetworkConnection() {
-        if (_impl->sock != 0) {
-            std::cout << "closing sock " << _impl->sock;
-            close(_impl->sock);
+    ConnectionHandle::~ConnectionHandle() {
+        if (inner) {
+            networkctx_conn_free(ctx, inner);
         }
     }
 
-    NetworkConnection::NetworkConnection(NetworkConnection &&other)  noexcept {
-        _impl = std::make_unique<impl>();
-        _impl->receiveBuffer = std::move(other._impl->receiveBuffer);
-        _impl->sock = other._impl->sock;
-        _impl->error = std::move(other._impl->error);
-        other._impl->sock = 0;
+    void ConnectionHandle::sendMessage(const std::string &data, FnCallback &callback) {
+        networkctx_conn_send_data(ctx, inner, RipBytes {
+            .ptr = (const unsigned char*) data.data(),
+            .len = data.size(),
+        }, callbackFunction, callbackToUserdata(std::move(callback)));
+    }
+
+    void ConnectionHandle::recvMessage(FnCallback &callback) {
+        networkctx_conn_recv_data(ctx, inner, callbackFunction, callbackToUserdata(std::move(callback)));
+    }
+
+    ConnectionHandle::ConnectionHandle(ConnectionHandle &&other) {
+        ctx = other.ctx;
+        inner = other.inner;
+        other.inner = nullptr;
+    }
+
+    ConnectionHandle &ConnectionHandle::operator=(ConnectionHandle &&other) {
+        ctx = other.ctx;
+        inner = other.inner;
+        other.inner = nullptr;
     }
 }

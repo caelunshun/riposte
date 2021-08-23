@@ -1,8 +1,12 @@
+//
+// Created by Caelum van Ispelen on 8/21/21.
+//
+
 syntax = "proto3";
 
 import "google/protobuf/empty.proto";
 
-package riposte;
+package rip.backend;
 
 // =====================
 // gRPC service
@@ -45,7 +49,7 @@ message LogInRequest {
 }
 
 message UUID {
-    bytes bytes = 1;
+    string id = 1;
 }
 
 message UserInfo {

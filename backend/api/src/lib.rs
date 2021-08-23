@@ -1,4 +1,4 @@
-tonic::include_proto!("riposte");
+tonic::include_proto!("rip.backend");
 
 pub const PORT: u16 = 19836;
 
@@ -7,22 +7,21 @@ pub type SessionId = [u8; 16];
 pub extern crate tonic;
 pub extern crate quinn;
 
-use std::convert::TryInto;
+use std::str::FromStr;
 
 use tokio_util::codec::{length_delimited, LengthDelimitedCodec};
 
 impl From<uuid::Uuid> for Uuid {
     fn from(u: uuid::Uuid) -> Self {
         Self {
-            bytes: (&u.as_bytes()[..]).into(),
+            id: u.to_hyphenated().to_string(),
         }
     }
 }
 
 impl From<Uuid> for uuid::Uuid {
     fn from(u: Uuid) -> Self {
-        let bytes = u.bytes.try_into().unwrap_or_default();
-        uuid::Uuid::from_bytes(bytes)
+        uuid::Uuid::from_str(&u.id).unwrap_or_default()
     }
 }
 

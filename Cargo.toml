@@ -6,7 +6,8 @@ members = [
     "lobby",
     "bundler",
     "backend",
-    "backend/api"
+    "backend/api",
+    "c-bindings",
 ]
 
 resolver = "2"

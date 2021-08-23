@@ -2,6 +2,10 @@
 // Created by Caelum van Ispelen on 6/14/21.
 //
 
+syntax = "proto3";
+
+package rip.proto;
+
 // Defines the packets. All of them.
 //
 // The client connects to the server and sends ClientInfo.
@@ -48,9 +52,125 @@
 //
 // Some fields are not used in game saves.
 
-syntax = "proto3";
+// ----------------------------
+// ---------- LOBBY -----------
+// ----------------------------
 
-package rip.proto;
+message UUID {
+  string uuid = 1;
+}
+
+// A packet sent by the client during the lobby phase.
+message ClientLobbyPacket {
+  oneof packet {
+    CreateSlot createSlot = 1;
+    DeleteSlot deleteSlot = 2;
+    RequestGameStart requestGameStart = 3;
+    ChangeCivAndLeader changeCivAndLeader = 4;
+  }
+}
+
+// Sent by the client to add a new player slot to the game.
+//
+// Rejected if the lobby isStatic.
+//
+// Admin only
+message CreateSlot {
+  // Whether the slot should be a human or AI player
+  bool isAI = 1;
+}
+
+// Sent by the client to remove a player slot from the game.
+// If the player was human and had joined, the player is kicked.
+//
+// Rejected if the lobby isStatic.
+//
+// Admin only
+message DeleteSlot {
+  // ID of the slot to delete
+  uint32 slotID = 1;
+}
+
+// Sent by the client to start the game.
+//
+// Rejected if not all slots are filled.
+//
+// Admin only
+message RequestGameStart {}
+
+// Sent by the client to change its selected leader
+// and civilization.
+//
+// Rejected if the lobby isStatic. Also rejected
+// if the civilization is already in use by another
+// player.
+message ChangeCivAndLeader {
+  string civID = 1;
+  string leaderName = 2;
+}
+
+// A packet sent by the server during the lobby phase.
+message ServerLobbyPacket {
+  oneof packet {
+    LobbyInfo lobbyInfo = 1;
+    Kicked kicked = 2;
+    GameStarted gameStarted = 3;
+  }
+}
+
+// Sent by the server on join and whenever slot data changes.
+message LobbyInfo {
+  repeated LobbySlot slots = 1;
+  // Whether the game was loaded from a game save and, as
+  // a result, settings (including civ/leader choices) cannot be
+  // changed.
+  bool isStatic = 2;
+  // The slot ID occupied by this client.
+  uint32 yourSlotID = 3;
+}
+
+// Sent by the server when the client was kicked from the game.
+//
+// The connection is terminated immediately after this message is sent.
+message Kicked {}
+
+// Sent by the server when the game has started.
+//
+// This closes the game lobby. All clients should display
+// a loading screen until initial game data has been received.
+message GameStarted {}
+
+// A slot represents a player in the game.
+//
+// A slot may be empty or occupied. When a slot
+// is empty, the game cannot start.
+// A slot is filled when a player takes its place.
+//
+// If `ownerUUID` is set to a user UUID but `occupied` is
+// set to false, then only that user is allowed to join
+// in this slot. (This functionality is used when loading a saved
+// game - the same users will join the same slots.)
+message LobbySlot {
+  // Whether the slot is occupied.
+  bool occupied = 1;
+  // UUID of the slot owner. If null, either
+  // the slot is empty or the player is an AI.
+  UUID ownerUUID = 2;
+  // Whether the slot is an AI or a human player.
+  bool isAI = 3;
+  // The civilization selected by this player.
+  string civID = 4;
+  // The leader selected by this player.
+  string leaderName = 5;
+  // Unique ID of the slot
+  uint32 id = 6;
+  // Whether the player occupying this slot is the game admin
+  bool isAdmin = 7;
+}
+
+// ----------------------------
+// ---------- GAME ------------
+// ----------------------------
 
 message Pos {
   uint32 x = 1;
@@ -61,7 +181,6 @@ message Pos {
 message AnyClient {
   int32 requestID = 1;
   oneof packet {
-    ClientInfo clientInfo = 2;
     ComputePath computePath = 3;
     MoveUnits moveUnits = 4;
     EndTurn endTurn = 5;
@@ -74,9 +193,6 @@ message AnyClient {
     SetWorkerTask setWorkerTask = 12;
     DeclareWar declareWar = 13;
     ConfigureWorkedTiles configureWorkedTiles = 14;
-    GameOptions gameOptions = 15;
-    AdminStartGame adminStartGame = 16;
-    SetLeader setLeader = 17;
     BombardCity bombardCity = 18;
     SaveGame saveGame = 19;
   }
@@ -89,9 +205,6 @@ message AnyServer {
   // Otherwise, always equal to zero.
   int32 requestID = 1;
   oneof packet {
-    ServerInfo serverInfo = 2;
-    StartGame startGame = 3;
-    LobbyError lobbyError = 4;
     UpdateGlobalData updateGlobalData = 5;
     UpdateMap updateMap = 6;
     UpdateCity updateCity = 7;
@@ -115,74 +228,9 @@ message AnyServer {
   }
 }
 
-// PRE-GAME
-
-// Sent by the client upon connecting.
-message ClientInfo {
-  string username = 1;
-}
-
-message LobbyPlayer {
-  string username = 1;
-  bool isHuman = 2;
-  string civID = 3;
-  string leaderName = 4;
-  int32 playerID = 5;
-  // If `false`, then we're still waiting for a human player in this slot.
-  bool exists = 6;
-  bool isAdmin = 7;
-}
-
-// Response to ClientInfo. Indicates lobby data.
-//
-// Also sent whenever lobby data changes (a player leaves/joins, etc.)
-message ServerInfo {
-  // Players in the lobby.
-  repeated LobbyPlayer players = 1;
-  // The ID of the player in this connection.
-  int32 thePlayerID = 2;
-}
-
-// Can only be sent by the admin.
-message KickPlayer {
-  int32 id = 1;
-  string reason = 2;
-}
-
-// Might fail if another player has chosen the same leader.
-//
-// Initially, the player's leader is randomly chosen (sent in ServerInfo)
-message SetLeader {
-  string civID = 1;
-  string leader = 2;
-}
-
-// Can only be sent by the admin.
-// Might be rejected.
-message AdminStartGame {}
-
-// Sent by the server when an action cannot be performed
-// (game cannot start, etc.)
-message LobbyError {
-  string message = 1;
-}
-
-// Updates game options. Can only be sent by the admin.
-message GameOptions {
-  uint32 mapWidth = 1;
-  uint32 mapHeight = 2;
-  uint32 numHumanPlayers = 3;
-  uint32 numAIPlayers = 4;
-}
-
 // ---------------------
 // SERVER
 // ---------------------
-
-// Enters the game state.
-message StartGame {
-  // empty
-}
 
 message PlayerInfo {
   // The player's username.
