@@ -56,6 +56,11 @@ impl MenuState {
                     main_menu::Action::PushOptions => {
                         self.state = State::Options(OptionsState::new(cx))
                     }
+                    main_menu::Action::LogOut => {
+                        cx.options_mut().clear_account();
+                        cx.save_options_to_disk();
+                        self.state = State::Login(LoginState::new(cx));
+                    }
                 },
                 None => {}
             },
@@ -64,6 +69,7 @@ impl MenuState {
                 if let Some(authenticated) = authenticated {
                     cx.options_mut()
                         .set_account(Account::from_authentication(authenticated));
+                    cx.save_options_to_disk();
                     self.state = State::MainMenu(MainMenuState::new(cx));
                 }
             }

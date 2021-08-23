@@ -8,6 +8,7 @@ use ahash::AHashMap;
 
 pub enum Action {
     PushOptions,
+    LogOut,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -22,6 +23,7 @@ enum Message {
     SingleplayerClicked,
     OptionsClicked,
     BackClicked,
+    LogOutClicked,
 }
 
 pub struct MainMenuState {
@@ -42,6 +44,10 @@ impl MainMenuState {
                 uuid => cx.options().account().uuid().to_hyphenated(),
             },
         );
+        handle
+            .log_out_button
+            .get_mut()
+            .on_click(|| Message::LogOutClicked);
 
         attachment.create_window::<MenuBackground, _>(FillScreen, Z_BACKGROUND);
         let (handle, _) = attachment.create_window::<MainMenu, _>(FillScreen, Z_FOREGROUND);
@@ -66,6 +72,7 @@ impl MainMenuState {
                 Message::SingleplayerClicked => self.current_page = Page::Singleplayer,
                 Message::BackClicked => self.current_page = Page::Main,
                 Message::OptionsClicked => action = Some(Action::PushOptions),
+                Message::LogOutClicked => action = Some(Action::LogOut),
             }
         });
 

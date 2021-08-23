@@ -83,6 +83,7 @@ use duit::widgets::*;
 use duit::*;
 pub struct UserBar {
     pub user_text: WidgetHandle<Text>,
+    pub log_out_button: WidgetHandle<Button>,
 }
 impl ::duit::InstanceHandle for UserBar {
     fn name() -> &'static str {
@@ -90,9 +91,11 @@ impl ::duit::InstanceHandle for UserBar {
     }
     fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
         let mut user_text = None;
+        let mut log_out_button = None;
         for (name, widget) in widget_handles {
             match name.as_str() {
                 "user_text" => user_text = Some(widget),
+                "log_out_button" => log_out_button = Some(widget),
                 _ => {}
             }
         }
@@ -101,6 +104,12 @@ impl ::duit::InstanceHandle for UserBar {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "user_text"
+                )
+            })),
+            log_out_button: WidgetHandle::new(log_out_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "log_out_button"
                 )
             })),
         }
