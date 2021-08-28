@@ -89,6 +89,9 @@ namespace rip {
         proto::LobbyInfo packet;
         packet.set_isstatic(isStatic);
         packet.set_yourslotid(slotID);
+        for (const auto &slot : slots) {
+            packet.add_slots()->CopyFrom(slot);
+        }
         SEND(packet, lobbyinfo);
     }
 

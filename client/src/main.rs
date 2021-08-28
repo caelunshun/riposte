@@ -20,31 +20,51 @@ macro_rules! vars {
 mod assets;
 mod audio;
 mod backend;
+mod client;
 mod context;
 mod event_loop;
 mod game;
 #[allow(warnings)]
 mod generated;
-mod registry;
-mod state;
+mod lobby;
+mod options;
 mod paths;
+mod registry;
+mod server_bridge;
+mod state;
 mod states;
 mod ui;
 mod volumes;
-mod options;
 
-use states::menu::MenuState;
+use states::{lobby::GameLobbyState, menu::MenuState};
 
 extern crate fs_err as fs;
 
+pub enum Action {
+    EnterSingleplayerLobby,
+}
+
 pub enum RootState {
     MainMenu(MenuState),
+    Lobby(GameLobbyState),
 }
 
 impl RootState {
     pub fn update(&mut self, cx: &mut Context) {
         match self {
-            RootState::MainMenu(menu) => menu.update(cx),
+            RootState::MainMenu(menu) => {
+                if let Some(action) = menu.update(cx) {
+                    match action {
+                        Action::EnterSingleplayerLobby => {
+                            *self = RootState::Lobby(
+                                GameLobbyState::new_singleplayer(cx)
+                                    .expect("failed to enter singleplayer"),
+                            )
+                        }
+                    }
+                }
+            }
+            RootState::Lobby(lobby) => lobby.update(cx),
         }
     }
 }
@@ -57,7 +77,7 @@ fn init_logging() {
         .unwrap();
 }
 
-fn main() -> anyhow::Result<()> { 
+fn main() -> anyhow::Result<()> {
     init_logging();
 
     // TEMP for testing

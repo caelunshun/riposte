@@ -144,6 +144,33 @@ impl ::duit::InstanceHandle for MainMenu {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct GameLobbyWindow {
+    pub slots_table: WidgetHandle<Table>,
+}
+impl ::duit::InstanceHandle for GameLobbyWindow {
+    fn name() -> &'static str {
+        "GameLobbyWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut slots_table = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "slots_table" => slots_table = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            slots_table: WidgetHandle::new(slots_table.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "slots_table"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct MenuBackground {}
 impl ::duit::InstanceHandle for MenuBackground {
     fn name() -> &'static str {

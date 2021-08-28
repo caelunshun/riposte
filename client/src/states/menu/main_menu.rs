@@ -9,6 +9,7 @@ use ahash::AHashMap;
 pub enum Action {
     PushOptions,
     LogOut,
+    EnterSingleplayerLobby,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -24,6 +25,8 @@ enum Message {
     OptionsClicked,
     BackClicked,
     LogOutClicked,
+
+    NewGameClicked,
 }
 
 pub struct MainMenuState {
@@ -73,6 +76,7 @@ impl MainMenuState {
                 Message::BackClicked => self.current_page = Page::Main,
                 Message::OptionsClicked => action = Some(Action::PushOptions),
                 Message::LogOutClicked => action = Some(Action::LogOut),
+                Message::NewGameClicked => action = Some(Action::EnterSingleplayerLobby),
             }
         });
 
@@ -93,7 +97,7 @@ impl MainMenuState {
                     .add_entry(cx, "OPTIONS", Some(Message::OptionsClicked));
             }
             Page::Singleplayer => {
-                self.add_entry(cx, "NEW GAME", None)
+                self.add_entry(cx, "NEW GAME", Some(Message::NewGameClicked))
                     .add_entry(cx, "LOAD GAME", None)
                     .add_entry(cx, "BACK", Some(Message::BackClicked));
             }

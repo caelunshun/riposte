@@ -3150,6 +3150,7 @@ dependencies = [
  "dume-renderer 0.1.0",
  "flume",
  "fs-err",
+ "futures",
  "glam",
  "log",
  "pollster",

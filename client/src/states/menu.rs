@@ -49,10 +49,11 @@ impl MenuState {
         }
     }
 
-    pub fn update(&mut self, cx: &mut Context) {
+    pub fn update(&mut self, cx: &mut Context) -> Option<crate::Action> {
+        let mut action = None;
         match &mut self.state {
             State::MainMenu(s) => match s.update(cx) {
-                Some(action) => match action {
+                Some(act) => match act {
                     main_menu::Action::PushOptions => {
                         self.state = State::Options(OptionsState::new(cx))
                     }
@@ -61,6 +62,7 @@ impl MenuState {
                         cx.save_options_to_disk();
                         self.state = State::Login(LoginState::new(cx));
                     }
+                    main_menu::Action::EnterSingleplayerLobby => action = Some(crate::Action::EnterSingleplayerLobby),
                 },
                 None => {}
             },
@@ -79,5 +81,6 @@ impl MenuState {
                 }
             }
         }
+        action
     }
 }

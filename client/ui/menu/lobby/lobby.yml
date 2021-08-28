@@ -1,0 +1,45 @@
+name: GameLobbyWindow
+child:
+  Container:
+    mode:
+      FillParentAndPad: 50
+    child:
+      Column:
+        spacing: 20
+        children:
+          - Text:
+              text: Game Lobby
+              classes:
+                - h1
+          - Divider: {}
+          - Row:
+              spacing: 20
+              children:
+                # players / slots
+                - Column:
+                    flex: 1
+                    spacing: 10
+                    children:
+                      - Text:
+                          text: Players
+                          classes:
+                            - h3
+                      - Divider: {}
+                      - Table:
+                          id: slots_table
+                          columns:
+                            - name # player username, "AI," or "empty"
+                            - type # "AI," "vacant", or "human"
+
+                # game settings
+                - Column:
+                    flex: 1
+                    spacing: 10
+                    children:
+                      - Text:
+                          text: Game Settings
+                          classes:
+                            - h3
+                      - Divider: {}
+                      
+      

@@ -229,7 +229,7 @@ pub unsafe extern "C" fn networkctx_conn_send_data(
     let request_id = ctx.insert_callback(callback, userdata);
     conn.sending_data
         .send(SendDataRequest {
-            data: slice::from_raw_parts(data.ptr, data.len).into(),
+            data: slice::from_raw_parts(data.ptr, data.len).to_vec().into(),
             request_id,
         })
         .ok();
