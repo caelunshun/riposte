@@ -54,10 +54,14 @@ namespace rip {
         }
     }
 
-    float Tile::getMovementCost() const {
+    float Tile::getMovementCost(const Game &game, PlayerId player, glm::uvec2 pos) const {
         float cost = (forested || hilled) ? 2 : 1;
 
-        if (hasImprovement<Road>()) {
+        const auto owner = game.getCultureMap().getTileOwner(pos);
+
+        if (hasImprovement<Road>() && (
+                !owner.has_value()
+                || !game.getPlayer(player).isAtWarWith(*owner))) {
             cost /= 3;
         }
 

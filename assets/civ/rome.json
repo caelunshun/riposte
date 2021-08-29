@@ -2,7 +2,7 @@
   "id": "rome",
   "name": "Roman Empire",
   "adjective": "Roman",
-  "color": [78, 0, 142],
+  "color": [255, 255, 255],
   "leaders": [
     {
       "name": "Julius Caesar",

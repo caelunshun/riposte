@@ -3,7 +3,7 @@
   "name": "Archer",
   "strength": 3,
   "movement": 1,
-  "cost": 40,
+  "cost": 25,
   "techs": ["Archery"],
   "category": "archery",
   "combatBonuses": [

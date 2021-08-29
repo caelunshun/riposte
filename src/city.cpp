@@ -194,6 +194,15 @@ namespace rip {
         auto worker = game.isTileWorked(tilePos);
         if (!(!worker.has_value() || worker == id)) return false;
         if (game.getCultureMap().getTileOwner(tilePos) != std::make_optional<PlayerId>(getOwner())) return false;
+
+        // Check for enemy units
+        for (const auto stackID : game.getStacksAtPos(tilePos)) {
+            const auto &stack = game.getStack(stackID);
+            if (game.getPlayer(stack.getOwner()).isAtWarWith(owner) && !stack.getUnits().empty()) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -341,7 +350,10 @@ namespace rip {
                 game.getPlayer(builder.getOwner()).getCiv().id
                 ));
 
-        return hasTech && isCoastal && uniqueUnit;
+        bool replacedUnit = game.getPlayer(builder.getOwner()).getCiv()
+                .replacedUnits.contains(unitKind->id);
+
+        return hasTech && isCoastal && uniqueUnit && !replacedUnit;
     }
 
     std::vector<std::string> UnitBuildTask::describe() const {
@@ -575,6 +587,8 @@ namespace rip {
         newOwner.recomputeScore(game);
         oldOwner.recomputeScore(game);
 
+        game.getTradeRoutes().updateResources(game);
+
         game.getServer().broadcastCityCaptured(id, newOwnerID);
         game.getServer().markCityDirty(id);
         game.getServer().markTileDirty(pos);
@@ -617,7 +631,8 @@ namespace rip {
                 && (!building->onlyCoastal || builder.isCoastal())
                 && game.getPlayer(builder.getOwner()).getTechs().isBuildingUnlocked(*building)
                 && (building->onlyForCivs.empty()
-                    || building->onlyForCivs.contains(game.getPlayer(builder.getOwner()).getCiv().id));
+                    || building->onlyForCivs.contains(game.getPlayer(builder.getOwner()).getCiv().id))
+                    && !game.getPlayer(builder.getOwner()).getCiv().replacedBuildings.contains(building->name);
     }
 
     void BuildingBuildTask::onCompleted(Game &game, City &builder) {
@@ -745,7 +760,7 @@ namespace rip {
 
     void City::regrowCultureDefense() {
         const auto growthRate = 5;
-        if (getHappiness() > getUnhappiness()) {
+        if (getHappiness() >= getUnhappiness()) {
             cultureDefenseBonus += growthRate;
             cultureDefenseBonus = std::clamp(cultureDefenseBonus, 0, getMaxCultureDefenseBonus());
         }

@@ -3,6 +3,7 @@
   "cost": 100,
   "techs": ["Masonry"],
   "onlyForCivs": ["china"],
+  "replaces": "Walls",
   "effects": [
     {
       "type": "defenseBonusPercent",

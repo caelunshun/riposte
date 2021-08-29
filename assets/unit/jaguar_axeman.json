@@ -1,0 +1,18 @@
+{
+  "id": "jaguar_axeman",
+  "name": "Jaguar Axeman",
+  "strength": 5,
+  "movement": 1,
+  "cost": 30,
+  "techs": ["Bronze Working"],
+  "replaces": "axeman",
+  "onlyForCivs": ["aztec"],
+  "category": "melee",
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "category": "melee",
+      "bonusPercent": 50
+    }
+  ]
+}

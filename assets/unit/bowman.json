@@ -1,0 +1,24 @@
+{
+  "id": "bowman",
+  "name": "Bowman",
+  "strength": 3,
+  "movement": 1,
+  "cost": 25,
+  "techs": ["Archery"],
+  "onlyForCivs": ["babylonia"],
+  "replaces": "archer",
+  "category": "archery",
+  "combatBonuses": [
+    {
+      "type": "whenInCity",
+      "bonusPercent": 50
+    },
+
+    {
+      "type": "againstUnitCategory",
+      "category": "melee",
+      "bonusPercent": 50
+    }
+
+  ]
+}

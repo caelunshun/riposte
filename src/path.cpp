@@ -34,7 +34,7 @@ namespace rip {
         return points.at(points.size() - 1);
     }
 
-    std::optional<Path> computeShortestPath(const Game &game, glm::uvec2 source, glm::uvec2 target, std::optional<VisibilityMap> visibilityMask, const UnitKind &unit) {
+    std::optional<Path> computeShortestPath(const Game &game, glm::uvec2 source, glm::uvec2 target, std::optional<VisibilityMap> visibilityMask, const UnitKind &unit, PlayerId player) {
         // A* algorithm.
         using Pos = std::pair<uint32_t, uint32_t>;
         using OpenEntry = std::pair<double, Pos>;
@@ -89,7 +89,7 @@ namespace rip {
                     continue;
                 }
 
-                auto tentativeGScore = gScore[currentPos] + tile.getMovementCost();
+                auto tentativeGScore = gScore[currentPos] + tile.getMovementCost(game, player, neighbor);
                 const Pos neighborPos(neighbor.x, neighbor.y);
                 if (!gScore.contains(neighborPos) || tentativeGScore < gScore[neighborPos]) {
                     cameFrom[neighborPos] = current;

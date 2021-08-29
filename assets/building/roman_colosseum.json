@@ -3,6 +3,7 @@
   "cost": 90,
   "techs": ["Construction"],
   "onlyForCivs": ["rome"],
+  "replaces":  "Colosseum",
   "effects": [
     {
       "type": "happiness",

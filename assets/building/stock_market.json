@@ -1,0 +1,13 @@
+{
+  "name": "Stock Market",
+  "cost": 115,
+  "techs": ["Currency"],
+  "onlyForCivs": ["dutch"],
+  "replaces": "Market",
+  "effects": [
+    {
+      "type": "bonusCommercePercent",
+      "amount": 40
+    }
+  ]
+}

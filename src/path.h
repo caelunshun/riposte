@@ -31,7 +31,7 @@ namespace rip {
     };
 
     // Computes a shortest path between two points on the map.
-    std::optional<Path> computeShortestPath(const Game &game, glm::uvec2 source, glm::uvec2 target, std::optional<VisibilityMap> visibilityMask, const UnitKind &unit);
+    std::optional<Path> computeShortestPath(const Game &game, glm::uvec2 source, glm::uvec2 target, std::optional<VisibilityMap> visibilityMask, const UnitKind &unit, PlayerId player);
 }
 
 #endif //RIPOSTE_PATH_H

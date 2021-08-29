@@ -1,0 +1,17 @@
+{
+  "name": "Stonehenge",
+  "cost": 60,
+  "techs": ["Mysticism"],
+  "onlyForCivs": ["britain"],
+  "replaces": "Monument",
+  "effects": [
+    {
+      "type": "bonusCulture",
+      "amount": 3
+    },
+    {
+      "type": "happiness",
+      "amount": 1
+    }
+  ]
+}

@@ -3,7 +3,7 @@
   "name": "Chariot",
   "strength": 4,
   "movement": 2,
-  "cost": 40,
+  "cost": 30,
   "techs": ["Animal Husbandry"],
   "resources": ["horse"],
   "category": "mounted",
@@ -11,6 +11,12 @@
     {
       "type": "againstUnit",
       "unit": "axeman",
+      "onlyOnAttack": true,
+      "bonusPercent": 100
+    },
+    {
+      "type": "againstUnit",
+      "unit": "phalanx",
       "onlyOnAttack": true,
       "bonusPercent": 100
     }
