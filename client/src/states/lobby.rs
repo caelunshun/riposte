@@ -12,10 +12,10 @@ use crate::{
     server_bridge::ServerBridge,
     state::StateAttachment,
     ui::{FillScreen, Z_FOREGROUND},
+    utils::color_to_string,
 };
 
 use ahash::{AHashMap, AHashSet};
-use anyhow::Context as _;
 use duit::{
     widget,
     widgets::{Button, Text},
@@ -75,8 +75,7 @@ impl GameLobbyState {
     pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<()> {
         let events = self
             .client
-            .handle_messages(&mut self.lobby)
-            .context("failed to handle messages")?;
+            .handle_messages(&mut self.lobby, cx.registry())?;
 
         for event in events {
             match event {
@@ -85,10 +84,19 @@ impl GameLobbyState {
         }
 
         let mut ui = cx.ui_mut();
+        let can_add_slots = self.lobby.slots().len() < cx.registry().num_civs();
         while let Some(msg) = ui.pop_message::<Message>() {
             match msg {
-                Message::AddAiSlot => self.client.create_slot(CreateSlot { is_ai: true }),
-                Message::AddHumanSlot => self.client.create_slot(CreateSlot { is_ai: false }),
+                Message::AddAiSlot => {
+                    if can_add_slots {
+                        self.client.create_slot(CreateSlot { is_ai: true })
+                    }
+                }
+                Message::AddHumanSlot => {
+                    if can_add_slots {
+                        self.client.create_slot(CreateSlot { is_ai: false })
+                    }
+                }
                 Message::DeleteSlot(slot_id) => self.client.delete_slot(DeleteSlot { slot_id }),
             }
         }
@@ -164,6 +172,8 @@ impl GameLobbyState {
                 "delete_button",
                 widget(Text::from_markup("Actions", vars! {})),
             ),
+            ("civ", widget(Text::from_markup("Civilization", vars! {}))),
+            ("leader", widget(Text::from_markup("Leader", vars! {}))),
         ]);
 
         for slot in self.lobby.slots() {
@@ -200,6 +210,19 @@ impl GameLobbyState {
                 "Kick"
             };
 
+            let (civ, leader) = if slot.occupied {
+                let civ = self
+                    .lobby
+                    .player_civ(slot.id)
+                    .expect("civ not set for occupied slot");
+                (
+                    format!("@color{{{}}}{{{}}}", color_to_string(&civ.color), civ.name),
+                    slot.leader_name.as_str(),
+                )
+            } else {
+                ("-".to_owned(), "-")
+            };
+
             let mut delete_button = Button::new();
             let id = slot.id;
             delete_button.on_click(move || Message::DeleteSlot(id));
@@ -216,6 +239,8 @@ impl GameLobbyState {
             table.add_row([
                 ("name", widget(Text::from_markup(name, vars! {}))),
                 ("status", widget(Text::from_markup(status, vars! {}))),
+                ("civ", widget(Text::from_markup(civ, vars! {}))),
+                ("leader", widget(Text::from_markup(leader, vars! {}))),
                 ("delete_button", delete_button),
             ]);
         }

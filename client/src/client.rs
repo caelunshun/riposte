@@ -2,9 +2,12 @@ use std::marker::PhantomData;
 
 use bytes::BytesMut;
 use prost::Message;
-use protocol::{AnyClient, AnyServer, ClientLobbyPacket, CreateSlot, DeleteSlot, GameStarted, Kicked, LobbyInfo, ServerLobbyPacket, client_lobby_packet, server_lobby_packet};
+use protocol::{
+    client_lobby_packet, server_lobby_packet, AnyClient, AnyServer, ClientLobbyPacket, CreateSlot,
+    DeleteSlot, GameStarted, Kicked, LobbyInfo, ServerLobbyPacket,
+};
 
-use crate::{lobby::GameLobby, server_bridge::ServerBridge};
+use crate::{lobby::GameLobby, registry::Registry, server_bridge::ServerBridge};
 
 #[derive(Debug, thiserror::Error)]
 pub enum ClientError {
@@ -14,6 +17,8 @@ pub enum ClientError {
     Decode(#[from] prost::DecodeError),
     #[error("packet is null")]
     MissingPacket,
+    #[error("lobby error: {0}")]
+    Other(#[from] anyhow::Error),
 }
 
 pub type Result<T> = std::result::Result<T, ClientError>;
@@ -68,12 +73,16 @@ impl Client<LobbyState> {
         self.send_message(client_lobby_packet::Packet::DeleteSlot(req));
     }
 
-    pub fn handle_messages(&mut self, lobby: &mut GameLobby) -> Result<Vec<LobbyEvent>> {
+    pub fn handle_messages(
+        &mut self,
+        lobby: &mut GameLobby,
+        registry: &Registry,
+    ) -> Result<Vec<LobbyEvent>> {
         let mut events = Vec::new();
         while let Some(msg) = self.poll_for_message()? {
             match msg.packet.ok_or(ClientError::MissingPacket)? {
                 server_lobby_packet::Packet::LobbyInfo(packet) => {
-                    self.handle_lobby_info(packet, lobby)?;
+                    self.handle_lobby_info(packet, lobby, registry)?;
                     events.push(LobbyEvent::InfoUpdated);
                 }
                 server_lobby_packet::Packet::Kicked(packet) => {
@@ -88,9 +97,14 @@ impl Client<LobbyState> {
         Ok(events)
     }
 
-    fn handle_lobby_info(&mut self, packet: LobbyInfo, lobby: &mut GameLobby) -> Result<()> {
+    fn handle_lobby_info(
+        &mut self,
+        packet: LobbyInfo,
+        lobby: &mut GameLobby,
+        registry: &Registry,
+    ) -> Result<()> {
         log::info!("Received new lobby info: {:?}", packet);
-        lobby.set_info(packet);
+        lobby.set_info(packet, registry)?;
         Ok(())
     }
 

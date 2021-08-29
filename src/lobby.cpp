@@ -105,9 +105,9 @@ namespace rip {
         SEND(packet, gamestarted);
     }
 
-    LobbyServer::LobbyServer(std::shared_ptr<NetworkingContext> networkCtx) : networkCtx(networkCtx) {
-
-    }
+    LobbyServer::LobbyServer(std::shared_ptr<NetworkingContext> networkCtx,
+                             std::shared_ptr<Registry> registry)
+                             : networkCtx(networkCtx), registry(registry) {}
 
     LobbyConnectionID LobbyServer::addConnection(ConnectionHandle handle, proto::UUID userID, bool isAdmin) {
         // Attempt to find a suitable slot.
@@ -164,6 +164,25 @@ namespace rip {
 
     uint32_t LobbyServer::addSlot(proto::LobbySlot slot) {
         slot.set_id(nextSlotID++);
+
+        // Find available civilization + leader to default to
+        int attempts = 0;
+        while (attempts++ < 10000) {
+            const auto &civ = registry->getCivs()[rng.u32(0, registry->getCivs().size())];
+            bool isTaken = false;
+            for (const auto &slot : slots) {
+                if (slot.civid() == civ->id) {
+                    isTaken = true;
+                    break;
+                }
+            }
+
+            if (!isTaken) {
+                slot.set_civid(civ->id);
+                slot.set_leadername(civ->leaders[rng.u32(0, civ->leaders.size())].name);
+                break;
+            }
+        }
 
         slots.push_back(std::move(slot));;
 

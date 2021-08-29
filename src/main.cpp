@@ -1,4 +1,6 @@
 #include "lobby.h"
+#include "assets.h"
+#include "registry.h"
 
 using rip::proto::LobbySlot;
 
@@ -9,9 +11,14 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+    auto assets = std::make_shared<rip::Assets>();
+    auto registry = std::make_shared<rip::Registry>();
+    assets->addLoader("civ", std::make_unique<rip::CivLoader>(registry));
+    assets->loadAssetsDir("assets", true);
+
     auto networkCtx = std::make_shared<rip::NetworkingContext>();
 
-    auto lobbyServer = std::make_shared<rip::LobbyServer>(networkCtx);
+    auto lobbyServer = std::make_shared<rip::LobbyServer>(networkCtx, registry);
 
     rip::proto::UUID hostUUID;
     hostUUID.set_uuid(hostUUIDstr);

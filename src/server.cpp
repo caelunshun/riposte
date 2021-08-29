@@ -246,7 +246,7 @@ namespace rip {
         } else if (kind.improvementid() == "Mine") {
             improvement = std::make_unique<Mine>(worker.getPos());
         } else {
-            std::cout << "[server-err] invalid improvement ID " << kind.improvementid() << std::endl;
+            std::cerr << "[server-err] invalid improvement ID " << kind.improvementid() << std::endl;
             return;
         }
 
@@ -364,14 +364,14 @@ namespace rip {
             // Parse the packet.
             AnyClient packet;
             if (!packet.ParseFromString(*packetData)) {
-                std::cout << "received malformed packet!" << std::endl;
+                std::cerr << "received malformed packet!" << std::endl;
                 continue;
             }
 
             try {
                 handlePacket(game, packet);
             } catch (std::exception &e) {
-                std::cout << "ERROR while handling packet: " << e.what() << std::endl;
+                std::cerr << "ERROR while handling packet: " << e.what() << std::endl;
             }
         }
     }
@@ -651,7 +651,7 @@ namespace rip {
         GameSaved packet;
         BROADCAST(packet, gamesaved, 0);
 
-        std::cout << "Saved game to " << path << std::endl;
+        std::cerr << "Saved game to " << path << std::endl;
     }
 
     void Server::broadcastBordersExpanded(CityId cityID) {

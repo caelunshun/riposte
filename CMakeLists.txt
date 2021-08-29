@@ -28,7 +28,7 @@ protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/riposte.proto)
 
 set(NANOVG_SOURCES external/nanovg/src/nanovg.c)
 #set(SOURCES ${NANOVG_SOURCES} ${PROTO_SRCS} src/main.cpp src/ripmath.h src/tile.cpp src/tile.h src/game.cpp src/game.h src/renderer.cpp src/renderer.h src/assets.cpp src/assets.h src/view.cpp src/view.h src/cursor.cpp src/cursor.h src/mapgen.cpp src/mapgen.h src/rng.cpp src/rng.h src/city.cpp src/city.h src/player.cpp src/player.h src/registry.cpp src/registry.h src/unit.cpp src/unit.h src/ripmath.cpp src/hud.cpp src/hud.h src/ui.cpp src/ui.h src/path.cpp src/path.h src/ai.cpp src/ai.h src/worker.cpp src/traversal.h src/culture.cpp src/culture.h src/tech.cpp src/yield.cpp src/yield.h src/trade.cpp src/trade.h src/era.cpp src/era.h src/combat.cpp src/combat.h src/stack.cpp src/stack.h src/event.cpp src/event.h src/ship.cpp src/ship.h src/bridge.cpp src/server.cpp src/server.h src/slot_map.cpp src/slot_map.h src/network.cpp src/network.h src/protocol.cpp src/protocol.h src/saveload.cpp src/saveload.h src/lobby.cpp src/lobby.h)
-set(SOURCES ${PROTO_SRCS} src/main.cpp src/network.cpp src/lobby.cpp src/slot_map.cpp)
+set(SOURCES ${PROTO_SRCS} src/main.cpp src/network.cpp src/lobby.cpp src/slot_map.cpp src/registry.cpp src/assets.cpp src/rng.cpp)
 
 add_executable(riposte ${SOURCES})
 

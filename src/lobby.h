@@ -9,6 +9,8 @@
 #include <riposte.pb.h>
 #include "network.h"
 #include "slot_map.h"
+#include "registry.h"
+#include "rng.h"
 
 namespace rip {
     typedef ID LobbyConnectionID;
@@ -61,9 +63,11 @@ namespace rip {
         std::vector<proto::LobbySlot> slots;
         uint32_t nextSlotID = 0;
         bool isStatic = false;
+        Rng rng;
+        std::shared_ptr<Registry> registry;
 
     public:
-        LobbyServer(std::shared_ptr<NetworkingContext> networkCtx);
+        LobbyServer(std::shared_ptr<NetworkingContext> networkCtx, std::shared_ptr<Registry> registry);
 
         // Adds a new connection.
         //

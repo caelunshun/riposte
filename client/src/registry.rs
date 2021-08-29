@@ -82,4 +82,8 @@ impl Registry {
     pub fn resource(&self, id: &str) -> Result<Handle<Resource>, RegistryItemNotFound> {
         get(&self.resources, id, "resource")
     }
+
+    pub fn num_civs(&self) -> usize {
+        self.civs.len()
+    }
 }

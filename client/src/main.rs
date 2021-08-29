@@ -27,6 +27,7 @@ mod game;
 #[allow(warnings)]
 mod generated;
 mod lobby;
+mod utils;
 mod options;
 mod paths;
 mod popups;

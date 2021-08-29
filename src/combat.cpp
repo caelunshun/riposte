@@ -23,7 +23,6 @@ namespace rip {
         startingAttackerStrength = attacker.getModifiedAttackingStrength(game);
         startingDefenderStrength = defender.getModifiedDefendingStrength(attacker, game);
 
-        std::cout << startingAttackerStrength << " attacks " << startingDefenderStrength << std::endl;
         if (startingDefenderStrength == 0 || startingAttackerStrength == 0) {
             finished = true;
 

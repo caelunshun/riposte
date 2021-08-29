@@ -17,7 +17,7 @@ child:
               children:
                 # players / slots
                 - Column:
-                    flex: 1
+                    flex: 2
                     spacing: 10
                     children:
                       - Text:
@@ -42,6 +42,8 @@ child:
                           columns:
                             - name # player username, "AI," or "empty"
                             - status # "AI," "vacant", or "human"
+                            - civ
+                            - leader
                             - delete_button
 
                 # game settings
