@@ -9,6 +9,7 @@ use crate::{
 };
 
 use anyhow::Context as _;
+use duit::{widget, widgets::Text};
 
 /// The game lobby state.
 pub struct GameLobbyState {
@@ -34,20 +35,66 @@ impl GameLobbyState {
 
         let (window, _) = attachment.create_window::<GameLobbyWindow, _>(FillScreen, Z_FOREGROUND);
 
-        Self {
+        let mut state = Self {
             attachment,
 
             lobby: GameLobby::new(),
             client,
 
             window,
-        }
+        };
+        state.recreate_table_slots();
+        state
     }
 
     pub fn update(&mut self, _cx: &mut Context) -> anyhow::Result<()> {
-        self.client
+        let events = self
+            .client
             .handle_messages(&mut self.lobby)
             .context("failed to handle messages")?;
+
+        for event in events {
+            match event {
+                client::LobbyEvent::InfoUpdated => self.recreate_table_slots(),
+            }
+        }
+
         Ok(())
+    }
+
+    fn recreate_table_slots(&mut self) {
+        let mut table = self.window.slots_table.get_mut();
+        table.clear_rows();
+
+        // Header row
+        table.add_row([
+            ("name", widget(Text::from_markup("Name", vars! {}))),
+            ("status", widget(Text::from_markup("Status", vars! {}))),
+        ]);
+
+        for slot in self.lobby.slots() {
+            let name = if slot.occupied {
+                "Occupied"
+            } else {
+                "@color{rgb(180, 180, 180)}{<empty>}"
+            };
+            let status = if !slot.occupied {
+                "Open"
+            } else if slot.is_ai {
+                "AI"
+            } else if slot.is_admin {
+                "Admin"
+            } else {
+                "Human"
+            };
+
+            table.add_row([
+                ("name", widget(Text::from_markup(name, vars! {}))),
+                (
+                    "status",
+                    widget(Text::from_markup("%status", vars! { status => status })),
+                ),
+            ]);
+        }
     }
 }

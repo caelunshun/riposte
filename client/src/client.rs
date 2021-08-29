@@ -21,6 +21,10 @@ pub enum ClientError {
 
 pub type Result<T> = std::result::Result<T, ClientError>;
 
+pub enum LobbyEvent {
+    InfoUpdated,
+}
+
 /// The game client. Wraps a `ServerBridge`
 /// and handles and sends packets.
 ///
@@ -59,11 +63,13 @@ where
 }
 
 impl Client<LobbyState> {
-    pub fn handle_messages(&mut self, lobby: &mut GameLobby) -> Result<()> {
+    pub fn handle_messages(&mut self, lobby: &mut GameLobby) -> Result<Vec<LobbyEvent>> {
+        let mut events = Vec::new();
         while let Some(msg) = self.poll_for_message()? {
             match msg.packet.ok_or(ClientError::MissingPacket)? {
                 server_lobby_packet::Packet::LobbyInfo(packet) => {
                     self.handle_lobby_info(packet, lobby)?;
+                    events.push(LobbyEvent::InfoUpdated);
                 }
                 server_lobby_packet::Packet::Kicked(packet) => {
                     self.handle_kicked(packet, lobby)?;
@@ -74,7 +80,7 @@ impl Client<LobbyState> {
             }
         }
 
-        Ok(())
+        Ok(events)
     }
 
     fn handle_lobby_info(&mut self, packet: LobbyInfo, lobby: &mut GameLobby) -> Result<()> {
