@@ -8,6 +8,7 @@ bytes = "1"
 glam = "0.17"
 prost = "0.8"
 prost-types = "0.8"
+uuid = "0.8"
 
 [build-dependencies]
 prost-build = "0.8"

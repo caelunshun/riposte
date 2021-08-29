@@ -11,6 +11,7 @@ use anyhow::Context as _;
 use duit::{Spec, Ui, Vec2};
 use dume::Canvas;
 use flume::Receiver;
+use once_cell::sync::OnceCell;
 use tokio::runtime::{self, Runtime};
 use walkdir::WalkDir;
 use winit::{dpi::PhysicalSize, event_loop::EventLoop, window::Window};
@@ -297,6 +298,7 @@ impl Context {
 /// from the main thread.
 pub struct FutureHandle<T> {
     receiver: Receiver<T>,
+    value: OnceCell<T>,
 }
 
 impl<T: Send + 'static> FutureHandle<T> {
@@ -311,14 +313,24 @@ impl<T: Send + 'static> FutureHandle<T> {
             sender.send(result).ok();
         });
 
-        Self { receiver }
+        Self {
+            receiver,
+            value: OnceCell::new(),
+        }
+    }
+
+    pub fn pending() -> Self {
+        Self {
+            receiver: flume::bounded(0).1,
+            value: OnceCell::new(),
+        }
     }
 
     /// Polls for the return value from the future.
     ///
     /// If the future completed, returns `Some(output)`.
     /// If the future is still running or panicked, returns `None`.
-    pub fn get(&self) -> Option<T> {
-        self.receiver.try_recv().ok()
+    pub fn get(&self) -> Option<&T> {
+        self.value.get_or_try_init(|| self.receiver.try_recv()).ok()
     }
 }

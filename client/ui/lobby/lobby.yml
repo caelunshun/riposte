@@ -25,12 +25,6 @@ child:
                           classes:
                             - h3
                       - Divider: {}
-                      - Table:
-                          id: slots_table
-                          columns:
-                            - name # player username, "AI," or "empty"
-                            - status # "AI," "vacant", or "human"
-                            - delete_button
                       - Row:
                           align_h: End
                           spacing: 30
@@ -43,6 +37,12 @@ child:
                               id: add_human_slot_button
                               child:
                                 Text: Add Human Slot
+                      - Table:
+                          id: slots_table
+                          columns:
+                            - name # player username, "AI," or "empty"
+                            - status # "AI," "vacant", or "human"
+                            - delete_button
 
                 # game settings
                 - Column:

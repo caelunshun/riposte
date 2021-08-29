@@ -72,7 +72,7 @@ impl LogInPage {
             match response {
                 Ok(a) => {
                     log::info!("Logged in successfully.");
-                    action = Some(Action::AdvanceToMenu(a.into_inner()));
+                    action = Some(Action::AdvanceToMenu(a.get_ref().clone()));
                 }
                 Err(e) => {
                     log::error!("Login error: {}", e);
@@ -82,6 +82,7 @@ impl LogInPage {
                             error => e.message(),
                         },
                     );
+                    self.response_handle = None;
                 }
             }
         }
@@ -155,7 +156,7 @@ impl RegisterPage {
             match response {
                 Ok(a) => {
                     log::info!("Registered account successfully.");
-                    action = Some(Action::AdvanceToMenu(a.into_inner()));
+                    action = Some(Action::AdvanceToMenu(a.get_ref().clone()));
                 }
                 Err(e) => {
                     log::error!("Register error: {}", e);
@@ -165,6 +166,7 @@ impl RegisterPage {
                             error => e.message(),
                         },
                     );
+                    self.response_handle = None;
                 }
             }
         }

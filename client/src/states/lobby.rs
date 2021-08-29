@@ -1,6 +1,10 @@
-use std::ptr;
+use std::{
+    cell::{Ref, RefCell},
+    ptr,
+};
 
 use crate::{
+    backend::BackendResponse,
     client::{self, Client},
     context::Context,
     generated::GameLobbyWindow,
@@ -10,12 +14,15 @@ use crate::{
     ui::{FillScreen, Z_FOREGROUND},
 };
 
+use ahash::{AHashMap, AHashSet};
 use anyhow::Context as _;
 use duit::{
     widget,
     widgets::{Button, Text},
 };
 use protocol::{CreateSlot, DeleteSlot};
+use riposte_backend_api::UserInfo;
+use uuid::Uuid;
 
 enum Message {
     AddAiSlot,
@@ -31,12 +38,15 @@ pub struct GameLobbyState {
     client: Client<client::LobbyState>,
 
     window: GameLobbyWindow,
+
+    user_info: RefCell<AHashMap<Uuid, BackendResponse<UserInfo>>>,
+    missing_user_info: RefCell<AHashSet<Uuid>>,
 }
 
 impl GameLobbyState {
     pub fn new_singleplayer(cx: &Context) -> anyhow::Result<Self> {
         let _rt_guard = cx.runtime().enter();
-        let bridge = ServerBridge::create_singleplayer()?;
+        let bridge = ServerBridge::create_singleplayer(cx.options().account())?;
         let client = Client::new(bridge);
 
         Ok(Self::new(cx, client))
@@ -54,8 +64,11 @@ impl GameLobbyState {
             client,
 
             window,
+
+            user_info: RefCell::new(AHashMap::new()),
+            missing_user_info: RefCell::new(AHashSet::new()),
         };
-        state.recreate_ui();
+        state.recreate_ui(cx);
         state
     }
 
@@ -67,7 +80,7 @@ impl GameLobbyState {
 
         for event in events {
             match event {
-                client::LobbyEvent::InfoUpdated => self.recreate_ui(),
+                client::LobbyEvent::InfoUpdated => self.recreate_ui(cx),
             }
         }
 
@@ -80,11 +93,54 @@ impl GameLobbyState {
             }
         }
 
+        // Check for user info that has been received
+        let mut received_user_infos = false;
+        for slot in self.lobby.slots() {
+            if let Some(owner_uuid) = &slot.owner_uuid {
+                let owner_uuid: Uuid = owner_uuid.clone().into();
+                if self.user_info.borrow()[&owner_uuid].get().is_some()
+                    && self.missing_user_info.borrow().contains(&owner_uuid)
+                {
+                    self.missing_user_info.borrow_mut().remove(&owner_uuid);
+                    received_user_infos = true;
+                }
+            }
+        }
+        if received_user_infos {
+            self.recreate_ui(cx);
+        }
+
         Ok(())
     }
 
-    fn recreate_ui(&mut self) {
-        self.recreate_table_slots();
+    fn user_info(&self, cx: &Context, user: Uuid) -> Option<Ref<UserInfo>> {
+        if self.user_info.borrow().contains_key(&user) {
+            if self.user_info.borrow()[&user].get().is_some() {
+                if self.user_info.borrow()[&user]
+                    .get()
+                    .as_ref()
+                    .unwrap()
+                    .is_ok()
+                {
+                    Some(Ref::map(self.user_info.borrow(), |info| {
+                        info[&user].get().unwrap().as_ref().unwrap().get_ref()
+                    }))
+                } else {
+                    None
+                }
+            } else {
+                None
+            }
+        } else {
+            self.user_info
+                .borrow_mut()
+                .insert(user, cx.backend().fetch_user_data(user));
+            None
+        }
+    }
+
+    fn recreate_ui(&mut self, cx: &Context) {
+        self.recreate_table_slots(cx);
 
         self.window
             .add_ai_slot_button
@@ -96,7 +152,7 @@ impl GameLobbyState {
             .on_click(|| Message::AddHumanSlot);
     }
 
-    fn recreate_table_slots(&mut self) {
+    fn recreate_table_slots(&mut self, cx: &Context) {
         let mut table = self.window.slots_table.get_mut();
         table.clear_rows();
 
@@ -112,9 +168,21 @@ impl GameLobbyState {
 
         for slot in self.lobby.slots() {
             let name = if slot.occupied {
-                "Occupied"
+                if let Some(owner_uuid) = &slot.owner_uuid {
+                    match self.user_info(cx, owner_uuid.clone().into()) {
+                        Some(info) => info.username.clone(),
+                        None => {
+                            self.missing_user_info
+                                .borrow_mut()
+                                .insert(owner_uuid.clone().into());
+                            "<unknown>".to_owned()
+                        }
+                    }
+                } else {
+                    "<AI>".to_owned()
+                }
             } else {
-                "@color{rgb(180, 180, 180)}{<empty>}"
+                "@color{rgb(180, 180, 180)}{<empty>}".to_owned()
             };
             let status = if !slot.occupied {
                 "@color{rgb(30, 200, 50)}{Open}"
@@ -147,10 +215,7 @@ impl GameLobbyState {
 
             table.add_row([
                 ("name", widget(Text::from_markup(name, vars! {}))),
-                (
-                    "status",
-                    widget(Text::from_markup(status, vars! {})),
-                ),
+                ("status", widget(Text::from_markup(status, vars! {}))),
                 ("delete_button", delete_button),
             ]);
         }

@@ -2,9 +2,10 @@ use anyhow::Context as _;
 use riposte_backend_api::{
     riposte_backend_client::RiposteBackendClient,
     tonic::{transport::Channel, Response, Status},
-    Authenticated, LogInRequest, RegisterRequest,
+    Authenticated, LogInRequest, RegisterRequest, UserInfo,
 };
 use tokio::runtime;
+use uuid::Uuid;
 
 use crate::context::FutureHandle;
 
@@ -43,6 +44,20 @@ impl BackendService {
         let mut client = self.client.clone();
         FutureHandle::spawn(&self.runtime, async move {
             client.register_account(request).await
+        })
+    }
+
+    pub fn fetch_user_data(&self, user_id: Uuid) -> BackendResponse<UserInfo> {
+        let mut client = self.client.clone();
+        FutureHandle::spawn(&self.runtime, async move {
+            log::info!("Fetching user info for {:?}", user_id);
+            let res = client
+                .fetch_user_info(riposte_backend_api::Uuid::from(user_id))
+                .await;
+            if let Err(e) = &res {
+                log::error!("Failed to fetch user info for {:?}: {}", user_id, e);
+            }
+            res
         })
     }
 }

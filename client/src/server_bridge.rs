@@ -7,6 +7,8 @@ use futures::{stream::StreamExt, SinkExt};
 use riposte_backend_api::codec;
 use tokio::{process::Command, task};
 
+use crate::options::Account;
+
 const SERVER_PATH: &str =
     "/Users/caelum/CLionProjects/riposte/cmake-build-relwithdebinfo/bin/riposte";
 
@@ -20,11 +22,12 @@ impl ServerBridge {
     /// Launches a singleplayer game server process.
     ///
     /// Returns a connection to it.
-    pub fn create_singleplayer() -> anyhow::Result<Self> {
+    pub fn create_singleplayer(host_account: &Account) -> anyhow::Result<Self> {
         let mut server_process = Command::new(SERVER_PATH)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
+            .env("RIPOSTE_HOST_UUID", host_account.uuid().to_hyphenated().to_string())
             .spawn()
             .context("failed to launch server process")?;
 
