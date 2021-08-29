@@ -2,10 +2,7 @@ use std::marker::PhantomData;
 
 use bytes::BytesMut;
 use prost::Message;
-use protocol::{
-    client_lobby_packet, server_lobby_packet, AnyClient, AnyServer, ClientLobbyPacket, GameStarted,
-    Kicked, LobbyInfo, ServerLobbyPacket,
-};
+use protocol::{AnyClient, AnyServer, ClientLobbyPacket, CreateSlot, DeleteSlot, GameStarted, Kicked, LobbyInfo, ServerLobbyPacket, client_lobby_packet, server_lobby_packet};
 
 use crate::{lobby::GameLobby, server_bridge::ServerBridge};
 
@@ -63,6 +60,14 @@ where
 }
 
 impl Client<LobbyState> {
+    pub fn create_slot(&mut self, req: CreateSlot) {
+        self.send_message(client_lobby_packet::Packet::CreateSlot(req));
+    }
+
+    pub fn delete_slot(&mut self, req: DeleteSlot) {
+        self.send_message(client_lobby_packet::Packet::DeleteSlot(req));
+    }
+
     pub fn handle_messages(&mut self, lobby: &mut GameLobby) -> Result<Vec<LobbyEvent>> {
         let mut events = Vec::new();
         while let Some(msg) = self.poll_for_message()? {

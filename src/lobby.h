@@ -57,7 +57,7 @@ namespace rip {
     // once the lobby state is ended (because the host sent RequestStartGame).
     class LobbyServer {
         std::shared_ptr<NetworkingContext> networkCtx;
-        slot_map<LobbyConnection> connections;
+        slot_map<std::shared_ptr<LobbyConnection>> connections;
         std::vector<proto::LobbySlot> slots;
         uint32_t nextSlotID = 0;
         bool isStatic = false;

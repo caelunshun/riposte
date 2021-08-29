@@ -1,3 +1,5 @@
+use std::ptr;
+
 use crate::{
     client::{self, Client},
     context::Context,
@@ -9,7 +11,17 @@ use crate::{
 };
 
 use anyhow::Context as _;
-use duit::{widget, widgets::Text};
+use duit::{
+    widget,
+    widgets::{Button, Text},
+};
+use protocol::{CreateSlot, DeleteSlot};
+
+enum Message {
+    AddAiSlot,
+    AddHumanSlot,
+    DeleteSlot(u32),
+}
 
 /// The game lobby state.
 pub struct GameLobbyState {
@@ -43,11 +55,11 @@ impl GameLobbyState {
 
             window,
         };
-        state.recreate_table_slots();
+        state.recreate_ui();
         state
     }
 
-    pub fn update(&mut self, _cx: &mut Context) -> anyhow::Result<()> {
+    pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<()> {
         let events = self
             .client
             .handle_messages(&mut self.lobby)
@@ -55,11 +67,33 @@ impl GameLobbyState {
 
         for event in events {
             match event {
-                client::LobbyEvent::InfoUpdated => self.recreate_table_slots(),
+                client::LobbyEvent::InfoUpdated => self.recreate_ui(),
+            }
+        }
+
+        let mut ui = cx.ui_mut();
+        while let Some(msg) = ui.pop_message::<Message>() {
+            match msg {
+                Message::AddAiSlot => self.client.create_slot(CreateSlot { is_ai: true }),
+                Message::AddHumanSlot => self.client.create_slot(CreateSlot { is_ai: false }),
+                Message::DeleteSlot(slot_id) => self.client.delete_slot(DeleteSlot { slot_id }),
             }
         }
 
         Ok(())
+    }
+
+    fn recreate_ui(&mut self) {
+        self.recreate_table_slots();
+
+        self.window
+            .add_ai_slot_button
+            .get_mut()
+            .on_click(|| Message::AddAiSlot);
+        self.window
+            .add_human_slot_button
+            .get_mut()
+            .on_click(|| Message::AddHumanSlot);
     }
 
     fn recreate_table_slots(&mut self) {
@@ -70,6 +104,10 @@ impl GameLobbyState {
         table.add_row([
             ("name", widget(Text::from_markup("Name", vars! {}))),
             ("status", widget(Text::from_markup("Status", vars! {}))),
+            (
+                "delete_button",
+                widget(Text::from_markup("Actions", vars! {})),
+            ),
         ]);
 
         for slot in self.lobby.slots() {
@@ -79,21 +117,41 @@ impl GameLobbyState {
                 "@color{rgb(180, 180, 180)}{<empty>}"
             };
             let status = if !slot.occupied {
-                "Open"
+                "@color{rgb(30, 200, 50)}{Open}"
             } else if slot.is_ai {
-                "AI"
+                "@color{rgb(30, 120, 200)}{AI}"
             } else if slot.is_admin {
-                "Admin"
+                "@color{rgb(230, 20, 10)}{Admin}"
             } else {
-                "Human"
+                "@color{rgb(240, 78, 152)}{Human}"
             };
+
+            let delete_text = if slot.is_ai || !slot.occupied {
+                "Remove"
+            } else {
+                "Kick"
+            };
+
+            let mut delete_button = Button::new();
+            let id = slot.id;
+            delete_button.on_click(move || Message::DeleteSlot(id));
+            let delete_button = widget(delete_button);
+            delete_button
+                .borrow_mut()
+                .data_mut()
+                .add_child(widget(Text::from_markup(delete_text, vars! {})));
+
+            if ptr::eq(slot, self.lobby.our_slot().unwrap()) {
+                delete_button.borrow_mut().data_mut().set_hidden(true);
+            }
 
             table.add_row([
                 ("name", widget(Text::from_markup(name, vars! {}))),
                 (
                     "status",
-                    widget(Text::from_markup("%status", vars! { status => status })),
+                    widget(Text::from_markup(status, vars! {})),
                 ),
+                ("delete_button", delete_button),
             ]);
         }
     }

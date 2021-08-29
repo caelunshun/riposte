@@ -3147,6 +3147,7 @@ dependencies = [
  "bytes",
  "directories-next",
  "duit 0.1.0",
+ "duit-core 0.1.0",
  "dume-renderer 0.1.0",
  "flume",
  "fs-err",

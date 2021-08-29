@@ -30,6 +30,19 @@ child:
                           columns:
                             - name # player username, "AI," or "empty"
                             - status # "AI," "vacant", or "human"
+                            - delete_button
+                      - Row:
+                          align_h: End
+                          spacing: 30
+                          children:
+                          - Button:
+                              id: add_ai_slot_button
+                              child:
+                                Text: Add AI Slot
+                          - Button:
+                              id: add_human_slot_button
+                              child:
+                                Text: Add Human Slot
 
                 # game settings
                 - Column:

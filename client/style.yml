@@ -107,3 +107,7 @@ styles:
     handle_border_color: $border_active
     handle_color: rgb(200, 200, 200)
 
+  table:
+    background_color_a: rgb(70, 70, 70)
+    background_color_b: rgb(80, 80, 80)
+  

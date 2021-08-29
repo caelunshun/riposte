@@ -34,7 +34,7 @@ namespace rip {
 
         proto::LobbySlot slot;
         slot.set_isai(packet.isai());
-        slot.set_occupied(false);
+        slot.set_occupied(packet.isai());
         server->addSlot(std::move(slot));
     }
 
@@ -139,9 +139,9 @@ namespace rip {
         getSlot(*slotID)->mutable_owneruuid()->CopyFrom(userID);
         getSlot(*slotID)->set_isadmin(isAdmin);
 
-        const auto id = connections.insert(LobbyConnection(std::move(handle), std::move(userID), isAdmin, this));
-        connections[id].setID(id);
-        connections[id].setSlotID(*slotID);
+        const auto id = connections.insert(std::make_shared<LobbyConnection>(std::move(handle), std::move(userID), isAdmin, this));
+        connections[id]->setID(id);
+        connections[id]->setSlotID(*slotID);
 
         broadcastLobbyInfo();
 
@@ -150,9 +150,9 @@ namespace rip {
 
     void LobbyServer::removeConnection(LobbyConnectionID id) {
         if (!connections.contains(id)) return;
-        connections[id].disconnect();
+        connections[id]->disconnect();
 
-        auto slot = getSlot(connections[id].getSlotID());
+        auto slot = getSlot(connections[id]->getSlotID());
         if (slot) {
             slot->set_occupied(false);
         }
@@ -165,7 +165,7 @@ namespace rip {
     uint32_t LobbyServer::addSlot(proto::LobbySlot slot) {
         slot.set_id(nextSlotID++);
 
-        slots.emplace_back(std::move(slot));
+        slots.push_back(std::move(slot));;
 
         broadcastLobbyInfo();
 
@@ -195,7 +195,7 @@ namespace rip {
 
     void LobbyServer::broadcastLobbyInfo() {
         for (auto &conn : connections) {
-            conn.sendLobbyInfo(slots, isStatic);
+            conn->sendLobbyInfo(slots, isStatic);
         }
     }
 
