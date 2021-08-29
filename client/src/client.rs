@@ -83,12 +83,12 @@ impl Client<LobbyState> {
         Ok(())
     }
 
-    fn handle_kicked(&mut self, packet: Kicked, lobby: &mut GameLobby) -> Result<()> {
+    fn handle_kicked(&mut self, _packet: Kicked, _lobby: &mut GameLobby) -> Result<()> {
         log::info!("Kicked from lobby");
         Ok(())
     }
 
-    fn handle_game_started(&mut self, packet: GameStarted, lobby: &mut GameLobby) -> Result<()> {
+    fn handle_game_started(&mut self, _packet: GameStarted, _lobby: &mut GameLobby) -> Result<()> {
         log::info!("Game starting");
         Ok(())
     }

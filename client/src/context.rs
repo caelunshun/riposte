@@ -24,6 +24,7 @@ use crate::{
     backend::BackendService,
     options::Options,
     paths::FilePaths,
+    popups::PopupWindows,
     registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
     state::StateManager,
 };
@@ -43,6 +44,9 @@ pub struct Context {
 
     /// The UI state (duit)
     ui: Rc<RefCell<Ui>>,
+    /// Popup window manager
+    popup_windows: PopupWindows,
+
     /// Loaded assets
     assets: Assets,
     /// The game window
@@ -74,6 +78,8 @@ impl Context {
         let canvas = Rc::new(RefCell::new(canvas));
 
         let ui = Rc::new(RefCell::new(Ui::new()));
+        let popup_windows = PopupWindows::new();
+
         let state_manager = StateManager::new(Rc::clone(&ui));
 
         let paths = FilePaths::new()?;
@@ -113,6 +119,7 @@ impl Context {
                 surface,
                 sample_texture,
                 ui,
+                popup_windows,
                 assets,
                 window,
                 audio,
@@ -251,9 +258,15 @@ impl Context {
         );
     }
 
+    pub fn show_error_popup(&mut self, error: &str) {
+        self.popup_windows
+            .show_error_popup(&mut *self.ui.borrow_mut(), error);
+    }
+
     pub fn render(&mut self) {
         self.state_manager.update();
         self.audio.borrow_mut().update();
+        self.popup_windows.update(&mut *self.ui.borrow_mut());
 
         let window_logical_size = self
             .window

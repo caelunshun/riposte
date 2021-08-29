@@ -8,6 +8,8 @@ use crate::{
     ui::{FillScreen, Z_FOREGROUND},
 };
 
+use anyhow::Context as _;
+
 /// The game lobby state.
 pub struct GameLobbyState {
     attachment: StateAttachment,
@@ -42,7 +44,10 @@ impl GameLobbyState {
         }
     }
 
-    pub fn update(&mut self, cx: &mut Context) {
-        self.client.handle_messages(&mut self.lobby).expect("failed to handle messages");
+    pub fn update(&mut self, _cx: &mut Context) -> anyhow::Result<()> {
+        self.client
+            .handle_messages(&mut self.lobby)
+            .context("failed to handle messages")?;
+        Ok(())
     }
 }

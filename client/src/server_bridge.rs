@@ -7,7 +7,8 @@ use futures::{stream::StreamExt, SinkExt};
 use riposte_backend_api::codec;
 use tokio::{process::Command, task};
 
-const SERVER_PATH: &str = "/Users/caelum/CLionProjects/riposte/cmake-build-relwithdebinfo/bin/riposte";
+const SERVER_PATH: &str =
+    "/Users/caelum/CLionProjects/riposte/cmake-build-relwithdebinfo/bin/riposte";
 
 /// A bridge abstracting over a connection to the game server.
 pub struct ServerBridge {
@@ -48,7 +49,6 @@ impl ServerBridge {
 
         task::spawn(async move {
             while let Some(Ok(msg)) = reader.next().await {
-                log::info!("Data: {:?}", (&*msg));
                 if receiving_tx.send_async(msg.freeze()).await.is_err() {
                     break;
                 }

@@ -62,7 +62,9 @@ impl MenuState {
                         cx.save_options_to_disk();
                         self.state = State::Login(LoginState::new(cx));
                     }
-                    main_menu::Action::EnterSingleplayerLobby => action = Some(crate::Action::EnterSingleplayerLobby),
+                    main_menu::Action::EnterSingleplayerLobby => {
+                        action = Some(crate::Action::EnterSingleplayerLobby)
+                    }
                 },
                 None => {}
             },

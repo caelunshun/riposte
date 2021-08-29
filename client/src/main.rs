@@ -29,6 +29,7 @@ mod generated;
 mod lobby;
 mod options;
 mod paths;
+mod popups;
 mod registry;
 mod server_bridge;
 mod state;
@@ -56,15 +57,21 @@ impl RootState {
                 if let Some(action) = menu.update(cx) {
                     match action {
                         Action::EnterSingleplayerLobby => {
-                            *self = RootState::Lobby(
-                                GameLobbyState::new_singleplayer(cx)
-                                    .expect("failed to enter singleplayer"),
-                            )
+                            match GameLobbyState::new_singleplayer(cx) {
+                                Ok(l) => *self = RootState::Lobby(l),
+                                Err(e) => cx.show_error_popup(&format!(
+                                    "failed to create singleplayer game: {}",
+                                    e
+                                )),
+                            }
                         }
                     }
                 }
             }
-            RootState::Lobby(lobby) => lobby.update(cx),
+            RootState::Lobby(lobby) => if let Err(e) = lobby.update(cx) {
+                cx.show_error_popup(&format!("disconnected from game: {}", e));
+                *self = RootState::MainMenu(MenuState::new(cx));
+            }
         }
     }
 }

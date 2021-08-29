@@ -1,5 +1,68 @@
 use duit::widgets::*;
 use duit::*;
+pub struct ErrorPopup {
+    pub error_text: WidgetHandle<Text>,
+    pub close_button: WidgetHandle<Button>,
+}
+impl ::duit::InstanceHandle for ErrorPopup {
+    fn name() -> &'static str {
+        "ErrorPopup"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut error_text = None;
+        let mut close_button = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "error_text" => error_text = Some(widget),
+                "close_button" => close_button = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            error_text: WidgetHandle::new(error_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "error_text"
+                )
+            })),
+            close_button: WidgetHandle::new(close_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "close_button"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct GameLobbyWindow {
+    pub slots_table: WidgetHandle<Table>,
+}
+impl ::duit::InstanceHandle for GameLobbyWindow {
+    fn name() -> &'static str {
+        "GameLobbyWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut slots_table = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "slots_table" => slots_table = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            slots_table: WidgetHandle::new(slots_table.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "slots_table"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct OptionsWindow {
     pub music_volume_slider: WidgetHandle<Slider>,
     pub effects_volume_slider: WidgetHandle<Slider>,
@@ -137,33 +200,6 @@ impl ::duit::InstanceHandle for MainMenu {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "entries"
-                )
-            })),
-        }
-    }
-}
-use duit::widgets::*;
-use duit::*;
-pub struct GameLobbyWindow {
-    pub slots_table: WidgetHandle<Table>,
-}
-impl ::duit::InstanceHandle for GameLobbyWindow {
-    fn name() -> &'static str {
-        "GameLobbyWindow"
-    }
-    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
-        let mut slots_table = None;
-        for (name, widget) in widget_handles {
-            match name.as_str() {
-                "slots_table" => slots_table = Some(widget),
-                _ => {}
-            }
-        }
-        Self {
-            slots_table: WidgetHandle::new(slots_table.unwrap_or_else(|| {
-                panic!(
-                    "missing widget with ID '{}' (generated code not up to date)",
-                    "slots_table"
                 )
             })),
         }

@@ -1,0 +1,23 @@
+name: ErrorPopup
+child:
+  Container:
+    mode:
+      FillParentAndPad: 25
+    classes:
+      - window_container
+    child:
+      Column:
+        spacing: 10
+        children:
+          - Text:
+              id: error_text
+              classes:
+                - h3
+          - Divider: {}
+          - Row:
+              align_h: Center
+              children:
+                - Button:
+                    id: close_button
+                    child:
+                      Text: "Close"
