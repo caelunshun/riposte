@@ -116,5 +116,5 @@ styles:
     bar_border_radius: 1
     bar_color: rgb(120, 120, 120)
     hovered_bar_color: rgb(140, 140, 140)
-    grabbed_bar_color: rgb(150, 150, 150)
+    grabbed_bar_color: rgb(160, 160, 160)
   
