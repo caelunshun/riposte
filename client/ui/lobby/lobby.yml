@@ -37,14 +37,18 @@ child:
                               id: add_human_slot_button
                               child:
                                 Text: Add Human Slot
-                      - Table:
-                          id: slots_table
-                          columns:
-                            - name # player username, "AI," or "empty"
-                            - status # "AI," "vacant", or "human"
-                            - civ
-                            - leader
-                            - delete_button
+                      - Scrollable:
+                          flex: 1
+                          scroll_axis: Vertical
+                          child:
+                            Table:
+                                id: slots_table
+                                columns:
+                                  - name # player username, "AI," or "empty"
+                                  - status # "AI," "vacant", or "human"
+                                  - civ
+                                  - leader
+                                  - delete_button
 
                 # game settings
                 - Column:
