@@ -45,6 +45,9 @@ pub struct UnitKind {
     pub max_bombard_per_turn: u32,
     #[serde(default)]
     pub max_collateral_targets: u32,
+    #[serde(default)]
+    pub only_for_civs: Vec<String>,
+    pub replaces: Option<String>,
 }
 
 #[derive(Debug, serde::Deserialize)]

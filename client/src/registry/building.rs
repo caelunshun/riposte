@@ -9,6 +9,9 @@ pub struct Building {
     #[serde(default)]
     pub only_coastal: bool,
     pub effects: Vec<BuildingEffect>,
+    #[serde(default)]
+    pub only_for_civs: Vec<String>,
+    pub replaces: Option<String>,
 }
 
 #[derive(Debug, serde::Deserialize)]
