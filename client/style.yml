@@ -11,6 +11,7 @@ variables:
   border_active: rgb(0, 112, 150)
   
   default_font_family: Merriweather
+  icon_font_family: Cormorant Garamond
 
 styles:
   text:
@@ -117,4 +118,10 @@ styles:
     bar_color: rgb(120, 120, 120)
     hovered_bar_color: rgb(140, 140, 140)
     grabbed_bar_color: rgb(160, 160, 160)
+
+  pick_list:
+    arrow_font_family: $icon_font_family
+
+  pick_list_option & hovered:
+    background_color: $border_active
   

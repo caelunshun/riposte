@@ -3,11 +3,15 @@ use std::marker::PhantomData;
 use bytes::BytesMut;
 use prost::Message;
 use protocol::{
-    client_lobby_packet, server_lobby_packet, AnyClient, AnyServer, ClientLobbyPacket, CreateSlot,
-    DeleteSlot, GameStarted, Kicked, LobbyInfo, ServerLobbyPacket,
+    client_lobby_packet, server_lobby_packet, AnyClient, AnyServer, ChangeCivAndLeader,
+    ClientLobbyPacket, CreateSlot, DeleteSlot, GameStarted, Kicked, LobbyInfo, ServerLobbyPacket,
 };
 
-use crate::{lobby::GameLobby, registry::Registry, server_bridge::ServerBridge};
+use crate::{
+    lobby::GameLobby,
+    registry::{Civilization, Leader, Registry},
+    server_bridge::ServerBridge,
+};
 
 #[derive(Debug, thiserror::Error)]
 pub enum ClientError {
@@ -71,6 +75,15 @@ impl Client<LobbyState> {
 
     pub fn delete_slot(&mut self, req: DeleteSlot) {
         self.send_message(client_lobby_packet::Packet::DeleteSlot(req));
+    }
+
+    pub fn set_civ_and_leader(&mut self, civ: &Civilization, leader: &Leader) {
+        self.send_message(client_lobby_packet::Packet::ChangeCivAndLeader(
+            ChangeCivAndLeader {
+                civ_id: civ.id.clone(),
+                leader_name: leader.name.clone(),
+            },
+        ));
     }
 
     pub fn handle_messages(

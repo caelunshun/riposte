@@ -4,11 +4,13 @@ use std::{
 };
 
 use crate::{
+    assets::Handle,
     backend::BackendResponse,
     client::{self, Client},
     context::Context,
     generated::GameLobbyWindow,
     lobby::GameLobby,
+    registry::{Civilization, Leader},
     server_bridge::ServerBridge,
     state::StateAttachment,
     ui::{FillScreen, Z_FOREGROUND},
@@ -18,7 +20,7 @@ use crate::{
 use ahash::{AHashMap, AHashSet};
 use duit::{
     widget,
-    widgets::{Button, Text},
+    widgets::{Button, PickList, Text},
 };
 use protocol::{CreateSlot, DeleteSlot};
 use riposte_backend_api::UserInfo;
@@ -29,6 +31,9 @@ enum Message {
     AddHumanSlot,
     DeleteSlot(u32),
 }
+
+struct SetCiv(Handle<Civilization>);
+struct SetLeader(Leader);
 
 /// The game lobby state.
 pub struct GameLobbyState {
@@ -99,6 +104,18 @@ impl GameLobbyState {
                 }
                 Message::DeleteSlot(slot_id) => self.client.delete_slot(DeleteSlot { slot_id }),
             }
+        }
+        while let Some(msg) = ui.pop_message::<SetCiv>() {
+            self.client.set_civ_and_leader(&msg.0, &msg.0.leaders[0]);
+        }
+        while let Some(msg) = ui.pop_message::<SetLeader>() {
+            self.client.set_civ_and_leader(
+                &self
+                    .lobby
+                    .player_civ(self.lobby.our_slot().unwrap().id)
+                    .unwrap(),
+                &msg.0,
+            );
         }
 
         // Check for user info that has been received
@@ -223,6 +240,47 @@ impl GameLobbyState {
                 ("-".to_owned(), "-")
             };
 
+            let (civ_widget, leader_widget) =
+                if slot.occupied && ptr::eq(slot, self.lobby.our_slot().unwrap()) {
+                    let mut civ_picklist = PickList::new(Some(250.), Some(200.));
+                    for civ in cx.registry().civs() {
+                        let civ = civ.clone();
+                        let option = widget(Text::from_markup(
+                            cx.registry().describe_civ(&civ),
+                            vars! {},
+                        ));
+                        civ_picklist.add_option(option, move || SetCiv(civ.clone()));
+                    }
+                    let civ_picklist = widget(civ_picklist);
+                    civ_picklist
+                        .borrow_mut()
+                        .data_mut()
+                        .add_child(widget(Text::from_markup(&civ, vars! {})));
+
+                    let mut leader_picklist = PickList::new(Some(150.), Some(200.));
+                    let our_civ = self
+                        .lobby
+                        .player_civ(self.lobby.our_slot().unwrap().id)
+                        .unwrap();
+                    for leader in &our_civ.leaders {
+                        let leader = leader.clone();
+                        let option = widget(Text::from_markup(&leader.name, vars! {}));
+                        leader_picklist.add_option(option, move || SetLeader(leader.clone()));
+                    }
+                    let leader_picklist = widget(leader_picklist);
+                    leader_picklist
+                        .borrow_mut()
+                        .data_mut()
+                        .add_child(widget(Text::from_markup(leader, vars! {})));
+
+                    (civ_picklist, leader_picklist)
+                } else {
+                    (
+                        widget(Text::from_markup(&civ, vars! {})),
+                        widget(Text::from_markup(leader, vars! {})),
+                    )
+                };
+
             let mut delete_button = Button::new();
             let id = slot.id;
             delete_button.on_click(move || Message::DeleteSlot(id));
@@ -239,8 +297,8 @@ impl GameLobbyState {
             table.add_row([
                 ("name", widget(Text::from_markup(name, vars! {}))),
                 ("status", widget(Text::from_markup(status, vars! {}))),
-                ("civ", widget(Text::from_markup(civ, vars! {}))),
-                ("leader", widget(Text::from_markup(leader, vars! {}))),
+                ("civ", civ_widget),
+                ("leader", leader_widget),
                 ("delete_button", delete_button),
             ]);
         }

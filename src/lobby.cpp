@@ -48,6 +48,15 @@ namespace rip {
         if (!isAdmin) return;
     }
 
+    void LobbyConnection::handleChangeCivAndLeader(const proto::ChangeCivAndLeader &packet) {
+        auto *slot = server->getSlot(slotID);
+        if (slot) {
+            slot->set_civid(packet.civid());
+            slot->set_leadername(packet.leadername());
+            server->broadcastLobbyInfo();
+        }
+    }
+
     void LobbyConnection::handleMessage(const proto::ClientLobbyPacket &packet) {
         if (packet.has_createslot()) {
             handleCreateSlot(packet.createslot());
@@ -55,6 +64,8 @@ namespace rip {
             handleDeleteSlot(packet.deleteslot());
         } else if (packet.has_requestgamestart()) {
             handleRequestGameStart(packet.requestgamestart());
+        } else if (packet.has_changecivandleader()) {
+            handleChangeCivAndLeader(packet.changecivandleader());
         }
     }
 

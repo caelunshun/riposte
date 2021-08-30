@@ -28,6 +28,7 @@ namespace rip {
         void handleCreateSlot(const proto::CreateSlot &packet);
         void handleDeleteSlot(const proto::DeleteSlot &packet);
         void handleRequestGameStart(const proto::RequestGameStart &packet);
+        void handleChangeCivAndLeader(const proto::ChangeCivAndLeader &packet);
 
         void sendMessage(const proto::ServerLobbyPacket &packet);
         void handleMessage(const proto::ClientLobbyPacket &packet);

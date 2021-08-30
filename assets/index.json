@@ -250,6 +250,11 @@
     "loader": "font"
   },
   {
+    "path": "font/CormorantGaramond-Regular.ttf",
+    "id": "font/icons",
+    "loader": "font"
+  },
+  {
     "path": "unit/settler.json",
     "id": "unit/settler",
     "loader": "unit"
