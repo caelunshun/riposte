@@ -103,8 +103,8 @@ impl Registry {
                 uniques.push(unit.name.clone());
             }
         }
-        for building in self.unit_kinds.values() {
-            if building.only_for_civs.contains(&building.name) {
+        for building in self.buildings.values() {
+            if building.only_for_civs.contains(&civ.id) {
                 uniques.push(building.name.clone());
             }
         }
