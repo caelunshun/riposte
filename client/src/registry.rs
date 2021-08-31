@@ -104,20 +104,25 @@ impl Registry {
     pub fn describe_civ(&self, civ: &Civilization) -> String {
         let mut result = civ.name.clone();
 
-        let mut uniques = Vec::new();
+        let mut parentheticals = Vec::new();
+
+        for starting_tech in &civ.starting_techs {
+            parentheticals.push(starting_tech.clone());
+        }
+
         for unit in self.unit_kinds.values() {
             if unit.only_for_civs.contains(&civ.id) {
-                uniques.push(unit.name.clone());
+                parentheticals.push(unit.name.clone());
             }
         }
         for building in self.buildings.values() {
             if building.only_for_civs.contains(&civ.id) {
-                uniques.push(building.name.clone());
+                parentheticals.push(building.name.clone());
             }
         }
 
-        if !uniques.is_empty() {
-            result += &format!(" ({})", delimit_string(&uniques, ", "));
+        if !parentheticals.is_empty() {
+            result += &format!(" ({})", delimit_string(&parentheticals, ", "));
         }
 
         result
