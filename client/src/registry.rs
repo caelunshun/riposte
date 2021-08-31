@@ -4,9 +4,9 @@ mod resource;
 mod tech;
 mod unit_kind;
 
-use ahash::AHashMap;
 pub use building::*;
 pub use civ::*;
+use indexmap::IndexMap;
 pub use resource::*;
 pub use tech::*;
 pub use unit_kind::*;
@@ -20,16 +20,16 @@ use crate::{
 /// buildings, etc.
 #[derive(Default)]
 pub struct Registry {
-    unit_kinds: AHashMap<String, Handle<UnitKind>>,
-    civs: AHashMap<String, Handle<Civilization>>,
-    buildings: AHashMap<String, Handle<Building>>,
-    techs: AHashMap<String, Handle<Tech>>,
-    resources: AHashMap<String, Handle<Resource>>,
+    unit_kinds: IndexMap<String, Handle<UnitKind>, ahash::RandomState>,
+    civs: IndexMap<String, Handle<Civilization>, ahash::RandomState>,
+    buildings: IndexMap<String, Handle<Building>, ahash::RandomState>,
+    techs: IndexMap<String, Handle<Tech>, ahash::RandomState>,
+    resources: IndexMap<String, Handle<Resource>, ahash::RandomState>,
 }
 
 fn load_into_map<T: Send + Sync + 'static>(
     assets: &Assets,
-    map: &mut AHashMap<String, Handle<T>>,
+    map: &mut IndexMap<String, Handle<T>, ahash::RandomState>,
     get_id: impl Fn(&T) -> &str,
 ) {
     for asset in assets.iter_by_type::<T>() {
@@ -42,7 +42,7 @@ fn load_into_map<T: Send + Sync + 'static>(
 pub struct RegistryItemNotFound(&'static str, String);
 
 fn get<T>(
-    map: &AHashMap<String, Handle<T>>,
+    map: &IndexMap<String, Handle<T>, ahash::RandomState>,
     id: &str,
     typ: &'static str,
 ) -> Result<Handle<T>, RegistryItemNotFound> {
@@ -62,6 +62,13 @@ impl Registry {
         load_into_map(assets, &mut self.buildings, |b| &b.name);
         load_into_map(assets, &mut self.techs, |t| &t.name);
         load_into_map(assets, &mut self.resources, |r| &r.id);
+
+        // Sort all items alphabetically.
+        self.unit_kinds.sort_by(|_, a, _, b| a.name.cmp(&b.name));
+        self.civs.sort_by(|_, a, _, b| a.name.cmp(&b.name));
+        self.buildings.sort_by(|_, a, _, b| a.name.cmp(&b.name));
+        self.techs.sort_by(|_, a, _, b| a.name.cmp(&b.name));
+        self.resources.sort_by(|_, a, _, b| a.name.cmp(&b.name));
 
         log::info!("Initialized the registry");
     }
