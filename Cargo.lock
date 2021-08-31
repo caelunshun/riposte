@@ -3242,6 +3242,7 @@ dependencies = [
  "riposte-backend-api",
  "slotmap",
  "tokio",
+ "zeno",
 ]
 
 [[package]]
@@ -4664,6 +4665,12 @@ checksum = "56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85"
 dependencies = [
  "linked-hash-map",
 ]
+
+[[package]]
+name = "zeno"
+version = "0.2.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c110ba09c9b3a43edd4803d570df0da2414fed6e822e22b976a4e3ef50860701"
 
 [[package]]
 name = "zstd"

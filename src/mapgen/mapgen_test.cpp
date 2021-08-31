@@ -22,8 +22,8 @@ int main() {
 
     // Circle
     for (float theta = 0; theta <= 2 * 3.142; theta += 0.1) {
-        float x = std::cos(theta);
-        float y = std::sin(theta);
+        float x = std::cos(theta) + 5;
+        float y = std::sin(theta) + 5;
         mesh.addPoint(glm::vec2(x, y));
     }
 

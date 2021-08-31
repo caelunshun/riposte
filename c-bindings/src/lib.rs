@@ -24,6 +24,7 @@ use tokio::{
     runtime::{self, Runtime},
     task,
 };
+use zeno::{PathBuilder, Placement};
 
 slotmap::new_key_type! {
     pub struct RequestId;
@@ -308,6 +309,57 @@ fn run_connection(
                 .ok();
         }
     });
+}
+
+pub struct RipRasterizedMask {
+    data: Vec<u8>,
+    placement: Placement,
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn zeno_mask_get_value(mask: &RipRasterizedMask, x: u32, y: u32) -> u8 {
+    mask.data[(x + y * mask.placement.width) as usize]
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn zeno_mask_get_width(mask: &RipRasterizedMask) -> u32 {
+    mask.placement.width
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn zeno_mask_get_height(mask: &RipRasterizedMask) -> u32 {
+    mask.placement.height
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn zeno_mask_free(mask: *mut RipRasterizedMask) {
+    drop(Box::from_raw(mask));
+}
+
+/// Rasterizes the given line mesh into an alpha grid.
+#[no_mangle]
+pub unsafe extern "C" fn zeno_rasterize_lines(
+    coordinates: *const f32,
+    num_points: usize,
+) -> *mut RipRasterizedMask {
+    let mut path: Vec<zeno::Command> = Vec::new();
+    let coordinates = slice::from_raw_parts(coordinates, num_points * 2);
+
+    for (i, point) in coordinates.chunks_exact(2).enumerate() {
+        let x = point[0];
+        let y = point[1];
+
+        if i == 0 {
+            path.move_to([x, y]);
+        } else {
+            path.line_to([x, y]);
+        }
+    }
+
+    <Vec<zeno::Command> as PathBuilder>::close(&mut path);
+
+    let (data, placement) = zeno::Mask::new(&path).render();
+    Box::leak(Box::new(RipRasterizedMask { data, placement })) as *mut _
 }
 
 unsafe fn unpointer<T>(ptr: *mut T) -> &'static mut T {

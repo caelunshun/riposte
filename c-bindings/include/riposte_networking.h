@@ -25,6 +25,8 @@ struct RipConnectionHandle;
 /// request performed.
 struct RipNetworkingContext;
 
+struct RipRasterizedMask;
+
 struct RipResult;
 
 /// Parameter 1: userdata passed into request
@@ -86,5 +88,16 @@ RipBytes rip_result_get_bytes(const RipResult *res);
 RipError rip_result_get_error(const RipResult *res);
 
 bool rip_result_is_success(const RipResult *res);
+
+void zeno_mask_free(RipRasterizedMask *mask);
+
+uint32_t zeno_mask_get_height(const RipRasterizedMask *mask);
+
+uint8_t zeno_mask_get_value(const RipRasterizedMask *mask, uint32_t x, uint32_t y);
+
+uint32_t zeno_mask_get_width(const RipRasterizedMask *mask);
+
+/// Rasterizes the given line mesh into an alpha grid.
+RipRasterizedMask *zeno_rasterize_lines(const float *coordinates, size_t num_points);
 
 } // extern "C"
