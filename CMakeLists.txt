@@ -42,7 +42,7 @@ set(SOURCES
         src/mapgen/line_mesh.cpp
         )
 
-set(MAPGEN_TEST_SOURCES src/mapgen/grid.cpp src/mapgen/line_mesh.cpp src/mapgen/mapgen_test.cpp)
+set(MAPGEN_TEST_SOURCES src/rng.cpp src/mapgen/grid.cpp src/mapgen/line_mesh.cpp src/mapgen/mapgen_test.cpp)
 
 add_executable(riposte ${SOURCES})
 
@@ -61,8 +61,8 @@ target_include_directories(riposte PRIVATE
         ${PROTOBUF_INCLUDE_DIR})
 
 add_executable(mapgen-test ${MAPGEN_TEST_SOURCES})
-target_link_libraries(mapgen-test ${CONAN_LIBS} riposte-c-bindings)
-target_include_directories(mapgen-test PRIVATE c-bindings/include)
+target_link_libraries(mapgen-test ${CONAN_LIBS} riposte-c-bindings FastNoise)
+target_include_directories(mapgen-test PRIVATE c-bindings/include external/FastNoise2/include)
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")

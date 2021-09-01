@@ -10,6 +10,8 @@
 #include <string>
 #include <cmath>
 
+#include "../rng.h"
+
 namespace rip::mapgen {
     class OutOfBoundsException : public std::exception {
         int width, height, x, y;
@@ -141,6 +143,68 @@ namespace rip::mapgen {
                     apply(ourCell, stampCell);
                 }
             }
+        }
+
+        // Grows the grid to size 2*width + 1, 2*height + 1,
+        // adding in random detail.
+        Grid<T> grow(Rng &rng) {
+            // For each pair of adjacent values in the original grid,
+            // output 3 new values where the value in between is randomly
+            // selected between the two other values.
+            //
+            // For example, let's say the input is a 2x2 grid:
+            // a b
+            // c d
+            // The output will be a 3x3 grid with some random values based on their neighbors:
+            // a         (a or b)           b
+            // (a or c)  (a or b or c or d) (b or d)
+            // c         (c or b)           d
+            //
+            // This technique was pioneered by the Cuberite project
+            // for generating biome grids for Minecraft. For more information,
+            // see http://cuberite.xoft.cz/docs/Generator.html#biomegen; scroll down to
+            // "Grown biomes."
+            const auto newWidth = 2 * width + 1;
+            const auto newHeight = 2 * height + 1;
+
+            Grid<T> result(newWidth, newHeight, defaultValue);
+            for (int x = 0; x < width; x++) {
+                for (int y = 0; y < height; y++) {
+                    const auto targetX = 2 * (x + 1) - 2;
+                    const auto targetY = 2 * (y + 1) - 2;
+
+                    // this tile
+                    const auto current = get(x, y);
+                    result.set(targetX, targetY, current);
+
+                    auto onEdgeX = (x == width - 1);
+                    auto onEdgeY = (y == height - 1);
+
+                    // 1 to the right
+                    if (!onEdgeX) {
+                        auto nextX = get(x + 1, y);
+                        std::array<T, 2> choices({current, nextX});
+                        result.set(targetX + 1, targetY, rng.choose(choices));
+                    }
+
+                    // 1 down
+                    if (!onEdgeY) {
+                        auto nextY = get(x, y + 1);
+                        std::array<T, 2> choices({current, nextY});
+                        result.set(targetX, targetY + 1, rng.choose(choices));
+                    }
+
+                    // diagonally
+                    if (!onEdgeX && !onEdgeY) {
+                        auto nextX = get(x + 1, y);
+                        auto nextY = get(x, y + 1);
+                        auto diagonal = get(x + 1, y + 1);
+                        std::array<T, 4> choices({current, nextX, nextY, diagonal});
+                        result.set(targetX + 1, targetY + 1, rng.choose(choices));
+                    }
+                }
+            }
+            return result;
         }
     };
 }
