@@ -321,60 +321,7 @@ namespace rip {
         }
 
         // Set terrain types with a noise.
-        auto cellular = FastNoise::New<FastNoise::CellularValue>();
-        auto noise = FastNoise::New<FastNoise::FractalFBm>();
-        noise->SetSource(cellular);
-        auto treeNoise = FastNoise::New<FastNoise::FractalFBm>();
-        treeNoise->SetSource(cellular);
 
-        std::vector<float> noiseOutput(game.getMapWidth() * game.getMapHeight());
-        noise->GenUniformGrid2D(noiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 0.5, rng.u32(0, 0xFFFFFFFF));
-
-        std::vector<float> treeNoiseOutput(game.getMapWidth() * game.getMapHeight());
-        treeNoise->GenUniformGrid2D(treeNoiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 5.0f, rng.u32(0, 0xFFFFFFFF));
-
-        auto simplex = FastNoise::New<FastNoise::Simplex>();
-        auto hillNoise = FastNoise::New<FastNoise::FractalFBm>();
-        hillNoise->SetSource(simplex);
-
-        std::vector<float> hillNoiseOutput(game.getMapWidth() * game.getMapHeight());
-        hillNoise->GenUniformGrid2D(hillNoiseOutput.data(), 0, 0, game.getMapWidth(), game.getMapHeight(), 5.0f, rng.u32(0, 0xFFFFFFFF));
-
-        for (int x = 0; x < game.getMapWidth(); x++) {
-            for (int y = 0; y < game.getMapHeight(); y++) {
-                auto noiseIndex = x + y * game.getMapWidth();
-                Terrain t;
-                glm::uvec2 pos(x, y);
-                if (landMap.isLand(pos)) {
-                    auto choice = noiseOutput[noiseIndex];
-                    if (choice < -0.1) {
-                        t = Terrain::Grassland;
-                    } else if (choice < 0.4) {
-                        t = Terrain::Plains;
-                    } else {
-                        t = Terrain::Desert;
-                    }
-                } else {
-                    t = Terrain::Ocean;
-                }
-
-                game.getTile(pos).setTerrain(t);
-
-                if (t != Terrain::Ocean) {
-                    // Hills
-                    if (hillNoiseOutput[noiseIndex] > 0.2) {
-                        game.getTile(pos).setHilled(true);
-                    }
-
-                    // Forest
-                    if (t != Terrain::Desert) {
-                        if (treeNoiseOutput[noiseIndex] < 0.3) {
-                            game.getTile(pos).setForested(true);
-                        }
-                    }
-                }
-            }
-        }
 
         return true;
     }

@@ -54,6 +54,13 @@ namespace rip {
         }
     }
 
+    Tile::Tile(const Tile &other) {
+        terrain = other.terrain;
+        forested = other.forested;
+        hilled = other.hilled;
+        resource = other.resource;
+    }
+
     float Tile::getMovementCost(const Game &game, PlayerId player, glm::uvec2 pos) const {
         float cost = (forested || hilled) ? 2 : 1;
 

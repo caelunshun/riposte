@@ -28,6 +28,8 @@ namespace rip {
 
     class IdConverter;
 
+    class City;
+
     // A tile improvement (usually created by a worker)
     class Improvement {
     protected:
@@ -178,7 +180,7 @@ namespace rip {
         Tile() : terrain(Terrain::Grassland) {}
         Tile(const proto::Tile &packet, const IdConverter &playerIDs, const Registry &registry, glm::uvec2 pos);
 
-        Tile(const Tile &other) = delete;
+        Tile(const Tile &other);
         Tile(Tile &&other) noexcept = default;
 
         Tile &operator=(Tile &&other) noexcept = default;
