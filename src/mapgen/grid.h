@@ -9,7 +9,11 @@
 #include <optional>
 #include <string>
 #include <cmath>
+#include <deque>
+#include <glm/vec2.hpp>
+#include <iostream>
 
+#include "../ripmath.h"
 #include "../rng.h"
 
 namespace rip::mapgen {
@@ -22,6 +26,23 @@ namespace rip::mapgen {
 
         const char *what() const noexcept override;
 
+    };
+
+    template<class T>
+            class Grid;
+
+    template<class T>
+    struct WithId {
+        uint32_t id;
+        T value;
+    };
+
+    template<class T>
+    struct WithAssignedIDs {
+        Grid<WithId<T>> grid;
+        // Maps ID as an index into this vector
+        // to the grid positions in this ID group.
+        std::vector<std::vector<glm::uvec2>> groupToPositions;
     };
 
     // A grid of values of type T.
@@ -205,6 +226,77 @@ namespace rip::mapgen {
                 }
             }
             return result;
+        }
+
+        // Performs a flood fill on every cell, giving
+        // each cell an `id` field that indicates which
+        // group of connected cells it belongs to.
+        WithAssignedIDs<T> withAssignedIDs() const {
+            Grid<WithId<T>> result(width, height, WithId<T> {
+                .value = defaultValue,
+                .id = 0
+            });
+
+            std::vector<bool> visitedCells(width * height);
+
+            std::vector<std::vector<glm::uvec2>> groupToPositions;
+
+            uint32_t nextID = 0;
+
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    const auto index = x + width * y;
+                    if (!visitedCells[index]) {
+                        // Breadth-first search starting on this cell.
+                        std::deque<glm::uvec2> queue;
+                        queue.emplace_back(x, y);
+
+                        const auto id = nextID++;
+                        groupToPositions.emplace_back();
+
+                        while (!queue.empty()) {
+                            auto pos = queue[0];
+                            queue.pop_front();
+
+                            result.set(pos.x, pos.y, WithId<T> {
+                                .value = get(pos.x, pos.y),
+                                .id = id,
+                                });
+                            groupToPositions[id].push_back(pos);
+
+                            // Adjacent positions
+                            for (const auto p : getNeighbors(pos)) {
+                                if (p.x >= width || p.y >= height) continue;
+                                if (get(p.x, p.y) == get(pos.x, pos.y)) {
+                                    if (!visitedCells[p.x + width * p.y]) {
+                                        queue.push_back(p);
+                                        visitedCells[p.x + width * p.y] = true;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            return WithAssignedIDs<T> {
+                .grid = std::move(result),
+                .groupToPositions = std::move(groupToPositions),
+            };
+        }
+
+        // Returns the number of instances of the given cell
+        // in the grid.
+        int countInstances(const T &value) const noexcept {
+            int count = 0;
+            for (int y = 0; y < height; y++) {
+                for (int x = 0; x < width; x++) {
+                    if (get(x, y) == value) {
+                        ++count;
+                    }
+                }
+            }
+            return count;
         }
     };
 }

@@ -12,8 +12,8 @@
 
 namespace rip::mapgen {
     enum class LandCell {
-        Land,
         Ocean,
+        Land,
     };
 
     // Responsible for generating a grid indicating

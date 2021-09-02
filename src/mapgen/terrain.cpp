@@ -7,7 +7,7 @@
 #include "terrain.h"
 
 namespace rip::mapgen {
-    Grid<Tile> DefaultTerrainGenerator::generateTerrain(const Grid<LandCell> landGrid, Rng &rng) {
+    Grid<Tile> DefaultTerrainGenerator::generateTerrain(const Grid<LandCell> &landGrid, Rng &rng) {
         Grid<Tile> tileGrid(landGrid.getWidth(), landGrid.getHeight(), Tile());
         
         // Use noise to determine terrain types.

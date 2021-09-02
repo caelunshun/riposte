@@ -19,14 +19,14 @@ namespace rip::mapgen {
     public:
         virtual ~TerrainGenerator() = default;
 
-        virtual Grid<Tile> generateTerrain(const Grid<LandCell> landGrid, Rng &rng) = 0;
+        virtual Grid<Tile> generateTerrain(const Grid<LandCell> &landGrid, Rng &rng) = 0;
     };
 
     // The default terrain generator, which uses a series
     // of noises to create semi-realistic terrain.
     class DefaultTerrainGenerator : public TerrainGenerator {
     public:
-        Grid<Tile> generateTerrain(const Grid<LandCell> landGrid, Rng &rng) override;
+        Grid<Tile> generateTerrain(const Grid<LandCell> &landGrid, Rng &rng) override;
     };
 }
 

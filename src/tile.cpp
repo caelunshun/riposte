@@ -7,11 +7,11 @@
 #include "city.h"
 #include "game.h"
 #include "rng.h"
-#include "server.h"
 #include "protocol.h"
 #include "saveload.h"
 
 namespace rip {
+    /*
     void Cottage::setLevel(CottageLevel level) {
         this->level = level;
     }
@@ -54,12 +54,12 @@ namespace rip {
         }
     }
 
-    Tile::Tile(const Tile &other) {
+    */Tile::Tile(const Tile &other) {
         terrain = other.terrain;
         forested = other.forested;
         hilled = other.hilled;
         resource = other.resource;
-    }
+    }/*
 
     float Tile::getMovementCost(const Game &game, PlayerId player, glm::uvec2 pos) const {
         float cost = (forested || hilled) ? 2 : 1;
@@ -74,6 +74,7 @@ namespace rip {
 
         return cost;
     }
+     */
 
     bool Tile::isForested() const {
         return forested;
@@ -100,7 +101,7 @@ namespace rip {
         return false;
     }
 
-    Yield Tile::getYield(const Game &game, glm::uvec2 pos, PlayerId playerID) const {
+    /*Yield Tile::getYield(const Game &game, glm::uvec2 pos, PlayerId playerID) const {
         Yield yield(0, 0, 0);
 
         switch (terrain) {
@@ -155,13 +156,13 @@ namespace rip {
         if (yield.food < 0) yield.food = 0;
 
         return yield;
-    }
+    }*/
 
     const std::vector<std::unique_ptr<Improvement>> &Tile::getImprovements() const {
         return improvements;
     }
 
-    bool Tile::addImprovement(Game &game, glm::uvec2 ourPos, std::unique_ptr<Improvement> improvement) {
+    /*bool Tile::addImprovement(Game &game, glm::uvec2 ourPos, std::unique_ptr<Improvement> improvement) {
         if (improvement->isCompatible(*this)) {
             improvements.push_back(std::move(improvement));
             game.getServer().markTileDirty(ourPos);
@@ -169,13 +170,13 @@ namespace rip {
         } else {
             return false;
         }
-    }
+    }*/
 
     void Tile::clearImprovements() {
         improvements.clear();
     }
 
-    static void paintImprovementIcon(NVGcontext *vg, const Assets &assets, glm::vec2 offset, const std::string &assetID) {
+    /*static void paintImprovementIcon(NVGcontext *vg, const Assets &assets, glm::vec2 offset, const std::string &assetID) {
         const auto &image = std::dynamic_pointer_cast<Image>(assets.get(assetID));
         nvgBeginPath(vg);
         auto aspectRatio = 640.0f / 512;
@@ -386,7 +387,7 @@ namespace rip {
         }
 
         return results;
-    }
+    }*/
 
     int Tile::getDefensiveBonus() const {
         int result = 0;

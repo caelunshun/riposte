@@ -24,33 +24,58 @@ FetchContent_MakeAvailable(Corrosion)
 
 corrosion_import_crate(MANIFEST_PATH c-bindings/Cargo.toml CRATES riposte-c-bindings)
 
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/riposte.proto)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/riposte.proto proto/mapgen.proto)
 
 set(NANOVG_SOURCES external/nanovg/src/nanovg.c)
-#set(SOURCES ${NANOVG_SOURCES} ${PROTO_SRCS} src/main.cpp src/ripmath.h src/tile.cpp src/tile.h src/game.cpp src/game.h src/renderer.cpp src/renderer.h src/assets.cpp src/assets.h src/view.cpp src/view.h src/cursor.cpp src/cursor.h src/mapgen.cpp src/mapgen.h src/rng.cpp src/rng.h src/city.cpp src/city.h src/player.cpp src/player.h src/registry.cpp src/registry.h src/unit.cpp src/unit.h src/ripmath.cpp src/hud.cpp src/hud.h src/ui.cpp src/ui.h src/path.cpp src/path.h src/ai.cpp src/ai.h src/worker.cpp src/traversal.h src/culture.cpp src/culture.h src/tech.cpp src/yield.cpp src/yield.h src/trade.cpp src/trade.h src/era.cpp src/era.h src/combat.cpp src/combat.h src/stack.cpp src/stack.h src/event.cpp src/event.h src/ship.cpp src/ship.h src/bridge.cpp src/server.cpp src/server.h src/slot_map.cpp src/slot_map.h src/network.cpp src/network.h src/protocol.cpp src/protocol.h src/saveload.cpp src/saveload.h src/lobby.cpp src/lobby.h)
 set(SOURCES
         ${PROTO_SRCS}
-        src/main.cpp
-        src/network.cpp
-        src/lobby.cpp
-        src/slot_map.cpp
-        src/registry.cpp
+        #src/ai.cpp
         src/assets.cpp
+        #src/bridge.cpp
+        #src/city.cpp
+        #src/combat.cpp
+        #src/culture.cpp
+        #src/cursor.cpp
+        src/era.cpp
+        #src/event.cpp
+        #src/game.cpp
+        #src/hud.cpp
+        #src/lobby.cpp
+        #src/mapgen.cpp
+        #src/network.cpp
+        #src/path.cpp
+        #src/player.cpp
+        #src/protocol.cpp
+        src/registry.cpp
+        #src/renderer.cpp
+        src/ripmath.cpp
         src/rng.cpp
+        #src/saveload.cpp
+        #src/server.cpp
+        #src/ship.cpp
+        src/slot_map.cpp
+        #src/stack.cpp
+        src/tech.cpp
+        src/tile.cpp
+        #src/trade.cpp
+        #src/ui.cpp
+        #src/unit.cpp
+        #src/view.cpp
+        #src/worker.cpp
+        src/yield.cpp
 
         src/mapgen/grid.cpp
         src/mapgen/line_mesh.cpp
-        )
+        src/mapgen/land.cpp
+        src/mapgen/terrain.cpp
+        src/mapgen/starting_locations.cpp)
 
-set(MAPGEN_TEST_SOURCES src/rng.cpp src/mapgen/grid.cpp src/mapgen/line_mesh.cpp src/mapgen/mapgen_test.cpp)
-
-add_executable(riposte ${SOURCES})
+add_library(riposte-lib ${SOURCES})
 
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "" FORCE)
 add_subdirectory(external/FastNoise2)
 
-target_compile_definitions(riposte PRIVATE FONS_USE_FREETYPE SOL_ALL_SAFETIES_ON)
-target_include_directories(riposte PRIVATE
+target_include_directories(riposte-lib PUBLIC
         src/
         external/nanovg/src
         external/FastNoise2/include
@@ -59,10 +84,6 @@ target_include_directories(riposte PRIVATE
         c-bindings/include
         ${CMAKE_CURRENT_BINARY_DIR} // for protobuf files
         ${PROTOBUF_INCLUDE_DIR})
-
-add_executable(mapgen-test ${MAPGEN_TEST_SOURCES})
-target_link_libraries(mapgen-test ${CONAN_LIBS} riposte-c-bindings FastNoise)
-target_include_directories(mapgen-test PRIVATE c-bindings/include external/FastNoise2/include)
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
@@ -81,4 +102,10 @@ elseif(UNIX)
     SET(NATIVE_AUDIO_LIBS rt ${ALSA_LIBRARIES} Threads::Threads)
 endif()
 
-target_link_libraries(riposte ${CONAN_LIBS} ${PROTOBUF_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} riposte-c-bindings)
+target_link_libraries(riposte-lib ${CONAN_LIBS} ${PROTOBUF_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} riposte-c-bindings)
+
+add_executable(riposte src/main.cpp)
+target_link_libraries(riposte riposte-lib)
+
+add_executable(mapgen-test src/mapgen/mapgen_test.cpp)
+target_link_libraries(mapgen-test riposte-lib)
