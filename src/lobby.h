@@ -15,10 +15,14 @@
 namespace rip {
     typedef ID LobbyConnectionID;
 
+    enum class LobbyResult {
+        StartGame,
+        Exit,
+    };
+
     class LobbyServer;
 
     class LobbyConnection {
-        ConnectionHandle handle;
         uint32_t slotID = 0;
         LobbyConnectionID id;
         LobbyServer *server;
@@ -36,6 +40,8 @@ namespace rip {
         void requestMoreData();
 
     public:
+        ConnectionHandle handle;
+
         LobbyConnection(ConnectionHandle handle, proto::UUID userID, bool isAdmin, LobbyServer *server);
 
         void setSlotID(uint32_t slotID);
@@ -68,6 +74,9 @@ namespace rip {
         std::shared_ptr<Registry> registry;
 
     public:
+        bool shouldStartGame = false;
+        bool shouldExit = false;
+
         LobbyServer(std::shared_ptr<NetworkingContext> networkCtx, std::shared_ptr<Registry> registry);
 
         // Adds a new connection.
@@ -84,6 +93,9 @@ namespace rip {
         void removeSlot(uint32_t id);
         // May return null if the ID is invalid.
         proto::LobbySlot *getSlot(uint32_t id);
+        const std::vector<proto::LobbySlot> &getSlots() const;
+
+        ConnectionHandle &getConnectionForSlot(uint32_t id);
 
         // Puts the lobby in static mode, preventing
         // new slots from being created.
@@ -94,7 +106,7 @@ namespace rip {
         // Broadcasts LobbyInfo to all connections.
         void broadcastLobbyInfo();
 
-        void run();
+        LobbyResult run();
     };
 }
 

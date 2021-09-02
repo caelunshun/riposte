@@ -58,7 +58,7 @@ namespace rip {
         virtual ~Improvement() = default;
     };
 
-    /*class Mine : public Improvement {
+    class Mine : public Improvement {
     public:
         explicit Mine(glm::uvec2 pos) : Improvement(pos) {}
 
@@ -152,7 +152,7 @@ namespace rip {
         std::string getName() const override;
 
         void paint(const Game &game, glm::uvec2 pos, NVGcontext *vg, const Assets &assets) override;
-    };*/
+    };
 
     /**
      * A type of terrain.

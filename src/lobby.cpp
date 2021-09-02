@@ -46,6 +46,8 @@ namespace rip {
 
     void LobbyConnection::handleRequestGameStart(const proto::RequestGameStart &packet) {
         if (!isAdmin) return;
+
+        server->shouldStartGame = true;
     }
 
     void LobbyConnection::handleChangeCivAndLeader(const proto::ChangeCivAndLeader &packet) {
@@ -229,9 +231,27 @@ namespace rip {
         }
     }
 
-    void LobbyServer::run() {
+    LobbyResult LobbyServer::run() {
         while (true) {
             networkCtx->waitAndInvokeCallbacks();
+
+            if (shouldStartGame) {
+                return LobbyResult::StartGame;
+            }
+            if (shouldExit) {
+                return LobbyResult::Exit;
+            }
         }
+    }
+
+    const std::vector<proto::LobbySlot> &LobbyServer::getSlots() const {
+        return slots;
+    }
+
+    ConnectionHandle &LobbyServer::getConnectionForSlot(uint32_t id) {
+        for (auto &conn : connections) {
+            if (conn->getSlotID() == id) return conn->handle;
+        }
+        throw std::string("missing connection for slot ID");
     }
 }

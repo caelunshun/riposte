@@ -30,6 +30,7 @@ enum Message {
     AddAiSlot,
     AddHumanSlot,
     DeleteSlot(u32),
+    StartGame,
 }
 
 struct SetCiv(Handle<Civilization>);
@@ -103,6 +104,7 @@ impl GameLobbyState {
                     }
                 }
                 Message::DeleteSlot(slot_id) => self.client.delete_slot(DeleteSlot { slot_id }),
+                Message::StartGame => self.client.request_start_game(),
             }
         }
         while let Some(msg) = ui.pop_message::<SetCiv>() {
@@ -175,6 +177,11 @@ impl GameLobbyState {
             .add_human_slot_button
             .get_mut()
             .on_click(|| Message::AddHumanSlot);
+
+        self.window
+            .start_game_button
+            .get_mut()
+            .on_click(|| Message::StartGame);
     }
 
     fn recreate_table_slots(&mut self, cx: &Context) {

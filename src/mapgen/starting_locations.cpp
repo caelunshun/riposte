@@ -33,7 +33,7 @@ namespace rip::mapgen {
 
                 // If the continent is very small, we should never assign it.
                 if (continents[continent].size() < 30) {
-                    continentScores[continent] = -1000000;
+                    continentScores[continent] -= 1000000;
                 }
             }
 
@@ -90,8 +90,10 @@ namespace rip::mapgen {
             const auto &bfcTile = tileGrid.get(bfcPos.x, bfcPos.y);
 
             const auto bfcTerrain = bfcTile.getTerrain();
-            if (bfcTerrain == Terrain::Grassland || bfcTerrain == Terrain::Ocean) {
+            if (bfcTerrain == Terrain::Grassland) {
                 score += 2;
+            } else if (bfcTerrain == Terrain::Ocean) {
+                score += 1;
             } else if (bfcTerrain == Terrain::Desert) {
                 score -= 2;
             } else if (bfcTerrain == Terrain::Plains) {

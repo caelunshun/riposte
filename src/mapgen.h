@@ -6,6 +6,8 @@
 #define RIPOSTE_MAPGEN_H
 
 #include <riposte.pb.h>
+#include <mapgen.pb.h>
+#include <map>
 #include "game.h"
 #include "rng.h"
 
@@ -16,7 +18,7 @@ namespace rip {
     class MapGenerator {
         Rng rng;
     public:
-        Game generate(proto::GameOptions gameOptions, std::shared_ptr<Registry> registry, const std::shared_ptr<TechTree> &techTree, Server *server);
+        std::pair<Game, std::map<uint32_t, PlayerId>> generate(const std::vector<proto::LobbySlot> &playerSlots, mapgen::MapgenSettings settings, std::shared_ptr<Registry> registry, const std::shared_ptr<TechTree> &techTree, Server *server);
     };
 }
 

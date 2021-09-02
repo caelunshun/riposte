@@ -60,7 +60,7 @@ namespace rip::mapgen {
 
         for (int i = 0; i < getNumContinents(settings); i++) {
             auto continent = generateSingleContinent(continentWidth, mapHeight - 2, rng);
-            grid.stamp(continent, 1 + i * continentWidth, 1, continentWidth, mapHeight - 2, stampLand);
+            grid.stamp(continent, 1 + i * (continentWidth + 1), 1, continentWidth, mapHeight - 2, stampLand);
         }
 
         return grid;

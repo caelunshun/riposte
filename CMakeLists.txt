@@ -29,39 +29,39 @@ protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/riposte.proto proto/mapgen.pro
 set(NANOVG_SOURCES external/nanovg/src/nanovg.c)
 set(SOURCES
         ${PROTO_SRCS}
-        #src/ai.cpp
+        ${NANOVG_SOURCES}
+        src/ai.cpp
         src/assets.cpp
-        #src/bridge.cpp
-        #src/city.cpp
-        #src/combat.cpp
-        #src/culture.cpp
-        #src/cursor.cpp
+        src/city.cpp
+        src/combat.cpp
+        src/culture.cpp
+        src/cursor.cpp
         src/era.cpp
-        #src/event.cpp
-        #src/game.cpp
-        #src/hud.cpp
-        #src/lobby.cpp
-        #src/mapgen.cpp
-        #src/network.cpp
-        #src/path.cpp
-        #src/player.cpp
-        #src/protocol.cpp
+        src/event.cpp
+        src/game.cpp
+        src/hud.cpp
+        src/lobby.cpp
+        src/mapgen.cpp
+        src/network.cpp
+        src/path.cpp
+        src/player.cpp
+        src/protocol.cpp
         src/registry.cpp
-        #src/renderer.cpp
+        src/renderer.cpp
         src/ripmath.cpp
         src/rng.cpp
-        #src/saveload.cpp
-        #src/server.cpp
-        #src/ship.cpp
+        src/saveload.cpp
+        src/server.cpp
+        src/ship.cpp
         src/slot_map.cpp
-        #src/stack.cpp
+        src/stack.cpp
         src/tech.cpp
         src/tile.cpp
-        #src/trade.cpp
-        #src/ui.cpp
-        #src/unit.cpp
-        #src/view.cpp
-        #src/worker.cpp
+        src/trade.cpp
+        src/ui.cpp
+        src/unit.cpp
+        src/view.cpp
+        src/worker.cpp
         src/yield.cpp
 
         src/mapgen/grid.cpp
@@ -84,6 +84,7 @@ target_include_directories(riposte-lib PUBLIC
         c-bindings/include
         ${CMAKE_CURRENT_BINARY_DIR} // for protobuf files
         ${PROTOBUF_INCLUDE_DIR})
+target_compile_definitions(riposte-lib PRIVATE FONS_USE_FREETYPE)
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")

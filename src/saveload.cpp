@@ -11,7 +11,6 @@
 #include "player.h"
 #include "trade.h"
 
-#include <crodio.h>
 #include <ghc/filesystem.hpp>
 #include <sstream>
 
@@ -21,6 +20,11 @@ namespace fs = ghc::filesystem;
 
 namespace rip {
     const size_t headerSize = 128;
+
+    std::string riposte_data_dir() {
+        // TODO
+        return "";
+    }
 
     fs::path getSavesDir(const std::string &category) {
         const fs::path dataDir(riposte_data_dir());

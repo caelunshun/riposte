@@ -60,5 +60,7 @@ child:
                           classes:
                             - h3
                       - Divider: {}
-                      
-      
+                      - Button:
+                          id: start_game_button
+                          child:
+                            Text: Start Game

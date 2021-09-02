@@ -37,33 +37,30 @@ impl ::duit::InstanceHandle for ErrorPopup {
 use duit::widgets::*;
 use duit::*;
 pub struct GameLobbyWindow {
-    pub slots_table: WidgetHandle<Table>,
     pub add_ai_slot_button: WidgetHandle<Button>,
     pub add_human_slot_button: WidgetHandle<Button>,
+    pub slots_table: WidgetHandle<Table>,
+    pub start_game_button: WidgetHandle<Button>,
 }
 impl ::duit::InstanceHandle for GameLobbyWindow {
     fn name() -> &'static str {
         "GameLobbyWindow"
     }
     fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
-        let mut slots_table = None;
         let mut add_ai_slot_button = None;
         let mut add_human_slot_button = None;
+        let mut slots_table = None;
+        let mut start_game_button = None;
         for (name, widget) in widget_handles {
             match name.as_str() {
-                "slots_table" => slots_table = Some(widget),
                 "add_ai_slot_button" => add_ai_slot_button = Some(widget),
                 "add_human_slot_button" => add_human_slot_button = Some(widget),
+                "slots_table" => slots_table = Some(widget),
+                "start_game_button" => start_game_button = Some(widget),
                 _ => {}
             }
         }
         Self {
-            slots_table: WidgetHandle::new(slots_table.unwrap_or_else(|| {
-                panic!(
-                    "missing widget with ID '{}' (generated code not up to date)",
-                    "slots_table"
-                )
-            })),
             add_ai_slot_button: WidgetHandle::new(add_ai_slot_button.unwrap_or_else(|| {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
@@ -74,6 +71,18 @@ impl ::duit::InstanceHandle for GameLobbyWindow {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "add_human_slot_button"
+                )
+            })),
+            slots_table: WidgetHandle::new(slots_table.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "slots_table"
+                )
+            })),
+            start_game_button: WidgetHandle::new(start_game_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "start_game_button"
                 )
             })),
         }

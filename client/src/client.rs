@@ -4,7 +4,8 @@ use bytes::BytesMut;
 use prost::Message;
 use protocol::{
     client_lobby_packet, server_lobby_packet, AnyClient, AnyServer, ChangeCivAndLeader,
-    ClientLobbyPacket, CreateSlot, DeleteSlot, GameStarted, Kicked, LobbyInfo, ServerLobbyPacket,
+    ClientLobbyPacket, CreateSlot, DeleteSlot, GameStarted, Kicked, LobbyInfo, RequestGameStart,
+    ServerLobbyPacket,
 };
 
 use crate::{
@@ -83,6 +84,12 @@ impl Client<LobbyState> {
                 civ_id: civ.id.clone(),
                 leader_name: leader.name.clone(),
             },
+        ));
+    }
+
+    pub fn request_start_game(&mut self) {
+        self.send_message(client_lobby_packet::Packet::RequestGameStart(
+            RequestGameStart {},
         ));
     }
 
