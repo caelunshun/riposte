@@ -160,6 +160,14 @@ impl Map {
         }
     }
 
+    pub fn width(&self) -> u32 {
+        self.width 
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
     fn index(&self, pos: UVec2) -> Result<usize, OutOfBounds> {
         if pos.x >= self.width || pos.y >= self.height {
             Err(OutOfBounds { x: pos.x, y: pos.y })

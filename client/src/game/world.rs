@@ -226,6 +226,10 @@ impl Game {
         self.map.tile_mut(pos)
     }
 
+    pub fn map(&self) -> &Map {
+        &self.map
+    }
+
     /// Gets the current turn number.
     pub fn turn(&self) -> u32 {
         self.turn

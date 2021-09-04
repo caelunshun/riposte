@@ -4,10 +4,24 @@ use glam::{uvec2, UVec2};
 use crate::{
     context::Context,
     game::{Game, Tile},
-    renderer::terrain::TerrainRenderer,
+    renderer::{
+        city::CityRenderer, cultural_border::CulturalBorderRenderer, fog::FogRenderer,
+        grid_overlay::GridOverlayRenderer, improvement::ImprovementRenderer,
+        resource::ResourceRenderer, terrain::TerrainRenderer, tile_yield::TileYieldRenderer,
+        tree::TreeRenderer, unit::UnitRenderer,
+    },
 };
 
+mod city;
+mod cultural_border;
+mod fog;
+mod grid_overlay;
+mod improvement;
+mod resource;
 mod terrain;
+mod tile_yield;
+mod tree;
+mod unit;
 
 trait RenderLayer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile);
@@ -24,7 +38,18 @@ pub struct GameRenderer {
 impl GameRenderer {
     pub fn new(cx: &Context) -> Self {
         Self {
-            layers: vec![Box::new(TerrainRenderer::new(cx))],
+            layers: vec![
+                Box::new(TerrainRenderer::new(cx)),
+                Box::new(GridOverlayRenderer::new(cx)),
+                Box::new(ResourceRenderer::new(cx)),
+                Box::new(TreeRenderer::new(cx)),
+                Box::new(ImprovementRenderer::new(cx)),
+                Box::new(CityRenderer::new(cx)),
+                Box::new(TileYieldRenderer::new(cx)),
+                Box::new(UnitRenderer::new(cx)),
+                Box::new(CulturalBorderRenderer::new(cx)),
+                Box::new(FogRenderer::new(cx)),
+            ],
         }
     }
 
@@ -38,7 +63,8 @@ impl GameRenderer {
         let first_tile = game.view().tile_pos_for_screen_offset(Vec2::ZERO);
         let last_tile = game
             .view()
-            .tile_pos_for_screen_offset(game.view().window_size());
+            .tile_pos_for_screen_offset(game.view().window_size())
+            + UVec2::splat(1);
 
         for layer in &mut self.layers {
             for x in first_tile.x..=last_tile.x {

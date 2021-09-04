@@ -22,10 +22,13 @@ glam = "0.17"
 indexmap = "1"
 log = "0.4"
 once_cell = "1"
+palette = "0.5"
 pollster = "0.2"
 prost = "0.8"
 prost-types = "0.8"
 protocol = { path = "protocol", package = "riposte-protocol" }
+rand = "0.8"
+rand_pcg = "0.3"
 riposte-backend-api = { path = "../backend/api" }
 rodio = { version = "0.14", default-features = false, features = [ "vorbis", "wav" ] }
 serde = { version = "1", features = [ "derive" ] }
