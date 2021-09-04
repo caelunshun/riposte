@@ -101,6 +101,10 @@ impl Registry {
         self.civs.values()
     }
 
+    pub fn unit_kinds(&self) -> impl Iterator<Item= &Handle<UnitKind>> + '_ {
+        self.unit_kinds.values()
+    }
+
     pub fn describe_civ(&self, civ: &Civilization) -> String {
         let mut result = civ.name.clone();
 

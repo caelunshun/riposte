@@ -7,7 +7,7 @@ pub enum CapabilityType {
     BombardCityDefenses,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, PartialEq, Eq, Copy, Clone)]
 #[serde(rename_all = "camelCase")]
 pub enum UnitCategory {
     Auxilary,
@@ -54,16 +54,16 @@ pub struct UnitKind {
 #[serde(rename_all = "camelCase")]
 pub struct CombatBonus {
     #[serde(default)]
-    only_on_attack: bool,
+    pub only_on_attack: bool,
     #[serde(default)]
-    only_on_defense: bool,
-    bonus_percent: u32,
+    pub only_on_defense: bool,
+    pub bonus_percent: u32,
     #[serde(rename = "type")]
-    typ: CombatBonusType,
+    pub typ: CombatBonusType,
     #[serde(default)]
-    unit: String,
-    #[serde(default)]
-    unit_category: String,
+    pub unit: String,
+
+    pub unit_category: Option<UnitCategory>,
 }
 
 #[derive(Debug, serde::Deserialize)]

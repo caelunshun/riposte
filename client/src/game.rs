@@ -5,6 +5,7 @@ pub mod player;
 pub mod tile;
 pub mod unit;
 pub mod view;
+pub mod stack;
 
 mod id_mapper;
 mod world;

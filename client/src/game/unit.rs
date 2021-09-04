@@ -1,10 +1,15 @@
 use std::{convert::TryInto, str::FromStr};
 
-use crate::{assets::Handle, game::InvalidNetworkId, registry::UnitKind};
+use crate::{
+    assets::Handle,
+    game::InvalidNetworkId,
+    registry::{CombatBonusType, UnitKind},
+};
 
 use super::{Game, Improvement, PlayerId, UnitId};
 
 use anyhow::anyhow;
+use glam::UVec2;
 use protocol::{capability, worker_task_kind};
 
 #[derive(Debug)]
@@ -42,7 +47,15 @@ impl Unit {
             .collect::<Result<_, anyhow::Error>>()?;
 
         self.data = data;
+
+        dbg!(game.tile(self.pos()).unwrap().terrain());
+
         Ok(())
+    }
+
+    pub fn pos(&self) -> UVec2 {
+        let p = self.data.pos.clone().unwrap_or_default();
+        UVec2::new(p.x, p.y)
     }
 
     pub fn health(&self) -> f64 {
@@ -71,6 +84,82 @@ impl Unit {
 
     pub fn used_attack(&self) -> bool {
         self.data.used_attack
+    }
+
+    pub fn owner(&self) -> PlayerId {
+        self.owner
+    }
+
+    /// Computes this unit's modified defense strength against
+    /// an attacker.
+    ///
+    /// NB: this method is duplicated from the C++ server code, Unit::getModifiedDefendingStrength.
+    /// It should be kept in sync.
+    ///
+    /// This method ignores tile defense and city defense bonuses,
+    /// as its only use on the Rust client is to sort unit stacks - and all units in the same
+    /// stack have the same tile defense bonuses.
+    pub fn modified_defending_strength(&self, game: &Game, attacker: &Unit) -> f64 {
+        let mut percent_bonus = 0i32;
+
+        // Subtract opponent bonuses
+        for bonus in &attacker.kind().combat_bonuses {
+            if bonus.only_on_defense {
+                continue;
+            }
+            match &bonus.typ {
+                CombatBonusType::AgainstUnit => {
+                    if self.kind().id == bonus.unit {
+                        percent_bonus -= bonus.bonus_percent as i32;
+                    }
+                }
+                CombatBonusType::WhenInCity => {
+                    if game.city_at_pos(attacker.pos()).is_some() {
+                        percent_bonus -= bonus.bonus_percent as i32;
+                    }
+                }
+                CombatBonusType::AgainstUnitCategory => {
+                    if Some(self.kind().category) == bonus.unit_category {
+                        percent_bonus -= bonus.bonus_percent as i32;
+                    }
+                }
+            }
+        }
+
+        // Add our bonuses
+        for bonus in &self.kind().combat_bonuses {
+            if bonus.only_on_attack {
+                continue;
+            }
+
+            match &bonus.typ {
+                CombatBonusType::WhenInCity => {
+                    if game.city_at_pos(self.pos()).is_some() {
+                        percent_bonus += bonus.bonus_percent as i32;
+                    }
+                }
+                CombatBonusType::AgainstUnit => {
+                    if attacker.kind().id == bonus.unit {
+                        percent_bonus += bonus.bonus_percent as i32;
+                    }
+                }
+                CombatBonusType::AgainstUnitCategory => {
+                    if Some(attacker.kind().category) == bonus.unit_category {
+                        percent_bonus += bonus.bonus_percent as i32;
+                    }
+                }
+            }
+        }
+
+        let mut result = self.health() * self.kind().strength;
+
+        if percent_bonus >= 0 {
+            result *= 1. + (percent_bonus as f64 / 100.);
+        } else {
+            result /= 1. + (percent_bonus as f64).abs() / 100.;
+        }
+
+        result
     }
 }
 

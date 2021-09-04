@@ -28,7 +28,7 @@ impl TreeRenderer {
 }
 
 impl RenderLayer for TreeRenderer {
-    fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
+    fn render(&mut self, _game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
         if !tile.is_forested() {
             return;
         }

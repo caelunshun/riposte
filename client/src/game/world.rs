@@ -16,6 +16,7 @@ use super::{
     city::City,
     id_mapper::IdMapper,
     player::Player,
+    stack::{StackGrid, UnitStack},
     tile::{Map, OutOfBounds},
     unit::Unit,
     Tile, View,
@@ -54,6 +55,8 @@ pub struct Game {
 
     map: Map,
 
+    stacks: StackGrid,
+
     view: View,
 
     turn: u32,
@@ -73,6 +76,7 @@ impl Game {
             registry,
             map: Map::default(),
             view: View::default(),
+            stacks: StackGrid::default(),
 
             turn: 0,
             era: Era::Ancient,
@@ -85,6 +89,24 @@ impl Game {
         data: InitialGameData,
     ) -> anyhow::Result<Self> {
         let mut game = Self::new(registry);
+
+        let proto_map = data.map.context("missing tile map")?;
+        let tiles = proto_map
+            .tiles
+            .into_iter()
+            .map(|tile_data| Tile::from_data(tile_data, &game))
+            .collect::<Result<Vec<_>, anyhow::Error>>()?;
+        let visibility = data
+            .visibility
+            .context("missing visibility grid")?
+            .visibility()
+            .collect();
+
+        let map = Map::new(proto_map.width, proto_map.height, tiles, visibility)?;
+        game.map = map;
+
+        let stacks = StackGrid::new(proto_map.width, proto_map.height);
+        game.stacks = stacks;
 
         for player in data.players {
             game.add_or_update_player(player)?;
@@ -99,21 +121,6 @@ impl Game {
         }
 
         game.update_global_data(data.global_data.as_ref().context("missing global data")?)?;
-
-        let map = data.map.context("missing tile map")?;
-        let tiles = map
-            .tiles
-            .into_iter()
-            .map(|tile_data| Tile::from_data(tile_data, &game))
-            .collect::<Result<Vec<_>, anyhow::Error>>()?;
-        let visibility = data
-            .visibility
-            .context("missing visibility grid")?
-            .visibility()
-            .collect();
-
-        let map = Map::new(map.width, map.height, tiles, visibility)?;
-        game.map = map;
 
         Ok(game)
     }
@@ -188,6 +195,15 @@ impl Game {
         self.cities.contains_key(id)
     }
 
+    /// Gets the city at the given position.
+    pub fn city_at_pos(&self, pos: UVec2) -> Option<Ref<City>> {
+        // PERF: consider using hashmap instead of linear search
+        self.cities
+            .iter()
+            .find(|(_, city)| city.borrow().pos() == pos)
+            .map(|(_, city)| city.borrow())
+    }
+
     /// Gets the unit with the given ID.
     pub fn unit(&self, id: UnitId) -> Ref<Unit> {
         self.units[id].borrow()
@@ -203,15 +219,22 @@ impl Game {
         self.units.contains_key(id)
     }
 
+    /// Gets the stack of units at `pos`.
+    pub fn unit_stack(&self, pos: UVec2) -> Result<Ref<UnitStack>, OutOfBounds> {
+        self.stacks.get(pos)
+    }
+
     /// Gets the game data registry.
     pub fn registry(&self) -> &Registry {
         &self.registry
     }
 
+    /// Gets the game view.
     pub fn view(&self) -> &View {
         &self.view
     }
 
+    /// Mutably the game view.
     pub fn view_mut(&mut self) -> &mut View {
         &mut self.view
     }
@@ -226,6 +249,7 @@ impl Game {
         self.map.tile_mut(pos)
     }
 
+    /// Gets the tile map.
     pub fn map(&self) -> &Map {
         &self.map
     }
@@ -238,7 +262,17 @@ impl Game {
     pub fn add_or_update_unit(&mut self, data: UpdateUnit) -> anyhow::Result<()> {
         let data_id = data.id as u32;
         match self.unit_ids.get(data_id) {
-            Some(id) => self.unit_mut(id).update_data(data, self),
+            Some(id) => {
+                let mut unit = self.unit_mut(id);
+                let old_pos = unit.pos();
+                unit.update_data(data, self)?;
+                let new_pos = unit.pos();
+                if old_pos != new_pos {
+                    drop(unit);
+                    self.on_unit_moved(id, old_pos, new_pos);
+                }
+                Ok(())
+            }
             None => {
                 let mut units = mem::take(&mut self.units);
                 let res =
@@ -246,10 +280,19 @@ impl Game {
                 self.units = units;
                 if let Ok(id) = &res {
                     self.unit_ids.insert(data_id, *id);
+                    self.on_unit_added(*id);
                 }
                 res.map(|_| ())
             }
         }
+    }
+
+    fn on_unit_added(&mut self, unit: UnitId) {
+        self.stacks.on_unit_added(self, unit);
+    }
+
+    fn on_unit_moved(&mut self, unit: UnitId, old_pos: UVec2, new_pos: UVec2) {
+        self.stacks.on_unit_moved(self, unit, old_pos, new_pos);
     }
 
     pub fn add_or_update_city(&mut self, data: UpdateCity) -> anyhow::Result<()> {

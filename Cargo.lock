@@ -1145,6 +1145,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "398ea4fabe40b9b0d885340a2a991a44c8a645624075ad966d21f88688e2b69e"
 
 [[package]]
+name = "float-ord"
+version = "0.3.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "8ce81f49ae8a0482e4c55ea62ebbd7e5a686af544c00b9d090bba3ff9be97b3d"
+
+[[package]]
 name = "float_next_after"
 version = "0.1.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3208,6 +3214,7 @@ dependencies = [
  "duit 0.1.0",
  "duit-core 0.1.0",
  "dume-renderer 0.1.0",
+ "float-ord",
  "flume",
  "fs-err",
  "futures",
@@ -3228,6 +3235,7 @@ dependencies = [
  "serde_json",
  "simple_logger",
  "slotmap",
+ "smallvec",
  "thiserror",
  "tokio",
  "uuid",

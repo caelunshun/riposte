@@ -102,8 +102,8 @@ pub struct MapNotFull;
 #[derive(Debug, thiserror::Error)]
 #[error("map position ({x}, {y}) is out of bounds")]
 pub struct OutOfBounds {
-    x: u32,
-    y: u32,
+   pub x: u32,
+  pub  y: u32,
 }
 
 /// The map. Stores all tiles and visibility data.
