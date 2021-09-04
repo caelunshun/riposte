@@ -4,6 +4,7 @@ use std::sync::Arc;
 
 use anyhow::Context as _;
 use context::Context;
+use duit::Event;
 use game::Game;
 use simple_logger::SimpleLogger;
 
@@ -99,6 +100,13 @@ impl RootState {
                     *self = RootState::MainMenu(MenuState::new(cx));
                 }
             }
+        }
+    }
+
+    pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
+        match self {
+            RootState::Game(g) => g.handle_event(cx, event),
+            _ => {}
         }
     }
 }

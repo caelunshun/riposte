@@ -29,6 +29,7 @@ impl ServerBridge {
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
             .env("RIPOSTE_HOST_UUID", host_account.uuid().to_hyphenated().to_string())
+            .kill_on_drop(true)
             .spawn()
             .context("failed to launch server process")?;
 

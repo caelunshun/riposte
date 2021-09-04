@@ -1,6 +1,8 @@
 use std::f32::consts::PI;
 
 use bitflags::bitflags;
+use duit::Event;
+use dume::Canvas;
 use glam::{uvec2, vec2, UVec2, Vec2};
 
 use crate::context::Context;
@@ -155,6 +157,27 @@ impl View {
 
         self.move_time += Vec2::splat(dt);
         self.center += self.center_velocity * (1. / self.zoom_factor) * dt;
+    }
+
+    pub fn handle_event(&mut self, event: &Event, _cx: &Context) {
+        match event {
+            Event::Scroll { offset, .. } => {
+                let min_zoom_factor = 0.2;
+                let max_zoom_factor = 8.;
+                let zoom_sensitivity = 0.015;
+                self.zoom_factor += offset.y * zoom_sensitivity;
+                self.zoom_factor = self.zoom_factor.clamp(min_zoom_factor, max_zoom_factor);
+            }
+            _ => {}
+        }
+    }
+
+    /// Applies a zoom transform to the canvas.
+    pub fn transform_canvas(&self, canvas: &mut Canvas) {
+        let new_size = self.size / self.zoom_factor;
+        let diff = self.size - new_size;
+        canvas.translate(-diff / 2. * self.zoom_factor);
+        canvas.scale(self.zoom_factor);
     }
 }
 

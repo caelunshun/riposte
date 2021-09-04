@@ -1,3 +1,5 @@
+use duit::Event;
+
 use crate::{
     client::{self, Client},
     context::Context,
@@ -33,5 +35,9 @@ impl GameState {
         self.game.view_mut().update(cx);
         self.renderer.render(&self.game, cx);
         Ok(())
+    }
+
+    pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
+        self.game.view_mut().handle_event(event, cx);
     }
 }

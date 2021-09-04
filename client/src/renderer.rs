@@ -66,12 +66,14 @@ impl GameRenderer {
             .tile_pos_for_screen_offset(game.view().window_size())
             + UVec2::splat(1);
 
+        game.view().transform_canvas(&mut *cx.canvas_mut());
         for layer in &mut self.layers {
             for x in first_tile.x..=last_tile.x {
                 for y in first_tile.y..=last_tile.y {
                     let pos = uvec2(x, y);
                     if let Ok(tile) = game.tile(pos) {
-                        let translation = game.view().screen_offset_for_tile_pos(pos);
+                        let translation =
+                            game.view().screen_offset_for_tile_pos(pos) * game.view().zoom_factor();
                         cx.canvas_mut().translate(translation);
                         layer.render(game, cx, pos, tile);
                         cx.canvas_mut().translate(-translation);
@@ -79,5 +81,6 @@ impl GameRenderer {
                 }
             }
         }
+        cx.canvas_mut().reset_transform();
     }
 }
