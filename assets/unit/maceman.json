@@ -1,0 +1,17 @@
+{
+  "id": "maceman",
+  "name": "Maceman",
+  "strength": 8,
+  "movement": 1,
+  "cost": 60,
+  "techs": ["Civil Service"],
+  "category": "melee",
+  "resources": ["copper"],
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "bonusPercent": 50,
+      "category": "melee"
+    }
+  ]
+}

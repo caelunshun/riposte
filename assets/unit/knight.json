@@ -1,0 +1,10 @@
+{
+  "id": "knight",
+  "name": "Knight",
+  "strength": 10,
+  "movement": 2,
+  "cost": 90,
+  "techs": ["Guilds", "Horseback Riding"],
+  "category": "mounted",
+  "resources": ["copper", "horse"]
+}
