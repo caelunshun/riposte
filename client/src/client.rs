@@ -3,12 +3,13 @@ use std::marker::PhantomData;
 use bytes::BytesMut;
 use prost::Message;
 use protocol::{
-    client_lobby_packet, server_lobby_packet, AnyClient, AnyServer, ChangeCivAndLeader,
-    ClientLobbyPacket, CreateSlot, DeleteSlot, GameStarted, Kicked, LobbyInfo, RequestGameStart,
-    ServerLobbyPacket,
+    any_client, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer, ChangeCivAndLeader,
+    ClientLobbyPacket, CreateSlot, DeleteSlot, GameStarted, InitialGameData, Kicked, LobbyInfo,
+    RequestGameStart, ServerLobbyPacket,
 };
 
 use crate::{
+    game::Game,
     lobby::GameLobby,
     registry::{Civilization, Leader, Registry},
     server_bridge::ServerBridge,
@@ -30,6 +31,7 @@ pub type Result<T> = std::result::Result<T, ClientError>;
 
 pub enum LobbyEvent {
     InfoUpdated,
+    GameStarted(InitialGameData),
 }
 
 /// The game client. Wraps a `ServerBridge`
@@ -93,6 +95,13 @@ impl Client<LobbyState> {
         ));
     }
 
+    pub fn to_game_state(&self) -> Client<GameState> {
+        Client {
+            bridge: self.bridge.clone(),
+            _marker: PhantomData,
+        }
+    }
+
     pub fn handle_messages(
         &mut self,
         lobby: &mut GameLobby,
@@ -109,7 +118,9 @@ impl Client<LobbyState> {
                     self.handle_kicked(packet, lobby)?;
                 }
                 server_lobby_packet::Packet::GameStarted(packet) => {
-                    self.handle_game_started(packet, lobby)?;
+                    let game_data = self.handle_game_started(packet, lobby)?;
+                    events.push(LobbyEvent::GameStarted(game_data));
+                    break;
                 }
             }
         }
@@ -133,14 +144,42 @@ impl Client<LobbyState> {
         Ok(())
     }
 
-    fn handle_game_started(&mut self, _packet: GameStarted, _lobby: &mut GameLobby) -> Result<()> {
+    fn handle_game_started(
+        &mut self,
+        packet: GameStarted,
+        _lobby: &mut GameLobby,
+    ) -> Result<InitialGameData> {
         log::info!("Game starting");
-        Ok(())
+        packet.game_data.ok_or(ClientError::MissingPacket)
     }
 
     fn send_message(&self, packet: client_lobby_packet::Packet) {
         let mut bytes = BytesMut::new();
-        packet.encode(&mut bytes);
+        let packet = ClientLobbyPacket {
+            packet: Some(packet),
+        };
+        packet.encode(&mut bytes).expect("failed to encode message");
+        self.bridge.send_message(bytes.freeze());
+    }
+}
+
+impl Client<GameState> {
+    pub fn handle_messages(&mut self, _game: &mut Game) -> anyhow::Result<()> {
+        while let Some(msg) = self.poll_for_message()? {
+            match msg.packet.ok_or(ClientError::MissingPacket)? {
+                _ => log::warn!("unhandled packet"),
+            }
+        }
+        Ok(())
+    }
+
+    fn send_message(&self, packet: any_client::Packet, request_id: Option<i32>) {
+        let mut bytes = BytesMut::new();
+        let packet = AnyClient {
+            request_id: request_id.unwrap_or_default(),
+            packet: Some(packet),
+        };
+        packet.encode(&mut bytes).expect("failed to encode message");
         self.bridge.send_message(bytes.freeze());
     }
 }

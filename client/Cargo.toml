@@ -9,6 +9,7 @@ default-run = "riposte"
 ahash = { version = "0.7", features = [ "serde" ] }
 anyhow = "1"
 arrayvec = { version = "0.7", features = [ "serde" ] }
+bitflags = "1"
 bytes = "1"
 directories-next = "2"
 duit = { path = "/Users/caelum/dev/duit/crates/duit" }

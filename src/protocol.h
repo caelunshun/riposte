@@ -17,7 +17,6 @@ namespace rip {
     class CultureValue;
     class Culture;
 
-    void setPlayerInfo(const Player &player, PlayerInfo &playerInfo);
     UpdateGlobalData getUpdateGlobalDataPacket(Game &game, PlayerId thePlayerID);
     void writeYield(const Yield &yield, proto::Yield &protoYield);
     void writeCultureValues(const Culture &culture, proto::CultureValues &proto);

@@ -5,16 +5,18 @@ use std::{
     iter,
     rc::Rc,
     sync::Arc,
+    time::Instant,
 };
 
 use anyhow::Context as _;
 use duit::{Spec, Ui, Vec2};
 use dume::Canvas;
 use flume::Receiver;
+use glam::vec2;
 use once_cell::sync::OnceCell;
 use tokio::runtime::{self, Runtime};
 use walkdir::WalkDir;
-use winit::{dpi::PhysicalSize, event_loop::EventLoop, window::Window};
+use winit::{dpi::PhysicalSize, event::WindowEvent, event_loop::EventLoop, window::Window};
 
 use crate::{
     assets::{
@@ -55,7 +57,7 @@ pub struct Context {
     /// Audio player
     audio: Rc<RefCell<Audio>>,
     /// Registry of game files
-    registry: Registry,
+    registry: Arc<Registry>,
     /// Application state store
     state_manager: StateManager,
 
@@ -69,6 +71,18 @@ pub struct Context {
 
     /// File path manager
     paths: FilePaths,
+
+    /// Time in seconds since program start
+    time: f32,
+    /// Program start time
+    start: Instant,
+    /// Previous frame time
+    previous_frame: Instant,
+    /// Time elapsed since the previous frame
+    dt: f32,
+
+    /// Position of the mouse cursor in logical pixxels
+    cursor_pos: Vec2,
 }
 
 impl Context {
@@ -105,7 +119,7 @@ impl Context {
             .add_loader("building", JsonLoader::<Building>::new())
             .add_loader("resource", JsonLoader::<Resource>::new());
 
-        let registry = Registry::new();
+        let registry = Arc::new(Registry::new());
 
         let runtime = runtime::Builder::new_multi_thread().enable_all().build()?;
         let rt_handle = runtime.handle().clone();
@@ -130,6 +144,11 @@ impl Context {
                 backend,
                 options,
                 paths,
+                start: Instant::now(),
+                previous_frame: Instant::now(),
+                time: 0.,
+                dt: 0.,
+                cursor_pos: Vec2::ZERO,
             },
             event_loop,
         ))
@@ -137,7 +156,9 @@ impl Context {
 
     pub fn load_assets(&mut self) -> anyhow::Result<()> {
         self.assets.load_from_dir("assets")?;
-        self.registry.load_from_assets(&self.assets);
+        Arc::get_mut(&mut self.registry)
+            .unwrap()
+            .load_from_assets(&self.assets);
         Ok(())
     }
 
@@ -192,7 +213,7 @@ impl Context {
         self.audio.borrow_mut()
     }
 
-    pub fn registry(&self) -> &Registry {
+    pub fn registry(&self) -> &Arc<Registry> {
         &self.registry
     }
 
@@ -218,6 +239,18 @@ impl Context {
 
     pub fn paths(&self) -> &FilePaths {
         &self.paths
+    }
+
+    pub fn dt(&self) -> f32 {
+        self.dt
+    }
+
+    pub fn time(&self) -> f32 {
+        self.time
+    }
+
+    pub fn cursor_pos(&self) -> Vec2 {
+        self.cursor_pos
     }
 
     /// Asynchronously saves the Options to disk.
@@ -264,11 +297,25 @@ impl Context {
             .show_error_popup(&mut *self.ui.borrow_mut(), error);
     }
 
-    pub fn render(&mut self) {
+    pub fn update(&mut self) {
+        self.dt = self.previous_frame.elapsed().as_secs_f32();
+        self.previous_frame = Instant::now();
+
+        self.time = self.start.elapsed().as_secs_f32();
+
         self.state_manager.update();
         self.audio.borrow_mut().update();
         self.popup_windows.update(&mut *self.ui.borrow_mut());
+    }
 
+    pub fn handle_window_event(&mut self, event: &WindowEvent) {
+        if let WindowEvent::CursorMoved { position, .. } = event {
+            let position = position.to_logical(self.window.scale_factor());
+            self.cursor_pos = vec2(position.x, position.y);
+        }
+    }
+
+    pub fn render(&mut self) {
         let window_logical_size = self
             .window
             .inner_size()

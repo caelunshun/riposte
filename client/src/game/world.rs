@@ -1,13 +1,25 @@
 use std::{
     cell::{Ref, RefCell, RefMut},
+    convert::TryInto,
+    mem,
     sync::Arc,
 };
 
+use anyhow::Context as _;
+use glam::UVec2;
+use protocol::{Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit};
 use slotmap::SlotMap;
 
 use crate::registry::Registry;
 
-use super::{city::City, id_mapper::IdMapper, player::Player, unit::Unit};
+use super::{
+    city::City,
+    id_mapper::IdMapper,
+    player::Player,
+    tile::{Map, OutOfBounds},
+    unit::Unit,
+    Tile, View,
+};
 
 slotmap::new_key_type! {
     pub struct PlayerId;
@@ -39,6 +51,14 @@ pub struct Game {
     units: SlotMap<UnitId, RefCell<Unit>>,
 
     registry: Arc<Registry>,
+
+    map: Map,
+
+    view: View,
+
+    turn: u32,
+    era: Era,
+    the_player_id: PlayerId,
 }
 
 impl Game {
@@ -51,7 +71,51 @@ impl Game {
             cities: SlotMap::default(),
             units: SlotMap::default(),
             registry,
+            map: Map::default(),
+            view: View::default(),
+
+            turn: 0,
+            era: Era::Ancient,
+            the_player_id: PlayerId::default(),
         }
+    }
+
+    pub fn from_initial_data(
+        registry: Arc<Registry>,
+        data: InitialGameData,
+    ) -> anyhow::Result<Self> {
+        let mut game = Self::new(registry);
+
+        for player in data.players {
+            game.add_or_update_player(player)?;
+        }
+
+        for city in data.cities {
+            game.add_or_update_city(city)?;
+        }
+
+        for unit in data.units {
+            game.add_or_update_unit(unit)?;
+        }
+
+        game.update_global_data(data.global_data.as_ref().context("missing global data")?)?;
+
+        let map = data.map.context("missing tile map")?;
+        let tiles = map
+            .tiles
+            .into_iter()
+            .map(|tile_data| Tile::from_data(tile_data, &game))
+            .collect::<Result<Vec<_>, anyhow::Error>>()?;
+        let visibility = data
+            .visibility
+            .context("missing visibility grid")?
+            .visibility()
+            .collect();
+
+        let map = Map::new(map.width, map.height, tiles, visibility)?;
+        game.map = map;
+
+        Ok(game)
     }
 
     /// Gets a player ID from its network ID.
@@ -94,6 +158,16 @@ impl Game {
         self.players[id].borrow_mut()
     }
 
+    /// Gets the player on this client.
+    pub fn the_player(&self) -> Ref<Player> {
+        self.player(self.the_player_id)
+    }
+
+    /// Mutably gets the player on this client.
+    pub fn the_player_mut(&self) -> RefMut<Player> {
+        self.player_mut(self.the_player_id)
+    }
+
     /// Returns whether the given player ID is still valid.
     pub fn is_player_valid(&self, id: PlayerId) -> bool {
         self.players.contains_key(id)
@@ -132,5 +206,85 @@ impl Game {
     /// Gets the game data registry.
     pub fn registry(&self) -> &Registry {
         &self.registry
+    }
+
+    pub fn view(&self) -> &View {
+        &self.view
+    }
+
+    pub fn view_mut(&mut self) -> &mut View {
+        &mut self.view
+    }
+
+    /// Gets the tile at the given position.
+    pub fn tile(&self, pos: UVec2) -> Result<&Tile, OutOfBounds> {
+        self.map.tile(pos)
+    }
+
+    /// Mutably gets the tile at the given position.
+    pub fn tile_mut(&mut self, pos: UVec2) -> Result<&mut Tile, OutOfBounds> {
+        self.map.tile_mut(pos)
+    }
+
+    /// Gets the current turn number.
+    pub fn turn(&self) -> u32 {
+        self.turn
+    }
+
+    pub fn add_or_update_unit(&mut self, data: UpdateUnit) -> anyhow::Result<()> {
+        let data_id = data.id as u32;
+        match self.unit_ids.get(data_id) {
+            Some(id) => self.unit_mut(id).update_data(data, self),
+            None => {
+                let mut units = mem::take(&mut self.units);
+                let res =
+                    units.try_insert_with_key(|k| Unit::from_data(data, k, self).map(RefCell::new));
+                self.units = units;
+                if let Ok(id) = &res {
+                    self.unit_ids.insert(data_id, *id);
+                }
+                res.map(|_| ())
+            }
+        }
+    }
+
+    pub fn add_or_update_city(&mut self, data: UpdateCity) -> anyhow::Result<()> {
+        let data_id = data.id as u32;
+        match self.city_ids.get(data_id) {
+            Some(id) => self.city_mut(id).update_data(data, self),
+            None => {
+                let mut cities = mem::take(&mut self.cities);
+                let res = cities
+                    .try_insert_with_key(|k| City::from_data(data, k, self).map(RefCell::new));
+                self.cities = cities;
+                if let Ok(id) = &res {
+                    self.city_ids.insert(data_id, *id);
+                }
+                res.map(|_| ())
+            }
+        }
+    }
+
+    pub fn add_or_update_player(&mut self, data: UpdatePlayer) -> anyhow::Result<()> {
+        let data_id = data.id as u32;
+        match self.player_ids.get(data_id) {
+            Some(id) => self.player_mut(id).update_data(data, self),
+            None => {
+                let mut players = mem::take(&mut self.players);
+                let res = players
+                    .try_insert_with_key(|k| Player::from_data(data, k, self).map(RefCell::new));
+                self.players = players;
+                if let Ok(id) = &res {
+                    self.player_ids.insert(data_id, *id);
+                }
+                res.map(|_| ())
+            }
+        }
+    }
+
+    pub fn update_global_data(&mut self, data: &UpdateGlobalData) -> anyhow::Result<()> {
+        self.turn = data.turn.try_into()?;
+        self.the_player_id = self.resolve_player_id(data.player_id as u32)?;
+        Ok(())
     }
 }

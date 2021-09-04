@@ -13,6 +13,7 @@ const SERVER_PATH: &str =
     "/Users/caelum/CLionProjects/riposte/cmake-build-relwithdebinfo/bin/riposte";
 
 /// A bridge abstracting over a connection to the game server.
+#[derive(Clone)]
 pub struct ServerBridge {
     sending: Sender<Bytes>,
     receiving: Receiver<Bytes>,

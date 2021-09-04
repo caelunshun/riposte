@@ -14,6 +14,7 @@ pub fn run(event_loop: EventLoop<()>, mut context: Context, mut state: RootState
             Event::MainEventsCleared => context.window().request_redraw(),
 
             Event::RedrawRequested(_) => {
+                context.update();
                 state.update(&mut context);
                 context.render();
             }
@@ -37,6 +38,8 @@ pub fn run(event_loop: EventLoop<()>, mut context: Context, mut state: RootState
                     WindowEvent::Resized(new_size) => context.resize(new_size),
                     _ => {}
                 }
+
+                context.handle_window_event(&event);
             }
 
             _ => {}

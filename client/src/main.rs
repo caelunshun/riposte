@@ -1,7 +1,10 @@
 #![allow(dead_code)]
 
+use std::sync::Arc;
+
 use anyhow::Context as _;
 use context::Context;
+use game::Game;
 use simple_logger::SimpleLogger;
 
 macro_rules! vars {
@@ -27,18 +30,19 @@ mod game;
 #[allow(warnings)]
 mod generated;
 mod lobby;
-mod utils;
 mod options;
 mod paths;
 mod popups;
 mod registry;
+mod renderer;
 mod server_bridge;
 mod state;
 mod states;
 mod ui;
+mod utils;
 mod volumes;
 
-use states::{lobby::GameLobbyState, menu::MenuState};
+use states::{game::GameState, lobby::GameLobbyState, menu::MenuState};
 
 extern crate fs_err as fs;
 
@@ -49,6 +53,7 @@ pub enum Action {
 pub enum RootState {
     MainMenu(MenuState),
     Lobby(GameLobbyState),
+    Game(GameState),
 }
 
 impl RootState {
@@ -69,9 +74,30 @@ impl RootState {
                     }
                 }
             }
-            RootState::Lobby(lobby) => if let Err(e) = lobby.update(cx) {
-                cx.show_error_popup(&format!("disconnected from game: {}", e));
-                *self = RootState::MainMenu(MenuState::new(cx));
+            RootState::Lobby(lobby) => match lobby.update(cx) {
+                Ok(Some(states::lobby::Action::EnterGame(game_data))) => {
+                    let game = match Game::from_initial_data(Arc::clone(cx.registry()), game_data) {
+                        Ok(g) => g,
+                        Err(e) => {
+                            cx.show_error_popup(&format!("failed to start game: {}", e));
+                            *self = RootState::MainMenu(MenuState::new(cx));
+                            return;
+                        }
+                    };
+                    let client = lobby.client().to_game_state();
+                    *self = RootState::Game(GameState::new(cx, client, game));
+                }
+                Ok(None) => {}
+                Err(e) => {
+                    cx.show_error_popup(&format!("disconnected from game: {}", e));
+                    *self = RootState::MainMenu(MenuState::new(cx));
+                }
+            },
+            RootState::Game(game) => {
+                if let Err(e) = game.update(cx) {
+                    cx.show_error_popup(&format!("disconnected from the game: {}", e));
+                    *self = RootState::MainMenu(MenuState::new(cx));
+                }
             }
         }
     }

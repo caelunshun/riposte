@@ -76,5 +76,6 @@ namespace rip {
         ctx = other.ctx;
         inner = other.inner;
         other.inner = nullptr;
+        return *this;
     }
 }

@@ -3,28 +3,20 @@ use std::{
     ptr,
 };
 
-use crate::{
-    assets::Handle,
-    backend::BackendResponse,
-    client::{self, Client},
-    context::Context,
-    generated::GameLobbyWindow,
-    lobby::GameLobby,
-    registry::{Civilization, Leader},
-    server_bridge::ServerBridge,
-    state::StateAttachment,
-    ui::{FillScreen, Z_FOREGROUND},
-    utils::color_to_string,
-};
+use crate::{assets::Handle, backend::BackendResponse, client::{self, Client, LobbyState}, context::Context, generated::GameLobbyWindow, lobby::GameLobby, registry::{Civilization, Leader}, server_bridge::ServerBridge, state::StateAttachment, ui::{FillScreen, Z_FOREGROUND}, utils::color_to_string};
 
 use ahash::{AHashMap, AHashSet};
 use duit::{
     widget,
     widgets::{Button, PickList, Text},
 };
-use protocol::{CreateSlot, DeleteSlot};
+use protocol::{CreateSlot, DeleteSlot, InitialGameData};
 use riposte_backend_api::UserInfo;
 use uuid::Uuid;
+
+pub enum Action {
+    EnterGame(InitialGameData),
+}
 
 enum Message {
     AddAiSlot,
@@ -78,7 +70,11 @@ impl GameLobbyState {
         state
     }
 
-    pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<()> {
+    pub fn client(&self) -> &Client<LobbyState> {
+        &self.client
+    }
+
+    pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<Option<Action>> {
         let events = self
             .client
             .handle_messages(&mut self.lobby, cx.registry())?;
@@ -86,6 +82,9 @@ impl GameLobbyState {
         for event in events {
             match event {
                 client::LobbyEvent::InfoUpdated => self.recreate_ui(cx),
+                client::LobbyEvent::GameStarted(game_data) => {
+                    return Ok(Some(Action::EnterGame(game_data)))
+                }
             }
         }
 
@@ -137,7 +136,7 @@ impl GameLobbyState {
             self.recreate_ui(cx);
         }
 
-        Ok(())
+        Ok(None)
     }
 
     fn user_info(&self, cx: &Context, user: Uuid) -> Option<Ref<UserInfo>> {

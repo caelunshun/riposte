@@ -13,27 +13,10 @@
 #include "ship.h"
 
 namespace rip {
-    void setPlayerInfo(const Player &player, PlayerInfo &playerInfo) {
-        playerInfo.set_username(player.getUsername());
-        playerInfo.set_civid(player.getCiv().id);
-        playerInfo.set_leadername(player.getLeader().name);
-        playerInfo.set_score(player.getScore());
-        playerInfo.set_id(player.getID().encode());
-        playerInfo.set_isadmin(false); // TODO: permissions
-    }
-
     UpdateGlobalData getUpdateGlobalDataPacket(Game &game, PlayerId thePlayerID) {
         UpdateGlobalData packet;
         packet.set_turn(game.getTurn());
-        packet.set_era(static_cast<::Era>(static_cast<int>(game.getPlayer(thePlayerID).getEra())));
-
-        for (const auto &player : game.getPlayers()) {
-            auto *protoPlayer = packet.add_players();
-            setPlayerInfo(player, *protoPlayer);
-        }
-
         packet.set_playerid(thePlayerID.encode());
-
         return packet;
     }
 

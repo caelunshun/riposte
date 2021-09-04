@@ -530,7 +530,6 @@ namespace rip {
     }
 
     void City::addResource(std::shared_ptr<Resource> resource) {
-        std::cout << "city got " << resource->name << std::endl;
         resources.insert(std::move(resource));
     }
 
@@ -754,6 +753,7 @@ namespace rip {
             case 5:
                 return 80;
             case 6:
+            default:
                 return 100;
         }
     }

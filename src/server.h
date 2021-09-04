@@ -50,10 +50,9 @@ namespace rip {
 
         void requestMoreData();
 
-        void sendGameData(Game &game);
+        void sendGameStarted(Game &game);
         void sendUpdateTile(Game &game, glm::uvec2 pos);
         void sendUpdateVisibility(Game &game);
-        void sendPlayerData(Game &game);
         void sendGlobalData(Game &game);
         void sendTradeNetworks(Game &game);
 
@@ -96,7 +95,9 @@ namespace rip {
         std::shared_ptr<NetworkingContext> networkCtx;
 
     public:
-        // NB: are never null.
+        // Must be initialized by the Server creator.
+        // Not initialized by the constructor because
+        // Game requires a Server pointer.
         std::unique_ptr<Game> game;
         std::shared_ptr<Registry> registry;
         std::shared_ptr<TechTree> techTree;

@@ -136,9 +136,11 @@ message Kicked {}
 
 // Sent by the server when the game has started.
 //
-// This closes the game lobby. All clients should display
-// a loading screen until initial game data has been received.
-message GameStarted {}
+// This closes the game lobby. It includes all initial
+// data for the game.
+message GameStarted {
+  InitialGameData gameData = 1;
+}
 
 // A slot represents a player in the game.
 //
@@ -171,6 +173,15 @@ message LobbySlot {
 // ----------------------------
 // ---------- GAME ------------
 // ----------------------------
+
+message InitialGameData {
+  UpdateMap map = 1;
+  repeated UpdateCity cities = 2;
+  repeated UpdateUnit units = 3;
+  repeated UpdatePlayer players = 4;
+  UpdateGlobalData globalData = 5;
+  UpdateVisibility visibility = 6;
+}
 
 message Pos {
   uint32 x = 1;
@@ -232,17 +243,6 @@ message AnyServer {
 // SERVER
 // ---------------------
 
-message PlayerInfo {
-  // The player's username.
-  string username = 1;
-  string civID = 2;
-  string leaderName = 3;
-  int32 score = 4;
-  // A unique ID.
-  int32 id = 5;
-  bool isAdmin = 6;
-}
-
 enum Era {
   Ancient = 0;
   Classical = 1;
@@ -255,14 +255,10 @@ enum Era {
 
 // Sets global data for the entire game.
 message UpdateGlobalData {
-  // List of players in the game.
-  repeated PlayerInfo players = 1;
   // The current turn number.
-  int32 turn = 2;
-  // The current era.
-  Era era = 3;
+  int32 turn = 1;
   // The ID of the connected client.
-  int32 playerID = 4;
+  int32 playerID = 2;
 }
 
 enum Terrain {
@@ -491,7 +487,7 @@ message ResearchingTech {
   int32 progress = 2;
 }
 
-// Updates the client's own player data.
+// Updates a player's data.
 message UpdatePlayer {
   int32 id = 1;
   string username = 2;
@@ -514,7 +510,6 @@ message UpdatePlayer {
 
   repeated int32 atWarWithIDs = 13;
 
-  // Saveload-specific. Not set in protocol
   Era era = 14;
   bool hasAI = 15;
   UpdateVisibility visibility = 16;

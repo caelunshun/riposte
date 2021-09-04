@@ -107,6 +107,7 @@ pub struct OutOfBounds {
 }
 
 /// The map. Stores all tiles and visibility data.
+#[derive(Default)]
 pub struct Map {
     width: u32,
     height: u32,

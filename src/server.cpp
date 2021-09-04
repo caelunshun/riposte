@@ -39,11 +39,6 @@ namespace rip {
         SEND(packet, updatevisibility, 0);
     }
 
-    void Connection::sendPlayerData(Game &game) {
-        auto packet = getUpdatePlayerPacket(game, game.getPlayer(playerID));
-        SEND(packet, updateplayer, 0);
-    }
-
     PlayerId Connection::getPlayerID() const {
         return playerID;
     }
@@ -52,18 +47,27 @@ namespace rip {
         SEND(getUpdateGlobalDataPacket(game, playerID), updateglobaldata, 0);
     }
 
-    void Connection::sendGameData(Game &game) {
-        sendGlobalData(game);
-        sendPlayerData(game);
-        sendUpdateVisibility(game);
-        SEND(getUpdateMapPacket(game, playerID), updatemap, 0);
+    void Connection::sendGameStarted(Game &game) {
+        GameStarted gameStarted;
+        auto *gameData = gameStarted.mutable_gamedata();
 
-        for (auto &unit : game.getUnits()) {
-            SEND(getUpdateUnitPacket(game, unit), updateunit, 0);
+        for (auto &player : game.getPlayers()) {
+            gameData->add_players()->CopyFrom(getUpdatePlayerPacket(game, player));
         }
         for (auto &city : game.getCities()) {
-            SEND(getUpdateCityPacket(game, city), updatecity, 0);
+            gameData->add_cities()->CopyFrom(getUpdateCityPacket(game, city));
         }
+        for (auto &unit : game.getUnits()) {
+            gameData->add_units()->CopyFrom(getUpdateUnitPacket(game, unit));
+        }
+
+        gameData->mutable_globaldata()->CopyFrom(getUpdateGlobalDataPacket(game, playerID));
+        gameData->mutable_map()->CopyFrom(getUpdateMapPacket(game, playerID));
+        gameData->mutable_visibility()->CopyFrom(getUpdateVisibilityPacket(game, playerID));
+
+        ServerLobbyPacket packet;
+        packet.mutable_gamestarted()->CopyFrom(gameStarted);
+        send(packet);
     }
 
     void Connection::sendTradeNetworks(Game &game) {
@@ -372,7 +376,7 @@ namespace rip {
 
     void Server::startGame() {
         for (auto &conn : connections) {
-            conn->sendGameData(*game);
+            conn->sendGameStarted(*game);
         }
     }
 
@@ -430,12 +434,8 @@ namespace rip {
 
         for (const auto playerID : dirtyPlayers) {
             auto &player = game.getPlayer(playerID);
-            for (auto &conn : connections) {
-                if (conn->getPlayerID() == playerID) {
-                    conn->sendPlayerData(game);
-                    break;
-                }
-            }
+            auto packet = getUpdatePlayerPacket(game, player);
+            BROADCAST(packet, updateplayer, 0);
         }
 
         dirtyUnits.clear();

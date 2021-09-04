@@ -4,12 +4,14 @@ pub mod improvement;
 pub mod player;
 pub mod tile;
 pub mod unit;
+pub mod view;
 
 mod id_mapper;
 mod world;
 
 pub use culture::Culture;
 pub use improvement::Improvement;
+pub use view::View;
 pub use tile::Tile;
 pub use world::{CityId, Game, InvalidNetworkId, PlayerId, UnitId};
 
