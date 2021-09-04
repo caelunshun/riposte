@@ -253,6 +253,11 @@ namespace rip {
         yield.commerce += percentOf(yield.commerce, buildingEffects.bonusCommercePercent);
         yield.food += percentOf(yield.food, buildingEffects.bonusFoodPercent);
 
+        // Palace bonuses
+        if (isCapital()) {
+            yield.commerce += 8;
+        }
+
         return yield;
     }
 
@@ -471,7 +476,7 @@ namespace rip {
     int City::getCulturePerTurn() const {
         int culture = 0;
         if (isCapital()) {
-            culture += 1;
+            culture += 2;
         }
 
         culture += buildingEffects.bonusCulture;
