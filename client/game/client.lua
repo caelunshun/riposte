@@ -141,6 +141,12 @@ function Client:declareWarOn(player)
     })
 end
 
+function Client:declarePeaceWith(player)
+    self:sendPacket("declarePeace", {
+        onPlayerID = player.id
+    })
+end
+
 function Client:setTileWorkedManually(city, tilePos, worked)
     self:sendPacket("configureWorkedTiles", {
         cityID = city.id,
@@ -253,6 +259,8 @@ function Client:handlePacket(packet)
         self:handleBuildTaskFinished(packet.buildTaskFinished)
     elseif packet.buildTaskFailed ~= nil then
         self:handleBuildTaskFailed(packet.buildTaskFailed)
+    elseif packet.peaceDeclared ~= nil then
+        self:handlePeaceDeclared(packet.peaceDeclared)
     end
 end
 
@@ -318,6 +326,13 @@ end
 
 function Client:handleWarDeclared(packet)
     self.game.eventBus:trigger("warDeclared", {
+        declarer = self.game.players[packet.declarerID],
+        declared = self.game.players[packet.declaredID],
+    })
+end
+
+function Client:handlePeaceDeclared(packet)
+    self.game.eventBus:trigger("peaceDeclared", {
         declarer = self.game.players[packet.declarerID],
         declared = self.game.players[packet.declaredID],
     })

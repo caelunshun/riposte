@@ -259,6 +259,10 @@ namespace rip {
         game.getPlayer(playerID).declareWarOn(PlayerId(packet.onplayerid()), game);
     }
 
+    void Connection::handleDeclarePeace(Game &game, const DeclarePeace &packet) {
+        game.getPlayer(playerID).makePeaceWith(PlayerId(packet.onplayerid()), game);
+    }
+
     void Connection::handleConfigureWorkedTiles(Game &game, const ConfigureWorkedTiles &packet) {
         auto &city = game.getCity(CityId(packet.cityid()));
         glm::uvec2 tilePos(packet.tilepos().x(), packet.tilepos().y());
@@ -341,6 +345,8 @@ namespace rip {
                 handleBombardCity(game, packet.bombardcity());
             } else if (packet.has_savegame()) {
                 handleSaveGame();
+            } else if (packet.has_declarepeace()) {
+                handleDeclarePeace(game, packet.declarepeace());
             }
         } else {
             // game hasn't started; we're in the lobby phase
@@ -523,6 +529,13 @@ namespace rip {
         packet.set_declarerid(declarer.encode());
         packet.set_declaredid(declared.encode());
         BROADCAST(packet, wardeclared, 0);
+    }
+
+    void Server::broadcastPeaceDeclared(PlayerId declarer, PlayerId declared) {
+        PeaceDeclared packet;
+        packet.set_declarerid(declarer.encode());
+        packet.set_declaredid(declared.encode());
+        BROADCAST(packet, peacedeclared, 0);
     }
 
     void Server::flushDirtyItems() {

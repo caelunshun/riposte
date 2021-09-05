@@ -83,7 +83,7 @@ local function getWarDeclaration(greetingPlayer, greetedPlayer)
     r[#r + 1] = "Say goodbye to your cities, " .. greetedPlayer.username .. "."
 
     if greetingPlayer.leader.aggressive >= 6 then
-        r[#r + 1] = "You are but an ant to us. We will stampede you on the path to domination."
+        r[#r + 1] = "You are but an ant to us, a nuisance on the path to domination."
     end
 
     math.randomseed(os.time())
@@ -144,6 +144,13 @@ function DiplomacyDialogue:getMainOptions()
             end
         },
         {
+            text = "Let us have peace.",
+            onselect = function()
+                self.game.client:declarePeaceWith(self.withPlayer)
+                self:close()
+            end
+        },
+        {
             text = "Farewell.",
             onselect = function()
                 self:close()
@@ -154,6 +161,8 @@ function DiplomacyDialogue:getMainOptions()
     if self.game.thePlayer:isAtWarWith(self.withPlayer) then
         -- can't declare war again! (TODO:
         table.remove(options, 1)
+    else
+        table.remove(options, 2)
     end
 
     return options

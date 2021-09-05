@@ -188,8 +188,10 @@ namespace rip {
 
          bool isAtWarWith(PlayerId player) const;
          void declareWarOn(PlayerId player, Game &game);
+         void makePeaceWith(PlayerId player, Game &game);
 
          void onWarDeclared(PlayerId withPlayer, Game &game);
+         void onPeaceDeclared(PlayerId withPlayer, Game &game);
 
          void expelUnitsInTerritoryOf(PlayerId player, Game &game);
 

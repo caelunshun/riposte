@@ -66,6 +66,10 @@ local function handleWarDeclared(event)
     playSound("sound/event/war_declared", 0.4)
 end
 
+local function handlePeaceDeclared(event)
+    playSound("sound/event/peace_declared", 0.4)
+end
+
 local function handleBordersExpanded(event)
     playSound("sound/event/borders_expand", 0.3)
 end
@@ -84,6 +88,7 @@ local function registerSoundEvents(game)
     end)
     game.eventBus:registerHandler("cityCaptured", handleCityCaptured)
     game.eventBus:registerHandler("warDeclared", handleWarDeclared)
+    game.eventBus:registerHandler("peaceDeclared", handlePeaceDeclared)
     game.eventBus:registerHandler("bordersExpanded", function(event)
         if event.city.owner == game.thePlayer then
             handleBordersExpanded(event)

@@ -68,6 +68,7 @@ namespace rip {
         void handleDoUnitAction(Game &game, const DoUnitAction &packet);
         void handleSetWorkerTask(Game &game, const SetWorkerTask &packet);
         void handleDeclareWar(Game &game, const DeclareWar &packet);
+        void handleDeclarePeace(Game &game, const DeclarePeace &packet);
         void handleConfigureWorkedTiles(Game &game, const ConfigureWorkedTiles &packet);
         void handleBombardCity(Game &game, const BombardCity &packet);
         void handleSaveGame();
@@ -146,6 +147,7 @@ namespace rip {
                 );
         void broadcastCityCaptured(CityId id, PlayerId capturer);
         void broadcastWarDeclared(PlayerId declarer, PlayerId declared);
+        void broadcastPeaceDeclared(PlayerId declarer, PlayerId declared);
         void broadcastBordersExpanded(CityId cityID);
 
         void sendBuildTaskFinished(CityId cityID, const BuildTask *task);

@@ -81,7 +81,7 @@ namespace rip {
                         result.setLand(target + glm::uvec2(1, 0), rng.choose(choices));
                     }
 
-                    // 1 down
+                    //  ex  1 down
                     if (!onEdgeY) {
                         auto nextY = isLand(pos + glm::uvec2(0, 1));
                         std::array<bool, 2> choices({current, nextY});

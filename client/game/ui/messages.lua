@@ -7,6 +7,7 @@ local style = require("ui/style")
 
 local messageColorBad = "rgb(220, 68, 5)"
 local messageColorGood = "rgb(67, 176, 42)"
+local messageColorLiberal = "rgb(0, 169, 224)"
 
 local messageDisplayTime = 6
 local width = 500
@@ -96,6 +97,14 @@ function Messages:onWarDeclared(event)
     })
 end
 
+function Messages:onPeaceDeclared(event)
+    self:push("@color{%color}{%declarer has made peace with %declared!}", {
+        color = messageColorLiberal,
+        declarer = event.declarer.username,
+        declared = event.declared.username,
+    })
+end
+
 function Messages:onUnitUnderAttack(unit)
     self:push("@color{%color}{Your %unit is under attack!}", {
         color = messageColorBad,
@@ -166,6 +175,9 @@ end
 function Messages:registerHandlers(game)
     game.eventBus:registerHandler("warDeclared", function(event)
         self:onWarDeclared(event)
+    end)
+    game.eventBus:registerHandler("peaceDeclared", function(event)
+        self:onPeaceDeclared(event)
     end)
     game.eventBus:registerHandler("cityCaptured", function(event)
         self:onCityCaptured(event)
