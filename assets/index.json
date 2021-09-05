@@ -1025,6 +1025,11 @@
     "loader": "sound"
   },
   {
+    "path": "sound/event/peace_declared.wav",
+    "id": "sound/event/peace_declared",
+    "loader": "sound"
+  },
+  {
     "path": "sound/event/borders_expand.ogg",
     "id": "sound/event/borders_expand",
     "loader": "sound"
