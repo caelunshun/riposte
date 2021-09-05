@@ -101,7 +101,7 @@ impl Registry {
         self.civs.values()
     }
 
-    pub fn unit_kinds(&self) -> impl Iterator<Item= &Handle<UnitKind>> + '_ {
+    pub fn unit_kinds(&self) -> impl Iterator<Item = &Handle<UnitKind>> + '_ {
         self.unit_kinds.values()
     }
 

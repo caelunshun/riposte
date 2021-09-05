@@ -57,8 +57,30 @@ impl UnitStack {
     /// Should be called whenever a unit is added to the stack,
     /// or whenever our selected unit is changed.
     pub fn resort(&mut self, game: &Game) {
-        self.units
-            .sort_unstable_by_key(|u| FloatOrd(game.unit(*u).strength()));
+        let selected_unit = game
+            .selected_units()
+            .get_all()
+            .first()
+            .map(|&u| game.unit(u));
+
+        self.units.sort_unstable_by_key(|&u| {
+            let mut score = match &selected_unit {
+                Some(selected_unit) => game
+                    .unit(u)
+                    .modified_defending_strength(game, &*selected_unit),
+                None => game.unit(u).strength(),
+            };
+
+            if game.selected_units().contains(u) {
+                score += 100000.;
+            }
+
+            if game.unit(u).owner() == game.the_player().id() {
+                score += 1000.;
+            }
+
+            FloatOrd(score)
+        });
     }
 
     pub fn top_unit(&self) -> Option<UnitId> {
@@ -121,6 +143,12 @@ impl StackGrid {
 
         if let Ok(mut new_stack) = self.get_mut(new_pos) {
             new_stack.add_unit(game, unit);
+        }
+    }
+
+    pub fn resort(&self, game: &Game) {
+        for stack in self.stacks.iter() {
+            stack.borrow_mut().resort(game);
         }
     }
 }

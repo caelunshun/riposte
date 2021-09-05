@@ -120,7 +120,7 @@ fn init_logging() {
 }
 
 fn main() -> anyhow::Result<()> {
-    init_logging();
+    init_logging(); 
 
     // TEMP for testing
     std::env::set_current_dir("/Users/caelum/CLionProjects/riposte")?;

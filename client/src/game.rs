@@ -6,6 +6,7 @@ pub mod tile;
 pub mod unit;
 pub mod view;
 pub mod stack;
+pub mod selection;
 
 mod id_mapper;
 mod world;

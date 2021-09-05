@@ -6,16 +6,18 @@ use std::{
 };
 
 use anyhow::Context as _;
+use duit::Event;
 use glam::UVec2;
 use protocol::{Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit};
 use slotmap::SlotMap;
 
-use crate::registry::Registry;
+use crate::{context::Context, registry::Registry, utils::VersionSnapshot};
 
 use super::{
     city::City,
     id_mapper::IdMapper,
     player::Player,
+    selection::{SelectedUnits, SelectionDriver},
     stack::{StackGrid, UnitStack},
     tile::{Map, OutOfBounds},
     unit::Unit,
@@ -62,10 +64,16 @@ pub struct Game {
     turn: u32,
     era: Era,
     the_player_id: PlayerId,
+
+    selected_units: RefCell<SelectedUnits>,
+    selection_units_version: VersionSnapshot,
+    selection_driver: RefCell<SelectionDriver>,
 }
 
 impl Game {
     pub fn new(registry: Arc<Registry>) -> Self {
+        let selected_units = SelectedUnits::new();
+        let selection_units_version = selected_units.version();
         Self {
             player_ids: IdMapper::new(),
             city_ids: IdMapper::new(),
@@ -81,6 +89,10 @@ impl Game {
             turn: 0,
             era: Era::Ancient,
             the_player_id: PlayerId::default(),
+
+            selected_units: RefCell::new(selected_units),
+            selection_driver: RefCell::new(SelectionDriver::new()),
+            selection_units_version,
         }
     }
 
@@ -112,6 +124,8 @@ impl Game {
             game.add_or_update_player(player)?;
         }
 
+        game.update_global_data(data.global_data.as_ref().context("missing global data")?)?;
+
         for city in data.cities {
             game.add_or_update_city(city)?;
         }
@@ -119,8 +133,6 @@ impl Game {
         for unit in data.units {
             game.add_or_update_unit(unit)?;
         }
-
-        game.update_global_data(data.global_data.as_ref().context("missing global data")?)?;
 
         Ok(game)
     }
@@ -224,6 +236,26 @@ impl Game {
         self.stacks.get(pos)
     }
 
+    /// Gets the currently selected units.
+    pub fn selected_units(&self) -> Ref<SelectedUnits> {
+        self.selected_units.borrow()
+    }
+
+    /// Mutably gets the currently selected units.
+    pub fn selected_units_mut(&self) -> RefMut<SelectedUnits> {
+        self.selected_units.borrow_mut()
+    }
+
+    /// Gets the selection driver.
+    pub fn selection_driver(&self) -> Ref<SelectionDriver> {
+        self.selection_driver.borrow()
+    }
+
+    /// Mutably gets the selection driver.
+    pub fn selection_driver_mut(&self) -> RefMut<SelectionDriver> {
+        self.selection_driver.borrow_mut()
+    }
+
     /// Gets the game data registry.
     pub fn registry(&self) -> &Registry {
         &self.registry
@@ -259,6 +291,23 @@ impl Game {
         self.turn
     }
 
+    /// Called every frame.
+    pub fn update(&mut self, cx: &mut Context) {
+        self.view_mut().update(cx);
+        self.selection_driver_mut().update(self, cx.time());
+
+        if self.selection_units_version.is_outdated() {
+            self.stacks.resort(self);
+            log::info!("Resorted unit stacks");
+            self.selection_units_version.update();
+        }
+    }
+
+    pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
+        self.view_mut().handle_event(cx, event);
+        self.selection_driver_mut().handle_event(self, cx, event);
+    }
+
     pub fn add_or_update_unit(&mut self, data: UpdateUnit) -> anyhow::Result<()> {
         let data_id = data.id as u32;
         match self.unit_ids.get(data_id) {
@@ -289,10 +338,20 @@ impl Game {
 
     fn on_unit_added(&mut self, unit: UnitId) {
         self.stacks.on_unit_added(self, unit);
+        self.selection_driver_mut().on_unit_added(self, unit);
     }
 
     fn on_unit_moved(&mut self, unit: UnitId, old_pos: UVec2, new_pos: UVec2) {
         self.stacks.on_unit_moved(self, unit, old_pos, new_pos);
+        self.selected_units_mut()
+            .on_unit_moved(self, unit, old_pos, new_pos);
+        self.selection_driver_mut()
+            .on_unit_moved(self, unit, old_pos, new_pos);
+    }
+
+    fn on_unit_deleted(&mut self, unit: UnitId) {
+        self.selected_units_mut().on_unit_deleted(unit);
+        self.selection_driver_mut().on_unit_deleted(unit);
     }
 
     pub fn add_or_update_city(&mut self, data: UpdateCity) -> anyhow::Result<()> {

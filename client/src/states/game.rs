@@ -32,12 +32,12 @@ impl GameState {
 
     pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<()> {
         self.client.handle_messages(&mut self.game)?;
-        self.game.view_mut().update(cx);
+        self.game.update(cx);
         self.renderer.render(&self.game, cx);
         Ok(())
     }
 
     pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
-        self.game.view_mut().handle_event(event, cx);
+        self.game.handle_event(cx, event);
     }
 }

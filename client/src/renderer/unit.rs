@@ -1,3 +1,5 @@
+use std::f32::consts::TAU;
+
 use ahash::AHashMap;
 use duit::Vec2;
 use dume::{
@@ -9,7 +11,7 @@ use palette::Srgba;
 
 use crate::{
     context::Context,
-    game::{Game, Tile},
+    game::{unit::Unit, Game, Tile},
 };
 
 use super::RenderLayer;
@@ -64,6 +66,39 @@ impl UnitRenderer {
     }
 }
 
+impl UnitRenderer {
+    fn render_selected_overlay(&mut self, cx: &Context, unit: &Unit) {
+        // Spinning white dashes.
+        let radius = 50.;
+        let center = Vec2::splat(50.);
+
+        let mut canvas = cx.canvas_mut();
+        canvas.begin_path();
+
+        let num_dashes = 16;
+        let angle_offset = cx.time() * TAU / 10.;
+        for i in 0..num_dashes {
+            let arc_length = TAU / num_dashes as f32;
+            let arc_start = angle_offset + i as f32 * arc_length;
+            let arc_end = angle_offset + (i + 1) as f32 * arc_length - 0.1;
+
+            canvas.move_to(vec2(
+                center.x + radius * arc_start.cos(),
+                center.y + radius * arc_start.sin(),
+            ));
+            canvas.arc(center, radius, arc_start, arc_end);
+        }
+
+        let color = if unit.has_movement_left() {
+            Srgba::new(255, 255, 255, 200)
+        } else {
+            Srgba::new(235, 51, 0, 200)
+        };
+
+        canvas.solid_color(color).stroke_width(4.).stroke();
+    }
+}
+
 impl RenderLayer for UnitRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, _tile: &Tile) {
         if let Some(unit_id) = game
@@ -91,6 +126,11 @@ impl RenderLayer for UnitRenderer {
                 .rect(vec2(70., 35.), vec2(20., 30.))
                 .solid_color(Srgba::new(color[0], color[1], color[2], 200))
                 .fill();
+
+            // Selected unit overlay
+            if game.selected_units().contains(unit.id()) {
+                self.render_selected_overlay(cx, &unit);
+            }
         }
     }
 }

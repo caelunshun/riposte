@@ -51,9 +51,6 @@ int main(int argc, char **argv) {
 
     rip::Server server(networkCtx, "Test Game", "singleplayer");
 
-
-    std::cerr << 55 << std::endl;
-
     // Start the game.
     rip::MapGenerator mapgen;
     auto mapgenResult = mapgen.generate(lobbyServer->getSlots(), settings, registry, techTree, &server);
@@ -61,7 +58,6 @@ int main(int argc, char **argv) {
 
     server.game = std::make_unique<rip::Game>(std::move(mapgenResult.first));
 
-    std::cerr << 64 << std::endl;
     for (const auto &lobbySlot : lobbyServer->getSlots()) {
         if (!lobbySlot.isai() && playerIDMapping.find(lobbySlot.id()) != playerIDMapping.end()) {
             rip::PlayerId player = playerIDMapping[lobbySlot.id()];
@@ -69,8 +65,6 @@ int main(int argc, char **argv) {
             server.addConnection(std::move(handle), player, lobbySlot.isadmin());
         }
     }
-
-    std::cerr << 73 << std::endl;
 
     server.run({});
 

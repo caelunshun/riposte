@@ -8,7 +8,11 @@
 
 namespace rip::mapgen {
     Grid<Tile> DefaultTerrainGenerator::generateTerrain(const Grid<LandCell> &landGrid, Rng &rng) {
+        std::cerr << "T" << 11 << std::endl;
+        std::cerr << landGrid.getWidth() << ", " << landGrid.getHeight() << std::endl;
         Grid<Tile> tileGrid(landGrid.getWidth(), landGrid.getHeight(), Tile());
+
+        std::cerr << "T" << 13 << std::endl;
         
         // Use noise to determine terrain types.
         auto cellular = FastNoise::New<FastNoise::CellularValue>();
@@ -29,6 +33,8 @@ namespace rip::mapgen {
 
         std::vector<float> hillNoiseOutput(tileGrid.getWidth() * tileGrid.getHeight());
         hillNoise->GenUniformGrid2D(hillNoiseOutput.data(), 0, 0, tileGrid.getWidth(), tileGrid.getHeight(), 5.0f, rng.u32(0, 0xFFFFFFFF));
+
+        std::cerr << "T" << 35 << std::endl;
 
         for (int x = 0; x < tileGrid.getWidth(); x++) {
             for (int y = 0; y < tileGrid.getHeight(); y++) {
@@ -64,6 +70,8 @@ namespace rip::mapgen {
                 }
             }
         }
+
+        std::cerr << "T" << 72 << std::endl;
 
         return tileGrid;
     }

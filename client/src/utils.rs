@@ -1,3 +1,5 @@
+use std::{cell::Cell, rc::Rc};
+
 use arrayvec::ArrayVec;
 
 pub fn color_to_string(color: &ArrayVec<u8, 3>) -> String {
@@ -13,4 +15,60 @@ pub fn delimit_string<'a>(lines: &[String], delimiter: &str) -> String {
         }
     }
     result
+}
+
+#[derive(Debug, Default)]
+struct VersionState {
+    version: Cell<u64>,
+}
+
+/// A version counter that can be used to track updates to some piece of data.
+#[derive(Debug, Default)]
+pub struct Version {
+    state: Rc<VersionState>,
+}
+
+impl Version {
+    pub fn new() -> Self {
+        Self::default()
+    }
+
+    /// Creates a snapshot of the version at the current time.
+    pub fn snapshot(&self) -> VersionSnapshot {
+        VersionSnapshot {
+            state: Rc::clone(&self.state),
+            snapshot: self.state.version.clone(),
+        }
+    }
+
+    /// Increments the version counter, causing any
+    /// snapshots to return `true` from `is_outdated`.
+    pub fn update(&self) {
+        self.state
+            .version
+            .set(self.state.version.get().wrapping_add(1));
+    }
+}
+
+/// Contains a snapshot of a [`Version`]. Can be used
+/// to check whether the version has changed since the snapshot
+/// was taken.
+#[derive(Debug)]
+pub struct VersionSnapshot {
+    state: Rc<VersionState>,
+    snapshot: Cell<u64>,
+}
+
+impl VersionSnapshot {
+    /// Returns whether the snapshot is outdated
+    /// because [`Version::update`] was called.
+    pub fn is_outdated(&self) -> bool {
+        self.snapshot != self.state.version
+    }
+
+    /// Updates to the latest version, causing `is_outdated` to return
+    /// `false` again.
+    pub fn update(&self) {
+        self.snapshot.set(self.state.version.get());
+    }
 }

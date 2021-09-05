@@ -79,18 +79,14 @@ namespace rip::mapgen {
         //
         // All cells are filled with copies of the default value.
         Grid(uint32_t width, uint32_t height, T defaultValue) :
-            width(width), height(height), defaultValue(std::move(defaultValue)),
-                theGrid(std::vector<T>(width * height, this->defaultValue)) {}
+            width(width), height(height), defaultValue(std::move(defaultValue)) {
+            theGrid = std::vector<T>(width * height, this->defaultValue);
+        }
 
-        // Gets the value at the given integer coordinates, or
-        // the default value if out of bounds.
+        // Gets the value at the given integer coordinates.
         const T &get(int x, int y) const noexcept {
-            const auto index = getIndex(x, y);
-            if (index) {
-                return theGrid[*index];
-            } else {
-                return defaultValue;
-            }
+            const auto index = getIndexOrThrow(x, y);
+            return theGrid[index];
         }
 
         // Mutably gets the value at the given integer coordinates.

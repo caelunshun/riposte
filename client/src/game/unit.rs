@@ -12,6 +12,8 @@ use anyhow::anyhow;
 use glam::UVec2;
 use protocol::{capability, worker_task_kind};
 
+pub const MOVEMENT_LEFT_EPSILON: f64 = 0.001;
+
 #[derive(Debug)]
 pub struct Unit {
     data: protocol::UpdateUnit,
@@ -48,8 +50,6 @@ impl Unit {
 
         self.data = data;
 
-        dbg!(game.tile(self.pos()).unwrap().terrain());
-
         Ok(())
     }
 
@@ -64,6 +64,10 @@ impl Unit {
 
     pub fn movement_left(&self) -> f64 {
         self.data.movement_left
+    }
+
+    pub fn has_movement_left(&self) -> bool {
+        self.movement_left() > MOVEMENT_LEFT_EPSILON
     }
 
     pub fn kind(&self) -> &UnitKind {

@@ -68,6 +68,13 @@ impl View {
         self.center
     }
 
+    pub fn center_tile(&self) -> UVec2 {
+        uvec2(
+            (self.center().x / PIXELS_PER_TILE).max(0.) as u32,
+            (self.center().y / PIXELS_PER_TILE).max(0.) as u32,
+        )
+    }
+
     pub fn zoom_factor(&self) -> f32 {
         self.zoom_factor
     }
@@ -159,7 +166,7 @@ impl View {
         self.center += self.center_velocity * (1. / self.zoom_factor) * dt;
     }
 
-    pub fn handle_event(&mut self, event: &Event, _cx: &Context) {
+    pub fn handle_event(&mut self, _cx: &Context, event: &Event) {
         match event {
             Event::Scroll { offset, .. } => {
                 let min_zoom_factor = 0.2;

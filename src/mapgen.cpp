@@ -19,6 +19,8 @@ namespace rip {
         Game game(settings.mapwidth(), settings.mapheight(), registry, techTree);
         game.setServer(server);
 
+        std::cerr << 22 << std::endl;
+
         std::unique_ptr<mapgen::LandGenerator> landGen;
         if (settings.has_continents()) {
             landGen = std::make_unique<mapgen::ContinentsGenerator>(settings.continents());
@@ -26,10 +28,16 @@ namespace rip {
             throw std::string("invalid setting");
         }
 
+        std::cerr << 31 << std::endl;
+
         const auto landGrid = landGen->generateLandGrid(settings.mapwidth(), settings.mapheight(), rng);
+
+        std::cerr << 35 << std::endl;
 
         mapgen::DefaultTerrainGenerator terrainGen;
         const auto tileGrid = terrainGen.generateTerrain(landGrid, rng);
+
+        std::cerr << 40 << std::endl;
 
         int numPlayers = 0;
         for (const auto &slot : playerSlots) {
@@ -38,6 +46,8 @@ namespace rip {
 
         mapgen::StartingLocationsGenerator startingLocGen;
         const auto startingLocations = startingLocGen.generateStartingLocations(landGrid, tileGrid, rng, numPlayers);
+
+        std::cerr << 48 << std::endl;
 
         // Copy the tile grid into the Game.
         for (int y = 0; y < settings.mapheight(); y++) {

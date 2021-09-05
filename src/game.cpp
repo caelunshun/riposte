@@ -405,7 +405,7 @@ namespace rip {
         const auto &inPos = getStacksAtPos(pos);
         for (const auto id : inPos) {
             if (getStack(id).getOwner() == owner) {
-                assert(impl->stacks.id_is_valid(id));
+                assert(impl->stacks.contains(id));
                 return id;
             }
         }
@@ -423,12 +423,12 @@ namespace rip {
     }
 
     const Stack &Game::getStack(StackId id) const {
-        assert(impl->stacks.id_is_valid(id));
+        assert(impl->stacks.contains(id));
         return impl->stacks[id];
     }
 
     Stack &Game::getStack(StackId id) {
-        assert(impl->stacks.id_is_valid(id));
+        assert(impl->stacks.contains(id));
         return impl->stacks[id];
     }
 
