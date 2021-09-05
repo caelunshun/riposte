@@ -6,8 +6,9 @@ use std::{
 };
 
 use anyhow::Context as _;
+use arrayvec::ArrayVec;
 use duit::Event;
-use glam::UVec2;
+use glam::{ivec2, UVec2};
 use protocol::{Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit};
 use slotmap::SlotMap;
 
@@ -284,6 +285,30 @@ impl Game {
     /// Gets the tile map.
     pub fn map(&self) -> &Map {
         &self.map
+    }
+
+    /// Gets the neighbors of the given tile (sideways and diagonally)
+    pub fn tile_neighbors(&self, pos: UVec2) -> ArrayVec<UVec2, 8> {
+        let pos = pos.as_i32();
+        let mut res = ArrayVec::from([
+            pos + ivec2(1, 0),
+            pos + ivec2(1, 1),
+            pos + ivec2(0, 1),
+            pos + ivec2(-1, 1),
+            pos + ivec2(-1, 0),
+            pos + ivec2(-1, -1),
+            pos + ivec2(0, -1),
+            pos + ivec2(1, -1),
+        ]);
+
+        res.retain(|pos| {
+            pos.x >= 0
+                && pos.y >= 0
+                && (pos.x as u32) < self.map.width()
+                && (pos.y as u32) < self.map.height()
+        });
+
+        res.into_iter().map(|p| p.as_u32()).collect()
     }
 
     /// Gets the current turn number.

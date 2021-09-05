@@ -7,6 +7,7 @@ pub mod unit;
 pub mod view;
 pub mod stack;
 pub mod selection;
+pub mod path;
 
 mod id_mapper;
 mod world;

@@ -3,7 +3,7 @@ use protocol::{Terrain, Visibility};
 
 use crate::{assets::Handle, registry::Resource};
 
-use super::{culture::Culture, Game, Improvement, PlayerId, Yield};
+use super::{culture::Culture, player::Player, Game, Improvement, PlayerId, Yield};
 
 /// A tile on the map.
 #[derive(Debug)]
@@ -93,6 +93,26 @@ impl Tile {
     pub fn improvements(&self) -> impl Iterator<Item = &Improvement> + '_ {
         self.improvements.iter()
     }
+
+    pub fn movement_cost(&self, game: &Game, player: &Player) -> f64 {
+        let mut cost = 1.;
+        if self.is_forested() {
+            cost += 1.;
+        }
+
+        if self.improvements().any(|i| matches!(i, Improvement::Road)) {
+            let can_use_road = match self.owner() {
+                Some(owner) => !player.is_at_war_with(owner),
+                None => true,
+            };
+
+            if can_use_road {
+                cost /= 3.;
+            }
+        }
+
+        cost
+    }
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -102,8 +122,8 @@ pub struct MapNotFull;
 #[derive(Debug, thiserror::Error)]
 #[error("map position ({x}, {y}) is out of bounds")]
 pub struct OutOfBounds {
-   pub x: u32,
-  pub  y: u32,
+    pub x: u32,
+    pub y: u32,
 }
 
 /// The map. Stores all tiles and visibility data.
@@ -161,7 +181,7 @@ impl Map {
     }
 
     pub fn width(&self) -> u32 {
-        self.width 
+        self.width
     }
 
     pub fn height(&self) -> u32 {
