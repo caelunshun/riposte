@@ -5,7 +5,7 @@ use crate::{
     game::{Game, Tile},
 };
 
-use super::RenderLayer;
+use super::TileRenderLayer;
 
 pub struct ImprovementRenderer {}
 
@@ -15,7 +15,7 @@ impl ImprovementRenderer {
     }
 }
 
-impl RenderLayer for ImprovementRenderer {
+impl TileRenderLayer for ImprovementRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
         
     }

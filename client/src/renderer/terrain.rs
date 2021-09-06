@@ -8,7 +8,7 @@ use crate::{
     game::{view::PIXELS_PER_TILE, Game, Tile},
 };
 
-use super::RenderLayer;
+use super::TileRenderLayer;
 
 #[derive(PartialEq, Eq, Hash)]
 struct TextureKey {
@@ -61,7 +61,7 @@ impl TerrainRenderer {
     }
 }
 
-impl RenderLayer for TerrainRenderer {
+impl TileRenderLayer for TerrainRenderer {
     fn render(&mut self, _game: &Game, cx: &mut Context, _tile_pos: UVec2, tile: &Tile) {
         let key = TextureKey::for_tile(tile);
         let sprite = self.textures[&key];

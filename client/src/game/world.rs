@@ -9,7 +9,7 @@ use anyhow::Context as _;
 use arrayvec::ArrayVec;
 use duit::Event;
 use glam::{ivec2, UVec2};
-use protocol::{Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit};
+use protocol::{Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit, Visibility};
 use slotmap::SlotMap;
 
 use crate::{context::Context, registry::Registry, utils::VersionSnapshot};
@@ -17,6 +17,7 @@ use crate::{context::Context, registry::Registry, utils::VersionSnapshot};
 use super::{
     city::City,
     id_mapper::IdMapper,
+    path::Pathfinder,
     player::Player,
     selection::{SelectedUnits, SelectionDriver},
     stack::{StackGrid, UnitStack},
@@ -69,6 +70,8 @@ pub struct Game {
     selected_units: RefCell<SelectedUnits>,
     selection_units_version: VersionSnapshot,
     selection_driver: RefCell<SelectionDriver>,
+
+    pathfinder: RefCell<Pathfinder>,
 }
 
 impl Game {
@@ -94,6 +97,8 @@ impl Game {
             selected_units: RefCell::new(selected_units),
             selection_driver: RefCell::new(SelectionDriver::new()),
             selection_units_version,
+
+            pathfinder: RefCell::new(Pathfinder::new()),
         }
     }
 
@@ -109,7 +114,7 @@ impl Game {
             .into_iter()
             .map(|tile_data| Tile::from_data(tile_data, &game))
             .collect::<Result<Vec<_>, anyhow::Error>>()?;
-        let visibility = data
+        let visibility: Vec<Visibility> = data
             .visibility
             .context("missing visibility grid")?
             .visibility()
@@ -314,6 +319,11 @@ impl Game {
     /// Gets the current turn number.
     pub fn turn(&self) -> u32 {
         self.turn
+    }
+
+    /// Gets the pathfinding engine.
+    pub fn pathfinder_mut(&self) -> RefMut<Pathfinder> {
+        self.pathfinder.borrow_mut()
     }
 
     /// Called every frame.

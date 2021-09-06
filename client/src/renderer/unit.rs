@@ -14,7 +14,7 @@ use crate::{
     game::{unit::Unit, Game, Tile},
 };
 
-use super::RenderLayer;
+use super::TileRenderLayer;
 
 pub struct UnitRenderer {
     textures: AHashMap<String, SpriteId>,
@@ -76,18 +76,7 @@ impl UnitRenderer {
         canvas.begin_path();
 
         let num_dashes = 16;
-        let angle_offset = cx.time() * TAU / 10.;
-        for i in 0..num_dashes {
-            let arc_length = TAU / num_dashes as f32;
-            let arc_start = angle_offset + i as f32 * arc_length;
-            let arc_end = angle_offset + (i + 1) as f32 * arc_length - 0.1;
-
-            canvas.move_to(vec2(
-                center.x + radius * arc_start.cos(),
-                center.y + radius * arc_start.sin(),
-            ));
-            canvas.arc(center, radius, arc_start, arc_end);
-        }
+        super::dashed_circle(&mut canvas, center, radius, num_dashes, 0.1, cx.time());
 
         let color = if unit.has_movement_left() {
             Srgba::new(255, 255, 255, 200)
@@ -99,7 +88,7 @@ impl UnitRenderer {
     }
 }
 
-impl RenderLayer for UnitRenderer {
+impl TileRenderLayer for UnitRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, _tile: &Tile) {
         if let Some(unit_id) = game
             .unit_stack(tile_pos)

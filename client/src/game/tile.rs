@@ -94,9 +94,9 @@ impl Tile {
         self.improvements.iter()
     }
 
-    pub fn movement_cost(&self, game: &Game, player: &Player) -> f64 {
+    pub fn movement_cost(&self, _game: &Game, player: &Player) -> f64 {
         let mut cost = 1.;
-        if self.is_forested() {
+        if self.is_forested() || self.is_hilled() {
             cost += 1.;
         }
 

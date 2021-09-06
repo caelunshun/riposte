@@ -5,7 +5,7 @@ use crate::{
     game::{Game, Tile},
 };
 
-use super::RenderLayer;
+use super::TileRenderLayer;
 
 pub struct ResourceRenderer {}
 
@@ -15,7 +15,7 @@ impl ResourceRenderer {
     }
 }
 
-impl RenderLayer for ResourceRenderer {
+impl TileRenderLayer for ResourceRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
        
     }

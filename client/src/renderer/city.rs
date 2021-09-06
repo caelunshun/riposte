@@ -5,7 +5,7 @@ use crate::{
     game::{Game, Tile},
 };
 
-use super::RenderLayer;
+use super::TileRenderLayer;
 
 pub struct CityRenderer {}
 
@@ -15,7 +15,7 @@ impl CityRenderer {
     }
 }
 
-impl RenderLayer for CityRenderer {
+impl TileRenderLayer for CityRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
         
     }

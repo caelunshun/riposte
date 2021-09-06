@@ -1,40 +1,55 @@
 //! Unit pathing.
 
-use std::collections::BinaryHeap;
+use std::{cell::Ref, collections::BinaryHeap};
 
 use ahash::{AHashMap, AHashSet};
 use float_ord::FloatOrd;
 use glam::UVec2;
 use protocol::{Terrain, Visibility};
 
+use crate::game::unit::MOVEMENT_LEFT_EPSILON;
+
 use super::{unit::Unit, Game};
+
+/// A point on a path.
+#[derive(Copy, Clone, Debug)]
+pub struct PathPoint {
+    /// The position of the tile
+    pub pos: UVec2,
+    /// The number of turns from the start it takes to arrive here
+    pub turn: u32,
+}
 
 /// A path between two points.
 #[derive(Debug)]
 pub struct Path {
-    points: Vec<UVec2>,
+    points: Vec<PathPoint>,
 }
 
 impl Path {
-    pub fn new(points: Vec<UVec2>) -> Self {
+    pub fn new(points: Vec<PathPoint>) -> Self {
         assert!(!points.is_empty(), "path cannot be empty");
         Self { points }
     }
 
-    pub fn start(&self) -> UVec2 {
+    pub fn start(&self) -> PathPoint {
         *self.points.first().unwrap()
     }
 
-    pub fn end(&self) -> UVec2 {
+    pub fn end(&self) -> PathPoint {
         *self.points.last().unwrap()
     }
 
-    /// Pops the next point to move to, if we begin at the starting position.
-    pub fn pop(&mut self) -> Option<UVec2> {
+    pub fn points(&self) -> &[PathPoint] {
+        &self.points
+    }
+
+    /// Gets the next point to move to, if we begin at the starting position.
+    pub fn next(&self) -> Option<PathPoint> {
         if self.points.len() == 1 {
             None
         } else {
-            Some(self.points.remove(1))
+            Some(self.points[1])
         }
     }
 }
@@ -79,10 +94,10 @@ impl Pathfinder {
     /// Computes the shortest path between two points.
     ///
     /// Returns `None` if no possible path exists.
-    pub fn compute_shortest_path(
+    pub fn compute_shortest_path<'a>(
         &mut self,
         game: &Game,
-        unit: &Unit,
+        units: impl IntoIterator<Item = Ref<'a, Unit>>,
         start: UVec2,
         end: UVec2,
     ) -> Option<Path> {
@@ -98,6 +113,18 @@ impl Pathfinder {
 
         let mut result = None;
 
+        // Get information about the units being moved
+        let mut is_ship = false;
+        let mut movement_left = f64::INFINITY;
+        let mut movement_per_turn = f64::INFINITY;
+        let mut can_fight = false;
+        for unit in units.into_iter() {
+            is_ship |= unit.kind().ship;
+            movement_left = movement_left.min(unit.movement_left());
+            movement_per_turn = movement_per_turn.min(unit.kind().movement as f64);
+            can_fight |= unit.kind().strength > 0.;
+        }
+
         while let Some(entry) = self.open_set.pop() {
             self.in_open_set.remove(&entry.pos);
 
@@ -112,29 +139,68 @@ impl Pathfinder {
                 points.reverse();
                 assert_eq!(points[0], start);
 
-                result = Some(Path::new(points));
+                // Simulate movement to determine turn offsets.
+                let mut path_points = Vec::with_capacity(points.len());
+                let mut current_movement_left = movement_left;
+                let mut current_turn = 0;
+                for (i, pos) in points.into_iter().enumerate() {
+                    if i != 0 {
+                        if current_turn == 0 {
+                            current_turn = 1;
+                        }
+
+                        let movement_cost = game
+                            .tile(pos)
+                            .unwrap()
+                            .movement_cost(game, &game.the_player())
+                            .min(movement_per_turn);
+                        current_movement_left -= movement_cost;
+                    }
+
+                    path_points.push(PathPoint {
+                        pos,
+                        turn: current_turn,
+                    });
+
+                    if current_movement_left <= MOVEMENT_LEFT_EPSILON {
+                        current_turn += 1;
+                        current_movement_left = movement_per_turn;
+                    }
+                }
+
+                result = Some(Path::new(path_points));
                 break;
             }
 
-            for neighbor in game.tile_neighbors(entry.pos) {
+            'neighbors: for neighbor in game.tile_neighbors(entry.pos) {
                 if game.map().visibility(neighbor) == Visibility::Hidden {
-                    continue;
+                    // continue;
                 }
 
                 let tile = game.tile(neighbor).unwrap();
-                if !unit.kind().ship && tile.terrain() == Terrain::Ocean {
+                if !is_ship && tile.terrain() == Terrain::Ocean {
                     continue;
                 }
-                if unit.kind().ship
+                if is_ship
                     && tile.terrain() != Terrain::Ocean
                     && game.city_at_pos(neighbor).is_none()
                 {
                     continue;
                 }
 
+                // Check for enemy units
+                if neighbor != end || !can_fight {
+                    let stack = game.unit_stack(neighbor).unwrap();
+                    for &unit in stack.units() {
+                        if game.the_player().is_at_war_with(game.unit(unit).owner()) {
+                            continue 'neighbors;
+                        }
+                    }
+                }
+
                 let movement_cost = tile
                     .movement_cost(game, &game.the_player())
-                    .min(unit.kind().movement as f64);
+                    .min(movement_per_turn);
                 let tentative_g_score = self.g_score[&entry.pos] + movement_cost;
                 if !self.g_score.contains_key(&neighbor)
                     || tentative_g_score < self.g_score[&neighbor]

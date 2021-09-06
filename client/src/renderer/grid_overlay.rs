@@ -7,7 +7,7 @@ use crate::{
     game::{view::PIXELS_PER_TILE, Game, Tile},
 };
 
-use super::RenderLayer;
+use super::TileRenderLayer;
 
 /// Renders a grid to indicate tile boundaries.
 pub struct GridOverlayRenderer {}
@@ -18,7 +18,7 @@ impl GridOverlayRenderer {
     }
 }
 
-impl RenderLayer for GridOverlayRenderer {
+impl TileRenderLayer for GridOverlayRenderer {
     fn render(&mut self, _game: &Game, cx: &mut Context, _tile_pos: UVec2, _tile: &Tile) {
         cx.canvas_mut()
             .begin_path()

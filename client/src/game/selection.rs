@@ -1,4 +1,4 @@
-//! Unit selection implementation.
+//! Unit selection and movement implementation.
 
 use std::iter;
 
@@ -14,11 +14,11 @@ use crate::{
     utils::{Version, VersionSnapshot},
 };
 
-use super::{Game, UnitId};
+use super::{path::Path, Game, UnitId};
 
 /// The time after no units are selected at which we will
 /// attempt to auto-select the next unit group.
-const AUTOSELECT_TIME: f32 = 1.;
+const AUTOSELECT_TIME: f32 = 0.5;
 
 /// Keeps track of which units are selected.
 ///
@@ -143,7 +143,13 @@ slotmap::new_key_type! {
     struct UnitGroupId;
 }
 
-/// Responsible for driving the selection UI.
+#[derive(Debug)]
+pub enum StagedPath {
+    Complete { path: Path },
+    Unreachable { pos: UVec2 },
+}
+
+/// Responsible for driving the selection UI, including unit movement.
 ///
 /// Maintains a list of `UnitGroup`s. Every unit belonging
 /// to the player is a member of exactly one unit group. Units
@@ -158,6 +164,9 @@ pub struct SelectionDriver {
 
     /// The last time where a nonzero number of units was selected
     last_selection_time: f32,
+
+    /// The currently staged path for unit movement
+    staged_path: Option<StagedPath>,
 }
 
 impl SelectionDriver {
@@ -225,6 +234,13 @@ impl SelectionDriver {
         }
     }
 
+    pub fn staged_destination(&self) -> Option<UVec2> {
+        self.staged_path.as_ref().map(|s| match s {
+            StagedPath::Complete { path } => path.end().pos,
+            StagedPath::Unreachable { pos } => *pos,
+        })
+    }
+
     /// Auto-selects the closest unit group that meets the following conditions:
     /// * It has at least one unit that can still move on this turn; and
     /// * not all units in the stack are fortified.
@@ -248,7 +264,10 @@ impl SelectionDriver {
                     .distance_squared(center),
             )
         }) {
-            log::info!("Auto-selected a unit group from {} candidates", candidate_groups.len());
+            log::info!(
+                "Auto-selected a unit group from {} candidates",
+                candidate_groups.len()
+            );
             self.select_unit_group(game, best_group_id);
         }
     }
@@ -267,6 +286,15 @@ impl SelectionDriver {
             } => {
                 self.handle_left_mouse_press(game, *pos);
             }
+            Event::MousePress {
+                button: MouseButton::Right,
+                pos,
+            } => self.handle_right_mouse_press(game, *pos),
+            Event::MouseRelease {
+                button: MouseButton::Right,
+                ..
+            } => self.handle_right_mouse_release(),
+            Event::MouseMove { pos } => self.handle_cursor_move(game, *pos),
             _ => {}
         }
     }
@@ -287,6 +315,51 @@ impl SelectionDriver {
 
         if !selected {
             game.selected_units_mut().clear();
+        }
+    }
+
+    fn handle_right_mouse_press(&mut self, game: &Game, pos: Vec2) {
+        if game.selected_units().get_all().is_empty() {
+            return;
+        }
+
+        self.pathfind_to(game, game.view().tile_pos_for_screen_offset(pos));
+    }
+
+    fn handle_right_mouse_release(&mut self) {
+        self.staged_path = None;
+    }
+
+    fn handle_cursor_move(&mut self, game: &Game, pos: Vec2) {
+        let pos = game.view().tile_pos_for_screen_offset(pos);
+        if let Some(dst) = self.staged_destination() {
+            if dst != pos {
+                self.pathfind_to(game, pos);
+            }
+        }
+    }
+
+    pub fn staged_path(&self) -> Option<&StagedPath> {
+        self.staged_path.as_ref()
+    }
+
+    fn pathfind_to(&mut self, game: &Game, end: UVec2) {
+        let start = game.selected_units().pos(game).unwrap();
+
+        match game.pathfinder_mut().compute_shortest_path(
+            game,
+            game.selected_units()
+                .get_all()
+                .iter()
+                .map(|&u| game.unit(u)),
+            start,
+            end,
+        ) {
+            Some(path) => {
+                log::info!("Computed path from {:?} to {:?}", start, end);
+                self.staged_path = Some(StagedPath::Complete { path });
+            }
+            None => self.staged_path = Some(StagedPath::Unreachable { pos: end }),
         }
     }
 }

@@ -5,7 +5,7 @@ use crate::{
     game::{Game, Tile},
 };
 
-use super::RenderLayer;
+use super::TileRenderLayer;
 
 pub struct FogRenderer {}
 
@@ -15,7 +15,7 @@ impl FogRenderer {
     }
 }
 
-impl RenderLayer for FogRenderer {
+impl TileRenderLayer for FogRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
         
     }

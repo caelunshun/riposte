@@ -8,7 +8,7 @@ use crate::{
     game::{Game, Tile},
 };
 
-use super::RenderLayer;
+use super::TileRenderLayer;
 
 /// Renders trees for forests.
 pub struct TreeRenderer {
@@ -27,7 +27,7 @@ impl TreeRenderer {
     }
 }
 
-impl RenderLayer for TreeRenderer {
+impl TileRenderLayer for TreeRenderer {
     fn render(&mut self, _game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
         if !tile.is_forested() {
             return;

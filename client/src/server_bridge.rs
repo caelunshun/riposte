@@ -10,7 +10,7 @@ use tokio::{process::Command, task};
 use crate::options::Account;
 
 const SERVER_PATH: &str =
-    "/Users/caelum/CLionProjects/riposte/cmake-build-relwithdebinfo/bin/riposte";
+    "/Users/caelum/CLionProjects/riposte/cmake-build-debug/bin/riposte";
 
 /// A bridge abstracting over a connection to the game server.
 #[derive(Clone)]

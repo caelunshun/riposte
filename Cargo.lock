@@ -3236,6 +3236,7 @@ dependencies = [
  "simple_logger",
  "slotmap",
  "smallvec",
+ "splines",
  "thiserror",
  "tokio",
  "uuid",
@@ -3726,6 +3727,15 @@ checksum = "246bfa38fe3db3f1dfc8ca5a2cdeb7348c78be2112740cc0ec8ef18b6d94f830"
 dependencies = [
  "bitflags",
  "num-traits",
+]
+
+[[package]]
+name = "splines"
+version = "4.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "c94307351d02448532cdf65ea95bfdd529183d360a60fb8c8bdca6c90af55542"
+dependencies = [
+ "glam",
 ]
 
 [[package]]
