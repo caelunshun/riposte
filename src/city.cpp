@@ -62,7 +62,7 @@ namespace rip {
         culture = getCultureFromProto(packet.culturevalues(), playerIDs);
 
         for (const auto &buildingName : packet.buildingnames()) {
-            buildings.push_back(registry.getBuilding(buildingName));
+            addBuilding(registry.getBuilding(buildingName));
         }
 
         population = packet.population();
@@ -846,4 +846,3 @@ namespace rip {
         }
     }
 }
-
