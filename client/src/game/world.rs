@@ -23,6 +23,7 @@ use crate::{
 
 use super::{
     city::City,
+    event::{EventBus, GameEvent},
     id_mapper::IdMapper,
     path::Pathfinder,
     player::Player,
@@ -79,6 +80,8 @@ pub struct Game {
     selection_driver: RefCell<SelectionDriver>,
 
     pathfinder: RefCell<Pathfinder>,
+
+    events: EventBus,
 }
 
 impl Game {
@@ -106,6 +109,8 @@ impl Game {
             selection_units_version,
 
             pathfinder: RefCell::new(Pathfinder::new()),
+
+            events: EventBus::default(),
         }
     }
 
@@ -346,6 +351,14 @@ impl Game {
         }
     }
 
+    pub fn push_event(&self, event: GameEvent) {
+        self.events.push(event);
+    }
+
+    pub fn next_event(&self) -> Option<GameEvent> {
+        self.events.next()
+    }
+
     pub fn handle_event(
         &mut self,
         cx: &mut Context,
@@ -369,6 +382,9 @@ impl Game {
                     drop(unit);
                     self.on_unit_moved(id, old_pos, new_pos);
                 }
+
+                self.push_event(GameEvent::UnitUpdated { unit: id });
+
                 Ok(())
             }
             None => {
@@ -379,7 +395,10 @@ impl Game {
                 if let Ok(id) = &res {
                     self.unit_ids.insert(data_id, *id);
                     self.on_unit_added(*id);
+
+                    self.push_event(GameEvent::UnitUpdated { unit: *id });
                 }
+
                 res.map(|_| ())
             }
         }

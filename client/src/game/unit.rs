@@ -1,4 +1,4 @@
-use std::{convert::TryInto, str::FromStr};
+use std::{convert::TryInto, num::NonZeroUsize, str::FromStr};
 
 use crate::{
     assets::Handle,
@@ -12,6 +12,7 @@ use super::{Game, Improvement, PlayerId, UnitId};
 use anyhow::anyhow;
 use duit::Vec2;
 use glam::UVec2;
+use lexical::WriteFloatOptions;
 use protocol::{capability, worker_task_kind};
 use splines::{Interpolation, Key, Spline};
 
@@ -227,6 +228,49 @@ impl Unit {
 
         result
     }
+
+    pub fn strength_text(&self) -> Option<String> {
+        if self.kind().strength == 0. {
+            None
+        } else if self.health() == 1. {
+            Some(lexical::to_string_with_options::<
+                _,
+                { lexical::format::STANDARD },
+            >(self.strength(), &float_options()))
+        } else {
+            Some(format!(
+                "{} / {}",
+                lexical::to_string_with_options::<_, { lexical::format::STANDARD }>(
+                    self.strength(),
+                    &float_options()
+                ),
+                lexical::to_string_with_options::<_, { lexical::format::STANDARD }>(
+                    self.kind().strength,
+                    &float_options()
+                )
+            ))
+        }
+    }
+
+    pub fn movement_text(&self) -> String {
+        if self.movement_left().ceil() as u32 == self.kind().movement {
+            lexical::to_string(self.movement_left().ceil() as u32)
+        } else {
+            format!(
+                "{} / {}",
+                lexical::to_string(self.movement_left().ceil() as u32),
+                self.kind.movement
+            )
+        }
+    }
+}
+
+fn float_options() -> WriteFloatOptions {
+    WriteFloatOptions::builder()
+        .trim_floats(true)
+        .max_significant_digits(Some(NonZeroUsize::new(2).unwrap()))
+        .build()
+        .unwrap()
 }
 
 #[derive(Debug)]

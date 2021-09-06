@@ -20,6 +20,8 @@ styles:
     default_color: $text_color
   text & hoverable_text & hovered:
     default_color: $emphasis
+  emphasized_text:
+    default_color: $emphasis
   text & tooltip_text:
     default_size: 15
   h1:
@@ -85,6 +87,9 @@ styles:
     border_width: 0
     background_color: rgba(50, 50, 50, 254)
     border_color: rgb(120, 120, 120)
+
+  container & game_window_container:
+    background_color: rgba(50, 50, 50, 250)
 
   progress_bar:
     border_radius: 1

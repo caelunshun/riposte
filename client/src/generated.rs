@@ -90,6 +90,42 @@ impl ::duit::InstanceHandle for GameLobbyWindow {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct UnitInfoWindow {
+    pub header_text: WidgetHandle<Text>,
+    pub info_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for UnitInfoWindow {
+    fn name() -> &'static str {
+        "UnitInfoWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut header_text = None;
+        let mut info_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "header_text" => header_text = Some(widget),
+                "info_text" => info_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            header_text: WidgetHandle::new(header_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "header_text"
+                )
+            })),
+            info_text: WidgetHandle::new(info_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "info_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct OptionsWindow {
     pub music_volume_slider: WidgetHandle<Slider>,
     pub effects_volume_slider: WidgetHandle<Slider>,
