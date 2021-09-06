@@ -31,7 +31,7 @@ impl GameState {
     }
 
     pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<()> {
-        self.client.handle_messages(&mut self.game)?;
+        self.client.handle_messages(cx, &mut self.game)?;
         self.game.update(cx);
         self.renderer.render(&self.game, cx);
         Ok(())

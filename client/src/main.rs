@@ -77,7 +77,7 @@ impl RootState {
             }
             RootState::Lobby(lobby) => match lobby.update(cx) {
                 Ok(Some(states::lobby::Action::EnterGame(game_data))) => {
-                    let game = match Game::from_initial_data(Arc::clone(cx.registry()), game_data) {
+                    let game = match Game::from_initial_data(Arc::clone(cx.registry()), cx, game_data) {
                         Ok(g) => g,
                         Err(e) => {
                             cx.show_error_popup(&format!("failed to start game: {}", e));

@@ -9,10 +9,17 @@ use anyhow::Context as _;
 use arrayvec::ArrayVec;
 use duit::Event;
 use glam::{ivec2, UVec2};
-use protocol::{Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit, Visibility};
+use protocol::{
+    Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit, Visibility,
+};
 use slotmap::SlotMap;
 
-use crate::{client::{Client, GameState}, context::Context, registry::Registry, utils::VersionSnapshot};
+use crate::{
+    client::{Client, GameState},
+    context::Context,
+    registry::Registry,
+    utils::VersionSnapshot,
+};
 
 use super::{
     city::City,
@@ -104,6 +111,7 @@ impl Game {
 
     pub fn from_initial_data(
         registry: Arc<Registry>,
+        cx: &Context,
         data: InitialGameData,
     ) -> anyhow::Result<Self> {
         let mut game = Self::new(registry);
@@ -137,7 +145,7 @@ impl Game {
         }
 
         for unit in data.units {
-            game.add_or_update_unit(unit)?;
+            game.add_or_update_unit(cx, unit)?;
         }
 
         Ok(game)
@@ -338,18 +346,24 @@ impl Game {
         }
     }
 
-    pub fn handle_event(&mut self, cx: &mut Context, client: &mut Client<GameState>, event: &Event) {
+    pub fn handle_event(
+        &mut self,
+        cx: &mut Context,
+        client: &mut Client<GameState>,
+        event: &Event,
+    ) {
         self.view_mut().handle_event(cx, event);
-        self.selection_driver_mut().handle_event(self, client, cx, event);
+        self.selection_driver_mut()
+            .handle_event(self, client, cx, event);
     }
 
-    pub fn add_or_update_unit(&mut self, data: UpdateUnit) -> anyhow::Result<()> {
+    pub fn add_or_update_unit(&mut self, cx: &Context, data: UpdateUnit) -> anyhow::Result<()> {
         let data_id = data.id as u32;
         match self.unit_ids.get(data_id) {
             Some(id) => {
                 let mut unit = self.unit_mut(id);
                 let old_pos = unit.pos();
-                unit.update_data(data, self)?;
+                unit.update_data(data, self, cx)?;
                 let new_pos = unit.pos();
                 if old_pos != new_pos {
                     drop(unit);
@@ -359,8 +373,8 @@ impl Game {
             }
             None => {
                 let mut units = mem::take(&mut self.units);
-                let res =
-                    units.try_insert_with_key(|k| Unit::from_data(data, k, self).map(RefCell::new));
+                let res = units
+                    .try_insert_with_key(|k| Unit::from_data(data, k, self, cx).map(RefCell::new));
                 self.units = units;
                 if let Ok(id) = &res {
                     self.unit_ids.insert(data_id, *id);

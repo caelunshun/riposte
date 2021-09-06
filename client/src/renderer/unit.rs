@@ -1,5 +1,3 @@
-use std::f32::consts::TAU;
-
 use ahash::AHashMap;
 use duit::Vec2;
 use dume::{
@@ -11,7 +9,7 @@ use palette::Srgba;
 
 use crate::{
     context::Context,
-    game::{unit::Unit, Game, Tile},
+    game::{unit::Unit, view::PIXELS_PER_TILE, Game, Tile},
 };
 
 use super::TileRenderLayer;
@@ -97,6 +95,13 @@ impl TileRenderLayer for UnitRenderer {
         {
             let unit = game.unit(unit_id);
 
+            // Translation based on spline interpolation for unit movement
+            let interpolated_pos = (unit.movement_spline().clamped_sample(cx.time()).unwrap()
+                - tile_pos.as_f32())
+                * PIXELS_PER_TILE
+                * game.view().zoom_factor();
+            cx.canvas_mut().translate(interpolated_pos);
+
             // Unit icon
             let texture = self.textures[&unit.kind().id];
             let size = 60.;
@@ -120,6 +125,8 @@ impl TileRenderLayer for UnitRenderer {
             if game.selected_units().contains(unit.id()) {
                 self.render_selected_overlay(cx, &unit);
             }
+
+            cx.canvas_mut().translate(-interpolated_pos);
         }
     }
 }

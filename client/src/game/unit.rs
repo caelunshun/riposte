@@ -2,6 +2,7 @@ use std::{convert::TryInto, str::FromStr};
 
 use crate::{
     assets::Handle,
+    context::Context,
     game::InvalidNetworkId,
     registry::{CombatBonusType, UnitKind},
 };
@@ -9,8 +10,10 @@ use crate::{
 use super::{Game, Improvement, PlayerId, UnitId};
 
 use anyhow::anyhow;
+use duit::Vec2;
 use glam::UVec2;
 use protocol::{capability, worker_task_kind};
+use splines::{Interpolation, Key, Spline};
 
 pub const MOVEMENT_LEFT_EPSILON: f64 = 0.001;
 
@@ -22,24 +25,40 @@ pub struct Unit {
     kind: Handle<UnitKind>,
     owner: PlayerId,
     capabilities: Vec<Capability>,
+
+    /// Used to interpolate unit movement
+    movement_spline: Spline<f32, Vec2>,
 }
 
 impl Unit {
-    pub fn from_data(data: protocol::UpdateUnit, id: UnitId, game: &Game) -> anyhow::Result<Self> {
+    pub fn from_data(
+        data: protocol::UpdateUnit,
+        id: UnitId,
+        game: &Game,
+        cx: &Context,
+    ) -> anyhow::Result<Self> {
         let mut unit = Self {
             data: Default::default(),
             id,
             kind: game.registry().unit_kind(&data.kind_id)?,
             owner: Default::default(),
             capabilities: Vec::new(),
+            movement_spline: Spline::from_vec(Vec::new()),
         };
 
-        unit.update_data(data, game)?;
+        unit.update_data(data, game, cx)?;
 
         Ok(unit)
     }
 
-    pub fn update_data(&mut self, data: protocol::UpdateUnit, game: &Game) -> anyhow::Result<()> {
+    pub fn update_data(
+        &mut self,
+        data: protocol::UpdateUnit,
+        game: &Game,
+        cx: &Context,
+    ) -> anyhow::Result<()> {
+        let old_pos = self.pos();
+
         self.kind = game.registry().unit_kind(&data.kind_id)?;
         self.owner = game.resolve_player_id(data.owner_id as u32)?;
         self.capabilities = data
@@ -50,7 +69,34 @@ impl Unit {
 
         self.data = data;
 
+        let new_pos = self.pos();
+
+        if old_pos != new_pos {
+            self.on_moved(cx, old_pos, new_pos);
+        }
+
         Ok(())
+    }
+
+    fn on_moved(&mut self, cx: &Context, old_pos: UVec2, new_pos: UVec2) {
+        let time = self
+            .movement_spline
+            .keys()
+            .iter()
+            .map(|k| k.t)
+            .last()
+            .unwrap_or_default()
+            .max(cx.time());
+
+        if !self.movement_spline.is_empty() {
+            self.movement_spline
+                .add(Key::new(time, old_pos.as_f32(), Interpolation::Cosine));
+        }
+        self.movement_spline.add(Key::new(
+            time + 0.2,
+            new_pos.as_f32(),
+            Interpolation::Cosine,
+        ));
     }
 
     pub fn pos(&self) -> UVec2 {
@@ -104,6 +150,10 @@ impl Unit {
 
     pub fn owner(&self) -> PlayerId {
         self.owner
+    }
+
+    pub fn movement_spline(&self) -> &Spline<f32, Vec2> {
+        &self.movement_spline
     }
 
     /// Computes this unit's modified defense strength against

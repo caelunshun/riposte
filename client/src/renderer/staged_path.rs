@@ -4,7 +4,7 @@ use dume::{
     font::{Query, Weight},
     Align, Baseline, Canvas, Paragraph, Text, TextLayout, TextSection, TextStyle,
 };
-use glam::{vec2, UVec2};
+use glam::UVec2;
 use palette::Srgba;
 use splines::{Interpolation, Key, Spline};
 

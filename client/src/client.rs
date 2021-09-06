@@ -12,6 +12,7 @@ use protocol::{
 };
 
 use crate::{
+    context::Context,
     game::{Game, UnitId},
     lobby::GameLobby,
     registry::{Civilization, Leader, Registry},
@@ -207,14 +208,14 @@ impl Client<GameState> {
         self.register_response_future(request_id)
     }
 
-    pub fn handle_messages(&mut self, game: &mut Game) -> anyhow::Result<()> {
+    pub fn handle_messages(&mut self, cx: &Context, game: &mut Game) -> anyhow::Result<()> {
         while let Some(msg) = self.poll_for_message()? {
             let request_id = msg.request_id as u32;
             match msg.packet.ok_or(ClientError::MissingPacket)? {
                 any_server::Packet::ConfirmMoveUnits(packet) => {
                     self.handle_confirm_move_units(packet, request_id)
                 }
-                any_server::Packet::UpdateUnit(packet) => game.add_or_update_unit(packet)?,
+                any_server::Packet::UpdateUnit(packet) => game.add_or_update_unit(cx, packet)?,
                 _ => log::warn!("unhandled packet"),
             }
         }
