@@ -1,0 +1,14 @@
+name: UnitActionButton
+child:
+  Custom:
+    id: the_button
+    type: FlashingButton
+    params: {}
+    classes:
+      - unit_action_button
+    children:
+      - Text:
+          classes:
+            - h3
+          id: the_text
+          

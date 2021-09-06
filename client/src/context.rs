@@ -30,6 +30,7 @@ use crate::{
     popups::PopupWindows,
     registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
     state::StateManager,
+    ui::flashing_button::FlashingButton,
 };
 
 mod init;
@@ -163,6 +164,9 @@ impl Context {
     }
 
     pub fn load_ui_specs(&mut self) -> anyhow::Result<()> {
+        self.ui_mut()
+            .add_custom_widget("FlashingButton", |_| FlashingButton::new());
+
         for entry in WalkDir::new("/Users/caelum/CLionProjects/riposte/client/ui") {
             let entry = entry?;
             if entry.path().extension() != Some(OsStr::new("yml")) {

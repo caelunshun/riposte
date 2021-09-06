@@ -1,3 +1,4 @@
+use crate::ui::flashing_button::FlashingButton;
 use duit::widgets::*;
 use duit::*;
 pub struct ErrorPopup {
@@ -83,6 +84,69 @@ impl ::duit::InstanceHandle for GameLobbyWindow {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "start_game_button"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct UnitActionButton {
+    pub the_button: WidgetHandle<FlashingButton>,
+    pub the_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for UnitActionButton {
+    fn name() -> &'static str {
+        "UnitActionButton"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut the_button = None;
+        let mut the_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "the_button" => the_button = Some(widget),
+                "the_text" => the_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            the_button: WidgetHandle::new(the_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "the_button"
+                )
+            })),
+            the_text: WidgetHandle::new(the_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "the_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct UnitActionBarWindow {
+    pub actions: WidgetHandle<Flex>,
+}
+impl ::duit::InstanceHandle for UnitActionBarWindow {
+    fn name() -> &'static str {
+        "UnitActionBarWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut actions = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "actions" => actions = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            actions: WidgetHandle::new(actions.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "actions"
                 )
             })),
         }

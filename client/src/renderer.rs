@@ -72,7 +72,9 @@ impl GameRenderer {
 
     fn render_tiles(&mut self, game: &Game, cx: &mut Context) {
         // For each layer, we render each visibile tile.
-        let first_tile = game.view().tile_pos_for_screen_offset(Vec2::ZERO);
+        let mut first_tile = game.view().tile_pos_for_screen_offset(Vec2::ZERO);
+        first_tile.x = first_tile.x.saturating_sub(1);
+        first_tile.y = first_tile.y.saturating_sub(1);
         let last_tile = game
             .view()
             .tile_pos_for_screen_offset(game.view().window_size())

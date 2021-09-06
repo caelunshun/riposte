@@ -1,6 +1,8 @@
 use duit::{Align, Rect, Vec2, WindowPositioner};
 use glam::vec2;
 
+pub mod flashing_button;
+
 // Z index constants for window layering
 pub const Z_BACKGROUND: u64 = 1;
 pub const Z_FOREGROUND: u64 = 10;
@@ -30,6 +32,7 @@ impl WindowPositioner for Center {
 
 pub struct AlignFixed {
     size: Vec2,
+    offset: Vec2,
     align_h: Align,
     align_v: Align,
 }
@@ -40,6 +43,14 @@ impl AlignFixed {
             size,
             align_h,
             align_v,
+            offset: Vec2::ZERO,
+        }
+    }
+
+    pub fn with_offset(self, offset: Vec2) -> Self {
+        Self {
+            offset: offset,
+            ..self
         }
     }
 }
@@ -58,6 +69,6 @@ impl WindowPositioner for AlignFixed {
             align_axis(self.align_h, available_space.x, self.size.x),
             align_axis(self.align_v, available_space.y, self.size.y),
         );
-        Rect::new(pos, self.size)
+        Rect::new(pos + self.offset, self.size)
     }
 }

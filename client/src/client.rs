@@ -7,8 +7,9 @@ use glam::UVec2;
 use prost::Message;
 use protocol::{
     any_client, any_server, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer,
-    ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits, CreateSlot, DeleteSlot, GameStarted,
-    InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, RequestGameStart, ServerLobbyPacket,
+    ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits, CreateSlot, DeleteSlot, DoUnitAction,
+    GameStarted, InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, RequestGameStart,
+    ServerLobbyPacket,
 };
 
 use crate::{
@@ -206,6 +207,14 @@ impl Client<GameState> {
             }),
         }));
         self.register_response_future(request_id)
+    }
+
+    pub fn do_unit_action(&mut self, game: &Game, unit: UnitId, action: protocol::UnitAction) {
+        self.send_message(any_client::Packet::DoUnitAction(DoUnitAction {
+            unit_id: game.unit(unit).network_id() as i32,
+            action: action.into(),
+        }));
+        log::info!("Performing unit action {:?}", action);
     }
 
     pub fn handle_messages(&mut self, cx: &Context, game: &mut Game) -> anyhow::Result<()> {

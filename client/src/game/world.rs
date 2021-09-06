@@ -196,6 +196,11 @@ impl Game {
         self.players[id].borrow_mut()
     }
 
+    /// Gets all players in the game.
+    pub fn players(&self) -> impl Iterator<Item = Ref<Player>> {
+        self.players.values().map(|cell| cell.borrow())
+    }
+
     /// Gets the player on this client.
     pub fn the_player(&self) -> Ref<Player> {
         self.player(self.the_player_id)
@@ -221,6 +226,16 @@ impl Game {
         self.cities[id].borrow_mut()
     }
 
+    /// Gets all cities in the game.
+    pub fn cities(&self) -> impl Iterator<Item = Ref<City>> {
+        self.cities.values().map(|cell| cell.borrow())
+    }
+
+    /// Gets all cities owned by the given player.
+    pub fn player_cities(&self, player: PlayerId) -> impl Iterator<Item = Ref<City>> {
+        self.cities().filter(move |c| c.owner() == player)
+    }
+
     /// Returns whether the given city ID is still valid.
     pub fn is_city_valid(&self, id: CityId) -> bool {
         self.cities.contains_key(id)
@@ -243,6 +258,11 @@ impl Game {
     /// Mutably gets the unit with the given ID.
     pub fn unit_mut(&self, id: UnitId) -> RefMut<Unit> {
         self.units[id].borrow_mut()
+    }
+
+    /// Gets all units in the game.
+    pub fn units(&self) -> impl Iterator<Item = Ref<Unit>> {
+        self.units.values().map(|cell| cell.borrow())
     }
 
     /// Returns whether the given unit ID is still valid.

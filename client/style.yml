@@ -59,19 +59,28 @@ styles:
     border_color: $border_active
     border_width: 1
   
-  button:
+  button | flashing_button:
     padding: 5
     border_radius: 2
     border_width: 1
     border_color: $border
     background_color: $background
 
-  button & hovered:
+  button | flashing_button & hovered:
     background_color: $active
 
-  button & pressed:
+  button | flashing_button & pressed:
     border_color: $border_active
     background_color: $foreground
+
+  flashing_button:
+    flash_color_a: $background
+    flash_color_b: rgb(0, 118, 165)
+    flash_period: 1.25
+
+  unit_action_button:
+    padding: 10
+    border_radius: 0.2
 
   container:
     border_radius: 0

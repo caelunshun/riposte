@@ -4,7 +4,7 @@ use crate::{
     assets::Handle,
     context::Context,
     game::InvalidNetworkId,
-    registry::{CombatBonusType, UnitKind},
+    registry::{CapabilityType, CombatBonusType, UnitKind},
 };
 
 use super::{Game, Improvement, PlayerId, UnitId};
@@ -127,6 +127,19 @@ impl Unit {
 
     pub fn kind(&self) -> &UnitKind {
         &self.kind
+    }
+
+    pub fn capabilities(&self) -> impl Iterator<Item = &Capability> {
+        self.capabilities.iter()
+    }
+
+    pub fn has_capability(&self, typ: CapabilityType) -> bool {
+        self.capabilities().any(|c| match c {
+            Capability::FoundCity => typ == CapabilityType::FoundCity,
+            Capability::BombardCity => typ == CapabilityType::BombardCityDefenses,
+            Capability::CarryUnits(_) => typ == CapabilityType::CarryUnits,
+            Capability::Worker(_) => typ == CapabilityType::DoWork,
+        })
     }
 
     pub fn id(&self) -> UnitId {
