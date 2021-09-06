@@ -424,6 +424,13 @@ impl Game {
         }
     }
 
+    pub fn delete_unit(&mut self, unit: UnitId) {
+        let network_id = self.unit(unit).network_id() as u32;
+        self.unit_ids.remove(network_id);
+        self.on_unit_deleted(unit);
+        self.units.remove(unit);
+    }
+
     fn on_unit_added(&mut self, unit: UnitId) {
         self.stacks.on_unit_added(self, unit);
         self.selection_driver_mut().on_unit_added(self, unit);
@@ -440,6 +447,7 @@ impl Game {
     fn on_unit_deleted(&mut self, unit: UnitId) {
         self.selected_units_mut().on_unit_deleted(unit);
         self.selection_driver_mut().on_unit_deleted(unit);
+        self.stacks.on_unit_deleted(self, unit);
     }
 
     pub fn add_or_update_city(&mut self, data: UpdateCity) -> anyhow::Result<()> {
@@ -474,6 +482,12 @@ impl Game {
                 res.map(|_| ())
             }
         }
+    }
+
+    pub fn delete_city(&mut self, city: CityId) {
+        let network_id = self.city(city).network_id() as u32;
+        self.city_ids.remove(network_id);
+        self.cities.remove(city);
     }
 
     pub fn update_global_data(&mut self, data: &UpdateGlobalData) -> anyhow::Result<()> {

@@ -134,6 +134,18 @@ impl City {
         self.data.consumed_food
     }
 
+    pub fn is_growing(&self) -> bool {
+        self.consumed_food() < self.city_yield().food as i32
+    }
+
+    pub fn is_starving(&self) -> bool {
+        self.consumed_food() > self.city_yield().food as i32
+    }
+
+    pub fn is_stagnant(&self) -> bool {
+        self.consumed_food() == self.city_yield().food as i32
+    }
+
     pub fn is_capital(&self) -> bool {
         self.data.is_capital
     }
@@ -172,14 +184,28 @@ impl City {
     pub fn culture_defense_bonus(&self) -> i32 {
         self.data.culture_defense_bonus
     }
+
+    pub fn estimate_remaining_build_time(&self) -> u32 {
+        match &self.build_task {
+            Some(task) => {
+                (task.cost - task.progress + self.city_yield().hammers - 1)
+                    / (self.city_yield().hammers)
+            }
+            None => 0,
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        &self.data.name
+    }
 }
 
 /// Something a city is building.
 #[derive(Debug)]
 pub struct BuildTask {
-    cost: u32,
-    progress: u32,
-    kind: BuildTaskKind,
+    pub cost: u32,
+    pub progress: u32,
+    pub kind: BuildTaskKind,
 }
 
 impl BuildTask {
@@ -202,6 +228,13 @@ impl BuildTask {
             progress: data.progress.try_into()?,
             kind,
         })
+    }
+
+    pub fn name(&self) -> &str {
+        match &self.kind {
+            BuildTaskKind::Unit(u) => &u.name,
+            BuildTaskKind::Building(b) => &b.name,
+        }
     }
 }
 

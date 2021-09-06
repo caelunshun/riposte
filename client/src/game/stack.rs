@@ -1,4 +1,7 @@
-use std::{cell::{Ref, RefCell, RefMut}, cmp, iter};
+use std::{
+    cell::{Ref, RefCell, RefMut},
+    cmp, iter,
+};
 
 use float_ord::FloatOrd;
 use glam::UVec2;
@@ -140,6 +143,12 @@ impl StackGrid {
 
         if let Ok(mut new_stack) = self.get_mut(new_pos) {
             new_stack.add_unit(game, unit);
+        }
+    }
+
+    pub fn on_unit_deleted(&self, game: &Game, unit: UnitId) {
+        if let Ok(mut group) = self.get_mut(game.unit(unit).pos()) {
+            group.remove_unit(unit);
         }
     }
 

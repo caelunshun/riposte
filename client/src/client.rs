@@ -225,6 +225,11 @@ impl Client<GameState> {
                     self.handle_confirm_move_units(packet, request_id)
                 }
                 any_server::Packet::UpdateUnit(packet) => game.add_or_update_unit(cx, packet)?,
+                any_server::Packet::UpdateCity(packet) => game.add_or_update_city(packet)?,
+                any_server::Packet::UpdatePlayer(packet) => game.add_or_update_player(packet)?,
+                any_server::Packet::DeleteUnit(packet) => {
+                    game.delete_unit(game.resolve_unit_id(packet.unit_id as u32)?)
+                }
                 _ => log::warn!("unhandled packet"),
             }
         }

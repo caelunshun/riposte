@@ -1,4 +1,4 @@
-use std::f32::consts::TAU;
+use std::f32::consts::{PI, TAU};
 
 use duit::Vec2;
 use dume::Canvas;
@@ -125,4 +125,26 @@ pub fn dashed_circle(
         ));
         canvas.arc(center, radius, arc_start, arc_end);
     }
+}
+
+pub fn five_point_star(canvas: &mut Canvas, center: Vec2, outer_radius: f32, inner_radius: f32) {
+    let angle_step = PI * 2. / 5.;
+
+    for i in 0..5 {
+        let outer_theta = angle_step * i as f32 - PI / 2.;
+        let inner_theta = angle_step * (i as f32 + 0.5) - PI / 2.;
+
+        let outer_pos = vec2(outer_theta.cos(), outer_theta.sin()) * outer_radius + center;
+        let inner_pos = vec2(inner_theta.cos(), inner_theta.sin()) * inner_radius + center;
+
+        if i == 0 {
+            canvas.move_to(outer_pos);
+        } else {
+            canvas.line_to(outer_pos);
+        }
+        canvas.line_to(inner_pos);
+    }
+
+    // Close the path
+    canvas.line_to(center - vec2(0., outer_radius));
 }
