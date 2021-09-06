@@ -89,7 +89,7 @@ impl GameRenderer {
                         let translation =
                             game.view().screen_offset_for_tile_pos(pos) * game.view().zoom_factor();
                         cx.canvas_mut().translate(translation);
-                        layer.render(game, cx, pos, tile);
+                        layer.render(game, cx, pos, &tile);
                         cx.canvas_mut().translate(-translation);
                     }
                 }

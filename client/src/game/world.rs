@@ -342,12 +342,12 @@ impl Game {
     }
 
     /// Gets the tile at the given position.
-    pub fn tile(&self, pos: UVec2) -> Result<&Tile, OutOfBounds> {
+    pub fn tile(&self, pos: UVec2) -> Result<Ref<Tile>, OutOfBounds> {
         self.map.tile(pos)
     }
 
     /// Mutably gets the tile at the given position.
-    pub fn tile_mut(&mut self, pos: UVec2) -> Result<&mut Tile, OutOfBounds> {
+    pub fn tile_mut(&self, pos: UVec2) -> Result<RefMut<Tile>, OutOfBounds> {
         self.map.tile_mut(pos)
     }
 

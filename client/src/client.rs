@@ -1,9 +1,10 @@
 use std::{any::Any, cell::Cell, marker::PhantomData};
 
 use ahash::AHashMap;
+use anyhow::Context as _;
 use bytes::BytesMut;
 use flume::Receiver;
-use glam::UVec2;
+use glam::{uvec2, UVec2};
 use prost::Message;
 use protocol::{
     any_client, any_server, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer,
@@ -230,6 +231,9 @@ impl Client<GameState> {
                 any_server::Packet::DeleteUnit(packet) => {
                     game.delete_unit(game.resolve_unit_id(packet.unit_id as u32)?)
                 }
+                any_server::Packet::UpdateTile(packet) => game
+                    .tile_mut(uvec2(packet.x, packet.y))?
+                    .update_data(packet.tile.context("missing tile")?, game)?,
                 _ => log::warn!("unhandled packet"),
             }
         }

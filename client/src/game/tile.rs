@@ -1,3 +1,5 @@
+use std::cell::{Ref, RefCell, RefMut};
+
 use glam::UVec2;
 use protocol::{Terrain, Visibility};
 
@@ -131,7 +133,7 @@ pub struct OutOfBounds {
 pub struct Map {
     width: u32,
     height: u32,
-    tiles: Vec<Tile>,
+    tiles: Vec<RefCell<Tile>>,
     visibility: Vec<Visibility>,
 }
 
@@ -149,19 +151,19 @@ impl Map {
         Ok(Self {
             width,
             height,
-            tiles,
+            tiles: tiles.into_iter().map(RefCell::new).collect(),
             visibility,
         })
     }
 
-    pub fn tile(&self, pos: UVec2) -> Result<&Tile, OutOfBounds> {
+    pub fn tile(&self, pos: UVec2) -> Result<Ref<Tile>, OutOfBounds> {
         let index = self.index(pos)?;
-        Ok(&self.tiles[index])
+        Ok(self.tiles[index].borrow())
     }
 
-    pub fn tile_mut(&mut self, pos: UVec2) -> Result<&mut Tile, OutOfBounds> {
+    pub fn tile_mut(&self, pos: UVec2) -> Result<RefMut<Tile>, OutOfBounds> {
         let index = self.index(pos)?;
-        Ok(&mut self.tiles[index])
+        Ok(self.tiles[index].borrow_mut())
     }
 
     pub fn visibility(&self, pos: UVec2) -> Visibility {
