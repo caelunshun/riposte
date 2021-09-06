@@ -42,9 +42,7 @@ pub fn run(event_loop: EventLoop<()>, mut context: Context, mut state: RootState
                 context.handle_window_event(&event);
 
                 let mut ui = context.ui_mut();
-                if let Some(event) = ui
-                    .convert_event(&event, context.window().scale_factor())
-                {
+                if let Some(event) = ui.convert_event(&event, context.window().scale_factor()) {
                     drop(ui);
                     state.handle_event(&mut context, &event);
                 }

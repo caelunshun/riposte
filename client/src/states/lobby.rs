@@ -3,7 +3,19 @@ use std::{
     ptr,
 };
 
-use crate::{assets::Handle, backend::BackendResponse, client::{self, Client, LobbyState}, context::Context, generated::GameLobbyWindow, lobby::GameLobby, registry::{Civilization, Leader}, server_bridge::ServerBridge, state::StateAttachment, ui::{FillScreen, Z_FOREGROUND}, utils::color_to_string};
+use crate::{
+    assets::Handle,
+    backend::BackendResponse,
+    client::{self, Client, LobbyState},
+    context::Context,
+    generated::GameLobbyWindow,
+    lobby::GameLobby,
+    registry::{Civilization, Leader},
+    server_bridge::ServerBridge,
+    state::StateAttachment,
+    ui::{FillScreen, Z_FOREGROUND},
+    utils::color_to_string,
+};
 
 use ahash::{AHashMap, AHashSet};
 use duit::{

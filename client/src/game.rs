@@ -1,21 +1,21 @@
 pub mod city;
 pub mod culture;
 pub mod improvement;
+pub mod path;
 pub mod player;
+pub mod selection;
+pub mod stack;
 pub mod tile;
 pub mod unit;
 pub mod view;
-pub mod stack;
-pub mod selection;
-pub mod path;
 
 mod id_mapper;
 mod world;
 
 pub use culture::Culture;
 pub use improvement::Improvement;
-pub use view::View;
 pub use tile::Tile;
+pub use view::View;
 pub use world::{CityId, Game, InvalidNetworkId, PlayerId, UnitId};
 
 #[derive(Copy, Clone, Debug, serde::Deserialize, Default)]

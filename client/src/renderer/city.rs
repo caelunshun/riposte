@@ -16,7 +16,5 @@ impl CityRenderer {
 }
 
 impl TileRenderLayer for CityRenderer {
-    fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
-        
-    }
+    fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {}
 }

@@ -12,7 +12,7 @@ pub struct Civilization {
     pub starting_techs: Vec<String>,
 }
 
-#[derive(Debug,Clone, serde::Deserialize)]
+#[derive(Debug, Clone, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Leader {
     pub name: String,

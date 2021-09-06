@@ -181,6 +181,7 @@ struct RecvDataRequest {
 pub struct RipConnectionHandle {
     sending_data: Sender<SendDataRequest>,
     receiving_data: Sender<RecvDataRequest>,
+    current_recv_id: RequestId,
 }
 
 /// Creates a new connection handle operating on stdout/stdin.
@@ -210,6 +211,7 @@ pub unsafe extern "C" fn networkctx_connect_stdio(
     Box::leak(Box::new(RipConnectionHandle {
         sending_data,
         receiving_data,
+        current_recv_id: RequestId::default(),
     }))
 }
 
@@ -243,14 +245,22 @@ pub unsafe extern "C" fn networkctx_conn_send_data(
 #[no_mangle]
 pub unsafe extern "C" fn networkctx_conn_recv_data(
     ctx: &mut RipNetworkingContext,
-    conn: &RipConnectionHandle,
+    conn: &mut RipConnectionHandle,
     callback: Callback,
     userdata: *mut c_void,
 ) {
-    let request_id = ctx.insert_callback(callback, userdata);
-    conn.receiving_data
-        .send(RecvDataRequest { request_id })
-        .ok();
+    // If an existing request for data already exists, override it.
+    let request_id = if ctx.callbacks.contains_key(conn.current_recv_id) {
+        *(&mut ctx.callbacks[conn.current_recv_id]) = (callback, userdata);
+        conn.current_recv_id
+    } else {
+        let request_id = ctx.insert_callback(callback, userdata);
+        conn.receiving_data
+            .send(RecvDataRequest { request_id })
+            .ok();
+        request_id
+    };
+    conn.current_recv_id = request_id;
 }
 
 /// Frees a connection, disconnecting it.

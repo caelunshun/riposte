@@ -1,7 +1,4 @@
-use std::{
-    cell::{Ref, RefCell, RefMut},
-    iter,
-};
+use std::{cell::{Ref, RefCell, RefMut}, cmp, iter};
 
 use float_ord::FloatOrd;
 use glam::UVec2;
@@ -79,12 +76,12 @@ impl UnitStack {
                 score += 1000.;
             }
 
-            FloatOrd(score)
+            cmp::Reverse(FloatOrd(score))
         });
     }
 
     pub fn top_unit(&self) -> Option<UnitId> {
-        self.units().get(0).copied()
+        self.units().first().copied()
     }
 }
 

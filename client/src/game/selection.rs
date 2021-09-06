@@ -59,13 +59,15 @@ impl SelectedUnits {
         let unit = game.unit(unit_id);
 
         if Some(unit.pos()) == self.pos(game) {
-            self.units.push(unit_id);
+            if !self.units.contains(&unit_id) {
+                self.units.push(unit_id);
+                self.version.update();
+            }
         } else {
             self.clear();
             self.units.push(unit_id);
+            self.version.update();
         }
-
-        self.version.update();
     }
 
     /// Removes a unit from the selection.
@@ -352,7 +354,11 @@ impl SelectionDriver {
                     point.pos,
                 );
 
-                log::info!("Requesting to move units to {:?}", point.pos);
+                log::info!(
+                    "Requesting to move {} units to {:?}",
+                    game.selected_units().get_all().len(),
+                    point.pos
+                );
             }
         }
     }
@@ -407,7 +413,11 @@ impl MovementDriver {
     pub fn update(&mut self, game: &Game) {
         self.waiting.retain(|waiting| {
             if let Some(response) = waiting.future.get() {
-                log::info!("Server responded to move request {:?}. Success: {}", waiting.target_pos, response.success);
+                log::info!(
+                    "Server responded to move request {:?}. Success: {}",
+                    waiting.target_pos,
+                    response.success
+                );
                 if response.success {
                     for &unit in &waiting.units {
                         if game.is_unit_valid(unit) {

@@ -9,8 +9,7 @@ use tokio::{process::Command, task};
 
 use crate::options::Account;
 
-const SERVER_PATH: &str =
-    "/Users/caelum/CLionProjects/riposte/cmake-build-debug/bin/riposte";
+const SERVER_PATH: &str = "/Users/caelum/CLionProjects/riposte/cmake-build-debug/bin/riposte";
 
 /// A bridge abstracting over a connection to the game server.
 #[derive(Clone)]
@@ -28,7 +27,10 @@ impl ServerBridge {
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
             .stderr(Stdio::inherit())
-            .env("RIPOSTE_HOST_UUID", host_account.uuid().to_hyphenated().to_string())
+            .env(
+                "RIPOSTE_HOST_UUID",
+                host_account.uuid().to_hyphenated().to_string(),
+            )
             .kill_on_drop(true)
             .spawn()
             .context("failed to launch server process")?;

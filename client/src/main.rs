@@ -77,14 +77,15 @@ impl RootState {
             }
             RootState::Lobby(lobby) => match lobby.update(cx) {
                 Ok(Some(states::lobby::Action::EnterGame(game_data))) => {
-                    let game = match Game::from_initial_data(Arc::clone(cx.registry()), cx, game_data) {
-                        Ok(g) => g,
-                        Err(e) => {
-                            cx.show_error_popup(&format!("failed to start game: {}", e));
-                            *self = RootState::MainMenu(MenuState::new(cx));
-                            return;
-                        }
-                    };
+                    let game =
+                        match Game::from_initial_data(Arc::clone(cx.registry()), cx, game_data) {
+                            Ok(g) => g,
+                            Err(e) => {
+                                cx.show_error_popup(&format!("failed to start game: {}", e));
+                                *self = RootState::MainMenu(MenuState::new(cx));
+                                return;
+                            }
+                        };
                     let client = lobby.client().to_game_state();
                     *self = RootState::Game(GameState::new(cx, client, game));
                 }
@@ -120,7 +121,7 @@ fn init_logging() {
 }
 
 fn main() -> anyhow::Result<()> {
-    init_logging(); 
+    init_logging();
 
     // TEMP for testing
     std::env::set_current_dir("/Users/caelum/CLionProjects/riposte")?;
