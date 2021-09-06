@@ -68,6 +68,11 @@ impl View {
         self.center
     }
 
+    pub fn set_center_tile(&mut self, center_tile: UVec2) {
+        self.center = vec2(center_tile.x as f32, center_tile.y as f32) * PIXELS_PER_TILE
+            + PIXELS_PER_TILE / 2.;
+    }
+
     pub fn center_tile(&self) -> UVec2 {
         uvec2(
             (self.center().x / PIXELS_PER_TILE).max(0.) as u32,

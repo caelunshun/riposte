@@ -17,7 +17,7 @@ use slotmap::SlotMap;
 use crate::{
     client::{Client, GameState},
     context::Context,
-    registry::Registry,
+    registry::{CapabilityType, Registry},
     utils::VersionSnapshot,
 };
 
@@ -153,7 +153,38 @@ impl Game {
             game.add_or_update_unit(cx, unit)?;
         }
 
+        game.set_initial_view_center();
+
         Ok(game)
+    }
+
+    fn set_initial_view_center(&mut self) {
+        // The view center is either the position of our settler,
+        // the position of our capital, or the origin, in that order
+        // of priority.
+        let mut center = UVec2::default();
+        if let Some(p) = self
+            .units()
+            .filter(|u| u.owner() == self.the_player().id())
+            .filter_map(|u| {
+                if u.kind().capabilities.contains(&CapabilityType::FoundCity) {
+                    Some(u.pos())
+                } else {
+                    None
+                }
+            })
+            .next()
+        {
+            center = p;
+        } else if let Some(p) = self
+            .player_cities(self.the_player().id())
+            .map(|c| c.pos())
+            .next()
+        {
+            center = p;
+        }
+
+        self.view_mut().set_center_tile(center);
     }
 
     /// Gets a player ID from its network ID.
