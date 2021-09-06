@@ -38,6 +38,6 @@ impl GameState {
     }
 
     pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
-        self.game.handle_event(cx, event);
+        self.game.handle_event(cx, &mut self.client, event);
     }
 }

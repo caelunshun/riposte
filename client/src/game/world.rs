@@ -12,7 +12,7 @@ use glam::{ivec2, UVec2};
 use protocol::{Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit, Visibility};
 use slotmap::SlotMap;
 
-use crate::{context::Context, registry::Registry, utils::VersionSnapshot};
+use crate::{client::{Client, GameState}, context::Context, registry::Registry, utils::VersionSnapshot};
 
 use super::{
     city::City,
@@ -338,9 +338,9 @@ impl Game {
         }
     }
 
-    pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
+    pub fn handle_event(&mut self, cx: &mut Context, client: &mut Client<GameState>, event: &Event) {
         self.view_mut().handle_event(cx, event);
-        self.selection_driver_mut().handle_event(self, cx, event);
+        self.selection_driver_mut().handle_event(self, client, cx, event);
     }
 
     pub fn add_or_update_unit(&mut self, data: UpdateUnit) -> anyhow::Result<()> {

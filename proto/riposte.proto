@@ -526,8 +526,11 @@ message PathComputed {
 }
 
 // Response to MoveUnits.
+//
+// Sent before UpdateUnit is sent to update the moved
+// units' positions.
 message ConfirmMoveUnits {
-  // Whether the units were moved at least one tile.
+  // Whether the units were moved to the target tile.
   bool success = 1;
 }
 
@@ -619,13 +622,18 @@ message BuildTaskFailed {
 // CLIENT
 // ---------------------
 
-// Moves multiple units along a path.
-// The units will all go to the same destination.
+// Moves multiple units to an adjacent tile.
+// This operation is atomic: either all units
+// move, or none of them do. Therefore, all
+// units need enough movement left to reach the destination.
+//
+// The target position _must_ be adjacent to the units' position;
+// the server will not attempt to pathfind through multiple tiles to the target.
 //
 // Response: ConfirmMoveUnits
 message MoveUnits {
   repeated int32 unitIDs = 1;
-  Path pathToFollow = 2;
+  Pos targetPos = 2;
 }
 
 message SetCityBuildTask {

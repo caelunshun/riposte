@@ -100,43 +100,26 @@ namespace rip {
     }
 
     void Connection::handleMoveUnits(Game &game, const MoveUnits &packet) {
-        bool success = false;
+        bool success = true;
 
-        std::deque<glm::uvec2> path(packet.pathtofollow().positions_size() / 2);
-        for (int i = 0; i < packet.pathtofollow().positions_size() / 2; i++) {
-            path[i] = glm::uvec2(packet.pathtofollow().positions(i * 2), packet.pathtofollow().positions(i * 2 + 1));
+        glm::uvec2 targetPos(packet.targetpos().x(), packet.targetpos().y());
+
+        // First, check if we can move all units.
+        for (const auto unitID : packet.unitids()) {
+            const auto &unit = game.getUnit(UnitId(unitID));
+            if (!unit.canMove(targetPos, game)) {
+                success = false;
+                break;
+            }
         }
 
-        while (!path.empty()) {
-            auto targetPos = path[0];
-            path.pop_front();
-
-            bool possible = true;
-            bool skip = false;
-            for (const auto unitID : packet.unitids()) {
-                auto &unit = game.getUnit(UnitId(unitID));
-                if (unit.getPos() == targetPos) {
-                    skip = true;
-                    break;
-                }
-                if (!unit.canMove(targetPos, game)) {
-                    possible = false;
-                    break;
-                }
-            }
-
-            if (skip) continue;
-
-            if (!possible) break;
-
-            success = true;
+        if (success) {
+            // Now actually move the units.
             for (const auto unitID : packet.unitids()) {
                 auto &unit = game.getUnit(UnitId(unitID));
                 unit.moveTo(targetPos, game, true);
             }
         }
-
-        game.getServer().flushDirtyItems();
 
         ConfirmMoveUnits response;
         response.set_success(success);

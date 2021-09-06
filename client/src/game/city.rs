@@ -82,6 +82,10 @@ impl City {
         self.id
     }
 
+    pub fn network_id(&self) -> u32 {
+        self.data.id as u32
+    }
+
     pub fn owner(&self) -> PlayerId {
         self.owner
     }

@@ -1,15 +1,18 @@
-use std::marker::PhantomData;
+use std::{any::Any, cell::Cell, marker::PhantomData};
 
+use ahash::AHashMap;
 use bytes::BytesMut;
+use flume::Receiver;
+use glam::UVec2;
 use prost::Message;
 use protocol::{
-    any_client, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer, ChangeCivAndLeader,
-    ClientLobbyPacket, CreateSlot, DeleteSlot, GameStarted, InitialGameData, Kicked, LobbyInfo,
-    RequestGameStart, ServerLobbyPacket,
+    any_client, any_server, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer,
+    ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits, CreateSlot, DeleteSlot, GameStarted,
+    InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, RequestGameStart, ServerLobbyPacket,
 };
 
 use crate::{
-    game::Game,
+    game::{Game, UnitId},
     lobby::GameLobby,
     registry::{Civilization, Leader, Registry},
     server_bridge::ServerBridge,
@@ -43,6 +46,9 @@ pub enum LobbyEvent {
 pub struct Client<State> {
     bridge: ServerBridge,
     _marker: PhantomData<State>,
+
+    next_request_id: Cell<u32>,
+    server_response_senders: AHashMap<u32, Box<dyn Any>>,
 }
 
 impl<S> Client<S>
@@ -53,6 +59,9 @@ where
         Self {
             bridge,
             _marker: PhantomData,
+
+            next_request_id: Cell::new(1),
+            server_response_senders: AHashMap::new(),
         }
     }
 
@@ -99,6 +108,8 @@ impl Client<LobbyState> {
         Client {
             bridge: self.bridge.clone(),
             _marker: PhantomData,
+            next_request_id: Cell::new(1),
+            server_response_senders: AHashMap::new(),
         }
     }
 
@@ -163,24 +174,86 @@ impl Client<LobbyState> {
     }
 }
 
+/// A future to a response received from the server.
+///
+/// Used for messages that follow a request-response model,
+/// like `MoveUnits` and `ConfirmMoveUnits`.
+pub struct ServerResponseFuture<T> {
+    receiver: Receiver<T>,
+}
+
+impl<T> ServerResponseFuture<T> {
+    pub fn get(&self) -> Option<T> {
+        self.receiver.try_recv().ok()
+    }
+}
+
 impl Client<GameState> {
-    pub fn handle_messages(&mut self, _game: &mut Game) -> anyhow::Result<()> {
+    pub fn move_units(
+        &mut self,
+        game: &Game,
+        unit_ids: impl Iterator<Item = UnitId>,
+        target_pos: UVec2,
+    ) -> ServerResponseFuture<ConfirmMoveUnits> {
+        let request_id = self.send_message(any_client::Packet::MoveUnits(MoveUnits {
+            unit_i_ds: unit_ids
+                .map(|id| game.unit(id).network_id() as i32)
+                .collect(),
+            target_pos: Some(Pos {
+                x: target_pos.x,
+                y: target_pos.y,
+            }),
+        }));
+        self.register_response_future(request_id)
+    }
+
+    pub fn handle_messages(&mut self, game: &mut Game) -> anyhow::Result<()> {
         while let Some(msg) = self.poll_for_message()? {
+            let request_id = msg.request_id as u32;
             match msg.packet.ok_or(ClientError::MissingPacket)? {
+                any_server::Packet::ConfirmMoveUnits(packet) => {
+                    self.handle_confirm_move_units(packet, request_id)
+                }
+                any_server::Packet::UpdateUnit(packet) => game.add_or_update_unit(packet)?,
                 _ => log::warn!("unhandled packet"),
             }
         }
         Ok(())
     }
 
-    fn send_message(&self, packet: any_client::Packet, request_id: Option<i32>) {
+    fn handle_confirm_move_units(&mut self, packet: ConfirmMoveUnits, request_id: u32) {
+        self.handle_server_response(request_id, packet);
+    }
+
+    fn register_response_future<T: 'static>(&mut self, request_id: u32) -> ServerResponseFuture<T> {
+        let (sender, receiver) = flume::bounded(1);
+
+        self.server_response_senders
+            .insert(request_id, Box::new(sender));
+
+        ServerResponseFuture { receiver }
+    }
+
+    fn handle_server_response<T: 'static>(&mut self, request_id: u32, value: T) {
+        if let Some(sender) = self.server_response_senders.remove(&request_id) {
+            if let Ok(sender) = sender.downcast::<flume::Sender<T>>() {
+                sender.send(value).ok();
+            }
+        }
+    }
+
+    fn send_message(&self, packet: any_client::Packet) -> u32 {
+        let request_id = self.next_request_id.get();
+        self.next_request_id
+            .set(self.next_request_id.get().wrapping_add(1));
         let mut bytes = BytesMut::new();
         let packet = AnyClient {
-            request_id: request_id.unwrap_or_default(),
+            request_id: request_id as i32,
             packet: Some(packet),
         };
         packet.encode(&mut bytes).expect("failed to encode message");
         self.bridge.send_message(bytes.freeze());
+        request_id
     }
 }
 

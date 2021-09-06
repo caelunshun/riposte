@@ -68,6 +68,10 @@ impl Player {
         self.id
     }
 
+    pub fn network_id(&self) -> u32 {
+        self.data.id as u32
+    }
+
     pub fn researching_tech(&self) -> Option<&ResearchingTech> {
         self.researching_tech.as_ref()
     }

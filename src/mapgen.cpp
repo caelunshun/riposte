@@ -107,6 +107,8 @@ namespace rip {
             }
 
             game.addUnit(Unit(unitKind, unitPos, player));
+
+            game.getPlayer(player).recomputeVisibility(game);
         }
 
         return std::pair<Game, std::map<uint32_t, PlayerId>>(std::move(game), std::move(playerIDMapping));

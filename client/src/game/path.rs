@@ -45,11 +45,11 @@ impl Path {
     }
 
     /// Gets the next point to move to, if we begin at the starting position.
-    pub fn next(&self) -> Option<PathPoint> {
+    pub fn next(&mut self) -> Option<PathPoint> {
         if self.points.len() == 1 {
             None
         } else {
-            Some(self.points[1])
+            Some(self.points.remove(1))
         }
     }
 }
@@ -145,8 +145,8 @@ impl Pathfinder {
                 let mut current_turn = 0;
                 for (i, pos) in points.into_iter().enumerate() {
                     if i != 0 {
-                        if current_turn == 0 {
-                            current_turn = 1;
+                        if i == 1 {
+                            current_turn += 1;
                         }
 
                         let movement_cost = game

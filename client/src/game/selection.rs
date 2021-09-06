@@ -5,11 +5,13 @@ use std::iter;
 use duit::{Event, Vec2};
 use float_ord::FloatOrd;
 use glam::UVec2;
+use protocol::ConfirmMoveUnits;
 use slotmap::{SecondaryMap, SlotMap};
 use smallvec::SmallVec;
 use winit::event::MouseButton;
 
 use crate::{
+    client::{Client, GameState, ServerResponseFuture},
     context::Context,
     utils::{Version, VersionSnapshot},
 };
@@ -167,6 +169,8 @@ pub struct SelectionDriver {
 
     /// The currently staged path for unit movement
     staged_path: Option<StagedPath>,
+
+    movement: MovementDriver,
 }
 
 impl SelectionDriver {
@@ -225,6 +229,8 @@ impl SelectionDriver {
     }
 
     pub fn update(&mut self, game: &Game, time: f32) {
+        self.movement.update(game);
+
         if !game.selected_units().get_all().is_empty() {
             self.last_selection_time = time;
         }
@@ -278,7 +284,13 @@ impl SelectionDriver {
         }
     }
 
-    pub fn handle_event(&mut self, game: &Game, _cx: &Context, event: &Event) {
+    pub fn handle_event(
+        &mut self,
+        game: &Game,
+        client: &mut Client<GameState>,
+        _cx: &Context,
+        event: &Event,
+    ) {
         match event {
             Event::MousePress {
                 button: MouseButton::Left,
@@ -293,7 +305,7 @@ impl SelectionDriver {
             Event::MouseRelease {
                 button: MouseButton::Right,
                 ..
-            } => self.handle_right_mouse_release(),
+            } => self.handle_right_mouse_release(game, client),
             Event::MouseMove { pos } => self.handle_cursor_move(game, *pos),
             _ => {}
         }
@@ -326,8 +338,23 @@ impl SelectionDriver {
         self.pathfind_to(game, game.view().tile_pos_for_screen_offset(pos));
     }
 
-    fn handle_right_mouse_release(&mut self) {
-        self.staged_path = None;
+    fn handle_right_mouse_release(&mut self, game: &Game, client: &mut Client<GameState>) {
+        if let Some(StagedPath::Complete { mut path }) = self.staged_path.take() {
+            while let Some(point) = path.next() {
+                if point.turn > 1 {
+                    break;
+                }
+
+                self.movement.move_units(
+                    game,
+                    client,
+                    game.selected_units().get_all().iter().copied(),
+                    point.pos,
+                );
+
+                log::info!("Requesting to move units to {:?}", point.pos);
+            }
+        }
     }
 
     fn handle_cursor_move(&mut self, game: &Game, pos: Vec2) {
@@ -362,4 +389,58 @@ impl SelectionDriver {
             None => self.staged_path = Some(StagedPath::Unreachable { pos: end }),
         }
     }
+}
+
+/// Responsible for driving unit movement.
+///
+/// Unit movement is asynchronous: we send the MoveUnits
+/// packet and the server responds with ConfirmMoveUnits.
+/// Multiple unit movement requests can happen in parallel,
+/// though this is an edge case.
+#[derive(Default)]
+struct MovementDriver {
+    /// List of units currently being moved (waiting on server confirmation)
+    waiting: Vec<WaitingMovement>,
+}
+
+impl MovementDriver {
+    pub fn update(&mut self, game: &Game) {
+        self.waiting.retain(|waiting| {
+            if let Some(response) = waiting.future.get() {
+                log::info!("Server responded to move request {:?}. Success: {}", waiting.target_pos, response.success);
+                if response.success {
+                    for &unit in &waiting.units {
+                        if game.is_unit_valid(unit) {
+                            game.unit_mut(unit).set_pos_unsafe(waiting.target_pos);
+                        }
+                    }
+                }
+                false
+            } else {
+                true
+            }
+        });
+    }
+
+    pub fn move_units(
+        &mut self,
+        game: &Game,
+        client: &mut Client<GameState>,
+        units: impl Iterator<Item = UnitId>,
+        target_pos: UVec2,
+    ) {
+        let units: Vec<UnitId> = units.collect();
+        let future = client.move_units(game, units.iter().copied(), target_pos);
+        self.waiting.push(WaitingMovement {
+            future,
+            units,
+            target_pos,
+        });
+    }
+}
+
+struct WaitingMovement {
+    future: ServerResponseFuture<ConfirmMoveUnits>,
+    units: Vec<UnitId>,
+    target_pos: UVec2,
 }

@@ -58,6 +58,14 @@ impl Unit {
         UVec2::new(p.x, p.y)
     }
 
+    /// Manually update the unit's position.
+    ///
+    /// Only used for unit movement code when we receive ConfirmMoveUnits.
+    /// Don't attempt to move units with this function.
+    pub fn set_pos_unsafe(&mut self, pos: UVec2) {
+        self.data.pos = Some(pos.into());
+    }
+
     pub fn health(&self) -> f64 {
         self.data.health
     }
@@ -76,6 +84,10 @@ impl Unit {
 
     pub fn id(&self) -> UnitId {
         self.id
+    }
+
+    pub fn network_id(&self) -> u32 {
+        self.data.id as u32
     }
 
     pub fn strength(&self) -> f64 {
