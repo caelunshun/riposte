@@ -24,7 +24,7 @@ use super::{tile::OutOfBounds, Game, UnitId};
 /// Additionally, if a unit in this stack is _selected_ by the user, then it is always at the top.
 #[derive(Debug, Default)]
 pub struct UnitStack {
-    units: SmallVec<[UnitId; 2]>,
+    units: SmallVec<[UnitId; 1]>,
 }
 
 impl UnitStack {
@@ -40,9 +40,10 @@ impl UnitStack {
 
     /// Adds a unit to the stack, then resorts.
     fn add_unit(&mut self, game: &Game, unit: UnitId) {
-        self.units.push(unit);
-
-        self.resort(game);
+        if !self.units.contains(&unit) {
+            self.units.push(unit);
+            self.resort(game);
+        }
     }
 
     /// Removes a unit from the stack.
@@ -143,6 +144,17 @@ impl StackGrid {
 
         if let Ok(mut new_stack) = self.get_mut(new_pos) {
             new_stack.add_unit(game, unit);
+        }
+
+        let mut touched_units = ahash::AHashSet::new();
+        for x in 0..self.width {
+            for y in 0..self.height {
+                let pos = glam::uvec2(x, y);
+                let stack = self.get(pos).unwrap();
+                for unit in stack.units() {
+                    assert!(touched_units.insert(*unit), "failed at {:?}", pos);
+                }
+            }
         }
     }
 

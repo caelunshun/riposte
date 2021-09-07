@@ -16,7 +16,7 @@ use crate::{
     utils::{Version, VersionSnapshot},
 };
 
-use super::{Game, UnitId, path::Path, unit::MOVEMENT_LEFT_EPSILON};
+use super::{path::Path, unit::MOVEMENT_LEFT_EPSILON, Game, UnitId};
 
 /// The time after no units are selected at which we will
 /// attempt to auto-select the next unit group.
@@ -113,12 +113,21 @@ impl SelectedUnits {
 #[derive(Debug)]
 struct UnitGroup {
     units: SmallVec<[UnitId; 1]>,
+
+    /// The target location of this unit group. If set,
+    /// the units will automatically move toward the target
+    /// until they have arrived or encountered an obstacle.
+    target_pos: Option<UVec2>,
+
+    last_move_turn: Option<u32>,
 }
 
 impl UnitGroup {
     pub fn new(units: impl IntoIterator<Item = UnitId>) -> Self {
         Self {
             units: units.into_iter().collect(),
+            target_pos: None,
+            last_move_turn: None,
         }
     }
 
@@ -138,10 +147,11 @@ impl UnitGroup {
 
     /// Returns whether the group is a candidate for being auto-selected.
     pub fn should_autoselect(&self, game: &Game) -> bool {
-        self.units.iter().any(|&u| {
-            let unit = game.unit(u);
-            unit.has_movement_left() && !unit.is_fortified()
-        })
+        self.last_move_turn != Some(game.turn())
+            && self.units.iter().any(|&u| {
+                let unit = game.unit(u);
+                unit.has_movement_left() && !unit.is_fortified()
+            })
     }
 }
 
@@ -173,6 +183,7 @@ pub struct SelectionDriver {
 
     /// The currently staged path for unit movement
     staged_path: Option<StagedPath>,
+    right_click_held: bool,
 
     movement: MovementDriver,
 
@@ -185,8 +196,10 @@ impl SelectionDriver {
     }
 
     fn create_group(&mut self, units: impl IntoIterator<Item = UnitId>) -> UnitGroupId {
-        let group = self.groups.insert(UnitGroup::new(units));
-        for &unit in self.groups[group].units() {
+        let units: Vec<UnitId> = units.into_iter().collect();
+        let group = self.groups.insert(UnitGroup::new(units.clone()));
+        for unit in units {
+            self.remove_unit_from_group(unit);
             self.unit_to_group.insert(unit, group);
         }
         group
@@ -234,7 +247,7 @@ impl SelectionDriver {
         }
     }
 
-    pub fn update(&mut self, cx: &Context, game: &Game, time: f32) {
+    pub fn update(&mut self, cx: &Context, game: &Game, client: &mut Client<GameState>, time: f32) {
         self.movement.update(game);
 
         if game.are_prompts_open {
@@ -246,7 +259,7 @@ impl SelectionDriver {
         }
 
         if time - self.last_selection_time >= AUTOSELECT_TIME && !game.are_prompts_open {
-            self.do_autoselect(cx, game);
+            self.do_autoselect(cx, game, client);
         }
     }
 
@@ -263,10 +276,15 @@ impl SelectionDriver {
         self.is_selection_exhausted
     }
 
+    /// Returns whether there are pending unit movement tasks.
+    pub fn has_pending_unit_movements(&self) -> bool {
+        !self.movement.waiting.is_empty()
+    }
+
     /// Auto-selects the closest unit group that meets the following conditions:
     /// * It has at least one unit that can still move on this turn; and
     /// * not all units in the stack are fortified.
-    fn do_autoselect(&mut self, cx: &Context, game: &Game) {
+    fn do_autoselect(&mut self, cx: &Context, game: &Game, client: &mut Client<GameState>) {
         let mut candidate_groups = Vec::new();
 
         for (group_id, group) in &self.groups {
@@ -290,18 +308,43 @@ impl SelectionDriver {
                 "Auto-selected a unit group from {} candidates",
                 candidate_groups.len()
             );
-            game.view_mut()
-                .animate_to(cx, self.groups[best_group_id].pos(game).unwrap());
-            self.select_unit_group(game, best_group_id);
-            self.is_selection_exhausted = false;
+
+            let group = &mut self.groups[best_group_id];
+            let mut should_select = true;
+            if let Some(target) = group.target_pos {
+                if target == group.pos(game).unwrap() {
+                    group.target_pos = None;
+                } else if let Some(mut path) = game.pathfinder_mut().compute_shortest_path(
+                    game,
+                    group.units.iter().map(|u| game.unit(*u)),
+                    group.pos(game).unwrap(),
+                    target,
+                ) {
+                    self.move_units_along_path(game, client, best_group_id, &mut path, false);
+                    should_select = false;
+                    self.groups[best_group_id].last_move_turn = Some(game.turn());
+                }
+            }
+
+            if should_select {
+                game.view_mut()
+                    .animate_to(cx, self.groups[best_group_id].pos(game).unwrap());
+                self.select_unit_group(game, best_group_id);
+                self.is_selection_exhausted = false;
+            }
         } else {
             self.is_selection_exhausted = true;
         }
     }
 
-    fn select_unit_group(&self, game: &Game, id: UnitGroupId) {
-        for &unit in self.groups[id].units() {
+    fn select_unit_group(&mut self, game: &Game, id: UnitGroupId) {
+        let group = &self.groups[id];
+        for &unit in group.units() {
             game.selected_units_mut().select(game, unit);
+        }
+
+        if let Some(target_pos) = group.target_pos {
+            self.pathfind_to(game, target_pos);
         }
     }
 
@@ -339,8 +382,8 @@ impl SelectionDriver {
         let mut selected = false;
         if let Ok(stack) = game.unit_stack(tile_pos) {
             if let Some(first_unit) = stack.top_unit() {
-                if let Some(group) = self.unit_to_group.get(first_unit) {
-                    self.select_unit_group(game, *group);
+                if let Some(&group) = self.unit_to_group.get(first_unit) {
+                    self.select_unit_group(game, group);
                     selected = true;
                 }
             }
@@ -348,6 +391,7 @@ impl SelectionDriver {
 
         if !selected {
             game.selected_units_mut().clear();
+            self.staged_path = None;
         }
     }
 
@@ -356,43 +400,76 @@ impl SelectionDriver {
             return;
         }
 
+        self.right_click_held = true;
+
         self.pathfind_to(game, game.view().tile_pos_for_screen_offset(pos));
     }
 
     fn handle_right_mouse_release(&mut self, game: &Game, client: &mut Client<GameState>) {
-        if let Some(StagedPath::Complete { mut path }) = self.staged_path.take() {
-            while let Some(point) = path.next() {
-                if point.turn > 1 {
-                    break;
-                }
+        self.right_click_held = false;
 
-                // If the units will have no movement left, then
-                // we automatically deselect them after moving.
-                let should_deselect = match path.peek() {
+        let group_id = self.create_group(game.selected_units().get_all().iter().copied());
+
+        if let Some(StagedPath::Complete { mut path }) = self.staged_path.take() {
+            self.move_units_along_path(game, client, group_id, &mut path, true);
+        }
+    }
+
+    fn move_units_along_path(
+        &mut self,
+        game: &Game,
+        client: &mut Client<GameState>,
+        group_id: UnitGroupId,
+        path: &mut Path,
+        deselect_after_move: bool,
+    ) {
+        let group = &mut self.groups[group_id];
+        let end = path.end().pos;
+
+        let mut prev_pos = path.start().pos;
+        while let Some(point) = path.next() {
+            if point.turn > 1 {
+                // We can't finish moving on this turn.
+                // Set the group's target position so it
+                // automatically moves toward the target on the next turn.
+                group.target_pos = Some(end);
+                if deselect_after_move {
+                    game.selected_units_mut().clear();
+                }
+                break;
+            }
+
+            // If the units will have no movement left, then
+            // we automatically deselect them after moving.
+            let should_deselect = deselect_after_move
+                && match path.peek() {
                     Some(next_point) => next_point.turn > 1,
                     None => point.movement_left <= MOVEMENT_LEFT_EPSILON,
                 };
 
-                self.movement.move_units(
-                    game,
-                    client,
-                    game.selected_units().get_all().iter().copied(),
-                    point.pos,
-                    move |game, success| {
-                        if success && should_deselect {
-                            game.selected_units_mut().clear();
-                        }
-                    },
-                );
-            }
+            self.movement.move_units(
+                game,
+                client,
+                group.units.iter().copied(),
+                prev_pos,
+                point.pos,
+                move |game, success| {
+                    if success && should_deselect {
+                        game.selected_units_mut().clear();
+                    }
+                },
+            );
+            prev_pos = point.pos;
         }
     }
 
     fn handle_cursor_move(&mut self, game: &Game, pos: Vec2) {
-        let pos = game.view().tile_pos_for_screen_offset(pos);
-        if let Some(dst) = self.staged_destination() {
-            if dst != pos {
-                self.pathfind_to(game, pos);
+        if self.right_click_held {
+            let pos = game.view().tile_pos_for_screen_offset(pos);
+            if let Some(dst) = self.staged_destination() {
+                if dst != pos {
+                    self.pathfind_to(game, pos);
+                }
             }
         }
     }
@@ -443,13 +520,6 @@ impl MovementDriver {
                     waiting.target_pos,
                     response.success
                 );
-                if response.success {
-                    for &unit in &waiting.units {
-                        if game.is_unit_valid(unit) {
-                            game.unit_mut(unit).set_pos_unsafe(waiting.target_pos);
-                        }
-                    }
-                }
                 (waiting.callback)(game, response.success);
                 false
             } else {
@@ -463,6 +533,7 @@ impl MovementDriver {
         game: &Game,
         client: &mut Client<GameState>,
         units: impl Iterator<Item = UnitId>,
+        start_pos: UVec2,
         target_pos: UVec2,
         callback: impl Fn(&Game, bool) + 'static,
     ) {
@@ -477,6 +548,7 @@ impl MovementDriver {
         self.waiting.push(WaitingMovement {
             future,
             units,
+            start_pos,
             target_pos,
             callback: Box::new(callback),
         });
@@ -487,5 +559,6 @@ struct WaitingMovement {
     future: ServerResponseFuture<ConfirmMoveUnits>,
     units: Vec<UnitId>,
     target_pos: UVec2,
+    start_pos: UVec2,
     callback: Box<dyn Fn(&Game, bool)>,
 }

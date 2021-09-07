@@ -404,13 +404,17 @@ impl Game {
     /// Returns whether the current turn can be ended
     /// because all units have been moved.
     pub fn can_end_turn(&self) -> bool {
-        self.selection_driver().is_selection_exhausted() && !self.are_prompts_open
+        self.selection_driver().is_selection_exhausted()
+            && !self.are_prompts_open
+            && self.selected_units().get_all().is_empty()
+            && !self.selection_driver().has_pending_unit_movements()
     }
 
     /// Called every frame.
-    pub fn update(&mut self, cx: &mut Context) {
+    pub fn update(&mut self, cx: &mut Context, client: &mut Client<GameState>) {
         self.view_mut().update(cx);
-        self.selection_driver_mut().update(cx, self, cx.time());
+        self.selection_driver_mut()
+            .update(cx, self, client, cx.time());
 
         if self.selection_units_version.is_outdated() {
             self.stacks.resort(self);
@@ -484,7 +488,7 @@ impl Game {
         self.selection_driver_mut().on_unit_added(self, unit);
     }
 
-    fn on_unit_moved(&mut self, unit: UnitId, old_pos: UVec2, new_pos: UVec2) {
+    pub fn on_unit_moved(&self, unit: UnitId, old_pos: UVec2, new_pos: UVec2) {
         self.stacks.on_unit_moved(self, unit, old_pos, new_pos);
         self.selected_units_mut()
             .on_unit_moved(self, unit, old_pos, new_pos);

@@ -56,6 +56,9 @@ impl ServerBridge {
 
         task::spawn(async move {
             while let Some(Ok(msg)) = reader.next().await {
+                // Uncomment to add artificial ping for testing.
+                // tokio::time::sleep(std::time::Duration::from_millis(200)).await;
+
                 if receiving_tx.send_async(msg.freeze()).await.is_err() {
                     break;
                 }

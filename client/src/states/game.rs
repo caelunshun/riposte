@@ -72,7 +72,7 @@ impl GameState {
     pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<()> {
         self.client.handle_messages(cx, &mut self.game)?;
         self.prompts.update(cx, &self.game, &mut self.client);
-        self.game.update(cx);
+        self.game.update(cx, &mut self.client);
         self.page.update(cx, &self.game, &mut self.client);
         self.renderer.render(&self.game, cx);
 
