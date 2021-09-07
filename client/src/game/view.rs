@@ -4,6 +4,7 @@ use bitflags::bitflags;
 use duit::Event;
 use dume::Canvas;
 use glam::{uvec2, vec2, UVec2, Vec2};
+use splines::{Interpolation, Key, Spline};
 
 use crate::context::Context;
 
@@ -43,6 +44,9 @@ pub struct View {
     move_time: Vec2,
     /// Current velocity of the center position.
     center_velocity: Vec2,
+
+    /// Center animation spline
+    center_animation: Option<Spline<f32, Vec2>>,
 }
 
 impl Default for View {
@@ -61,6 +65,8 @@ impl View {
             move_dirs: MoveDir::empty(),
             move_time: Vec2::ZERO,
             center_velocity: Vec2::ZERO,
+
+            center_animation: None,
         }
     }
 
@@ -69,8 +75,7 @@ impl View {
     }
 
     pub fn set_center_tile(&mut self, center_tile: UVec2) {
-        self.center = vec2(center_tile.x as f32, center_tile.y as f32) * PIXELS_PER_TILE
-            + PIXELS_PER_TILE / 2.;
+        self.center = center_of_tile(center_tile);
     }
 
     pub fn center_tile(&self) -> UVec2 {
@@ -86,6 +91,26 @@ impl View {
 
     pub fn window_size(&self) -> Vec2 {
         self.size
+    }
+
+    /// Animates the view to the given target position over a short
+    /// period of time.
+    ///
+    /// Overrides any existing animation.
+    pub fn animate_to(&mut self, cx: &Context, target_tile: UVec2) {
+        let animation_time = 0.5;
+
+        let start_pos = self.center;
+        let target_pos = center_of_tile(target_tile);
+
+        self.center_animation = Some(Spline::from_vec(vec![
+            Key::new(cx.time(), start_pos, Interpolation::Cosine),
+            Key::new(
+                cx.time() + animation_time,
+                target_pos,
+                Interpolation::Cosine,
+            ),
+        ]));
     }
 
     /// Gets the offset in screen space logical pixels
@@ -113,6 +138,13 @@ impl View {
     pub fn update(&mut self, cx: &Context) {
         self.update_window_size(cx);
         self.do_panning(cx);
+
+        if let Some(spline) = &self.center_animation {
+            match spline.sample(cx.time()) {
+                Some(p) => self.center = p,
+                None => self.center_animation = None,
+            }
+        }
     }
 
     fn update_window_size(&mut self, cx: &Context) {
@@ -202,4 +234,8 @@ fn sample_velocity_curve(time: f32) -> f32 {
     }
 
     -(max / 2.) * (time / (0.1 * PI)).cos() + max / 2.
+}
+
+fn center_of_tile(tile: UVec2) -> Vec2 {
+    vec2(tile.x as f32, tile.y as f32) * PIXELS_PER_TILE + PIXELS_PER_TILE / 2.
 }

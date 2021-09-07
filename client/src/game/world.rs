@@ -69,7 +69,7 @@ pub struct Game {
 
     stacks: StackGrid,
 
-    view: View,
+    view: RefCell<View>,
 
     turn: u32,
     era: Era,
@@ -97,7 +97,7 @@ impl Game {
             units: SlotMap::default(),
             registry,
             map: Map::default(),
-            view: View::default(),
+            view: RefCell::new(View::default()),
             stacks: StackGrid::default(),
 
             turn: 0,
@@ -332,13 +332,13 @@ impl Game {
     }
 
     /// Gets the game view.
-    pub fn view(&self) -> &View {
-        &self.view
+    pub fn view(&self) -> Ref<View> {
+        self.view.borrow()
     }
 
     /// Mutably the game view.
-    pub fn view_mut(&mut self) -> &mut View {
-        &mut self.view
+    pub fn view_mut(&self) -> RefMut<View> {
+        self.view.borrow_mut()
     }
 
     /// Gets the tile at the given position.
@@ -393,7 +393,7 @@ impl Game {
     /// Called every frame.
     pub fn update(&mut self, cx: &mut Context) {
         self.view_mut().update(cx);
-        self.selection_driver_mut().update(self, cx.time());
+        self.selection_driver_mut().update(cx, self, cx.time());
 
         if self.selection_units_version.is_outdated() {
             self.stacks.resort(self);

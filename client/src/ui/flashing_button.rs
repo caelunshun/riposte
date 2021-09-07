@@ -92,10 +92,7 @@ impl Widget for FlashingButton {
                 .into_linear()
                 .mix(&flash_color_b.into_format().into_linear(), mix_factor);
 
-            background_color =
-                ((background_color.into_format::<f32, f32>().into_linear() + blend_color) / 2.)
-                    .into_encoding()
-                    .into_format();
+            background_color = blend_color.into_encoding().into_format();
         }
 
         canvas

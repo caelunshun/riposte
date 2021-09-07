@@ -230,7 +230,7 @@ impl SelectionDriver {
         }
     }
 
-    pub fn update(&mut self, game: &Game, time: f32) {
+    pub fn update(&mut self, cx: &Context, game: &Game, time: f32) {
         self.movement.update(game);
 
         if !game.selected_units().get_all().is_empty() {
@@ -238,7 +238,7 @@ impl SelectionDriver {
         }
 
         if time - self.last_selection_time >= AUTOSELECT_TIME {
-            self.do_autoselect(game);
+            self.do_autoselect(cx, game);
         }
     }
 
@@ -252,7 +252,7 @@ impl SelectionDriver {
     /// Auto-selects the closest unit group that meets the following conditions:
     /// * It has at least one unit that can still move on this turn; and
     /// * not all units in the stack are fortified.
-    fn do_autoselect(&mut self, game: &Game) {
+    fn do_autoselect(&mut self, cx: &Context, game: &Game) {
         let mut candidate_groups = Vec::new();
 
         for (group_id, group) in &self.groups {
@@ -276,6 +276,8 @@ impl SelectionDriver {
                 "Auto-selected a unit group from {} candidates",
                 candidate_groups.len()
             );
+            game.view_mut()
+                .animate_to(cx, self.groups[best_group_id].pos(game).unwrap());
             self.select_unit_group(game, best_group_id);
         }
     }

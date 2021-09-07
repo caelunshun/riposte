@@ -74,9 +74,9 @@ styles:
     background_color: $foreground
 
   flashing_button:
-    flash_color_a: $background
+    flash_color_a: rgb(25, 97, 174)
     flash_color_b: rgb(0, 118, 165)
-    flash_period: 1.25
+    flash_period: 0.75
 
   unit_action_button:
     padding: 10
