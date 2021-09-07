@@ -6,7 +6,7 @@ use crate::{
 };
 
 /// Generates a tooltip for the given unit kind.
-pub fn unit_toolip(registry: &Registry, unit: &UnitKind) -> String {
+pub fn unit_tooltip(registry: &Registry, unit: &UnitKind) -> String {
     let mut lines = Vec::new();
 
     // Basic info

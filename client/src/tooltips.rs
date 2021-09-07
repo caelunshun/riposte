@@ -8,7 +8,7 @@ pub mod unit;
 
 pub fn build_task_tooltip(registry: &Registry, task: &BuildTaskKind) -> String {
     match task {
-        BuildTaskKind::Unit(u) => unit::unit_toolip(registry, &u),
+        BuildTaskKind::Unit(u) => unit::unit_tooltip(registry, &u),
         BuildTaskKind::Building(b) => building::building_tooltip(registry, &b),
     }
 }
