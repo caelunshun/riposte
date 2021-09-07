@@ -16,7 +16,7 @@ use crate::{
     utils::{Version, VersionSnapshot},
 };
 
-use super::{path::Path, Game, UnitId};
+use super::{Game, UnitId, path::Path, unit::MOVEMENT_LEFT_EPSILON};
 
 /// The time after no units are selected at which we will
 /// attempt to auto-select the next unit group.
@@ -81,8 +81,10 @@ impl SelectedUnits {
 
     /// Clears the selection.
     pub fn clear(&mut self) {
+        if !self.units.is_empty() {
+            self.version.update();
+        }
         self.units.clear();
-        self.version.update();
     }
 
     /// Returns whether the given unit is selected.
@@ -235,11 +237,15 @@ impl SelectionDriver {
     pub fn update(&mut self, cx: &Context, game: &Game, time: f32) {
         self.movement.update(game);
 
-        if !game.selected_units().get_all().is_empty() {
+        if game.are_prompts_open {
+            game.selected_units_mut().clear();
+        }
+
+        if !game.selected_units().get_all().is_empty() || game.are_prompts_open {
             self.last_selection_time = time;
         }
 
-        if time - self.last_selection_time >= AUTOSELECT_TIME {
+        if time - self.last_selection_time >= AUTOSELECT_TIME && !game.are_prompts_open {
             self.do_autoselect(cx, game);
         }
     }
@@ -360,17 +366,23 @@ impl SelectionDriver {
                     break;
                 }
 
+                // If the units will have no movement left, then
+                // we automatically deselect them after moving.
+                let should_deselect = match path.peek() {
+                    Some(next_point) => next_point.turn > 1,
+                    None => point.movement_left <= MOVEMENT_LEFT_EPSILON,
+                };
+
                 self.movement.move_units(
                     game,
                     client,
                     game.selected_units().get_all().iter().copied(),
                     point.pos,
-                );
-
-                log::info!(
-                    "Requesting to move {} units to {:?}",
-                    game.selected_units().get_all().len(),
-                    point.pos
+                    move |game, success| {
+                        if success && should_deselect {
+                            game.selected_units_mut().clear();
+                        }
+                    },
                 );
             }
         }
@@ -438,6 +450,7 @@ impl MovementDriver {
                         }
                     }
                 }
+                (waiting.callback)(game, response.success);
                 false
             } else {
                 true
@@ -451,13 +464,21 @@ impl MovementDriver {
         client: &mut Client<GameState>,
         units: impl Iterator<Item = UnitId>,
         target_pos: UVec2,
+        callback: impl Fn(&Game, bool) + 'static,
     ) {
         let units: Vec<UnitId> = units.collect();
+        log::info!(
+            "Requesting to move {} units to {:?}",
+            units.len(),
+            target_pos
+        );
+
         let future = client.move_units(game, units.iter().copied(), target_pos);
         self.waiting.push(WaitingMovement {
             future,
             units,
             target_pos,
+            callback: Box::new(callback),
         });
     }
 }
@@ -466,4 +487,5 @@ struct WaitingMovement {
     future: ServerResponseFuture<ConfirmMoveUnits>,
     units: Vec<UnitId>,
     target_pos: UVec2,
+    callback: Box<dyn Fn(&Game, bool)>,
 }

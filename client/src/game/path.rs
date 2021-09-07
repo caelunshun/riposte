@@ -18,6 +18,8 @@ pub struct PathPoint {
     pub pos: UVec2,
     /// The number of turns from the start it takes to arrive here
     pub turn: u32,
+    /// The movement the unit has left at this point.
+    pub movement_left: f64
 }
 
 /// A path between two points.
@@ -51,6 +53,10 @@ impl Path {
         } else {
             Some(self.points.remove(1))
         }
+    }
+
+    pub fn peek(&self) -> Option<PathPoint> {
+        self.points.get(1).copied()
     }
 }
 
@@ -160,6 +166,7 @@ impl Pathfinder {
                     path_points.push(PathPoint {
                         pos,
                         turn: current_turn,
+                        movement_left: current_movement_left,
                     });
 
                     if current_movement_left <= MOVEMENT_LEFT_EPSILON {

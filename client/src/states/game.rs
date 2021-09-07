@@ -70,18 +70,18 @@ impl GameState {
     }
 
     pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<()> {
-        self.game.are_prompts_open = !self.prompts.is_empty();
-
         self.client.handle_messages(cx, &mut self.game)?;
+        self.prompts.update(cx, &self.game, &mut self.client);
         self.game.update(cx);
         self.page.update(cx, &self.game, &mut self.client);
-        self.prompts.update(cx, &self.game, &mut self.client);
         self.renderer.render(&self.game, cx);
 
         while let Some(event) = self.game.next_event() {
             self.page.handle_game_event(cx, &self.game, &event);
             self.handle_game_event(cx, &event);
         }
+
+        self.game.are_prompts_open = !self.prompts.is_empty();
 
         Ok(())
     }
