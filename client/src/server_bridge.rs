@@ -5,7 +5,7 @@ use bytes::Bytes;
 use flume::{Receiver, Sender};
 use futures::{stream::StreamExt, SinkExt};
 use riposte_backend_api::codec;
-use tokio::{process::Command, task};
+use tokio::{io::{BufReader, AsyncBufReadExt}, process::Command, task};
 
 use crate::options::Account;
 
@@ -26,7 +26,7 @@ impl ServerBridge {
         let mut server_process = Command::new(SERVER_PATH)
             .stdin(Stdio::piped())
             .stdout(Stdio::piped())
-            .stderr(Stdio::inherit())
+            .stderr(Stdio::piped())
             .env(
                 "RIPOSTE_HOST_UUID",
                 host_account.uuid().to_hyphenated().to_string(),
@@ -37,6 +37,7 @@ impl ServerBridge {
 
         let stdin = server_process.stdin.take().unwrap();
         let stdout = server_process.stdout.take().unwrap();
+        let stderr = server_process.stderr.take().unwrap();
 
         task::spawn(async move {
             let exit_code = server_process
@@ -70,6 +71,13 @@ impl ServerBridge {
                 if writer.send(msg).await.is_err() {
                     break;
                 }
+            }
+        });
+
+        task::spawn(async move {
+            let mut stderr_lines = BufReader::new(stderr).lines();
+            while let Ok(Some(line)) = stderr_lines.next_line().await {
+                log::info!("{}", line);
             }
         });
 
