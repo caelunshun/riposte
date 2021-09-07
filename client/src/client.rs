@@ -9,8 +9,8 @@ use prost::Message;
 use protocol::{
     any_client, any_server, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer,
     BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits,
-    CreateSlot, DeleteSlot, DoUnitAction, GameStarted, GetBuildTasks, InitialGameData, Kicked,
-    LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, RequestGameStart, ServerLobbyPacket,
+    CreateSlot, DeleteSlot, DoUnitAction, EndTurn, GameStarted, GetBuildTasks, InitialGameData,
+    Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, RequestGameStart, ServerLobbyPacket,
     SetCityBuildTask,
 };
 
@@ -245,6 +245,11 @@ impl Client<GameState> {
         }));
     }
 
+    pub fn end_turn(&mut self, game: &mut Game) {
+        self.send_message(any_client::Packet::EndTurn(EndTurn {}));
+        game.waiting_on_turn_end = true;
+    }
+
     pub fn handle_messages(&mut self, cx: &Context, game: &mut Game) -> anyhow::Result<()> {
         while let Some(msg) = self.poll_for_message()? {
             let request_id = msg.request_id as u32;
@@ -270,10 +275,11 @@ impl Client<GameState> {
                 any_server::Packet::BuildTaskFailed(packet) => {
                     self.handle_build_task_failed(game, packet)?
                 }
-                any_server::Packet::UpdateVisibility(packet) => {
-                    game.map_mut().set_visibility(packet.visibility().collect())?
-                }
-                _ => log::warn!("unhandled packet"),
+                any_server::Packet::UpdateVisibility(packet) => game
+                    .map_mut()
+                    .set_visibility(packet.visibility().collect())?,
+                any_server::Packet::UpdateGlobalData(packet) => game.update_global_data(&packet)?,
+                p => log::warn!("unhandled packet: {:?}", p),
             }
         }
         Ok(())

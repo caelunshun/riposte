@@ -182,8 +182,8 @@ impl CityRenderer {
             vec2(BUBBLE_SIZE.x, BUBBLE_SIZE.y / 2.),
             progress,
             projected_progress,
+            Srgba::new(237, 155, 51, u8::MAX),
             Srgba::new(185, 112, 0, u8::MAX),
-            Srgba::new(209, 65, 36, u8::MAX),
             city.name().to_owned(),
         );
     }

@@ -173,6 +173,8 @@ pub struct SelectionDriver {
     staged_path: Option<StagedPath>,
 
     movement: MovementDriver,
+
+    is_selection_exhausted: bool,
 }
 
 impl SelectionDriver {
@@ -249,6 +251,12 @@ impl SelectionDriver {
         })
     }
 
+    /// Returns whether there are no units left to autoselect,
+    /// and thus we can end the turn.
+    pub fn is_selection_exhausted(&self) -> bool {
+        self.is_selection_exhausted
+    }
+
     /// Auto-selects the closest unit group that meets the following conditions:
     /// * It has at least one unit that can still move on this turn; and
     /// * not all units in the stack are fortified.
@@ -279,6 +287,9 @@ impl SelectionDriver {
             game.view_mut()
                 .animate_to(cx, self.groups[best_group_id].pos(game).unwrap());
             self.select_unit_group(game, best_group_id);
+            self.is_selection_exhausted = false;
+        } else {
+            self.is_selection_exhausted = true;
         }
     }
 

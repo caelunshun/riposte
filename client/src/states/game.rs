@@ -1,4 +1,5 @@
 use duit::Event;
+use winit::event::VirtualKeyCode;
 
 use crate::{
     client::{self, Client},
@@ -69,6 +70,8 @@ impl GameState {
     }
 
     pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<()> {
+        self.game.are_prompts_open = !self.prompts.is_empty();
+
         self.client.handle_messages(cx, &mut self.game)?;
         self.game.update(cx);
         self.page.update(cx, &self.game, &mut self.client);
@@ -107,5 +110,15 @@ impl GameState {
 
     pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
         self.game.handle_event(cx, &mut self.client, event);
+
+        if let Event::KeyPress {
+            key: VirtualKeyCode::Return,
+        } = event
+        {
+            if self.game.can_end_turn() {
+                log::info!("Ending the turn");
+                self.client.end_turn(&mut self.game);
+            }
+        }
     }
 }

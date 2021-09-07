@@ -11,8 +11,9 @@ use crate::{
     renderer::{
         city::CityRenderer, cultural_border::CulturalBorderRenderer, fog::FogRenderer,
         grid_overlay::GridOverlayRenderer, improvement::ImprovementRenderer,
-        resource::ResourceRenderer, staged_path::StagedPathOverlay, terrain::TerrainRenderer,
-        tile_yield::TileYieldRenderer, tree::TreeRenderer, unit::UnitRenderer,
+        resource::ResourceRenderer, staged_path::StagedPathOverlay, status_text::StatusTextOverlay,
+        terrain::TerrainRenderer, tile_yield::TileYieldRenderer, tree::TreeRenderer,
+        unit::UnitRenderer,
     },
 };
 
@@ -28,6 +29,7 @@ mod tree;
 mod unit;
 
 mod staged_path;
+mod status_text;
 
 trait TileRenderLayer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile);
@@ -61,7 +63,10 @@ impl GameRenderer {
                 Box::new(CulturalBorderRenderer::new(cx)),
                 Box::new(FogRenderer::new(cx)),
             ],
-            overlay_layers: vec![Box::new(StagedPathOverlay::new(cx))],
+            overlay_layers: vec![
+                Box::new(StagedPathOverlay::new(cx)),
+                Box::new(StatusTextOverlay::default()),
+            ],
         }
     }
 

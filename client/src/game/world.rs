@@ -82,6 +82,9 @@ pub struct Game {
     pathfinder: RefCell<Pathfinder>,
 
     events: EventBus,
+
+    pub waiting_on_turn_end: bool,
+    pub are_prompts_open: bool,
 }
 
 impl Game {
@@ -111,6 +114,9 @@ impl Game {
             pathfinder: RefCell::new(Pathfinder::new()),
 
             events: EventBus::default(),
+
+            waiting_on_turn_end: false,
+            are_prompts_open: false,
         }
     }
 
@@ -395,6 +401,12 @@ impl Game {
         self.pathfinder.borrow_mut()
     }
 
+    /// Returns whether the current turn can be ended
+    /// because all units have been moved.
+    pub fn can_end_turn(&self) -> bool {
+        self.selection_driver().is_selection_exhausted() && !self.are_prompts_open
+    }
+
     /// Called every frame.
     pub fn update(&mut self, cx: &mut Context) {
         self.view_mut().update(cx);
@@ -532,8 +544,18 @@ impl Game {
     }
 
     pub fn update_global_data(&mut self, data: &UpdateGlobalData) -> anyhow::Result<()> {
+        let old_turn = self.turn;
         self.turn = data.turn.try_into()?;
         self.the_player_id = self.resolve_player_id(data.player_id as u32)?;
+
+        if self.turn != old_turn {
+            self.on_turn_ended();
+        }
+
         Ok(())
+    }
+
+    fn on_turn_ended(&mut self) {
+        self.waiting_on_turn_end = false;
     }
 }
