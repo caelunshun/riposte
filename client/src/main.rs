@@ -41,6 +41,7 @@ mod state;
 mod states;
 mod ui;
 mod utils;
+mod tooltips;
 mod volumes;
 
 use states::{game::GameState, lobby::GameLobbyState, menu::MenuState};

@@ -17,6 +17,10 @@ pub fn delimit_string<'a>(lines: &[String], delimiter: &str) -> String {
     result
 }
 
+pub fn merge_lines(lines: &[String]) -> String {
+    delimit_string(lines, "\n")
+}
+
 /// Gets the definite article to use for the given noun.
 pub fn article(noun: &str) -> &'static str {
     let first_char = noun.chars().next().unwrap().to_ascii_lowercase();

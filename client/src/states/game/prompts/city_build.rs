@@ -11,6 +11,7 @@ use crate::{
     },
     generated::{CityBuildPromptOption, CityBuildPromptWindow},
     state::StateAttachment,
+    tooltips,
     ui::{AlignFixed, Z_POPUP},
     utils::article,
 };
@@ -136,11 +137,18 @@ impl CityBuildPrompt {
                             turns => city.estimate_build_time_for_task(&task),
                         },
                     );
-                    handle.tooltip_text.get_mut().set_text("todo", vars! {});
                     handle
                         .clickable
                         .get_mut()
                         .on_click(move || SetTask(proto_task.clone()));
+
+                    let tooltip_text = tooltips::build_task_tooltip(cx.registry(), &task.kind);
+                    handle.tooltip_text.get_mut().set_text(
+                        tooltip_text,
+                        vars! {
+                            percent => "%"
+                        },
+                    );
 
                     self.window
                         .as_mut()
