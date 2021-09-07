@@ -484,7 +484,11 @@ impl Game {
     pub fn add_or_update_city(&mut self, data: UpdateCity) -> anyhow::Result<()> {
         let data_id = data.id as u32;
         match self.city_ids.get(data_id) {
-            Some(id) => self.city_mut(id).update_data(data, self),
+            Some(id) => {
+                let res = self.city_mut(id).update_data(data, self);
+                self.push_event(GameEvent::CityUpdated { city: id });
+                res
+            }
             None => {
                 let mut cities = mem::take(&mut self.cities);
                 let res = cities
@@ -492,6 +496,7 @@ impl Game {
                 self.cities = cities;
                 if let Ok(id) = &res {
                     self.city_ids.insert(data_id, *id);
+                    self.push_event(GameEvent::CityUpdated { city: *id });
                 }
                 res.map(|_| ())
             }

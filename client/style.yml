@@ -100,6 +100,12 @@ styles:
   container & game_window_container:
     background_color: rgba(50, 50, 50, 250)
 
+  container & popup_container:
+    border_color: rgb(180, 180, 180)
+    background_color: rgba(50, 50, 50, 253)
+    border_radius: 5
+    border_width: 1
+
   progress_bar:
     border_radius: 1
     border_width: 1

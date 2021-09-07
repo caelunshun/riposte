@@ -19,6 +19,7 @@ pub struct City {
     owner: PlayerId,
     city_yield: Yield,
     build_task: Option<BuildTask>,
+    previous_build_task: Option<PreviousBuildTask>,
     buildings: Vec<Handle<Building>>,
     resources: Vec<Handle<Resource>>,
     culture: Culture,
@@ -34,6 +35,7 @@ impl City {
             owner: Default::default(),
             city_yield: Default::default(),
             build_task: None,
+            previous_build_task: None,
             buildings: Vec::new(),
             resources: Vec::new(),
             culture: Culture::new(),
@@ -185,18 +187,27 @@ impl City {
         self.data.culture_defense_bonus
     }
 
+    pub fn estimate_build_time_for_task(&self, task: &BuildTask) -> u32 {
+        (task.cost - task.progress + self.city_yield().hammers - 1) / (self.city_yield().hammers)
+    }
+
     pub fn estimate_remaining_build_time(&self) -> u32 {
         match &self.build_task {
-            Some(task) => {
-                (task.cost - task.progress + self.city_yield().hammers - 1)
-                    / (self.city_yield().hammers)
-            }
+            Some(task) => self.estimate_build_time_for_task(task),
             None => 0,
         }
     }
 
     pub fn name(&self) -> &str {
         &self.data.name
+    }
+
+    pub fn set_previous_build_task(&mut self, task: PreviousBuildTask) {
+        self.previous_build_task = Some(task);
+    }
+
+    pub fn previous_build_task(&self) -> Option<&PreviousBuildTask> {
+        self.previous_build_task.as_ref()
     }
 }
 
@@ -209,7 +220,7 @@ pub struct BuildTask {
 }
 
 impl BuildTask {
-    fn from_data(data: &protocol::BuildTask, game: &Game) -> anyhow::Result<Self> {
+    pub fn from_data(data: &protocol::BuildTask, game: &Game) -> anyhow::Result<Self> {
         let kind = match &data.kind {
             Some(k) => match &k.task {
                 Some(protocol::build_task_kind::Task::Unit(t)) => {
@@ -242,4 +253,14 @@ impl BuildTask {
 pub enum BuildTaskKind {
     Unit(Handle<UnitKind>),
     Building(Handle<Building>),
+}
+
+/// The previous build task completed by a city.
+#[derive(Debug)]
+pub struct PreviousBuildTask {
+    pub task: BuildTask,
+    /// Whether the task completed successfully.
+    /// If false, then it was canceled, e.g. because
+    /// we lost the necessary resources.
+    pub succeeded: bool,
 }

@@ -17,6 +17,16 @@ pub fn delimit_string<'a>(lines: &[String], delimiter: &str) -> String {
     result
 }
 
+/// Gets the definite article to use for the given noun.
+pub fn article(noun: &str) -> &'static str {
+    let first_char = noun.chars().next().unwrap().to_ascii_lowercase();
+    if matches!(first_char, 'a' | 'e' | 'i' | 'o' | 'u') {
+        "an"
+    } else {
+        "a"
+    }
+}
+
 #[derive(Debug, Default)]
 struct VersionState {
     version: Cell<u64>,

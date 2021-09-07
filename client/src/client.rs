@@ -8,14 +8,18 @@ use glam::{uvec2, UVec2};
 use prost::Message;
 use protocol::{
     any_client, any_server, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer,
-    ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits, CreateSlot, DeleteSlot, DoUnitAction,
-    GameStarted, InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, RequestGameStart,
-    ServerLobbyPacket,
+    BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits,
+    CreateSlot, DeleteSlot, DoUnitAction, GameStarted, GetBuildTasks, InitialGameData, Kicked,
+    LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, RequestGameStart, ServerLobbyPacket,
+    SetCityBuildTask,
 };
 
 use crate::{
     context::Context,
-    game::{Game, UnitId},
+    game::{
+        city::{self, PreviousBuildTask},
+        CityId, Game, UnitId,
+    },
     lobby::GameLobby,
     registry::{Civilization, Leader, Registry},
     server_bridge::ServerBridge,
@@ -218,6 +222,29 @@ impl Client<GameState> {
         log::info!("Performing unit action {:?}", action);
     }
 
+    pub fn get_possible_city_build_tasks(
+        &mut self,
+        game: &Game,
+        city: CityId,
+    ) -> ServerResponseFuture<PossibleCityBuildTasks> {
+        let request_id = self.send_message(any_client::Packet::GetBuildTasks(GetBuildTasks {
+            city_id: game.city(city).network_id() as i32,
+        }));
+        self.register_response_future(request_id)
+    }
+
+    pub fn set_city_build_task(
+        &mut self,
+        game: &Game,
+        city: CityId,
+        build_task: protocol::BuildTask,
+    ) {
+        self.send_message(any_client::Packet::SetCityBuildTask(SetCityBuildTask {
+            city_id: game.city(city).network_id() as i32,
+            task: build_task.kind,
+        }));
+    }
+
     pub fn handle_messages(&mut self, cx: &Context, game: &mut Game) -> anyhow::Result<()> {
         while let Some(msg) = self.poll_for_message()? {
             let request_id = msg.request_id as u32;
@@ -234,6 +261,15 @@ impl Client<GameState> {
                 any_server::Packet::UpdateTile(packet) => game
                     .tile_mut(uvec2(packet.x, packet.y))?
                     .update_data(packet.tile.context("missing tile")?, game)?,
+                any_server::Packet::PossibleCityBuildTasks(packet) => {
+                    self.handle_possible_city_build_tasks(packet, request_id)
+                }
+                any_server::Packet::BuildTaskFinished(packet) => {
+                    self.handle_build_task_finished(game, packet)?
+                }
+                any_server::Packet::BuildTaskFailed(packet) => {
+                    self.handle_build_task_failed(game, packet)?
+                }
                 _ => log::warn!("unhandled packet"),
             }
         }
@@ -242,6 +278,44 @@ impl Client<GameState> {
 
     fn handle_confirm_move_units(&mut self, packet: ConfirmMoveUnits, request_id: u32) {
         self.handle_server_response(request_id, packet);
+    }
+
+    fn handle_possible_city_build_tasks(
+        &mut self,
+        packet: PossibleCityBuildTasks,
+        request_id: u32,
+    ) {
+        self.handle_server_response(request_id, packet);
+    }
+
+    fn handle_build_task_finished(
+        &mut self,
+        game: &Game,
+        packet: BuildTaskFinished,
+    ) -> anyhow::Result<()> {
+        let mut city = game.city_mut(game.resolve_city_id(packet.city_id)?);
+        if let Some(task) = packet.task {
+            city.set_previous_build_task(PreviousBuildTask {
+                succeeded: true,
+                task: city::BuildTask::from_data(&task, game)?,
+            });
+        }
+        Ok(())
+    }
+
+    fn handle_build_task_failed(
+        &mut self,
+        game: &Game,
+        packet: BuildTaskFailed,
+    ) -> anyhow::Result<()> {
+        let mut city = game.city_mut(game.resolve_city_id(packet.city_id)?);
+        if let Some(task) = packet.task {
+            city.set_previous_build_task(PreviousBuildTask {
+                succeeded: false,
+                task: city::BuildTask::from_data(&task, game)?,
+            });
+        }
+        Ok(())
     }
 
     fn register_response_future<T: 'static>(&mut self, request_id: u32) -> ServerResponseFuture<T> {

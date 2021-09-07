@@ -54,6 +54,7 @@ impl MainUi {
                     self.on_selected_units_changed(cx, game);
                 }
             }
+            _ => {},
         }
     }
 

@@ -91,7 +91,7 @@ impl CityRenderer {
                     text,
                     style: TextStyle {
                         color: Srgba::new(u8::MAX, u8::MAX, u8::MAX, u8::MAX),
-                        size: 10.,
+                        size: 8.,
                         font: Query {
                             weight: Weight::Light,
                             ..Default::default()
@@ -252,7 +252,7 @@ impl CityRenderer {
                         canvas,
                         building.name.chars().next().unwrap_or('0').to_string(),
                     );
-                    canvas.draw_paragraph(pos, text);
+                    canvas.draw_paragraph(pos + vec2(0., radius), text);
                 }
             }
         }

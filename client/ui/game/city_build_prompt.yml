@@ -1,0 +1,20 @@
+name: CityBuildPromptWindow
+child:
+  Container:
+    mode:
+      FillParentAndPad: 20
+    classes:
+      - popup_container
+    child:
+      Scrollable:
+        scroll_axis: Vertical
+        child:
+          Column:
+            id: options_column
+            spacing: 10
+            children:
+              - Text:
+                  id: question_text
+                  classes:
+                    - h3
+              - Divider: {}

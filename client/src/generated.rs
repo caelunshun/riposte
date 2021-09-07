@@ -91,6 +91,51 @@ impl ::duit::InstanceHandle for GameLobbyWindow {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct CityBuildPromptOption {
+    pub clickable: WidgetHandle<Clickable>,
+    pub option_text: WidgetHandle<Text>,
+    pub tooltip_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for CityBuildPromptOption {
+    fn name() -> &'static str {
+        "CityBuildPromptOption"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut clickable = None;
+        let mut option_text = None;
+        let mut tooltip_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "clickable" => clickable = Some(widget),
+                "option_text" => option_text = Some(widget),
+                "tooltip_text" => tooltip_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            clickable: WidgetHandle::new(clickable.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "clickable"
+                )
+            })),
+            option_text: WidgetHandle::new(option_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "option_text"
+                )
+            })),
+            tooltip_text: WidgetHandle::new(tooltip_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "tooltip_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct UnitActionButton {
     pub the_button: WidgetHandle<FlashingButton>,
     pub the_text: WidgetHandle<Text>,
@@ -147,6 +192,42 @@ impl ::duit::InstanceHandle for UnitActionBarWindow {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "actions"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct CityBuildPromptWindow {
+    pub options_column: WidgetHandle<Flex>,
+    pub question_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for CityBuildPromptWindow {
+    fn name() -> &'static str {
+        "CityBuildPromptWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut options_column = None;
+        let mut question_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "options_column" => options_column = Some(widget),
+                "question_text" => question_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            options_column: WidgetHandle::new(options_column.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "options_column"
+                )
+            })),
+            question_text: WidgetHandle::new(question_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "question_text"
                 )
             })),
         }

@@ -1,6 +1,6 @@
 use std::{cell::RefCell, collections::VecDeque};
 
-use super::UnitId;
+use super::{CityId, UnitId};
 
 /// An event indicates that some piece of game data was updated.
 ///
@@ -8,6 +8,7 @@ use super::UnitId;
 #[derive(Debug)]
 pub enum GameEvent {
     UnitUpdated { unit: UnitId },
+    CityUpdated { city: CityId },
 }
 
 #[derive(Default)]
