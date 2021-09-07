@@ -356,6 +356,11 @@ impl Game {
         &self.map
     }
 
+    /// Mutably gets the tile map.
+    pub fn map_mut(&mut self) -> &mut Map {
+        &mut self.map
+    }
+
     /// Gets the neighbors of the given tile (sideways and diagonally)
     pub fn tile_neighbors(&self, pos: UVec2) -> ArrayVec<UVec2, 8> {
         let pos = pos.as_i32();

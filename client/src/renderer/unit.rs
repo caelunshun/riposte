@@ -6,6 +6,7 @@ use dume::{
 };
 use glam::{vec2, UVec2};
 use palette::Srgba;
+use protocol::Visibility;
 
 use crate::{
     context::Context,
@@ -88,6 +89,10 @@ impl UnitRenderer {
 
 impl TileRenderLayer for UnitRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, _tile: &Tile) {
+        if game.map().visibility(tile_pos) == Visibility::Fogged {
+            return;
+        }
+
         if let Some(unit_id) = game
             .unit_stack(tile_pos)
             .expect("rendering in bounds")

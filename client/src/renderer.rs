@@ -3,6 +3,7 @@ use std::f32::consts::{PI, TAU};
 use duit::Vec2;
 use dume::Canvas;
 use glam::{uvec2, vec2, UVec2};
+use protocol::Visibility;
 
 use crate::{
     context::Context,
@@ -86,6 +87,10 @@ impl GameRenderer {
                 for y in first_tile.y..=last_tile.y {
                     let pos = uvec2(x, y);
                     if let Ok(tile) = game.tile(pos) {
+                        if game.map().visibility(pos) == Visibility::Hidden {
+                            continue;
+                        }
+
                         let translation =
                             game.view().screen_offset_for_tile_pos(pos) * game.view().zoom_factor();
                         cx.canvas_mut().translate(translation);

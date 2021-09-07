@@ -270,6 +270,9 @@ impl Client<GameState> {
                 any_server::Packet::BuildTaskFailed(packet) => {
                     self.handle_build_task_failed(game, packet)?
                 }
+                any_server::Packet::UpdateVisibility(packet) => {
+                    game.map_mut().set_visibility(packet.visibility().collect())?
+                }
                 _ => log::warn!("unhandled packet"),
             }
         }
