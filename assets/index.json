@@ -90,6 +90,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/culture.png",
+    "id": "icon/culture",
+    "loader": "image"
+  },
+  {
     "path": "icon/beaker.png",
     "id": "icon/beaker",
     "loader": "image"
