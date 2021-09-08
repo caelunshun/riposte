@@ -135,13 +135,32 @@ impl Player {
     pub fn score(&self) -> i32 {
         self.data.score
     }
+
+    /// Estimate the number of turns it takes to complete the given research.
+    pub fn estimate_research_turns(&self, tech: &Tech, progress: u32) -> Option<u32> {
+        if self.beaker_revenue() == 0 {
+            None
+        } else {
+            Some(
+                (tech.cost - progress + self.beaker_revenue() as u32 - 1)
+                    / self.beaker_revenue() as u32,
+            )
+        }
+    }
+
+    /// Estimate remaining turns for the currently researching tech.
+    pub fn estimate_current_research_turns(&self) -> Option<u32> {
+        self.researching_tech()
+            .map(|tech| self.estimate_research_turns(&tech.tech, tech.progress))
+            .unwrap_or_default()
+    }
 }
 
 /// Tech a player is currently researching.
 #[derive(Debug)]
 pub struct ResearchingTech {
-    tech: Handle<Tech>,
-    progress: u32,
+    pub tech: Handle<Tech>,
+    pub progress: u32,
 }
 
 impl ResearchingTech {

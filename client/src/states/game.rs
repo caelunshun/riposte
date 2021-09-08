@@ -4,14 +4,14 @@ use winit::event::VirtualKeyCode;
 use crate::{
     client::{self, Client},
     context::Context,
-    game::{event::GameEvent, CityId, Game},
+    game::{event::GameEvent, CityId, Game, PlayerId},
     renderer::GameRenderer,
     state::StateAttachment,
 };
 
 use self::{
     main_ui::MainUi,
-    prompts::{city_build::CityBuildPrompt, Prompts},
+    prompts::{city_build::CityBuildPrompt, research::ResearchPrompt, Prompts},
 };
 
 mod main_ui;
@@ -91,6 +91,9 @@ impl GameState {
             GameEvent::CityUpdated { city } => {
                 self.handle_city_updated(cx, *city);
             }
+            GameEvent::PlayerUpdated { player } => {
+                self.handle_player_updated(cx, *player);
+            }
             _ => {}
         }
     }
@@ -105,6 +108,14 @@ impl GameState {
                 &mut self.client,
                 city.id(),
             ));
+        }
+    }
+
+    fn handle_player_updated(&mut self, cx: &Context, player: PlayerId) {
+        if player == self.game.the_player().id() && self.game.turn() > 0 {
+            if self.game.the_player().researching_tech().is_none() {
+                self.prompts.push(ResearchPrompt::new(cx, &mut self.client));
+            }
         }
     }
 

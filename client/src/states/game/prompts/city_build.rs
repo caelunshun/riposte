@@ -59,8 +59,8 @@ impl CityBuildPrompt {
                 };
 
                 if *succeeded {
-                    format!("You have {} {} @color{{rgb(rgb(255, 191, 63)}}{{{}}} in {}. What would you like to work on next?", 
-                        verb, article(name), name, city.name())
+                    dbg!(format!("You have {} {} @color{{rgb(rgb(255, 191, 63)}}{{{}}} in {}. What would you like to work on next?", 
+                        verb, article(name), name, city.name()))
                 } else {
                     format!("You can no longer continue {} {} @color{{rgb(rgb(255, 191, 63)}}{{{}}} in {}. What would you like to work on instead?", 
                         verb_participle, article(name), name, city.name())

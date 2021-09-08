@@ -527,7 +527,11 @@ impl Game {
     pub fn add_or_update_player(&mut self, data: UpdatePlayer) -> anyhow::Result<()> {
         let data_id = data.id as u32;
         match self.player_ids.get(data_id) {
-            Some(id) => self.player_mut(id).update_data(data, self),
+            Some(id) => {
+                let res = self.player_mut(id).update_data(data, self);
+                self.push_event(GameEvent::PlayerUpdated { player: id });
+                res
+            }
             None => {
                 let mut players = mem::take(&mut self.players);
                 let res = players
@@ -535,7 +539,9 @@ impl Game {
                 self.players = players;
                 if let Ok(id) = &res {
                     self.player_ids.insert(data_id, *id);
+                    self.push_event(GameEvent::PlayerUpdated { player: *id });
                 }
+
                 res.map(|_| ())
             }
         }

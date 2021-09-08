@@ -9,9 +9,9 @@ use prost::Message;
 use protocol::{
     any_client, any_server, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer,
     BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits,
-    CreateSlot, DeleteSlot, DoUnitAction, EndTurn, GameStarted, GetBuildTasks, InitialGameData,
-    Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, RequestGameStart, ServerLobbyPacket,
-    SetCityBuildTask,
+    CreateSlot, DeleteSlot, DoUnitAction, EndTurn, GameStarted, GetBuildTasks, GetPossibleTechs,
+    InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs,
+    RequestGameStart, ServerLobbyPacket, SetCityBuildTask, SetResearch,
 };
 
 use crate::{
@@ -21,7 +21,7 @@ use crate::{
         CityId, Game, UnitId,
     },
     lobby::GameLobby,
-    registry::{Civilization, Leader, Registry},
+    registry::{Civilization, Leader, Registry, Tech},
     server_bridge::ServerBridge,
 };
 
@@ -245,6 +245,18 @@ impl Client<GameState> {
         }));
     }
 
+    pub fn get_possible_techs(&mut self) -> ServerResponseFuture<PossibleTechs> {
+        let request_id =
+            self.send_message(any_client::Packet::GetPossibleTechs(GetPossibleTechs {}));
+        self.register_response_future(request_id)
+    }
+
+    pub fn set_research(&mut self, tech: &Tech) {
+        self.send_message(any_client::Packet::SetResearch(SetResearch {
+            tech_id: tech.name.clone(),
+        }));
+    }
+
     pub fn end_turn(&mut self, game: &mut Game) {
         self.send_message(any_client::Packet::EndTurn(EndTurn {}));
         game.waiting_on_turn_end = true;
@@ -260,6 +272,10 @@ impl Client<GameState> {
                 any_server::Packet::UpdateUnit(packet) => game.add_or_update_unit(cx, packet)?,
                 any_server::Packet::UpdateCity(packet) => game.add_or_update_city(packet)?,
                 any_server::Packet::UpdatePlayer(packet) => game.add_or_update_player(packet)?,
+                any_server::Packet::UpdateVisibility(packet) => game
+                    .map_mut()
+                    .set_visibility(packet.visibility().collect())?,
+                any_server::Packet::UpdateGlobalData(packet) => game.update_global_data(&packet)?,
                 any_server::Packet::DeleteUnit(packet) => {
                     game.delete_unit(game.resolve_unit_id(packet.unit_id as u32)?)
                 }
@@ -275,10 +291,9 @@ impl Client<GameState> {
                 any_server::Packet::BuildTaskFailed(packet) => {
                     self.handle_build_task_failed(game, packet)?
                 }
-                any_server::Packet::UpdateVisibility(packet) => game
-                    .map_mut()
-                    .set_visibility(packet.visibility().collect())?,
-                any_server::Packet::UpdateGlobalData(packet) => game.update_global_data(&packet)?,
+                any_server::Packet::PossibleTechs(packet) => {
+                    self.handle_possible_techs(packet, request_id)
+                }
                 p => log::warn!("unhandled packet: {:?}", p),
             }
         }
@@ -325,6 +340,10 @@ impl Client<GameState> {
             });
         }
         Ok(())
+    }
+
+    fn handle_possible_techs(&mut self, packet: PossibleTechs, request_id: u32) {
+        self.handle_server_response(request_id, packet);
     }
 
     fn register_response_future<T: 'static>(&mut self, request_id: u32) -> ServerResponseFuture<T> {

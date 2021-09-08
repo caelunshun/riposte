@@ -105,6 +105,36 @@ impl Registry {
         self.unit_kinds.values()
     }
 
+    pub fn buildings(&self) -> impl Iterator<Item = &Handle<Building>> + '_ {
+        self.buildings.values()
+    }
+
+    pub fn techs(&self) -> impl Iterator<Item = &Handle<Tech>> + '_ {
+        self.techs.values()
+    }
+
+    pub fn is_unit_replaced_for_civ(&self, unit: &UnitKind, civ: &Civilization) -> bool {
+        for u in self.unit_kinds() {
+            if u.only_for_civs.contains(&civ.id) {
+                if u.replaces == Some(unit.id.clone()) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
+    pub fn is_building_replaced_for_civ(&self, building: &Building, civ: &Civilization) -> bool {
+        for b in self.buildings.values() {
+            if b.only_for_civs.contains(&civ.id) {
+                if b.replaces == Some(building.name.clone()) {
+                    return true;
+                }
+            }
+        }
+        false
+    }
+
     pub fn describe_civ(&self, civ: &Civilization) -> String {
         let mut result = civ.name.clone();
 

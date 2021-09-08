@@ -6,10 +6,11 @@ use crate::{
     utils::VersionSnapshot,
 };
 
-use self::{unit_actions::UnitActionBar, unit_info::UnitInfo};
+use self::{research::ResearchBar, unit_actions::UnitActionBar, unit_info::UnitInfo};
 
 mod unit_actions;
 mod unit_info;
+mod research;
 
 /// The main in-game user interface.
 pub struct MainUi {
@@ -17,6 +18,7 @@ pub struct MainUi {
 
     unit_info: UnitInfo,
     unit_actions: UnitActionBar,
+    research_bar: ResearchBar,
 
     selected_units_version: VersionSnapshot,
 }
@@ -27,11 +29,13 @@ impl MainUi {
 
         let unit_info = UnitInfo::new(cx, &attachment);
         let unit_actions = UnitActionBar::new(cx, &attachment);
+        let research_bar = ResearchBar::new(cx, &attachment);
 
         Self {
             attachment,
             unit_info,
             unit_actions,
+            research_bar,
             selected_units_version: game.selected_units().version(),
         }
     }
@@ -46,6 +50,7 @@ impl MainUi {
     }
 
     pub fn handle_game_event(&mut self, cx: &mut Context, game: &Game, event: &GameEvent) {
+        self.research_bar.handle_game_event(cx, game, event);
         match event {
             GameEvent::UnitUpdated { unit } => {
                 // If the unit was selected, we should update the UI

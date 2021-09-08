@@ -5,6 +5,7 @@ use crate::{game::city::BuildTaskKind, registry::Registry};
 
 pub mod building;
 pub mod unit;
+pub mod tech;
 
 pub fn build_task_tooltip(registry: &Registry, task: &BuildTaskKind) -> String {
     match task {

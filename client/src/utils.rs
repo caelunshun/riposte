@@ -2,6 +2,8 @@ use std::{cell::Cell, rc::Rc};
 
 use arrayvec::ArrayVec;
 
+pub const INFINITY_SYMBOL: &str = "∞";
+
 pub fn color_to_string(color: &ArrayVec<u8, 3>) -> String {
     format!("rgb({}, {}, {})", color[0], color[1], color[2])
 }

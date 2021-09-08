@@ -14,7 +14,7 @@ bytes = "1"
 directories-next = "2"
 duit = { path = "/Users/caelum/dev/duit/crates/duit" }
 duit-core = { path = "/Users/caelum/dev/duit/crates/duit-core" }
-dume = { path = "/Users/caelum/dev/dume/renderer", package = "dume-renderer" }
+dume = { path = "/Users/caelum/dev/dume" }
 float-ord = "0.3"
 flume = "0.10"
 fs-err = "2"

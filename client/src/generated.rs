@@ -91,6 +91,42 @@ impl ::duit::InstanceHandle for GameLobbyWindow {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct ResearchBarWindow {
+    pub research_progress: WidgetHandle<ProgressBar>,
+    pub research_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for ResearchBarWindow {
+    fn name() -> &'static str {
+        "ResearchBarWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut research_progress = None;
+        let mut research_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "research_progress" => research_progress = Some(widget),
+                "research_text" => research_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            research_progress: WidgetHandle::new(research_progress.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "research_progress"
+                )
+            })),
+            research_text: WidgetHandle::new(research_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "research_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct CityBuildPromptOption {
     pub clickable: WidgetHandle<Clickable>,
     pub option_text: WidgetHandle<Text>,
@@ -199,6 +235,51 @@ impl ::duit::InstanceHandle for UnitActionBarWindow {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct ResearchPromptOption {
+    pub clickable: WidgetHandle<Clickable>,
+    pub option_text: WidgetHandle<Text>,
+    pub tooltip_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for ResearchPromptOption {
+    fn name() -> &'static str {
+        "ResearchPromptOption"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut clickable = None;
+        let mut option_text = None;
+        let mut tooltip_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "clickable" => clickable = Some(widget),
+                "option_text" => option_text = Some(widget),
+                "tooltip_text" => tooltip_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            clickable: WidgetHandle::new(clickable.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "clickable"
+                )
+            })),
+            option_text: WidgetHandle::new(option_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "option_text"
+                )
+            })),
+            tooltip_text: WidgetHandle::new(tooltip_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "tooltip_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct CityBuildPromptWindow {
     pub options_column: WidgetHandle<Flex>,
     pub question_text: WidgetHandle<Text>,
@@ -264,6 +345,33 @@ impl ::duit::InstanceHandle for UnitInfoWindow {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "info_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct ResearchPromptWindow {
+    pub options_column: WidgetHandle<Flex>,
+}
+impl ::duit::InstanceHandle for ResearchPromptWindow {
+    fn name() -> &'static str {
+        "ResearchPromptWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut options_column = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "options_column" => options_column = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            options_column: WidgetHandle::new(options_column.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "options_column"
                 )
             })),
         }

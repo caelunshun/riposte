@@ -7,6 +7,4 @@ pub struct Tech {
     pub unlocks_improvements: Vec<String>,
     #[serde(default)]
     pub prerequisites: Vec<String>,
-    #[serde(default)]
-    pub leads_to: Vec<String>,
 }
