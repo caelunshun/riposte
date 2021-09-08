@@ -374,16 +374,16 @@ namespace rip {
     }
 
     void Player::doEconomyTurn(Game &game) {
-        if (researchingTech.has_value()) {
-            researchingTech->beakersAccumulated += getBeakerRevenue();
-            updateResearch(game);
-        }
-
         // Lower beaker percent if needed.
         while (gold + getNetGold() < 0 && sciencePercent >= 10) {
             sciencePercent -= 10;
             recomputeRevenue(game);
             // TODO: what happens after sciencePercent==0 and gold==0?
+        }
+
+        if (researchingTech.has_value()) {
+            researchingTech->beakersAccumulated += getBeakerRevenue();
+            updateResearch(game);
         }
 
         gold += getNetGold();
