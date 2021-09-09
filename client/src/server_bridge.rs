@@ -5,7 +5,11 @@ use bytes::Bytes;
 use flume::{Receiver, Sender};
 use futures::{stream::StreamExt, SinkExt};
 use riposte_backend_api::codec;
-use tokio::{io::{BufReader, AsyncBufReadExt}, process::Command, task};
+use tokio::{
+    io::{AsyncBufReadExt, BufReader},
+    process::Command,
+    task,
+};
 
 use crate::options::Account;
 

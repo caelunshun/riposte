@@ -31,10 +31,15 @@ impl TurnIndicator {
     }
 
     pub fn update(&mut self, game: &Game) {
-        self.window
-            .turn_indicator
-            .get_mut()
-            .set_can_end_turn(game.can_end_turn());
+        if game.waiting_on_turn_end {
+            self.window.turn_indicator.hide();
+        } else {
+            self.window.turn_indicator.unhide();
+            self.window
+                .turn_indicator
+                .get_mut()
+                .set_can_end_turn(game.can_end_turn());
+        }
     }
 
     pub fn handle_game_event(&mut self, game: &Game, event: &GameEvent) {
