@@ -206,6 +206,7 @@ message AnyClient {
     ConfigureWorkedTiles configureWorkedTiles = 14;
     BombardCity bombardCity = 18;
     SaveGame saveGame = 19;
+    DeclarePeace declarePeace = 20;
   }
 }
 
@@ -236,6 +237,7 @@ message AnyServer {
     BordersExpanded bordersExpanded = 22;
     BuildTaskFinished buildTaskFinished = 23;
     BuildTaskFailed buildTaskFailed = 24;
+    PeaceDeclared peaceDeclared = 25;
   }
 }
 
@@ -602,6 +604,11 @@ message WarDeclared {
   int32 declaredID = 2;
 }
 
+message PeaceDeclared {
+  int32 declarerID = 1;
+  int32 declaredID = 2;
+}
+
 message GameSaved {}
 
 message BordersExpanded {
@@ -686,6 +693,10 @@ message DoUnitAction {
 }
 
 message DeclareWar {
+  int32 onPlayerID = 1;
+}
+
+message DeclarePeace {
   int32 onPlayerID = 1;
 }
 

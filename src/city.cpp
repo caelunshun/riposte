@@ -62,7 +62,7 @@ namespace rip {
         culture = getCultureFromProto(packet.culturevalues(), playerIDs);
 
         for (const auto &buildingName : packet.buildingnames()) {
-            buildings.push_back(registry.getBuilding(buildingName));
+            addBuilding(registry.getBuilding(buildingName));
         }
 
         population = packet.population();
@@ -252,6 +252,11 @@ namespace rip {
         yield.hammers += percentOf(yield.hammers, buildingEffects.bonusHammerPercent);
         yield.commerce += percentOf(yield.commerce, buildingEffects.bonusCommercePercent);
         yield.food += percentOf(yield.food, buildingEffects.bonusFoodPercent);
+
+        // Palace bonuses
+        if (isCapital()) {
+            yield.commerce += 8;
+        }
 
         return yield;
     }
@@ -471,7 +476,7 @@ namespace rip {
     int City::getCulturePerTurn() const {
         int culture = 0;
         if (isCapital()) {
-            culture += 1;
+            culture += 2;
         }
 
         culture += buildingEffects.bonusCulture;
@@ -841,4 +846,3 @@ namespace rip {
         }
     }
 }
-

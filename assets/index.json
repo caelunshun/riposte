@@ -355,6 +355,21 @@
     "loader": "unit"
   },
   {
+    "path": "unit/maceman.json",
+    "id": "unit/maceman",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/longbowman.json",
+    "id": "unit/longbownman",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/knight.json",
+    "id": "unit/knight",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -535,6 +550,21 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/axeman.png",
+    "id": "texture/unit/maceman",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/longbowman.png",
+    "id": "texture/unit/longbowman",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/knight.png",
+    "id": "texture/unit/knight",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -627,6 +657,21 @@
   {
     "path": "icon/unit_head/jaguar_axeman.png",
     "id": "icon/unit_head/jaguar_axeman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/maceman.png",
+    "id": "icon/unit_head/maceman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/longbowman.png",
+    "id": "icon/unit_head/longbowman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/knight.png",
+    "id": "icon/unit_head/knight",
     "loader": "image"
   },
   {
@@ -809,7 +854,11 @@
     "id": "tech/engineering",
     "loader": "tech"
   },
-
+  {
+    "path": "tech/civil_service.json",
+    "id": "tech/civil_service",
+    "loader": "tech"
+  },
   {
     "path": "resource/copper.json",
     "id": "resource/copper",
@@ -983,6 +1032,11 @@
   {
     "path": "sound/event/war_declared.wav",
     "id": "sound/event/war_declared",
+    "loader": "sound"
+  },
+  {
+    "path": "sound/event/peace_declared.wav",
+    "id": "sound/event/peace_declared",
     "loader": "sound"
   },
   {

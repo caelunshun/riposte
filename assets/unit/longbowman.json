@@ -1,0 +1,15 @@
+{
+  "id": "longbowman",
+  "name": "Longbowman",
+  "strength": 6,
+  "movement": 1,
+  "cost": 50,
+  "techs": ["Archery", "Feudalism"],
+  "category": "archery",
+  "combatBonuses": [
+    {
+      "type": "whenInCity",
+      "bonusPercent": 25
+    }
+  ]
+}

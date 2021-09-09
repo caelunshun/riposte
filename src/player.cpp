@@ -474,6 +474,22 @@ namespace rip {
         }
     }
 
+    void Player::makePeaceWith(PlayerId player, Game &game) {
+        if (atWarWith.erase(player)) {
+            onPeaceDeclared(player, game);
+            auto &other = game.getPlayer(player);
+            other.onPeaceDeclared(id, game);
+
+            game.getServer().broadcastPeaceDeclared(id, player);
+            game.getServer().markPlayerDirty(id);
+            game.getServer().markPlayerDirty(player);
+        }
+    }
+
+    void Player::onPeaceDeclared(PlayerId withPlayer, Game &game) {
+        atWarWith.erase(withPlayer);
+    }
+
     void Player::onWarDeclared(PlayerId withPlayer, Game &game) {
         atWarWith.insert(withPlayer);
         expelUnitsInTerritoryOf(withPlayer, game);
