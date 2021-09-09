@@ -1,0 +1,33 @@
+name: EconomyWindow
+child:
+  Container:
+    classes:
+      - game_window_container
+    mode: 
+      FillParentAndPad: 20
+    child:
+      Column:
+        spacing: 10
+        children:
+          - Text:
+              id: gold_text
+          - Text:
+              id: expenses_text
+          - Text:
+              id: revenue_text
+
+          - Row:
+              spacing: 5
+              children:
+                - Text:
+                    id: beaker_percent_text
+                - Button:
+                    id: beaker_increment_button
+                    child:
+                      Text: "+"
+                - Button:
+                    id: beaker_decrement_button
+                    child:
+                      Text: "-"
+                - Text:
+                    id: beaker_output_text

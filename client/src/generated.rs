@@ -172,6 +172,91 @@ impl ::duit::InstanceHandle for CityBuildPromptOption {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct EconomyWindow {
+    pub gold_text: WidgetHandle<Text>,
+    pub expenses_text: WidgetHandle<Text>,
+    pub revenue_text: WidgetHandle<Text>,
+    pub beaker_percent_text: WidgetHandle<Text>,
+    pub beaker_increment_button: WidgetHandle<Button>,
+    pub beaker_decrement_button: WidgetHandle<Button>,
+    pub beaker_output_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for EconomyWindow {
+    fn name() -> &'static str {
+        "EconomyWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut gold_text = None;
+        let mut expenses_text = None;
+        let mut revenue_text = None;
+        let mut beaker_percent_text = None;
+        let mut beaker_increment_button = None;
+        let mut beaker_decrement_button = None;
+        let mut beaker_output_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "gold_text" => gold_text = Some(widget),
+                "expenses_text" => expenses_text = Some(widget),
+                "revenue_text" => revenue_text = Some(widget),
+                "beaker_percent_text" => beaker_percent_text = Some(widget),
+                "beaker_increment_button" => beaker_increment_button = Some(widget),
+                "beaker_decrement_button" => beaker_decrement_button = Some(widget),
+                "beaker_output_text" => beaker_output_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            gold_text: WidgetHandle::new(gold_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "gold_text"
+                )
+            })),
+            expenses_text: WidgetHandle::new(expenses_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "expenses_text"
+                )
+            })),
+            revenue_text: WidgetHandle::new(revenue_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "revenue_text"
+                )
+            })),
+            beaker_percent_text: WidgetHandle::new(beaker_percent_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "beaker_percent_text"
+                )
+            })),
+            beaker_increment_button: WidgetHandle::new(beaker_increment_button.unwrap_or_else(
+                || {
+                    panic!(
+                        "missing widget with ID '{}' (generated code not up to date)",
+                        "beaker_increment_button"
+                    )
+                },
+            )),
+            beaker_decrement_button: WidgetHandle::new(beaker_decrement_button.unwrap_or_else(
+                || {
+                    panic!(
+                        "missing widget with ID '{}' (generated code not up to date)",
+                        "beaker_decrement_button"
+                    )
+                },
+            )),
+            beaker_output_text: WidgetHandle::new(beaker_output_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "beaker_output_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct UnitActionButton {
     pub the_button: WidgetHandle<FlashingButton>,
     pub the_text: WidgetHandle<Text>,

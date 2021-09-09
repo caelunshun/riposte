@@ -6,13 +6,7 @@ use bytes::BytesMut;
 use flume::Receiver;
 use glam::{uvec2, UVec2};
 use prost::Message;
-use protocol::{
-    any_client, any_server, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer,
-    BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits,
-    CreateSlot, DeleteSlot, DoUnitAction, EndTurn, GameStarted, GetBuildTasks, GetPossibleTechs,
-    InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs,
-    RequestGameStart, ServerLobbyPacket, SetCityBuildTask, SetResearch,
-};
+use protocol::{AnyClient, AnyServer, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits, CreateSlot, DeleteSlot, DoUnitAction, EndTurn, GameStarted, GetBuildTasks, GetPossibleTechs, InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs, RequestGameStart, ServerLobbyPacket, SetCityBuildTask, SetEconomySettings, SetResearch, any_client, any_server, client_lobby_packet, server_lobby_packet};
 
 use crate::{
     context::Context,
@@ -254,6 +248,12 @@ impl Client<GameState> {
     pub fn set_research(&mut self, tech: &Tech) {
         self.send_message(any_client::Packet::SetResearch(SetResearch {
             tech_id: tech.name.clone(),
+        }));
+    }
+
+    pub fn set_economy_settings(&mut self, beaker_percent: u32) {
+        self.send_message(any_client::Packet::SetEconomySettings(SetEconomySettings {
+            beaker_percent: beaker_percent as i32,
         }));
     }
 
