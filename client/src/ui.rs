@@ -2,6 +2,7 @@ use duit::{Align, Rect, Vec2, WindowPositioner};
 use glam::vec2;
 
 pub mod flashing_button;
+pub mod turn_indicator;
 
 // Z index constants for window layering
 pub const Z_BACKGROUND: u64 = 1;

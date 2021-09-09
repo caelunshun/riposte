@@ -18,20 +18,10 @@ use tokio::runtime::{self, Runtime};
 use walkdir::WalkDir;
 use winit::{dpi::PhysicalSize, event::WindowEvent, event_loop::EventLoop, window::Window};
 
-use crate::{
-    assets::{
+use crate::{assets::{
         loaders::{FontLoader, ImageLoader, JsonLoader, SoundLoader},
         Assets,
-    },
-    audio::Audio,
-    backend::BackendService,
-    options::Options,
-    paths::FilePaths,
-    popups::PopupWindows,
-    registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
-    state::StateManager,
-    ui::flashing_button::FlashingButton,
-};
+    }, audio::Audio, backend::BackendService, options::Options, paths::FilePaths, popups::PopupWindows, registry::{Building, Civilization, Registry, Resource, Tech, UnitKind}, state::StateManager, ui::{flashing_button::FlashingButton, turn_indicator::TurnIndicatorCircle}};
 
 mod init;
 
@@ -165,7 +155,8 @@ impl Context {
 
     pub fn load_ui_specs(&mut self) -> anyhow::Result<()> {
         self.ui_mut()
-            .add_custom_widget("FlashingButton", |_| FlashingButton::new());
+            .add_custom_widget("FlashingButton", |_| FlashingButton::new())
+            .add_custom_widget("TurnIndicatorCircle", |_| TurnIndicatorCircle::new());
 
         for entry in WalkDir::new("/Users/caelum/CLionProjects/riposte/client/ui") {
             let entry = entry?;

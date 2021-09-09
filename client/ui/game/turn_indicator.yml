@@ -1,0 +1,15 @@
+name: TurnIndicatorWindow
+child:
+  Container:
+    classes:
+      - game_window_container
+    mode: 
+      FillParentAndPad: 20
+    child:
+      Image:
+        id: flag
+        child:
+          Custom:
+            id: turn_indicator
+            type: TurnIndicatorCircle
+            params: {}

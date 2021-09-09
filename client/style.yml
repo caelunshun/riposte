@@ -99,6 +99,7 @@ styles:
 
   container & game_window_container:
     background_color: rgba(50, 50, 50, 250)
+    border_color: rgb(160, 160, 160)
 
   container & popup_container:
     border_color: rgb(180, 180, 180)

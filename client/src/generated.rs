@@ -1,4 +1,4 @@
-use crate::ui::flashing_button::FlashingButton;
+use crate::ui::flashing_button::FlashingButton; use crate::ui::turn_indicator::TurnIndicatorCircle;
 use duit::widgets::*;
 use duit::*;
 pub struct ErrorPopup {
@@ -313,6 +313,42 @@ impl ::duit::InstanceHandle for UnitActionBarWindow {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "actions"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct TurnIndicatorWindow {
+    pub flag: WidgetHandle<Image>,
+    pub turn_indicator: WidgetHandle<TurnIndicatorCircle>,
+}
+impl ::duit::InstanceHandle for TurnIndicatorWindow {
+    fn name() -> &'static str {
+        "TurnIndicatorWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut flag = None;
+        let mut turn_indicator = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "flag" => flag = Some(widget),
+                "turn_indicator" => turn_indicator = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            flag: WidgetHandle::new(flag.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "flag"
+                )
+            })),
+            turn_indicator: WidgetHandle::new(turn_indicator.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "turn_indicator"
                 )
             })),
         }
