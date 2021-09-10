@@ -11,9 +11,19 @@ pub fn build_improvement_tooltip(tile: &Tile, improvement: &Improvement) -> Stri
         Improvement::Road => lines.push("Unit movement costs reduced by 1/3".to_owned()),
         Improvement::Pasture => {}
         Improvement::Cottage(_) => lines.extend(vec![
-            "+1 @icon{commerce}".to_owned(),
+            "+1 @icon{coin}".to_owned(),
             "Grows for increased bonuses".to_owned(),
         ]),
     }
+
+    if let Some(resource) = tile.resource() {
+        if resource.improvement == improvement.name() {
+            lines.push(format!(
+                "@color{{rgb(30, 200, 50)}}{{Gives access to {}}}",
+                resource.name
+            ));
+        }
+    }
+
     merge_lines(&lines)
 }
