@@ -124,9 +124,6 @@ fn init_logging() {
 fn main() -> anyhow::Result<()> {
     init_logging();
 
-    // TEMP for testing
-    std::env::set_current_dir("/Users/caelum/CLionProjects/riposte")?;
-
     let (mut context, event_loop) = Context::new()?;
     context.load_ui_specs().context("failed to load UI specs")?;
     context.load_assets().context("failed to load assets")?;

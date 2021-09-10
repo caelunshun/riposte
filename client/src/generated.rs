@@ -255,8 +255,8 @@ use duit::widgets::*;
 use duit::*;
 pub struct CityInfoBarWindow {
     pub city_name: WidgetHandle<Text>,
-    pub hammers_text: WidgetHandle<Text>,
     pub food_text: WidgetHandle<Text>,
+    pub hammers_text: WidgetHandle<Text>,
     pub growth_progress_bar: WidgetHandle<ProgressBar>,
     pub growth_text: WidgetHandle<Text>,
     pub production_progress_bar: WidgetHandle<ProgressBar>,
@@ -278,8 +278,8 @@ impl ::duit::InstanceHandle for CityInfoBarWindow {
     }
     fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
         let mut city_name = None;
-        let mut hammers_text = None;
         let mut food_text = None;
+        let mut hammers_text = None;
         let mut growth_progress_bar = None;
         let mut growth_text = None;
         let mut production_progress_bar = None;
@@ -297,8 +297,8 @@ impl ::duit::InstanceHandle for CityInfoBarWindow {
         for (name, widget) in widget_handles {
             match name.as_str() {
                 "city_name" => city_name = Some(widget),
-                "hammers_text" => hammers_text = Some(widget),
                 "food_text" => food_text = Some(widget),
+                "hammers_text" => hammers_text = Some(widget),
                 "growth_progress_bar" => growth_progress_bar = Some(widget),
                 "growth_text" => growth_text = Some(widget),
                 "production_progress_bar" => production_progress_bar = Some(widget),
@@ -323,16 +323,16 @@ impl ::duit::InstanceHandle for CityInfoBarWindow {
                     "city_name"
                 )
             })),
-            hammers_text: WidgetHandle::new(hammers_text.unwrap_or_else(|| {
-                panic!(
-                    "missing widget with ID '{}' (generated code not up to date)",
-                    "hammers_text"
-                )
-            })),
             food_text: WidgetHandle::new(food_text.unwrap_or_else(|| {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "food_text"
+                )
+            })),
+            hammers_text: WidgetHandle::new(hammers_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "hammers_text"
                 )
             })),
             growth_progress_bar: WidgetHandle::new(growth_progress_bar.unwrap_or_else(|| {

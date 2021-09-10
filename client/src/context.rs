@@ -3,6 +3,7 @@ use std::{
     ffi::OsStr,
     future::Future,
     iter,
+    path::{Path, PathBuf},
     rc::Rc,
     sync::Arc,
     time::Instant,
@@ -18,10 +19,20 @@ use tokio::runtime::{self, Runtime};
 use walkdir::WalkDir;
 use winit::{dpi::PhysicalSize, event::WindowEvent, event_loop::EventLoop, window::Window};
 
-use crate::{assets::{
+use crate::{
+    assets::{
         loaders::{FontLoader, ImageLoader, JsonLoader, SoundLoader},
         Assets,
-    }, audio::Audio, backend::BackendService, options::Options, paths::FilePaths, popups::PopupWindows, registry::{Building, Civilization, Registry, Resource, Tech, UnitKind}, state::StateManager, ui::{flashing_button::FlashingButton, turn_indicator::TurnIndicatorCircle}};
+    },
+    audio::Audio,
+    backend::BackendService,
+    options::Options,
+    paths::FilePaths,
+    popups::PopupWindows,
+    registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
+    state::StateManager,
+    ui::{flashing_button::FlashingButton, turn_indicator::TurnIndicatorCircle},
+};
 
 mod init;
 
@@ -158,7 +169,13 @@ impl Context {
             .add_custom_widget("FlashingButton", |_| FlashingButton::new())
             .add_custom_widget("TurnIndicatorCircle", |_| TurnIndicatorCircle::new());
 
-        for entry in WalkDir::new("/Users/caelum/CLionProjects/riposte/client/ui") {
+        let base_dir = if let Ok(dir) = std::env::var("RIPOSTE_UI_BASE_DIR") {
+            PathBuf::from(dir)
+        } else {
+            PathBuf::new()
+        };
+
+        for entry in WalkDir::new(base_dir.join("ui")) {
             let entry = entry?;
             if entry.path().extension() != Some(OsStr::new("yml")) {
                 continue;
@@ -172,9 +189,7 @@ impl Context {
         }
 
         self.ui_mut()
-            .add_stylesheet(&fs::read(
-                "/Users/caelum/CLionProjects/riposte/client/style.yml",
-            )?)
+            .add_stylesheet(&fs::read(base_dir.join("style.yml"))?)
             .context("malformed stylehseet")?;
 
         Ok(())

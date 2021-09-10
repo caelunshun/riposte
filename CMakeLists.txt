@@ -70,12 +70,12 @@ set(SOURCES
         src/mapgen/terrain.cpp
         src/mapgen/starting_locations.cpp)
 
-add_library(riposte-lib ${SOURCES})
+add_library(riposte-core ${SOURCES})
 
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "" FORCE)
 add_subdirectory(external/FastNoise2)
 
-target_include_directories(riposte-lib PUBLIC
+target_include_directories(riposte-core PUBLIC
         src/
         external/nanovg/src
         external/FastNoise2/include
@@ -84,7 +84,7 @@ target_include_directories(riposte-lib PUBLIC
         c-bindings/include
         ${CMAKE_CURRENT_BINARY_DIR} // for protobuf files
         ${PROTOBUF_INCLUDE_DIR})
-target_compile_definitions(riposte-lib PRIVATE FONS_USE_FREETYPE)
+target_compile_definitions(riposte-core PRIVATE FONS_USE_FREETYPE)
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
@@ -103,10 +103,10 @@ elseif(UNIX)
     SET(NATIVE_AUDIO_LIBS rt ${ALSA_LIBRARIES} Threads::Threads)
 endif()
 
-target_link_libraries(riposte-lib ${CONAN_LIBS} ${PROTOBUF_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} riposte-c-bindings)
+target_link_libraries(riposte-core ${CONAN_LIBS} ${PROTOBUF_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} riposte-c-bindings)
 
-add_executable(riposte src/main.cpp)
-target_link_libraries(riposte riposte-lib)
+add_executable(riposte-server src/main.cpp)
+target_link_libraries(riposte-server riposte-core)
 
 add_executable(mapgen-test src/mapgen/mapgen_test.cpp)
-target_link_libraries(mapgen-test riposte-lib)
+target_link_libraries(mapgen-test riposte-core)

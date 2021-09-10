@@ -10,13 +10,13 @@ jobs:
     strategy:
       matrix: 
         os: [
-            #ubuntu-18.04,
+            ubuntu-18.04,
             macos-10.15
         ]
         include:
-          #- os: ubuntu-18.04
-          #  os-name: linux
-           # dylib-ext: so
+          - os: ubuntu-18.04
+            os-name: linux
+            dylib-ext: so
           - os: macos-10.15
             os-name: macOS
             dylib-ext: dylib
@@ -83,13 +83,6 @@ jobs:
           path: protobuf
           key: ${{ runner.os }}-protobuf
           
-      - name: Cache LuaJIT library
-        id: cache-luajit
-        uses: actions/cache@v2
-        with:
-          path: LuaJIT
-          key: ${{ runner.os }}-luajit
-          
       - name: Build protobuf library (Linux)
         if: steps.cache-protobuf.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-18.04'
         run: |
@@ -112,51 +105,21 @@ jobs:
         if: matrix.os-name == 'macOS'
         run: brew install protobuf
         
-      - name: Build LuaJIT
-        if: steps.cache-luajit.outputs.cache-hit != 'true'
-        run: |
-            git clone https://github.com/LuaJIT/LuaJIT
-            cd LuaJIT
-            make -j2
-            cd ..
-        env:
-          MACOSX_DEPLOYMENT_TARGET: 10.14
-            
-      - name: Install LuaJIT
-        run: cd LuaJIT && sudo make install
-        
       - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-18.04'
         run: sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
-           
-      - name: Prepare build
-        run: |
-            mkdir -p cmake-build-release
-            cd cmake-build-release
-            conan install ..
-            cmake .. -DCMAKE_BUILD_TYPE=Release
-            cd ..
-
-      - name: Copy LuaJIT shared library
-        run: cp /usr/local/lib/libluajit-5.1.${{ matrix.dylib-ext }} cmake-build-release/
-
-      - name: Build
-        run: cd cmake-build-release && cmake --build . --target riposte -j2 && cmake --build . --target pb
         
-      - name: Build riposte-bundler
-        run: |
-            cd bundler
-            cargo build --release
-            cd ..
-            
-      - name: Bundle
-        run: bundler/target/release/riposte-bundler
+      - name: Install makers
+        run: cargo install cargo-make --debug
+
+      - name: Build & Bundle
+        run: makers bundle
         
       - name: Upload temporary artifact
         uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.os-name }}
-          path: cmake-build-release/riposte.tar.zst
+          path: target/release/riposte.tar.zst
           
   publish:
     runs-on: ubuntu-18.04
@@ -176,25 +139,25 @@ jobs:
           tag_name: ${{ steps.get_tag.outputs.TAG }}
           release_name: Release ${{ steps.get_tag.outputs.TAG }}
           
-      #- name: Download Linux build
-      #  uses: actions/download-artifact@v1
-     #  with:
-     #     name: linux
+      - name: Download Linux build
+        uses: actions/download-artifact@v1
+        with:
+          name: linux
 
       - name: Download macOS build
         uses: actions/download-artifact@v1
         with:
           name: macOS
         
-     # - name: Upload Linux package
-        #   uses: actions/upload-release-asset@v1
-          #   env:
-        #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          #   with:
-          #   upload_url: ${{ steps.create_release.outputs.upload_url }}
-          #    asset_path: linux/riposte.tar.zst
-          #   asset_name: riposte-linux.tar.zst
-          #  asset_content_type: application/zstd
+      - name: Upload Linux package
+           uses: actions/upload-release-asset@v1
+             env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+             with:
+             upload_url: ${{ steps.create_release.outputs.upload_url }}
+              asset_path: linux/riposte.tar.zst
+             asset_name: riposte-linux.tar.zst
+            asset_content_type: application/zstd
           
       - name: Upload macOS package
         uses: actions/upload-release-asset@v1

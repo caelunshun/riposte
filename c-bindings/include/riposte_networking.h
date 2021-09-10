@@ -49,7 +49,7 @@ void networkctx_conn_free(RipNetworkingContext *_ctx, RipConnectionHandle *conn)
 /// `callback` is invoked after the data is received. The `data` field
 /// contains a `bytes` variant if successful.
 void networkctx_conn_recv_data(RipNetworkingContext *ctx,
-                               const RipConnectionHandle *conn,
+                               RipConnectionHandle *conn,
                                Callback callback,
                                void *userdata);
 
