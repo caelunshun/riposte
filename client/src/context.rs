@@ -3,7 +3,7 @@ use std::{
     ffi::OsStr,
     future::Future,
     iter,
-    path::{Path, PathBuf},
+    path::PathBuf,
     rc::Rc,
     sync::Arc,
     time::Instant,

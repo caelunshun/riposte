@@ -1,0 +1,14 @@
+name: InfoBarWindow
+child:
+  Container:
+    classes:
+      - game_window_container
+    mode: 
+      FillParentAndPad: 20
+    child:
+      Row:
+        spacing: 40
+        children:
+          - Text:
+              id: turn_text
+          

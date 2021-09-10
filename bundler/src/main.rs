@@ -140,10 +140,10 @@ fn find_dynlibs(bundle: &mut Bundle) -> anyhow::Result<()> {
 }
 
 fn find_executables(bundle: &mut Bundle) -> anyhow::Result<()> {
-    for executable in ["riposte", "riposte-server"] {
+    for (file, name) in [("riposte", "Riposte"), ("riposte-server", "riposte-server")] {
         bundle.executables.push(Executable {
-            name: executable.to_owned(),
-            contents: fs::read(Path::new(BUILD_DIR).join(executable))?,
+            name: name.to_owned(),
+            contents: fs::read(Path::new(BUILD_DIR).join(file))?,
         });
     }
     Ok(())

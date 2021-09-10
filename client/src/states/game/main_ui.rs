@@ -10,11 +10,12 @@ use crate::{
 };
 
 use self::{
-    economy::EconomyScreen, research::ResearchBar, turn_indicator::TurnIndicator,
-    unit_actions::UnitActionBar, unit_info::UnitInfo,
+    economy::EconomyScreen, info_bar::InfoBar, research::ResearchBar,
+    turn_indicator::TurnIndicator, unit_actions::UnitActionBar, unit_info::UnitInfo,
 };
 
 mod economy;
+mod info_bar;
 mod research;
 mod turn_indicator;
 mod unit_actions;
@@ -33,6 +34,7 @@ pub struct MainUi {
     research_bar: ResearchBar,
     economy_screen: EconomyScreen,
     turn_indicator: TurnIndicator,
+    info_bar: InfoBar,
 
     selected_units_version: VersionSnapshot,
 }
@@ -46,12 +48,14 @@ impl MainUi {
         let mut research_bar = ResearchBar::new(cx, &attachment);
         let mut economy_screen = EconomyScreen::new(cx, &attachment);
         let mut turn_indicator = TurnIndicator::new(cx, &attachment);
+        let mut info_bar = InfoBar::new(cx, &attachment);
 
         unit_info.update_info(cx, game);
         unit_actions.update_info(cx, game);
         research_bar.update_info(game);
         economy_screen.update_info(game);
         turn_indicator.update_info(game);
+        info_bar.update_info(cx, game);
 
         Self {
             attachment,
@@ -60,6 +64,7 @@ impl MainUi {
             research_bar,
             economy_screen,
             turn_indicator,
+            info_bar,
 
             selected_units_version: game.selected_units().version(),
         }
@@ -80,6 +85,7 @@ impl MainUi {
         self.research_bar.handle_game_event(cx, game, event);
         self.economy_screen.handle_game_event(cx, game, event);
         self.turn_indicator.handle_game_event(game, event);
+        self.info_bar.handle_game_event(cx, game, event);
         match event {
             GameEvent::UnitUpdated { unit } => {
                 // If the unit was selected, we should update the UI

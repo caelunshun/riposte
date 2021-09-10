@@ -19,4 +19,4 @@ child:
               child:
                 Column:
                   id: buildings_list
-                  spacing: 10
+                  spacing: 30

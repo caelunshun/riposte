@@ -398,6 +398,11 @@ impl Game {
         self.turn
     }
 
+    /// Gets the current era.
+    pub fn era(&self) -> Era {
+        self.era
+    }
+
     /// Gets the pathfinding engine.
     pub fn pathfinder_mut(&self) -> RefMut<Pathfinder> {
         self.pathfinder.borrow_mut()

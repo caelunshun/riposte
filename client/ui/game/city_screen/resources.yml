@@ -19,4 +19,4 @@ child:
               child:
                 Column:
                   id: resources_list
-                  spacing: 10
+                  spacing: 30

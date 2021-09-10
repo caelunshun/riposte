@@ -700,6 +700,33 @@ impl ::duit::InstanceHandle for UnitActionBarWindow {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct InfoBarWindow {
+    pub turn_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for InfoBarWindow {
+    fn name() -> &'static str {
+        "InfoBarWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut turn_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "turn_text" => turn_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            turn_text: WidgetHandle::new(turn_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "turn_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct TurnIndicatorWindow {
     pub flag: WidgetHandle<Image>,
     pub turn_indicator: WidgetHandle<TurnIndicatorCircle>,
