@@ -68,6 +68,8 @@ namespace rip {
 
         const auto culturePerTurn = city.getCulturePerTurn();
 
+        bool isVisibilityDirty = false;
+
         breadthFirstSearch(game, city.getPos(), [&] (Tile &tile, glm::uvec2 pos) {
             auto &cultureTile = getTileCulture(pos);
             cultureTile.addCultureForPlayer(city.getOwner(), culturePerTurn);
@@ -90,6 +92,7 @@ namespace rip {
                 if (!currentOwner.has_value() || cultureTile.getCultureForPlayer(touchingCity.getOwner())
                     > cultureTile.getCultureForPlayer(*currentOwner)) {
                     currentOwner = touchingCity.getOwner();
+                    isVisibilityDirty = true;
                 }
             }
             owners[pos.x + pos.y * mapWidth] = currentOwner;
@@ -99,6 +102,10 @@ namespace rip {
             auto d = dist(pos, city.getPos());
             return static_cast<int>(round(d)) <= level;
         });
+
+        if (isVisibilityDirty) {
+            game.getPlayer(city.getOwner()).recomputeVisibility(game);
+        }
     }
 
     void CultureMap::onTurnEnd(Game &game) {
