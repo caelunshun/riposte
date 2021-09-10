@@ -11,6 +11,7 @@ pub mod health;
 pub mod unhappiness;
 pub mod sickness;
 pub mod resource;
+pub mod improvement;
 
 pub fn build_task_tooltip(registry: &Registry, task: &BuildTaskKind) -> String {
     match task {

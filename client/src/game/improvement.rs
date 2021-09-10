@@ -11,7 +11,7 @@ pub struct InvalidCottageLevel(String);
 pub struct InvalidImprovementType(String);
 
 /// A tile improvement.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Improvement {
     Farm,
     Mine,
@@ -36,6 +36,16 @@ impl Improvement {
             s => Err(InvalidImprovementType(s.to_owned()).into()),
         }
     }
+
+    pub fn name(&self) -> String {
+        match self {
+            Improvement::Farm => "Farm".to_owned(),
+            Improvement::Mine => "Mine".to_owned(),
+            Improvement::Road => "Road".to_owned(),
+            Improvement::Pasture => "Pasture".to_owned(),
+            Improvement::Cottage(cottage) => format!("{:?}", cottage.level),
+        }
+    }
 }
 
 impl FromStr for Improvement {
@@ -53,7 +63,7 @@ impl FromStr for Improvement {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Cottage {
     level: CottageLevel,
 }

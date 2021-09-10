@@ -42,5 +42,10 @@ impl CultureScreen {
             ),
             vars! {},
         );
+
+        self.window.culture_amount_text.get_mut().set_text(
+            format!("@icon{{culture}}: {} / {}", city.num_culture(), city.culture_needed()),
+            vars! {},
+        );
     }
 }

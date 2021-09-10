@@ -218,6 +218,7 @@ impl ::duit::InstanceHandle for CityEconomyWindow {
 use duit::widgets::*;
 use duit::*;
 pub struct CityCultureWindow {
+    pub culture_amount_text: WidgetHandle<Text>,
     pub culture_progress_bar: WidgetHandle<ProgressBar>,
     pub culture_text: WidgetHandle<Text>,
 }
@@ -226,16 +227,24 @@ impl ::duit::InstanceHandle for CityCultureWindow {
         "CityCultureWindow"
     }
     fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut culture_amount_text = None;
         let mut culture_progress_bar = None;
         let mut culture_text = None;
         for (name, widget) in widget_handles {
             match name.as_str() {
+                "culture_amount_text" => culture_amount_text = Some(widget),
                 "culture_progress_bar" => culture_progress_bar = Some(widget),
                 "culture_text" => culture_text = Some(widget),
                 _ => {}
             }
         }
         Self {
+            culture_amount_text: WidgetHandle::new(culture_amount_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "culture_amount_text"
+                )
+            })),
             culture_progress_bar: WidgetHandle::new(culture_progress_bar.unwrap_or_else(|| {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
@@ -640,6 +649,8 @@ use duit::*;
 pub struct UnitActionButton {
     pub the_button: WidgetHandle<FlashingButton>,
     pub the_text: WidgetHandle<Text>,
+    pub tooltip_container: WidgetHandle<Container>,
+    pub tooltip_text: WidgetHandle<Text>,
 }
 impl ::duit::InstanceHandle for UnitActionButton {
     fn name() -> &'static str {
@@ -648,10 +659,14 @@ impl ::duit::InstanceHandle for UnitActionButton {
     fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
         let mut the_button = None;
         let mut the_text = None;
+        let mut tooltip_container = None;
+        let mut tooltip_text = None;
         for (name, widget) in widget_handles {
             match name.as_str() {
                 "the_button" => the_button = Some(widget),
                 "the_text" => the_text = Some(widget),
+                "tooltip_container" => tooltip_container = Some(widget),
+                "tooltip_text" => tooltip_text = Some(widget),
                 _ => {}
             }
         }
@@ -666,6 +681,18 @@ impl ::duit::InstanceHandle for UnitActionButton {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "the_text"
+                )
+            })),
+            tooltip_container: WidgetHandle::new(tooltip_container.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "tooltip_container"
+                )
+            })),
+            tooltip_text: WidgetHandle::new(tooltip_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "tooltip_text"
                 )
             })),
         }

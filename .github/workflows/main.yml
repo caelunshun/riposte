@@ -150,14 +150,14 @@ jobs:
           name: macOS
         
       - name: Upload Linux package
-           uses: actions/upload-release-asset@v1
-             env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-             with:
-             upload_url: ${{ steps.create_release.outputs.upload_url }}
-              asset_path: linux/riposte.tar.zst
-             asset_name: riposte-linux.tar.zst
-            asset_content_type: application/zstd
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: linux/riposte.tar.zst
+          asset_name: riposte-linux.tar.zst
+          asset_content_type: application/zstd
           
       - name: Upload macOS package
         uses: actions/upload-release-asset@v1

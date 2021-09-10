@@ -150,7 +150,7 @@ impl UnitGroup {
         self.last_move_turn != Some(game.turn())
             && self.units.iter().any(|&u| {
                 let unit = game.unit(u);
-                unit.has_movement_left() && !unit.is_fortified()
+                unit.has_movement_left() && !unit.is_fortified() && !unit.has_worker_task()
             })
     }
 }

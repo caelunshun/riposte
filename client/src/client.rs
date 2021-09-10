@@ -7,18 +7,20 @@ use flume::Receiver;
 use glam::{uvec2, UVec2};
 use prost::Message;
 use protocol::{
-    any_client, any_server, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer,
-    BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket,
+    any_client, any_server, client_lobby_packet, server_lobby_packet, worker_task_kind, AnyClient,
+    AnyServer, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket,
     ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeleteSlot, DoUnitAction, EndTurn,
     GameStarted, GetBuildTasks, GetPossibleTechs, InitialGameData, Kicked, LobbyInfo, MoveUnits,
     Pos, PossibleCityBuildTasks, PossibleTechs, RequestGameStart, ServerLobbyPacket,
-    SetCityBuildTask, SetEconomySettings, SetResearch,
+    SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask, WorkerTask,
+    WorkerTaskImprovement,
 };
 
 use crate::{
     context::Context,
     game::{
         city::{self, PreviousBuildTask},
+        unit::WorkerTaskKind,
         CityId, Game, UnitId,
     },
     lobby::GameLobby,
@@ -281,6 +283,24 @@ impl Client<GameState> {
                 should_manually_work: manually_worked,
             },
         ));
+    }
+
+    pub fn set_worker_task(&mut self, game: &Game, worker_id: UnitId, task: &WorkerTaskKind) {
+        self.send_message(any_client::Packet::SetWorkerTask(SetWorkerTask {
+            worker_id: game.unit(worker_id).network_id() as i32,
+            task: Some(WorkerTask {
+                kind: Some(match task {
+                    WorkerTaskKind::BuildImprovement(improvement) => protocol::WorkerTaskKind {
+                        kind: Some(worker_task_kind::Kind::BuildImprovement(
+                            WorkerTaskImprovement {
+                                improvement_id: improvement.name().to_owned(),
+                            },
+                        )),
+                    },
+                }),
+                ..Default::default()
+            }),
+        }));
     }
 
     pub fn end_turn(&mut self, game: &mut Game) {

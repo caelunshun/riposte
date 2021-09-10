@@ -1,14 +1,26 @@
 name: UnitActionButton
 child:
-  Custom:
-    id: the_button
-    type: FlashingButton
-    params: {}
-    classes:
-      - unit_action_button
-    children:
-      - Text:
-          classes:
-            - h3
-          id: the_text
-          
+  Tooltip:
+    child:
+      Custom:
+        id: the_button
+        type: FlashingButton
+        params: {}
+        classes:
+          - unit_action_button
+        children:
+          - Text:
+              classes:
+                - h3
+              id: the_text
+    tooltip:
+      Container:
+        id: tooltip_container
+        classes:
+          - tooltip_container
+        mode:
+          Pad: 10
+        child:
+          Text:
+            id: tooltip_text
+              

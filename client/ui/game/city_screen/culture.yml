@@ -14,16 +14,21 @@ child:
               classes:
                 - h3
           - Divider: {}
-          - ProgressBar:
-              height: 20
-              classes:
-                - culture_progress_bar
-              id: culture_progress_bar
-              child:
-                Row:
-                  align_h: Center
-                  align_v: Center
-                  children:
-                    - Text:
-                        id: culture_text
-                  
+          - Row:
+              spacing: 10
+              children:
+                - Text:
+                    id: culture_amount_text
+                - ProgressBar:
+                    height: 20
+                    classes:
+                      - culture_progress_bar
+                    id: culture_progress_bar
+                    child:
+                      Row:
+                        align_h: Center
+                        align_v: Center
+                        children:
+                          - Text:
+                              id: culture_text
+                        

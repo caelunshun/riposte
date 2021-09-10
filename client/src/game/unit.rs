@@ -142,6 +142,13 @@ impl Unit {
         })
     }
 
+    pub fn has_worker_task(&self) -> bool {
+        self.capabilities().any(|c| match c {
+            Capability::Worker(w) => w.current_task.is_some(),
+            _ => false,
+        })
+    }
+
     pub fn id(&self) -> UnitId {
         self.id
     }
@@ -403,9 +410,13 @@ impl WorkerTask {
     pub fn turns_left(&self) -> u32 {
         self.turns_left
     }
+
+    pub fn kind(&self) -> &WorkerTaskKind {
+        &self.kind
+    }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum WorkerTaskKind {
     BuildImprovement(Improvement),
 }
