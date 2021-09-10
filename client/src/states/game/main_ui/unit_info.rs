@@ -3,7 +3,7 @@ use indoc::formatdoc;
 
 use crate::{
     context::Context,
-    game::Game,
+    game::{unit::Capability, Game},
     generated::UnitInfoWindow,
     state::StateAttachment,
     ui::{AlignFixed, Z_FOREGROUND},
@@ -25,11 +25,11 @@ impl UnitInfo {
         Self { window }
     }
 
-    pub fn update_info(&mut self, cx: & Context, game: &Game) {
+    pub fn update_info(&mut self, cx: &Context, game: &Game) {
         self.on_selected_units_changed(cx, game);
     }
 
-    pub fn on_selected_units_changed(&mut self, _cx: & Context, game: &Game) {
+    pub fn on_selected_units_changed(&mut self, _cx: &Context, game: &Game) {
         let mut header = self.window.header_text.get_mut();
         let mut info = self.window.info_text.get_mut();
         let selected_units = game.selected_units();
@@ -48,15 +48,25 @@ impl UnitInfo {
                     },
                 );
 
-                match unit.strength_text() {
-                    Some(t) => info.set_text(
-                        formatdoc! {
-                        "Strength: {}
-                        Movement: {}", t, unit.movement_text()},
-                        vars! {},
-                    ),
-                    None => info.set_text(format!("Movement: {}", unit.movement_text()), vars! {}),
+                let mut text = match unit.strength_text() {
+                    Some(t) => formatdoc! {
+                    "Strength: {}
+                    Movement: {}", t, unit.movement_text() },
+                    None => format!("Movement: {}", unit.movement_text()),
                 };
+                if let Some(worker_cap) = unit.capabilities().find_map(|w| match w {
+                    Capability::Worker(w) => Some(w),
+                    _ => None,
+                }) {
+                    if let Some(task) = worker_cap.current_task() {
+                        text.push_str(&format!(
+                            "\n{} ({})",
+                            task.present_participle(),
+                            task.turns_left()
+                        ));
+                    }
+                }
+                info.set_text(text, vars! {});
             }
             n => {
                 header.set_text(format!("Unit Stack ({})", n), vars! {});
