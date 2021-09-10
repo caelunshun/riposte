@@ -1,7 +1,10 @@
+use duit::Event;
+use winit::event::MouseButton;
+
 use crate::{
     client::{Client, GameState},
     context::Context,
-    game::{event::GameEvent, Game},
+    game::{event::GameEvent, CityId, Game},
     state::StateAttachment,
     utils::VersionSnapshot,
 };
@@ -16,6 +19,10 @@ mod research;
 mod turn_indicator;
 mod unit_actions;
 mod unit_info;
+
+pub enum Action {
+    OpenCityScreen(CityId),
+}
 
 /// The main in-game user interface.
 pub struct MainUi {
@@ -34,11 +41,17 @@ impl MainUi {
     pub fn new(cx: &Context, game: &Game) -> Self {
         let attachment = cx.state_manager().create_state();
 
-        let unit_info = UnitInfo::new(cx, &attachment);
-        let unit_actions = UnitActionBar::new(cx, &attachment);
-        let research_bar = ResearchBar::new(cx, &attachment);
-        let economy_screen = EconomyScreen::new(cx, &attachment);
-        let turn_indicator = TurnIndicator::new(cx, &attachment);
+        let mut unit_info = UnitInfo::new(cx, &attachment);
+        let mut unit_actions = UnitActionBar::new(cx, &attachment);
+        let mut research_bar = ResearchBar::new(cx, &attachment);
+        let mut economy_screen = EconomyScreen::new(cx, &attachment);
+        let mut turn_indicator = TurnIndicator::new(cx, &attachment);
+
+        unit_info.update_info(cx, game);
+        unit_actions.update_info(cx, game);
+        research_bar.update_info(game);
+        economy_screen.update_info(game);
+        turn_indicator.update_info(game);
 
         Self {
             attachment,
@@ -82,5 +95,23 @@ impl MainUi {
     fn on_selected_units_changed(&mut self, cx: &mut Context, game: &Game) {
         self.unit_info.on_selected_units_changed(cx, game);
         self.unit_actions.on_selected_units_changed(cx, game);
+    }
+
+    pub fn handle_event(&mut self, _cx: &Context, game: &Game, event: &Event) -> Option<Action> {
+        // Check for double-clicked cities
+        if let Event::MousePress {
+            pos,
+            button: MouseButton::Left,
+            is_double,
+        } = event
+        {
+            if *is_double {
+                let clicked_tile_pos = game.view().tile_pos_for_screen_offset(*pos);
+                if let Some(city) = game.city_at_pos(clicked_tile_pos) {
+                    return Some(Action::OpenCityScreen(city.id()));
+                }
+            }
+        }
+        None
     }
 }

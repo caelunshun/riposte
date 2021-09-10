@@ -2,6 +2,7 @@ use std::convert::TryInto;
 
 use anyhow::{anyhow, bail};
 use glam::UVec2;
+use protocol::{HappinessEntry, HealthEntry, SicknessEntry, UnhappinessEntry};
 
 use crate::{
     assets::Handle,
@@ -163,6 +164,10 @@ impl City {
             .map(|p| p.clone().into())
     }
 
+    pub fn is_tile_manually_worked(&self, tile: UVec2) -> bool {
+        self.manual_worked_tiles().any(|t| t == tile)
+    }
+
     pub fn num_happiness(&self) -> u32 {
         self.data.happiness_sources.iter().map(|s| s.count).sum()
     }
@@ -179,8 +184,41 @@ impl City {
         self.data.sickness_sources.iter().map(|s| s.count).sum()
     }
 
+    pub fn happiness(&self) -> impl Iterator<Item = &HappinessEntry> {
+        self.data.happiness_sources.iter()
+    }
+
+    pub fn unhappiness(&self) -> impl Iterator<Item = &UnhappinessEntry> {
+        self.data.unhappiness_sources.iter()
+    }
+
+    pub fn health(&self) -> impl Iterator<Item = &HealthEntry> {
+        self.data.health_sources.iter()
+    }
+
+    pub fn sickness(&self) -> impl Iterator<Item = &SicknessEntry> {
+        self.data.sickness_sources.iter()
+    }
+
     pub fn culture(&self) -> &Culture {
         &self.culture
+    }
+
+    pub fn culture_per_turn(&self) -> i32 {
+        self.data.culture_per_turn
+    }
+
+    pub fn culture_level(&self) -> &str {
+        &self.data.culture_level
+    }
+
+    pub fn beakers_per_turn(&self, game: &Game) -> u32 {
+        (self.city_yield().commerce as f32 * game.the_player().beaker_percent() as f32 / 100.)
+            .floor() as u32
+    }
+
+    pub fn gold_per_turn(&self, game: &Game) -> u32 {
+        self.city_yield().commerce - self.beakers_per_turn(game)
     }
 
     pub fn culture_defense_bonus(&self) -> i32 {
@@ -196,6 +234,16 @@ impl City {
             Some(task) => self.estimate_build_time_for_task(task),
             None => 0,
         }
+    }
+
+    pub fn turns_needed_for_growth(&self) -> u32 {
+        (self.food_needed_for_growth() as u32 - self.stored_food() as u32 + self.city_yield().food - self.consumed_food() as u32
+            - 1)
+            / (self.city_yield().food - self.consumed_food() as u32)
+    }
+
+    pub fn maintenance_cost(&self) -> i32 {
+        self.data.maintenance_cost
     }
 
     pub fn name(&self) -> &str {

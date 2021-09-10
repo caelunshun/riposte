@@ -114,6 +114,18 @@ styles:
     background_color: $background
     progress_color: rgb(91, 197, 0)
     projected_progress_color: rgb(62, 154, 44)
+  
+  production_progress_bar:
+    progress_color: rgba(82, 159, 223, 160)
+    projected_progress_color: rgba(141, 200, 232, 160)
+
+  population_progress_bar:
+    progress_color: rgb(237, 155, 51)
+    projected_progress_color: rgb(185, 112, 0)
+
+  culture_progress_bar:
+    progress_color: rgb(119, 37, 131)
+    projected_progress_color: rgb(213, 150, 200)
 
   slider:
     line_width: 3

@@ -85,6 +85,7 @@ pub struct Game {
 
     pub waiting_on_turn_end: bool,
     pub are_prompts_open: bool,
+    pub current_city_screen: Option<CityId>,
 }
 
 impl Game {
@@ -117,6 +118,7 @@ impl Game {
 
             waiting_on_turn_end: false,
             are_prompts_open: false,
+            current_city_screen: None,
         }
     }
 
@@ -410,9 +412,14 @@ impl Game {
             && !self.selection_driver().has_pending_unit_movements()
     }
 
+    /// Returns whether the user can move the view right now.
+    pub fn is_view_locked(&self) -> bool {
+        self.current_city_screen.is_some()
+    }
+
     /// Called every frame.
     pub fn update(&mut self, cx: &mut Context, client: &mut Client<GameState>) {
-        self.view_mut().update(cx);
+        self.view_mut().update(cx, self);
         self.selection_driver_mut()
             .update(cx, self, client, cx.time());
 
@@ -437,7 +444,7 @@ impl Game {
         client: &mut Client<GameState>,
         event: &Event,
     ) {
-        self.view_mut().handle_event(cx, event);
+        self.view_mut().handle_event(cx, self, event);
         self.selection_driver_mut()
             .handle_event(self, client, cx, event);
     }

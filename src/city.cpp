@@ -502,6 +502,21 @@ namespace rip {
         }
     }
 
+    int City::getCultureNeeded() const {
+        const auto culture = getCulture().getCultureForPlayer(owner);
+        if (culture < 10) {
+            return 10;
+        } else if (culture < 100) {
+            return 100;
+        } else if (culture < 500) {
+            return 500;
+        } else if (culture < 5000) {
+            return 5000;
+        } else {
+            return 50000;
+        }
+    }
+
     void City::onCreated(Game &game, bool isLoading) {
         game.getCultureMap().onCityCreated(game, getID());
         game.getTradeRoutes().onCityCreated(game, *this);

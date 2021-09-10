@@ -1,0 +1,13 @@
+name: CityBuildingEntry
+child:
+  Row:
+    children:
+      - Text:
+          id: building_name
+          flex: 1
+      - Row:
+          flex: 1
+          align_h: End
+          children:
+            - Text:
+                id: building_output             

@@ -45,11 +45,15 @@ impl TurnIndicator {
     pub fn handle_game_event(&mut self, game: &Game, event: &GameEvent) {
         if let GameEvent::PlayerUpdated { player } = event {
             if *player == game.the_player().id() {
-                self.window
-                    .flag
-                    .get_mut()
-                    .set_image(format!("icon/flag/{}", game.the_player().civ().id));
+                self.update_info(game);
             }
         }
+    }
+
+    pub fn update_info(&mut self, game: &Game) {
+        self.window
+            .flag
+            .get_mut()
+            .set_image(format!("icon/flag/{}", game.the_player().civ().id));
     }
 }

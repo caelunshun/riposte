@@ -202,6 +202,7 @@ namespace rip {
         const Culture &getCulture() const;
         int getCulturePerTurn() const;
         CultureLevel getCultureLevel() const;
+        int getCultureNeeded() const;
 
         void setName(std::string name);
 

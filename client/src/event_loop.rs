@@ -26,12 +26,18 @@ pub fn run(event_loop: EventLoop<()>, mut context: Context, mut state: RootState
                     .to_logical(context.window().scale_factor());
                 let window_logical_size =
                     Vec2::new(window_logical_size.width, window_logical_size.height);
-                context.ui_mut().handle_window_event(
-                    &mut *context.canvas_mut(),
-                    &event,
-                    context.window().scale_factor(),
-                    window_logical_size,
-                );
+
+                let duit_event = context
+                    .ui_mut()
+                    .convert_event(&event, context.window().scale_factor());
+
+                if let Some(event) = &duit_event {
+                    context.ui_mut().handle_window_event(
+                        &mut *context.canvas_mut(),
+                        event,
+                        window_logical_size,
+                    );
+                }
 
                 match event {
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
@@ -41,9 +47,7 @@ pub fn run(event_loop: EventLoop<()>, mut context: Context, mut state: RootState
 
                 context.handle_window_event(&event);
 
-                let mut ui = context.ui_mut();
-                if let Some(event) = ui.convert_event(&event, context.window().scale_factor()) {
-                    drop(ui);
+                if let Some(event) = duit_event {
                     state.handle_event(&mut context, &event);
                 }
             }

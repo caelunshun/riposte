@@ -1,0 +1,13 @@
+name: CityResourcesEntry
+child:
+  Row:
+    children:
+      - Text:
+          id: resource_name
+          flex: 1
+      - Row:
+          flex: 1
+          align_h: End
+          children:
+            - Text:
+                id: resource_output      

@@ -113,6 +113,7 @@ impl Widget for FlashingButton {
             if let Event::MousePress {
                 button: MouseButton::Left,
                 pos,
+                ..
             } = event
             {
                 if data.bounds().contains(*pos) {

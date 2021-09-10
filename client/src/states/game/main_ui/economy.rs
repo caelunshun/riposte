@@ -63,12 +63,12 @@ impl EconomyScreen {
     pub fn handle_game_event(&mut self, _cx: &Context, game: &Game, event: &GameEvent) {
         if let GameEvent::PlayerUpdated { player } = event {
             if game.the_player().id() == *player {
-                self.rebuild_info(game);
+                self.update_info(game);
             }
         }
     }
 
-    fn rebuild_info(&mut self, game: &Game) {
+    pub fn update_info(&mut self, game: &Game) {
         let the_player = game.the_player();
 
         let positive_color = "rgb(68, 194, 113)";

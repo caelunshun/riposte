@@ -8,6 +8,8 @@ use splines::{Interpolation, Key, Spline};
 
 use crate::context::Context;
 
+use super::Game;
+
 bitflags! {
     struct MoveDir: u32 {
         const RIGHT = 0x01;
@@ -47,6 +49,7 @@ pub struct View {
 
     /// Center animation spline
     center_animation: Option<Spline<f32, Vec2>>,
+    zoom_factor_animation: Option<Spline<f32, f32>>,
 }
 
 impl Default for View {
@@ -67,6 +70,7 @@ impl View {
             center_velocity: Vec2::ZERO,
 
             center_animation: None,
+            zoom_factor_animation: None,
         }
     }
 
@@ -113,6 +117,18 @@ impl View {
         ]));
     }
 
+    pub fn animate_zoom_factor_to(&mut self, cx: &Context, zoom_factor: f32) {
+        let animation_time = 0.5;
+
+        let start_z = self.zoom_factor;
+        let target_z = zoom_factor;
+
+        self.zoom_factor_animation = Some(Spline::from_vec(vec![
+            Key::new(cx.time(), start_z, Interpolation::Cosine),
+            Key::new(cx.time() + animation_time, target_z, Interpolation::Cosine),
+        ]));
+    }
+
     /// Gets the offset in screen space logical pixels
     /// of the given tile position.
     pub fn screen_offset_for_tile_pos(&self, tile_pos: UVec2) -> Vec2 {
@@ -135,14 +151,24 @@ impl View {
         )
     }
 
-    pub fn update(&mut self, cx: &Context) {
+    pub fn update(&mut self, cx: &Context, game: &Game) {
         self.update_window_size(cx);
-        self.do_panning(cx);
+
+        if !game.is_view_locked() {
+            self.do_panning(cx);
+        }
 
         if let Some(spline) = &self.center_animation {
             match spline.sample(cx.time()) {
                 Some(p) => self.center = p,
                 None => self.center_animation = None,
+            }
+        }
+
+        if let Some(spline) = &self.zoom_factor_animation {
+            match spline.sample(cx.time()) {
+                Some(z) => self.zoom_factor = z,
+                None => self.zoom_factor_animation = None,
             }
         }
     }
@@ -203,7 +229,10 @@ impl View {
         self.center += self.center_velocity * (1. / self.zoom_factor) * dt;
     }
 
-    pub fn handle_event(&mut self, _cx: &Context, event: &Event) {
+    pub fn handle_event(&mut self, _cx: &Context, game: &Game, event: &Event) {
+        if game.is_view_locked() {
+            return;
+        }
         match event {
             Event::Scroll { offset, .. } => {
                 let min_zoom_factor = 0.2;

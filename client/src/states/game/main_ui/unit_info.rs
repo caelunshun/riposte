@@ -25,7 +25,11 @@ impl UnitInfo {
         Self { window }
     }
 
-    pub fn on_selected_units_changed(&mut self, _cx: &mut Context, game: &Game) {
+    pub fn update_info(&mut self, cx: & Context, game: &Game) {
+        self.on_selected_units_changed(cx, game);
+    }
+
+    pub fn on_selected_units_changed(&mut self, _cx: & Context, game: &Game) {
         let mut header = self.window.header_text.get_mut();
         let mut info = self.window.info_text.get_mut();
         let selected_units = game.selected_units();

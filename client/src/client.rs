@@ -6,7 +6,14 @@ use bytes::BytesMut;
 use flume::Receiver;
 use glam::{uvec2, UVec2};
 use prost::Message;
-use protocol::{AnyClient, AnyServer, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket, ConfirmMoveUnits, CreateSlot, DeleteSlot, DoUnitAction, EndTurn, GameStarted, GetBuildTasks, GetPossibleTechs, InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs, RequestGameStart, ServerLobbyPacket, SetCityBuildTask, SetEconomySettings, SetResearch, any_client, any_server, client_lobby_packet, server_lobby_packet};
+use protocol::{
+    any_client, any_server, client_lobby_packet, server_lobby_packet, AnyClient, AnyServer,
+    BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket,
+    ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeleteSlot, DoUnitAction, EndTurn,
+    GameStarted, GetBuildTasks, GetPossibleTechs, InitialGameData, Kicked, LobbyInfo, MoveUnits,
+    Pos, PossibleCityBuildTasks, PossibleTechs, RequestGameStart, ServerLobbyPacket,
+    SetCityBuildTask, SetEconomySettings, SetResearch,
+};
 
 use crate::{
     context::Context,
@@ -255,6 +262,25 @@ impl Client<GameState> {
         self.send_message(any_client::Packet::SetEconomySettings(SetEconomySettings {
             beaker_percent: beaker_percent as i32,
         }));
+    }
+
+    pub fn set_tile_manually_worked(
+        &mut self,
+        game: &Game,
+        city: CityId,
+        tile: UVec2,
+        manually_worked: bool,
+    ) {
+        self.send_message(any_client::Packet::ConfigureWorkedTiles(
+            ConfigureWorkedTiles {
+                city_id: game.city(city).network_id() as i32,
+                tile_pos: Some(Pos {
+                    x: tile.x,
+                    y: tile.y,
+                }),
+                should_manually_work: manually_worked,
+            },
+        ));
     }
 
     pub fn end_turn(&mut self, game: &mut Game) {

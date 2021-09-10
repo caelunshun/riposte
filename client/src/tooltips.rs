@@ -6,6 +6,11 @@ use crate::{game::city::BuildTaskKind, registry::Registry};
 pub mod building;
 pub mod unit;
 pub mod tech;
+pub mod happiness;
+pub mod health;
+pub mod unhappiness;
+pub mod sickness;
+pub mod resource;
 
 pub fn build_task_tooltip(registry: &Registry, task: &BuildTaskKind) -> String {
     match task {

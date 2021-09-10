@@ -248,6 +248,10 @@ impl SelectionDriver {
     }
 
     pub fn update(&mut self, cx: &Context, game: &Game, client: &mut Client<GameState>, time: f32) {
+        if game.is_view_locked() {
+            return;
+        }
+        
         self.movement.update(game);
 
         if game.are_prompts_open {
@@ -355,16 +359,22 @@ impl SelectionDriver {
         _cx: &Context,
         event: &Event,
     ) {
+        if game.is_view_locked() {
+            return;
+        }
+
         match event {
             Event::MousePress {
                 button: MouseButton::Left,
                 pos,
+                ..
             } => {
                 self.handle_left_mouse_press(game, *pos);
             }
             Event::MousePress {
                 button: MouseButton::Right,
                 pos,
+                ..
             } => self.handle_right_mouse_press(game, *pos),
             Event::MouseRelease {
                 button: MouseButton::Right,

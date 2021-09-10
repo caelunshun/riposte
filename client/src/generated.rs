@@ -172,6 +172,386 @@ impl ::duit::InstanceHandle for CityBuildPromptOption {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct CityEconomyWindow {
+    pub beaker_output_text: WidgetHandle<Text>,
+    pub gold_output_text: WidgetHandle<Text>,
+    pub maintenance_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for CityEconomyWindow {
+    fn name() -> &'static str {
+        "CityEconomyWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut beaker_output_text = None;
+        let mut gold_output_text = None;
+        let mut maintenance_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "beaker_output_text" => beaker_output_text = Some(widget),
+                "gold_output_text" => gold_output_text = Some(widget),
+                "maintenance_text" => maintenance_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            beaker_output_text: WidgetHandle::new(beaker_output_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "beaker_output_text"
+                )
+            })),
+            gold_output_text: WidgetHandle::new(gold_output_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "gold_output_text"
+                )
+            })),
+            maintenance_text: WidgetHandle::new(maintenance_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "maintenance_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct CityCultureWindow {
+    pub culture_progress_bar: WidgetHandle<ProgressBar>,
+    pub culture_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for CityCultureWindow {
+    fn name() -> &'static str {
+        "CityCultureWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut culture_progress_bar = None;
+        let mut culture_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "culture_progress_bar" => culture_progress_bar = Some(widget),
+                "culture_text" => culture_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            culture_progress_bar: WidgetHandle::new(culture_progress_bar.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "culture_progress_bar"
+                )
+            })),
+            culture_text: WidgetHandle::new(culture_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "culture_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct CityInfoBarWindow {
+    pub city_name: WidgetHandle<Text>,
+    pub hammers_text: WidgetHandle<Text>,
+    pub food_text: WidgetHandle<Text>,
+    pub growth_progress_bar: WidgetHandle<ProgressBar>,
+    pub growth_text: WidgetHandle<Text>,
+    pub production_progress_bar: WidgetHandle<ProgressBar>,
+    pub production_text: WidgetHandle<Text>,
+    pub health_text: WidgetHandle<Text>,
+    pub health_tooltip_text: WidgetHandle<Text>,
+    pub health_sign_text: WidgetHandle<Text>,
+    pub sick_text: WidgetHandle<Text>,
+    pub sick_tooltip_text: WidgetHandle<Text>,
+    pub happy_text: WidgetHandle<Text>,
+    pub happy_tooltip_text: WidgetHandle<Text>,
+    pub happy_sign_text: WidgetHandle<Text>,
+    pub unhappy_text: WidgetHandle<Text>,
+    pub unhappy_tooltip_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for CityInfoBarWindow {
+    fn name() -> &'static str {
+        "CityInfoBarWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut city_name = None;
+        let mut hammers_text = None;
+        let mut food_text = None;
+        let mut growth_progress_bar = None;
+        let mut growth_text = None;
+        let mut production_progress_bar = None;
+        let mut production_text = None;
+        let mut health_text = None;
+        let mut health_tooltip_text = None;
+        let mut health_sign_text = None;
+        let mut sick_text = None;
+        let mut sick_tooltip_text = None;
+        let mut happy_text = None;
+        let mut happy_tooltip_text = None;
+        let mut happy_sign_text = None;
+        let mut unhappy_text = None;
+        let mut unhappy_tooltip_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "city_name" => city_name = Some(widget),
+                "hammers_text" => hammers_text = Some(widget),
+                "food_text" => food_text = Some(widget),
+                "growth_progress_bar" => growth_progress_bar = Some(widget),
+                "growth_text" => growth_text = Some(widget),
+                "production_progress_bar" => production_progress_bar = Some(widget),
+                "production_text" => production_text = Some(widget),
+                "health_text" => health_text = Some(widget),
+                "health_tooltip_text" => health_tooltip_text = Some(widget),
+                "health_sign_text" => health_sign_text = Some(widget),
+                "sick_text" => sick_text = Some(widget),
+                "sick_tooltip_text" => sick_tooltip_text = Some(widget),
+                "happy_text" => happy_text = Some(widget),
+                "happy_tooltip_text" => happy_tooltip_text = Some(widget),
+                "happy_sign_text" => happy_sign_text = Some(widget),
+                "unhappy_text" => unhappy_text = Some(widget),
+                "unhappy_tooltip_text" => unhappy_tooltip_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            city_name: WidgetHandle::new(city_name.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "city_name"
+                )
+            })),
+            hammers_text: WidgetHandle::new(hammers_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "hammers_text"
+                )
+            })),
+            food_text: WidgetHandle::new(food_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "food_text"
+                )
+            })),
+            growth_progress_bar: WidgetHandle::new(growth_progress_bar.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "growth_progress_bar"
+                )
+            })),
+            growth_text: WidgetHandle::new(growth_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "growth_text"
+                )
+            })),
+            production_progress_bar: WidgetHandle::new(production_progress_bar.unwrap_or_else(
+                || {
+                    panic!(
+                        "missing widget with ID '{}' (generated code not up to date)",
+                        "production_progress_bar"
+                    )
+                },
+            )),
+            production_text: WidgetHandle::new(production_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "production_text"
+                )
+            })),
+            health_text: WidgetHandle::new(health_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "health_text"
+                )
+            })),
+            health_tooltip_text: WidgetHandle::new(health_tooltip_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "health_tooltip_text"
+                )
+            })),
+            health_sign_text: WidgetHandle::new(health_sign_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "health_sign_text"
+                )
+            })),
+            sick_text: WidgetHandle::new(sick_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "sick_text"
+                )
+            })),
+            sick_tooltip_text: WidgetHandle::new(sick_tooltip_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "sick_tooltip_text"
+                )
+            })),
+            happy_text: WidgetHandle::new(happy_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "happy_text"
+                )
+            })),
+            happy_tooltip_text: WidgetHandle::new(happy_tooltip_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "happy_tooltip_text"
+                )
+            })),
+            happy_sign_text: WidgetHandle::new(happy_sign_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "happy_sign_text"
+                )
+            })),
+            unhappy_text: WidgetHandle::new(unhappy_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "unhappy_text"
+                )
+            })),
+            unhappy_tooltip_text: WidgetHandle::new(unhappy_tooltip_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "unhappy_tooltip_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct CityBuildingEntry {
+    pub building_name: WidgetHandle<Text>,
+    pub building_output: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for CityBuildingEntry {
+    fn name() -> &'static str {
+        "CityBuildingEntry"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut building_name = None;
+        let mut building_output = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "building_name" => building_name = Some(widget),
+                "building_output" => building_output = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            building_name: WidgetHandle::new(building_name.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "building_name"
+                )
+            })),
+            building_output: WidgetHandle::new(building_output.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "building_output"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct CityResourcesWindow {
+    pub resources_list: WidgetHandle<Flex>,
+}
+impl ::duit::InstanceHandle for CityResourcesWindow {
+    fn name() -> &'static str {
+        "CityResourcesWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut resources_list = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "resources_list" => resources_list = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            resources_list: WidgetHandle::new(resources_list.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "resources_list"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct CityResourcesEntry {
+    pub resource_name: WidgetHandle<Text>,
+    pub resource_output: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for CityResourcesEntry {
+    fn name() -> &'static str {
+        "CityResourcesEntry"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut resource_name = None;
+        let mut resource_output = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "resource_name" => resource_name = Some(widget),
+                "resource_output" => resource_output = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            resource_name: WidgetHandle::new(resource_name.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "resource_name"
+                )
+            })),
+            resource_output: WidgetHandle::new(resource_output.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "resource_output"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct CityBuildingsWindow {
+    pub buildings_list: WidgetHandle<Flex>,
+}
+impl ::duit::InstanceHandle for CityBuildingsWindow {
+    fn name() -> &'static str {
+        "CityBuildingsWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut buildings_list = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "buildings_list" => buildings_list = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            buildings_list: WidgetHandle::new(buildings_list.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "buildings_list"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct EconomyWindow {
     pub gold_text: WidgetHandle<Text>,
     pub expenses_text: WidgetHandle<Text>,

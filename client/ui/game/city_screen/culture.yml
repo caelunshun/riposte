@@ -1,0 +1,29 @@
+name: CityCultureWindow
+child:
+  Container:
+    classes:
+      - game_window_container
+    mode: 
+      FillParentAndPad: 20
+    child:
+      Column:
+        spacing: 10
+        children:
+          - Text:
+              text: Culture
+              classes:
+                - h3
+          - Divider: {}
+          - ProgressBar:
+              height: 20
+              classes:
+                - culture_progress_bar
+              id: culture_progress_bar
+              child:
+                Row:
+                  align_h: Center
+                  align_v: Center
+                  children:
+                    - Text:
+                        id: culture_text
+                  

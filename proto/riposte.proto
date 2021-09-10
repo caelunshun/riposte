@@ -416,6 +416,9 @@ message UpdateCity {
   repeated string resources = 21;
   CultureValues cultureValues = 22;
   repeated Pos manualWorkedTiles = 23;
+  int32 culturePerTurn = 24;
+  string cultureLevel = 25;
+  int32 maintenanceCost = 26;
 }
 
 message Path {

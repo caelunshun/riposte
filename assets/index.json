@@ -75,6 +75,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/eaten_bread.png",
+    "id": "icon/eaten_bread",
+    "loader": "image"
+  },
+  {
     "path": "icon/coin.png",
     "id": "icon/coin",
     "loader": "image"

@@ -29,12 +29,12 @@ impl ResearchBar {
     pub fn handle_game_event(&mut self, _cx: &Context, game: &Game, event: &GameEvent) {
         if let GameEvent::PlayerUpdated { player } = event {
             if *player == game.the_player().id() {
-                self.update_bar(game);
+                self.update_info(game);
             }
         }
     }
 
-    fn update_bar(&mut self, game: &Game) {
+    pub fn update_info(&mut self, game: &Game) {
         let the_player = game.the_player();
         let research = the_player.researching_tech();
 

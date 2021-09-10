@@ -16,7 +16,9 @@ pub struct StatusTextOverlay {
 
 impl OverlayRenderLayer for StatusTextOverlay {
     fn render(&mut self, game: &Game, cx: &mut Context) {
-        let text = if game.waiting_on_turn_end {
+        let text = if game.is_view_locked() {
+            "Press <ESC> to exit...."
+        } else if game.waiting_on_turn_end {
             "Waiting on other players...."
         } else if game.can_end_turn() {
             "Press <ENTER> to end turn...."

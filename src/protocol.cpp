@@ -215,7 +215,9 @@ namespace rip {
 
         writeYield(city.computeYield(game), *packet.mutable_yield());
         packet.set_culture(city.getCulture().getCultureForPlayer(city.getOwner()));
-        // packet.set_cultureneeded(city.getCultureNeeded()); TODO
+        packet.set_cultureneeded(city.getCultureNeeded());
+        packet.set_cultureperturn(city.getCulturePerTurn());
+        packet.set_culturelevel(city.getCultureLevel().getName());
         packet.set_id(city.getID().encode());
 
         for (const auto &building : city.getBuildings()) {
@@ -260,6 +262,8 @@ namespace rip {
             p->set_x(tilePos.x);
             p->set_y(tilePos.y);
         }
+
+        packet.set_maintenancecost(city.getMaintenanceCost(game));
 
         return packet;
     }

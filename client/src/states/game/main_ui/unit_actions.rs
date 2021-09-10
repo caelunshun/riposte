@@ -84,12 +84,18 @@ impl UnitActionBar {
         while let Some(msg) = cx.ui_mut().pop_message::<Message>() {
             match msg {
                 Message::Kill(unit) => client.do_unit_action(game, unit, UnitAction::Kill),
-                Message::FoundCity(unit) => client.do_unit_action(game, unit, UnitAction::FoundCity),
+                Message::FoundCity(unit) => {
+                    client.do_unit_action(game, unit, UnitAction::FoundCity)
+                }
             }
         }
     }
 
-    pub fn on_selected_units_changed(&mut self, cx: &mut Context, game: &Game) {
+    pub fn update_info(&mut self, cx: & Context, game: &Game) {
+        self.on_selected_units_changed(cx, game);
+    }
+
+    pub fn on_selected_units_changed(&mut self, cx: & Context, game: &Game) {
         self.window.actions.get_mut().clear_children();
 
         let selected_units = game.selected_units();
