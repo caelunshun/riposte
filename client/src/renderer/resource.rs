@@ -29,8 +29,12 @@ impl ResourceRenderer {
 }
 
 impl TileRenderLayer for ResourceRenderer {
-    fn render(&mut self, _game: &Game, cx: &mut Context, _tile_pos: UVec2, tile: &Tile) {
+    fn render(&mut self, game: &Game, cx: &mut Context, _tile_pos: UVec2, tile: &Tile) {
         if let Some(resource) = tile.resource() {
+            if !game.the_player().has_unlocked_tech(&resource.revealed_by) && !game.cheat_mode {
+                return;
+            }
+
             let sprite = self.textures[&resource.id];
             cx.canvas_mut()
                 .draw_sprite(sprite, Vec2::ZERO, PIXELS_PER_TILE);
