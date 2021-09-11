@@ -20,6 +20,7 @@ use crate::{
     context::Context,
     game::{
         city::{self, PreviousBuildTask},
+        combat::CombatEvent,
         unit::WorkerTaskKind,
         CityId, Game, PlayerId, UnitId,
     },
@@ -321,6 +322,9 @@ impl Client<GameState> {
     }
 
     pub fn handle_messages(&mut self, cx: &Context, game: &mut Game) -> anyhow::Result<()> {
+        if game.has_combat_event() {
+            return Ok(());
+        }
         while let Some(msg) = self.poll_for_message()? {
             let request_id = msg.request_id as u32;
             match msg.packet.ok_or(ClientError::MissingPacket)? {
@@ -352,7 +356,14 @@ impl Client<GameState> {
                 any_server::Packet::PossibleTechs(packet) => {
                     self.handle_possible_techs(packet, request_id)
                 }
+                any_server::Packet::CombatEvent(packet) => {
+                    self.handle_combat_event(cx, game, packet)?
+                }
                 p => log::warn!("unhandled packet: {:?}", p),
+            }
+
+            if game.has_combat_event() {
+                return Ok(());
             }
         }
         Ok(())
@@ -402,6 +413,16 @@ impl Client<GameState> {
 
     fn handle_possible_techs(&mut self, packet: PossibleTechs, request_id: u32) {
         self.handle_server_response(request_id, packet);
+    }
+
+    fn handle_combat_event(
+        &mut self,
+        cx: &Context,
+        game: &mut Game,
+        packet: protocol::CombatEvent,
+    ) -> anyhow::Result<()> {
+        game.set_current_combat_event(cx, CombatEvent::from_data(packet, game)?);
+        Ok(())
     }
 
     fn register_response_future<T: 'static>(&mut self, request_id: u32) -> ServerResponseFuture<T> {

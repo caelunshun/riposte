@@ -11,6 +11,7 @@ use protocol::Visibility;
 use crate::{
     context::Context,
     game::{unit::Unit, view::PIXELS_PER_TILE, Game, Tile},
+    ui::unit_indicator::HEALTH_BAR_GRADIENT,
 };
 
 use super::TileRenderLayer;
@@ -85,6 +86,35 @@ impl UnitRenderer {
 
         canvas.solid_color(color).stroke_width(4.).stroke();
     }
+
+    fn render_health_bar(&mut self, cx: &Context, unit: &Unit) {
+        let size = vec2(60., 10.);
+        let pos = vec2(50. - size.x / 2., 25.);
+
+        let bar_color = HEALTH_BAR_GRADIENT
+            .clamped_sample(unit.health() as f32)
+            .unwrap();
+
+        cx.canvas_mut()
+            .begin_path()
+            .rect(pos, size)
+            .solid_color(Srgba::new(100, 100, 100, 150))
+            .fill();
+        cx.canvas_mut()
+            .stroke_width(1.)
+            .solid_color(Srgba::new(0, 0, 0, u8::MAX))
+            .stroke();
+        cx.canvas_mut()
+            .begin_path()
+            .rect(pos, size * vec2(unit.health() as f32, 1.))
+            .solid_color(Srgba::new(
+                bar_color.x as u8,
+                bar_color.y as u8,
+                bar_color.z as u8,
+                u8::MAX,
+            ))
+            .fill();
+    }
 }
 
 impl TileRenderLayer for UnitRenderer {
@@ -98,6 +128,9 @@ impl TileRenderLayer for UnitRenderer {
             .expect("rendering in bounds")
             .top_unit()
         {
+            if !game.is_unit_valid(unit_id) {
+                return;
+            }
             let unit = game.unit(unit_id);
 
             // Translation based on spline interpolation for unit movement
@@ -125,6 +158,15 @@ impl TileRenderLayer for UnitRenderer {
                 .rect(vec2(70., 35.), vec2(20., 30.))
                 .solid_color(Srgba::new(color[0], color[1], color[2], 200))
                 .fill();
+
+            // Health bar - for combat
+            if let Some(combat_event) = game.current_combat_event() {
+                if combat_event.attacker_id() == unit.id()
+                    || combat_event.defender_id() == unit.id()
+                {
+                    self.render_health_bar(cx, &unit);
+                }
+            }
 
             // Selected unit overlay
             if game.selected_units().contains(unit.id()) {

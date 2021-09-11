@@ -9,6 +9,7 @@ pub mod tile;
 pub mod unit;
 pub mod view;
 pub mod event;
+pub mod combat;
 
 mod id_mapper;
 mod world;

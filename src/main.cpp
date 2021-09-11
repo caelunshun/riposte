@@ -45,9 +45,9 @@ int main(int argc, char **argv) {
 
     // TEMP
     rip::mapgen::MapgenSettings settings;
-    settings.set_mapwidth(80);
-    settings.set_mapheight(48);
-    settings.mutable_continents()->set_numcontinents(rip::mapgen::NumContinents::Two);
+    settings.set_mapwidth(20);
+    settings.set_mapheight(10);
+    settings.mutable_continents()->set_numcontinents(rip::mapgen::NumContinents::One);
 
     rip::Server server(networkCtx, "Test Game", "singleplayer");
 

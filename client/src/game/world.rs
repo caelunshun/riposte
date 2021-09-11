@@ -23,6 +23,7 @@ use crate::{
 
 use super::{
     city::City,
+    combat::CombatEvent,
     event::{EventBus, GameEvent},
     id_mapper::IdMapper,
     path::Pathfinder,
@@ -71,6 +72,8 @@ pub struct Game {
 
     view: RefCell<View>,
 
+    current_combat_event: Option<RefCell<CombatEvent>>,
+
     turn: u32,
     era: Era,
     the_player_id: PlayerId,
@@ -107,6 +110,7 @@ impl Game {
             map: Map::default(),
             view: RefCell::new(View::default()),
             stacks: StackGrid::default(),
+            current_combat_event: None,
 
             turn: 0,
             era: Era::Ancient,
@@ -347,6 +351,23 @@ impl Game {
         self.selection_driver.borrow_mut()
     }
 
+    /// Gets the current combat event.
+    pub fn current_combat_event(&self) -> Option<Ref<CombatEvent>> {
+        self.current_combat_event.as_ref().map(|cell| cell.borrow())
+    }
+
+    /// Sets the current combat event.
+    pub fn set_current_combat_event(&mut self, cx: &Context, event: CombatEvent) {
+        self.view_mut()
+            .animate_to(cx, self.unit(event.defender_id()).pos());
+        self.current_combat_event = Some(RefCell::new(event));
+    }
+
+    /// Returns whether there is an ongoing combat event.
+    pub fn has_combat_event(&self) -> bool {
+        self.current_combat_event.is_some()
+    }
+
     /// Gets the game data registry.
     pub fn registry(&self) -> &Registry {
         &self.registry
@@ -447,6 +468,14 @@ impl Game {
             self.stacks.resort(self);
             log::info!("Resorted unit stacks");
             self.selection_units_version.update();
+        }
+
+        if let Some(current_combat_event) = &self.current_combat_event {
+            current_combat_event.borrow_mut().update(cx, self);
+
+            if current_combat_event.borrow().is_finished() {
+                self.current_combat_event = None;
+            }
         }
     }
 

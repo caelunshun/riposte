@@ -113,6 +113,10 @@ impl Unit {
         self.data.pos = Some(pos.into());
     }
 
+    pub fn set_health_unsafe(&mut self, health: f64) {
+        self.data.health = health;
+    }
+
     pub fn health(&self) -> f64 {
         self.data.health
     }

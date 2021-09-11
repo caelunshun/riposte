@@ -556,6 +556,9 @@ impl MovementDriver {
                 game.enqueue_operation(move |game| {
                     let mut updated = false;
                     for &unit in &units {
+                        if !game.is_unit_valid(unit) {
+                            return;
+                        }
                         if game.unit(unit).pos() == old_pos {
                             updated = true;
                         }

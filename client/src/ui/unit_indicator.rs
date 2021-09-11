@@ -9,7 +9,7 @@ use splines::{Interpolation, Key, Spline};
 
 use crate::game::unit::Unit;
 
-static HEALTH_BAR_GRADIENT: Lazy<Spline<f32, Vec3>> = Lazy::new(|| {
+pub static HEALTH_BAR_GRADIENT: Lazy<Spline<f32, Vec3>> = Lazy::new(|| {
     Spline::from_vec(vec![
         Key::new(0., vec3(175., 35., 28.), Interpolation::Cosine),
         Key::new(0.5, vec3(254., 221., 0.), Interpolation::Cosine),
