@@ -103,6 +103,14 @@ impl Repository for PostgresRepository {
         .await?;
         Ok(())
     }
+
+    async fn get_user_token_by_token(&self, token: &[u8]) -> Result<Option<UserAccessToken>> {
+        let conn = self.pool.get().await?;
+        let row = conn
+            .query_one("SELECT * FROM user_token WHERE token = $1;", &[&token])
+            .await?;
+        Ok(Some(user_token_from_row(&row)))
+    }
 }
 
 fn user_from_row(row: &Row) -> User {

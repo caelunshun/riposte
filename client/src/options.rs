@@ -115,4 +115,8 @@ impl Account {
     pub fn uuid(&self) -> Uuid {
         self.uuid
     }
+
+    pub fn auth_token(&self) -> &[u8] {
+        &self.auth_token
+    }
 }

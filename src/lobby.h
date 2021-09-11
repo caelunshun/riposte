@@ -72,12 +72,15 @@ namespace rip {
         bool isStatic = false;
         Rng rng;
         std::shared_ptr<Registry> registry;
+        HubServerConnection hubConn;
 
     public:
         bool shouldStartGame = false;
         bool shouldExit = false;
 
-        LobbyServer(std::shared_ptr<NetworkingContext> networkCtx, std::shared_ptr<Registry> registry);
+        LobbyServer(std::shared_ptr<NetworkingContext> networkCtx, std::shared_ptr<Registry> registry, std::string authToken);
+
+        void requestNewConnection();
 
         // Adds a new connection.
         //

@@ -1258,6 +1258,42 @@ impl ::duit::InstanceHandle for MainMenu {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct ServerListWindow {
+    pub games_table: WidgetHandle<Table>,
+    pub back_button: WidgetHandle<Button>,
+}
+impl ::duit::InstanceHandle for ServerListWindow {
+    fn name() -> &'static str {
+        "ServerListWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut games_table = None;
+        let mut back_button = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "games_table" => games_table = Some(widget),
+                "back_button" => back_button = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            games_table: WidgetHandle::new(games_table.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "games_table"
+                )
+            })),
+            back_button: WidgetHandle::new(back_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "back_button"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct MenuBackground {}
 impl ::duit::InstanceHandle for MenuBackground {
     fn name() -> &'static str {

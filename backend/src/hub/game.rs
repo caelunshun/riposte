@@ -2,6 +2,8 @@ use rand::{rngs::OsRng, Rng};
 use riposte_backend_api::{GameSettings, SessionId};
 use uuid::Uuid;
 
+use super::proxy::HostHandle;
+
 /// An ongoing game.
 pub struct Game {
     /// The game's ID.
@@ -18,6 +20,7 @@ pub struct Game {
     /// Use the `num_players` field to find the number of
     /// connected players
     connected_players: Vec<ConnectedPlayerInfo>,
+    host_handle: Option<HostHandle>,
 }
 
 impl Game {
@@ -28,6 +31,7 @@ impl Game {
             host_session_id: OsRng.gen(),
             host_uuid,
             connected_players: Vec::new(),
+            host_handle: None
         }
     }
 
@@ -63,7 +67,13 @@ impl Game {
         1 + self.connected_players.len() as u32
     }
 
+    pub fn host_handle(&self) -> Option<&HostHandle> {
+        self.host_handle.as_ref()
+    }
 
+    pub fn set_host_handle(&mut self, h: Option<HostHandle>) {
+        self.host_handle = h;
+    }
 }
 
 pub struct ConnectedPlayerInfo {

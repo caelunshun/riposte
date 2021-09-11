@@ -2,7 +2,7 @@ use std::{
     cell::{Ref, RefCell, RefMut},
     ffi::OsStr,
     future::Future,
-    iter,
+    iter, mem,
     path::PathBuf,
     rc::Rc,
     sync::Arc,
@@ -19,10 +19,23 @@ use tokio::runtime::{self, Runtime};
 use walkdir::WalkDir;
 use winit::{dpi::PhysicalSize, event::WindowEvent, event_loop::EventLoop, window::Window};
 
-use crate::{assets::{
+use crate::{
+    assets::{
         loaders::{FontLoader, ImageLoader, JsonLoader, SoundLoader},
         Assets,
-    }, audio::Audio, backend::BackendService, options::Options, paths::FilePaths, popups::PopupWindows, registry::{Building, Civilization, Registry, Resource, Tech, UnitKind}, state::StateManager, ui::{flashing_button::FlashingButton, turn_indicator::TurnIndicatorCircle, unit_indicator::UnitIndicator}};
+    },
+    audio::Audio,
+    backend::BackendService,
+    options::Options,
+    paths::FilePaths,
+    popups::PopupWindows,
+    registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
+    state::StateManager,
+    ui::{
+        flashing_button::FlashingButton, turn_indicator::TurnIndicatorCircle,
+        unit_indicator::UnitIndicator,
+    },
+};
 
 mod init;
 
@@ -380,5 +393,13 @@ impl<T: Send + 'static> FutureHandle<T> {
     /// If the future is still running or panicked, returns `None`.
     pub fn get(&self) -> Option<&T> {
         self.value.get_or_try_init(|| self.receiver.try_recv()).ok()
+    }
+
+    pub fn take(&mut self) -> Option<T> {
+        if self.get().is_some() {
+            mem::take(&mut self.value).into_inner()
+        } else {
+            None
+        }
     }
 }

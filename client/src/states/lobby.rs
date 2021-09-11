@@ -61,7 +61,7 @@ impl GameLobbyState {
 
         Ok(Self::new(cx, client))
     }
-
+    
     pub fn new(cx: &Context, client: Client<client::LobbyState>) -> Self {
         let attachment = cx.state_manager().create_state();
 

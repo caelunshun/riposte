@@ -11,18 +11,21 @@
 
 namespace rip {
     class ConnectionHandle;
+    class HubServerConnection;
 
     typedef std::function<void(const RipResult&)> FnCallback;
 
     // C++ wrapper over riposte-c-bindings networking support.
     class NetworkingContext {
+    public:
         RipNetworkingContext *inner;
 
-    public:
         NetworkingContext();
         ~NetworkingContext();
 
         ConnectionHandle connectStdio();
+
+        HubServerConnection connectToHub(const std::string &authToken);
 
         void waitAndInvokeCallbacks();
 
@@ -45,6 +48,17 @@ namespace rip {
 
         void sendMessage(const std::string &data, FnCallback &callback);
         void recvMessage(FnCallback &callback);
+    };
+
+    // C++ wrapper over a RipHubServerConnection
+    class HubServerConnection {
+        RipHubServerConnection *inner;
+        RipNetworkingContext *ctx;
+
+    public:
+        HubServerConnection(RipHubServerConnection *inner, RipNetworkingContext *ctx);
+        
+        void getNewConnection(FnCallback &callback);
     };
 }
 

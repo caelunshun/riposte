@@ -119,8 +119,28 @@ namespace rip {
     }
 
     LobbyServer::LobbyServer(std::shared_ptr<NetworkingContext> networkCtx,
-                             std::shared_ptr<Registry> registry)
-                             : networkCtx(networkCtx), registry(registry) {}
+                             std::shared_ptr<Registry> registry, std::string authToken)
+                             : networkCtx(networkCtx), registry(registry),
+                            hubConn(networkCtx->connectToHub(authToken)) {
+        requestNewConnection();        
+    }
+    
+    void LobbyServer::requestNewConnection() {
+        FnCallback callback = [&](const RipResult &res) {
+            if (rip_result_is_success(&res)) {
+                RipConnectionHandle *handle = rip_result_get_connection(&res);
+                ConnectionHandle conn(handle, networkCtx->inner);
+                const char *uuid = rip_result_get_connection_uuid(&res);
+                proto::UUID protoUUID;
+                protoUUID.set_uuid(uuid);
+                std::cerr << "Got connection from user " << uuid << std::endl;
+                addConnection(std::move(conn), protoUUID, false);
+
+                requestNewConnection();
+            }
+        };
+        hubConn.getNewConnection(callback);
+    }
 
     LobbyConnectionID LobbyServer::addConnection(ConnectionHandle handle, proto::UUID userID, bool isAdmin) {
         // Attempt to find a suitable slot.
@@ -128,7 +148,7 @@ namespace rip {
         // First pass: check for a slot with the same UUID
         // (higher priority)
         for (const auto &slot : slots) {
-            if (slot.has_owneruuid() && slot.owneruuid().uuid() == userID.uuid()) {
+            if (!slot.occupied() && slot.has_owneruuid() && slot.owneruuid().uuid() == userID.uuid()) {
                 slotID = slot.id();
                 break;
             }
@@ -146,7 +166,10 @@ namespace rip {
             }
         }
 
-        if (!slotID.has_value()) return {};
+        if (!slotID.has_value()) {
+            std::cerr << "no available slots" << std::endl;
+            return {};
+        }
 
         getSlot(*slotID)->set_occupied(true);
         getSlot(*slotID)->mutable_owneruuid()->CopyFrom(userID);

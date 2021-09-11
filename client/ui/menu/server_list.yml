@@ -1,0 +1,28 @@
+name: ServerListWindow
+child:
+  Container:
+    mode:
+      Pad: 50
+    child:
+      Column:
+        spacing: 20
+        children:
+          - Text:
+              text: Game List
+              classes:
+                - h1
+          - Divider: {}
+          - Scrollable:
+              flex: 1
+              scroll_axis: Vertical
+              child:
+                Table:
+                    id: games_table
+                    columns:
+                      - id
+                      - join_button
+          - Button:
+              id: back_button
+              child:
+                Text: Back
+              

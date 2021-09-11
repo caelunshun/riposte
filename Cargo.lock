@@ -1367,16 +1367,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "gethostname"
-version = "0.2.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e692e296bfac1d2533ef168d0b60ff5897b8b70a4009276834014dd8924cc028"
-dependencies = [
- "libc",
- "winapi",
-]
-
-[[package]]
 name = "getrandom"
 version = "0.1.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2693,6 +2683,17 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "19b17cddbe7ec3f8bc800887bab5e717348c95ea2ca0b1bf0837fb964dc67099"
 
 [[package]]
+name = "pem"
+version = "0.8.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "fd56cbd21fea48d0c440b41cd69c589faacade08c992d9a54e471b79d0fd13eb"
+dependencies = [
+ "base64",
+ "once_cell",
+ "regex",
+]
+
+[[package]]
 name = "percent-encoding"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3109,6 +3110,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "rcgen"
+version = "0.8.13"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "2351cbef4bf91837f5ff7face6091cb277ba960d1638d2c5ae2327859912fbba"
+dependencies = [
+ "chrono",
+ "pem",
+ "ring",
+ "yasna",
+]
+
+[[package]]
 name = "redox_syscall"
 version = "0.1.57"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3276,6 +3289,7 @@ dependencies = [
  "ahash 0.7.4",
  "anyhow",
  "arrayvec 0.7.1",
+ "base64",
  "bitflags",
  "bytes",
  "directories-next",
@@ -3296,11 +3310,13 @@ dependencies = [
  "pollster",
  "prost",
  "prost-types",
+ "quinn",
  "rand 0.8.4",
  "rand_pcg 0.3.1",
  "riposte-backend-api",
  "riposte-protocol",
  "rodio",
+ "rustls",
  "serde",
  "serde_json",
  "simple_logger",
@@ -3311,6 +3327,7 @@ dependencies = [
  "tokio",
  "uuid",
  "walkdir",
+ "webpki",
  "wgpu",
  "winit",
 ]
@@ -3332,6 +3349,7 @@ dependencies = [
  "prost",
  "quinn",
  "rand 0.8.4",
+ "rcgen",
  "refinery",
  "riposte-backend-api",
  "subtle",
@@ -3342,7 +3360,6 @@ dependencies = [
  "tower",
  "tower-http",
  "tracing",
- "tracing-bunyan-formatter",
  "tracing-subscriber",
  "uuid",
 ]
@@ -3377,12 +3394,16 @@ name = "riposte-c-bindings"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "base64",
  "bytes",
  "flume",
  "futures",
+ "quinn",
  "riposte-backend-api",
+ "rustls",
  "slotmap",
  "tokio",
+ "webpki",
  "zeno",
 ]
 
@@ -4173,23 +4194,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "tracing-bunyan-formatter"
-version = "0.2.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "63053c8ba268268d59c06b919d6c94fd968b3bd9995c5f59a03dea42fc351e70"
-dependencies = [
- "chrono",
- "gethostname",
- "log",
- "serde",
- "serde_json",
- "tracing",
- "tracing-core",
- "tracing-log",
- "tracing-subscriber",
-]
-
-[[package]]
 name = "tracing-core"
 version = "0.1.19"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4814,6 +4818,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "56c1936c4cc7a1c9ab21a1ebb602eb942ba868cbd44a99cb7cdc5892335e1c85"
 dependencies = [
  "linked-hash-map",
+]
+
+[[package]]
+name = "yasna"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e262a29d0e61ccf2b6190d7050d4b237535fc76ce4c1210d9caa316f71dffa75"
+dependencies = [
+ "chrono",
 ]
 
 [[package]]

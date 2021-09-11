@@ -10,6 +10,7 @@ pub enum Action {
     PushOptions,
     LogOut,
     EnterSingleplayerLobby,
+    EnterServerList,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -22,6 +23,7 @@ enum Page {
 
 enum Message {
     SingleplayerClicked,
+    MultiplayerClicked,
     OptionsClicked,
     BackClicked,
     LogOutClicked,
@@ -77,6 +79,7 @@ impl MainMenuState {
                 Message::OptionsClicked => action = Some(Action::PushOptions),
                 Message::LogOutClicked => action = Some(Action::LogOut),
                 Message::NewGameClicked => action = Some(Action::EnterSingleplayerLobby),
+                Message::MultiplayerClicked => action = Some(Action::EnterServerList),
             }
         });
 
@@ -93,7 +96,7 @@ impl MainMenuState {
         match self.current_page {
             Page::Main => {
                 self.add_entry(cx, "SINGLEPLAYER", Some(Message::SingleplayerClicked))
-                    .add_entry(cx, "MULTIPLAYER", None)
+                    .add_entry(cx, "MULTIPLAYER", Some(Message::MultiplayerClicked))
                     .add_entry(cx, "OPTIONS", Some(Message::OptionsClicked));
             }
             Page::Singleplayer => {

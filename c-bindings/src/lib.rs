@@ -11,14 +11,24 @@
 //! Call [`networkctx_wait`] to wait on the next completed request and
 //! invoke its callback.
 
-use std::ffi::c_void;
+use std::collections::HashMap;
+use std::ffi::{c_void, CString};
+use std::os::raw::c_char;
 use std::slice;
+use std::sync::Arc;
 
 use bytes::{Bytes, BytesMut};
 use flume::{Receiver, Sender};
 use futures::{SinkExt, StreamExt};
-use riposte_backend_api::codec;
+use riposte_backend_api::prost::Message;
+use riposte_backend_api::uuid::Uuid;
+use riposte_backend_api::{
+    codec, riposte_backend_client::RiposteBackendClient, tonic::transport::Channel, BACKEND_URL,
+};
+use riposte_backend_api::{open_stream, quic_addr, CreateGameRequest, OpenStream};
+use rustls::ServerCertVerified;
 use slotmap::SlotMap;
+use tokio::sync::Mutex;
 use tokio::{
     io::{self, AsyncRead, AsyncWrite},
     runtime::{self, Runtime},
@@ -40,7 +50,10 @@ pub enum RipError {
 pub enum RipResultData {
     None,
     Bytes(BytesMut),
+    Connection(*mut RipConnectionHandle, Uuid),
 }
+
+unsafe impl Send for RipResultData {}
 
 pub struct RipResult {
     pub success: bool,
@@ -94,6 +107,26 @@ pub unsafe extern "C" fn rip_result_get_bytes(res: &RipResult) -> RipBytes {
     }
 }
 
+#[no_mangle]
+pub unsafe extern "C" fn rip_result_get_connection(res: &RipResult) -> *mut RipConnectionHandle {
+    if let RipResultData::Connection(conn, _) = &res.data {
+        *conn
+    } else {
+        panic!("RipResult did not contain a connection")
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn rip_result_get_connection_uuid(res: &RipResult) -> *const c_char {
+    if let RipResultData::Connection(_, uuid) = &res.data {
+        let s = CString::new(uuid.to_hyphenated().to_string()).unwrap();
+        let s: Box<[u8]> = s.as_bytes_with_nul().to_vec().into_boxed_slice();
+        Box::leak(s).as_ptr() as *const c_char
+    } else {
+        panic!("RipResult did not contain a connection")
+    }
+}
+
 /// Asserts that any value in the `data` field of `RipResult` is always `Send`.
 unsafe impl Send for RipResult {}
 
@@ -106,6 +139,20 @@ struct CompletedRequest {
     result: RipResult,
 }
 
+// Implementation of `ServerCertVerifier` that verifies everything as trustworthy.
+struct SkipCertificationVerification;
+impl rustls::ServerCertVerifier for SkipCertificationVerification {
+    fn verify_server_cert(
+        &self,
+        _: &rustls::RootCertStore,
+        _: &[rustls::Certificate],
+        _: webpki::DNSNameRef,
+        _: &[u8],
+    ) -> Result<rustls::ServerCertVerified, rustls::TLSError> {
+        Ok(ServerCertVerified::assertion())
+    }
+}
+
 /// A networking context. Internally
 /// stores the Tokio runtime instance.
 ///
@@ -116,6 +163,10 @@ pub struct RipNetworkingContext {
     callbacks: SlotMap<RequestId, (Callback, *mut c_void)>,
     completed_requests: Receiver<CompletedRequest>,
     completed_requests_sender: Sender<CompletedRequest>,
+
+    client: RiposteBackendClient<Channel>,
+
+    endpoint: quinn::Endpoint,
 }
 
 impl RipNetworkingContext {
@@ -129,13 +180,36 @@ impl RipNetworkingContext {
 pub unsafe extern "C" fn networkctx_create() -> *mut RipNetworkingContext {
     let (completed_requests_sender, completed_requests) = flume::bounded(16);
 
+    let runtime = runtime::Builder::new_multi_thread()
+        .enable_all()
+        .build()
+        .expect("failed to create runtime");
+
+    let _guard = runtime.enter();
+
+    let client = runtime
+        .block_on(async move { RiposteBackendClient::connect(BACKEND_URL).await })
+        .expect("failed to connect to backend");
+
+    let mut config = quinn::ClientConfigBuilder::default().build();
+    let tls_cfg: &mut rustls::ClientConfig = Arc::get_mut(&mut config.crypto).unwrap();
+    tls_cfg
+        .dangerous()
+        .set_certificate_verifier(Arc::new(SkipCertificationVerification));
+
+    let mut endpoint = quinn::Endpoint::builder();
+    endpoint.default_client_config(config);
+    let (endpoint, _) = endpoint
+        .bind(&"0.0.0.0:0".parse().unwrap())
+        .expect("failed to bind to QUIC");
+
     let ctx = RipNetworkingContext {
-        runtime: runtime::Builder::new_multi_thread()
-            .build()
-            .expect("failed to create runtime"),
+        runtime,
         callbacks: SlotMap::default(),
         completed_requests,
         completed_requests_sender,
+        client,
+        endpoint,
     };
     Box::leak(Box::new(ctx))
 }
@@ -162,6 +236,163 @@ pub unsafe extern "C" fn networkctx_wait(ctx: *mut RipNetworkingContext) {
     if let Some((callback, userdata)) = ctx.callbacks.remove(request.id) {
         callback(userdata, &request.result);
     }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn networkctx_create_game(
+    ctx: &mut RipNetworkingContext,
+    host_auth_token: *const u8,
+    host_auth_token_len: usize,
+) -> *mut RipHubServerConnection {
+    let auth_token = std::str::from_utf8_unchecked(std::slice::from_raw_parts(
+        host_auth_token,
+        host_auth_token_len,
+    ));
+    let auth_token = base64::decode(&auth_token).unwrap();
+    let mut client = ctx.client.clone();
+    let session_id = ctx
+        .runtime
+        .block_on(async move {
+            client
+                .create_game(CreateGameRequest {
+                    initial_settings: Default::default(),
+                    auth_token,
+                })
+                .await
+        })
+        .expect("failed to create game")
+        .into_inner()
+        .session_id;
+
+    let endpoint = &ctx.endpoint;
+    let new_conn = ctx.runtime.block_on(async move {
+        endpoint
+            .connect(&quic_addr(), "localhost")
+            .expect("failed to connect")
+            .await
+            .expect("failed to connect")
+    });
+
+    let conn = &new_conn.connection;
+    ctx.runtime.block_on(async move {
+        let (mut stream, _) = conn.open_bi().await.unwrap();
+        stream.write_all(&session_id).await.unwrap();
+    });
+
+    let _guard = ctx.runtime.enter();
+
+    Box::leak(Box::new(RipHubServerConnection::new(ctx, new_conn))) as *mut _
+}
+
+struct GetNewConnectionRequest {
+    request_id: RequestId,
+}
+
+pub struct RipHubServerConnection {
+    new_connections_req_tx: Sender<GetNewConnectionRequest>,
+}
+
+impl RipHubServerConnection {
+    pub fn new(ctx: &RipNetworkingContext, new_conn: quinn::NewConnection) -> Self {
+        let (new_connections_req_tx, new_connections_req_rx) = flume::unbounded();
+
+        let completed_requests = ctx.completed_requests_sender.clone();
+
+        let connections: Arc<
+            Mutex<HashMap<Uuid, (Receiver<SendDataRequest>, Receiver<RecvDataRequest>)>>,
+        > = Arc::new(Mutex::new(HashMap::new()));
+
+        let mut incoming_bi = new_conn.bi_streams;
+        task::spawn(async move {
+            while let Some(res) = incoming_bi.next().await {
+                match res {
+                    Ok((send_stream, recv_stream)) => {
+                        eprintln!("Remote opened a stream");
+                        let mut reader = codec().new_read(recv_stream);
+                        let data = reader.next().await.unwrap().unwrap();
+                        let packet = OpenStream::decode(data.as_ref()).unwrap();
+                        eprintln!("Stream type: {:?}", packet);
+                        match packet.inner.unwrap() {
+                            open_stream::Inner::NewConnection(new_connection) => {
+                                if let Ok(GetNewConnectionRequest { request_id }) =
+                                    new_connections_req_rx.recv_async().await
+                                {
+                                    let (sending_data, sending_data_recv) = flume::unbounded();
+                                    let (receiving_data, receiving_data_recv) = flume::unbounded();
+
+                                    let conn = RipConnectionHandle {
+                                        sending_data,
+                                        receiving_data,
+                                        current_recv_id: Default::default(),
+                                    };
+
+                                    connections.lock().await.insert(
+                                        new_connection
+                                            .connection_id
+                                            .clone()
+                                            .unwrap_or_default()
+                                            .into(),
+                                        (sending_data_recv, receiving_data_recv),
+                                    );
+
+                                    let conn = Box::leak(Box::new(conn)) as *mut _;
+
+                                    completed_requests
+                                        .send(CompletedRequest {
+                                            id: request_id,
+                                            result: RipResult::success(RipResultData::Connection(
+                                                conn,
+                                                new_connection
+                                                    .player_uuid
+                                                    .unwrap_or_default()
+                                                    .into(),
+                                            )),
+                                        })
+                                        .ok();
+                                }
+                            }
+                            open_stream::Inner::ProxiedStream(proxied_stream) => {
+                                let (sending_data_rx, receiving_data_rx) = connections.lock().await
+                                    [&proxied_stream
+                                        .connection_id
+                                        .clone()
+                                        .unwrap_or_default()
+                                        .into()]
+                                    .clone();
+
+                                run_connection(
+                                    reader.into_inner(),
+                                    send_stream,
+                                    sending_data_rx,
+                                    receiving_data_rx,
+                                    completed_requests.clone(),
+                                );
+                            }
+                        }
+                    }
+                    Err(e) => eprintln!("Failed to get stream: {:?}", e),
+                }
+            }
+            eprintln!("Left stream handling loop");
+        });
+
+        Self {
+            new_connections_req_tx,
+        }
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn hubconn_get_new_connection(
+    ctx: &mut RipNetworkingContext,
+    conn: &mut RipHubServerConnection,
+    callback: Callback,
+    userdata: *mut c_void,
+) {
+    let request_id = ctx.insert_callback(callback, userdata);
+    conn.new_connections_req_tx
+        .send(GetNewConnectionRequest { request_id })
+        .unwrap();
 }
 
 struct SendDataRequest {

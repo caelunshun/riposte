@@ -8,16 +8,21 @@ use crate::{
     volumes,
 };
 
-use self::{login::LoginState, main_menu::MainMenuState, options::OptionsState};
+use self::{
+    login::LoginState, main_menu::MainMenuState, options::OptionsState,
+    server_list::ServerListState,
+};
 
 mod login;
 mod main_menu;
 pub mod options;
+mod server_list;
 
 enum State {
     MainMenu(MainMenuState),
     Login(LoginState),
     Options(OptionsState),
+    ServerList(ServerListState),
 }
 
 pub struct MenuState {
@@ -65,6 +70,9 @@ impl MenuState {
                     main_menu::Action::EnterSingleplayerLobby => {
                         action = Some(crate::Action::EnterSingleplayerLobby)
                     }
+                    main_menu::Action::EnterServerList => {
+                        self.state = State::ServerList(ServerListState::new(cx))
+                    }
                 },
                 None => {}
             },
@@ -82,6 +90,15 @@ impl MenuState {
                     self.state = State::MainMenu(MainMenuState::new(cx));
                 }
             }
+            State::ServerList(s) => match s.update(cx) {
+                Some(server_list::Action::Close) => {
+                    self.state = State::MainMenu(MainMenuState::new(cx));
+                }
+                Some(server_list::Action::JoinGame(bridge)) => {
+                action = Some(crate::Action::EnterLobby(bridge));
+                }
+                _ => {}
+            },
         }
         action
     }

@@ -26,6 +26,11 @@ namespace rip {
         return ConnectionHandle(handle, inner);
     }
 
+    HubServerConnection NetworkingContext::connectToHub(const std::string &authToken) {
+        auto *handle = networkctx_create_game(inner, (const uint8_t*) authToken.data(), authToken.size());
+        return HubServerConnection(handle, inner);
+    }
+
     void NetworkingContext::waitAndInvokeCallbacks() {
         networkctx_wait(inner);
     }
@@ -77,5 +82,11 @@ namespace rip {
         inner = other.inner;
         other.inner = nullptr;
         return *this;
+    }
+
+    HubServerConnection::HubServerConnection(RipHubServerConnection *inner, RipNetworkingContext *ctx) : inner(inner), ctx(ctx) {}
+
+    void HubServerConnection::getNewConnection(FnCallback &callback) {
+        hubconn_get_new_connection(ctx, inner, callbackFunction, callbackToUserdata(std::move(callback)));
     }
 }

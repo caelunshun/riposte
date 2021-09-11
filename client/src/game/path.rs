@@ -180,8 +180,8 @@ impl Pathfinder {
             }
 
             'neighbors: for neighbor in game.tile_neighbors(entry.pos) {
-                if game.map().visibility(neighbor) == Visibility::Hidden {
-                    // continue;
+                if !game.cheat_mode && game.map().visibility(neighbor) == Visibility::Hidden {
+                    continue;
                 }
 
                 let tile = game.tile(neighbor).unwrap();

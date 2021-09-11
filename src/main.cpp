@@ -12,6 +12,11 @@ int main(int argc, char **argv) {
         std::cerr << "RIPOSTE_HOST_UUID must be set" << std::endl;
         return 1;
     }
+    const auto *authToken = std::getenv("RIPOSTE_HOST_AUTH_TOKEN");
+    if (!authToken) {
+        std::cerr << "RIPOSTE_HOST_AUTH_TOKEN must be set" << std::endl;
+        return 1;
+    }
 
     auto assets = std::make_shared<rip::Assets>();
     auto registry = std::make_shared<rip::Registry>();
@@ -25,7 +30,7 @@ int main(int argc, char **argv) {
 
     auto networkCtx = std::make_shared<rip::NetworkingContext>();
 
-    auto lobbyServer = std::make_shared<rip::LobbyServer>(networkCtx, registry);
+    auto lobbyServer = std::make_shared<rip::LobbyServer>(networkCtx, registry, std::string(authToken));
 
     rip::proto::UUID hostUUID;
     hostUUID.set_uuid(hostUUIDstr);

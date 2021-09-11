@@ -25,4 +25,6 @@ pub trait Repository: Send + Sync + 'static {
     async fn list_user_tokens(&self, user_id: Uuid) -> Result<Vec<UserAccessToken>>;
     /// Deletes a user access token
     async fn delete_user_token(&self, token: &UserAccessToken) -> Result<()>;
+    /// Gets the given user access token
+    async fn get_user_token_by_token(&self, token: &[u8]) -> Result<Option<UserAccessToken>>;
 }

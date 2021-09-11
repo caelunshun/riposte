@@ -2,28 +2,29 @@ use std::fmt::Display;
 use std::sync::Arc;
 
 use riposte_backend_api::riposte_backend_server::RiposteBackendServer;
-use riposte_backend_api::{riposte_backend_server::RiposteBackend, RegisterRequest};
 use riposte_backend_api::{
-    Authenticated, CreateGameRequest, CreateGameResponse, DeleteGameRequest, GameList,
-    GameListRequest, JoinGameRequest, JoinGameResponse, LogInRequest, UpdateGameSettingsRequest,
-    UserInfo, Uuid,
+    join_game_response, Authenticated, CreateGameRequest, CreateGameResponse, DeleteGameRequest,
+    GameList, GameListRequest, JoinGameRequest, JoinGameResponse, LogInRequest,
+    UpdateGameSettingsRequest, UserInfo, Uuid,
 };
+use riposte_backend_api::{riposte_backend_server::RiposteBackend, RegisterRequest};
 use tonic::transport::Server;
 use tonic::{Request, Response, Status};
 use tower_http::trace::TraceLayer;
 use tracing::{Instrument, Level};
 
+use crate::hub::Hub;
 use crate::models::{User, UserAccessToken};
 use crate::repository::Repository;
 
-pub async fn run_grpc_server(repo: Arc<dyn Repository>) -> anyhow::Result<()> {
+pub async fn run_grpc_server(repo: Arc<dyn Repository>, hub: Arc<Hub>) -> anyhow::Result<()> {
     let layer = tower::ServiceBuilder::new()
         .layer(TraceLayer::new_for_grpc())
         .into_inner();
 
     Server::builder()
         .layer(layer)
-        .add_service(RiposteBackendServer::new(RiposteBackendImpl { repo }))
+        .add_service(RiposteBackendServer::new(RiposteBackendImpl { repo, hub }))
         .serve("0.0.0.0:80".parse()?)
         .instrument(tracing::span!(Level::INFO, "gRPC Service"))
         .await?;
@@ -37,6 +38,27 @@ fn internal(e: impl Display) -> tonic::Status {
 
 pub struct RiposteBackendImpl {
     repo: Arc<dyn Repository>,
+    hub: Arc<Hub>,
+}
+
+impl RiposteBackendImpl {
+    async fn authenticate(&self, auth_token: &[u8]) -> Result<User, Status> {
+        let token = self
+            .repo
+            .get_user_token_by_token(auth_token)
+            .await
+            .map_err(internal)?;
+
+        match token {
+            Some(tok) => Ok(self
+                .repo
+                .get_user_by_id(tok.user_id())
+                .await
+                .map_err(internal)?
+                .unwrap()),
+            None => Err(Status::unauthenticated("invalid auth token")),
+        }
+    }
 }
 
 #[tonic::async_trait]
@@ -124,7 +146,12 @@ impl RiposteBackend for RiposteBackendImpl {
         &self,
         request: Request<CreateGameRequest>,
     ) -> Result<Response<CreateGameResponse>, Status> {
-        todo!()
+        let user = self.authenticate(&request.get_ref().auth_token).await?;
+
+        let session_id = self.hub.create_game(user.id()).await;
+        Ok(Response::new(CreateGameResponse {
+            session_id: session_id.to_vec(),
+        }))
     }
 
     async fn delete_game(
@@ -145,13 +172,25 @@ impl RiposteBackend for RiposteBackendImpl {
         &self,
         request: Request<JoinGameRequest>,
     ) -> Result<Response<JoinGameResponse>, Status> {
-        todo!()
+        let user = self.authenticate(&request.get_ref().auth_token).await?;
+        let session_id = self
+            .hub
+            .join_game(
+                request.get_ref().game_id.clone().unwrap_or_default().into(),
+                user.id(),
+            )
+            .await;
+        Ok(Response::new(JoinGameResponse {
+            result: Some(join_game_response::Result::SessionId(session_id.to_vec())),
+        }))
     }
 
     async fn request_game_list(
         &self,
         request: Request<GameListRequest>,
     ) -> Result<Response<GameList>, Status> {
-        todo!()
+        Ok(Response::new(GameList {
+            games: self.hub.games().await,
+        }))
     }
 }

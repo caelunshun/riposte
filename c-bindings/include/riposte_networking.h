@@ -18,6 +18,8 @@ enum class RipError {
 /// are length-prefixed.
 struct RipConnectionHandle;
 
+struct RipHubServerConnection;
+
 /// A networking context. Internally
 /// stores the Tokio runtime instance.
 ///
@@ -40,6 +42,11 @@ struct RipBytes {
 
 
 extern "C" {
+
+void hubconn_get_new_connection(RipNetworkingContext *ctx,
+                                RipHubServerConnection *conn,
+                                Callback callback,
+                                void *userdata);
 
 /// Frees a connection, disconnecting it.
 void networkctx_conn_free(RipNetworkingContext *_ctx, RipConnectionHandle *conn);
@@ -74,6 +81,10 @@ RipConnectionHandle *networkctx_connect_stdio(RipNetworkingContext *ctx);
 /// Creates a new networking context.
 RipNetworkingContext *networkctx_create();
 
+RipHubServerConnection *networkctx_create_game(RipNetworkingContext *ctx,
+                                               const uint8_t *host_auth_token,
+                                               size_t host_auth_token_len);
+
 /// Frees a networking context.
 void networkctx_free(RipNetworkingContext *ctx);
 
@@ -84,6 +95,10 @@ void networkctx_free(RipNetworkingContext *ctx);
 void networkctx_wait(RipNetworkingContext *ctx);
 
 RipBytes rip_result_get_bytes(const RipResult *res);
+
+RipConnectionHandle *rip_result_get_connection(const RipResult *res);
+
+const char *rip_result_get_connection_uuid(const RipResult *res);
 
 RipError rip_result_get_error(const RipResult *res);
 

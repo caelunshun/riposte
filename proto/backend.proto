@@ -63,6 +63,7 @@ message GameSettings {
 
 message CreateGameRequest {
     GameSettings initialSettings = 1;
+    bytes authToken = 2;
 }
 
 message CreateGameResponse {

@@ -171,11 +171,14 @@ impl CityRenderer {
         }
     }
 
-    fn render_population_progress_bar(&mut self, canvas: &mut Canvas, city: &City) {
-        let progress = city.stored_food() as f32 / city.food_needed_for_growth() as f32;
-        let projected_progress = (city.stored_food() + city.city_yield().food as i32
+    fn render_population_progress_bar(&mut self,  game: &Game, canvas: &mut Canvas, city: &City) {
+        let mut progress = city.stored_food() as f32 / city.food_needed_for_growth() as f32;
+        let mut projected_progress = (city.stored_food() + city.city_yield().food as i32
             - city.consumed_food() as i32) as f32
             / city.food_needed_for_growth() as f32;
+            if city.owner() !=game.the_player().id() {
+                progress = 0.; projected_progress = 0.;
+            }
         self.render_progress_bar(
             canvas,
             vec2(0., 70.),
@@ -273,8 +276,8 @@ impl CityRenderer {
 
         if city.owner() == game.the_player().id() {
             self.render_production_progress_bar(canvas, city);
-            self.render_population_progress_bar(canvas, city);
         }
+        self.render_population_progress_bar(game, canvas, city);
 
         self.render_left_circle(game, canvas, city);
 

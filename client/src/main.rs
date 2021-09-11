@@ -3,9 +3,11 @@
 use std::sync::Arc;
 
 use anyhow::Context as _;
+use client::Client;
 use context::Context;
 use duit::Event;
 use game::Game;
+use server_bridge::ServerBridge;
 use simple_logger::SimpleLogger;
 
 macro_rules! vars {
@@ -39,9 +41,9 @@ mod renderer;
 mod server_bridge;
 mod state;
 mod states;
+mod tooltips;
 mod ui;
 mod utils;
-mod tooltips;
 mod volumes;
 
 use states::{game::GameState, lobby::GameLobbyState, menu::MenuState};
@@ -50,6 +52,7 @@ extern crate fs_err as fs;
 
 pub enum Action {
     EnterSingleplayerLobby,
+    EnterLobby(ServerBridge),
 }
 
 pub enum RootState {
@@ -72,6 +75,10 @@ impl RootState {
                                     e
                                 )),
                             }
+                        }
+                        Action::EnterLobby(bridge) => {
+                            dbg!();
+                            *self = RootState::Lobby(GameLobbyState::new(cx, Client::new(bridge)));
                         }
                     }
                 }

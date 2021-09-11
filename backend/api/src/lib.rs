@@ -1,13 +1,22 @@
 tonic::include_proto!("rip.backend");
 
 pub const PORT: u16 = 19836;
+pub const QUIC_PORT: u16 = 19837;
+
+pub const BACKEND_URL: &str = "http://127.0.0.1:80";
+
+pub fn quic_addr() -> SocketAddr {
+    format!("127.0.0.1:{}", QUIC_PORT).parse().unwrap()
+}
 
 pub type SessionId = [u8; 16];
 
 pub extern crate tonic;
 pub extern crate quinn;
+pub extern crate prost;
+pub extern crate uuid;
 
-use std::str::FromStr;
+use std::{net::SocketAddr, str::FromStr};
 
 use tokio_util::codec::{length_delimited, LengthDelimitedCodec};
 

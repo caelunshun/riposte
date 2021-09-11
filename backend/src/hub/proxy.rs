@@ -18,7 +18,7 @@ use super::game::Game;
 /// Spawns a Tokio task that handles a connection to a game server host.
 ///
 /// Returns a [`HostHandle`] to communicate.
-pub fn spawn_host_task(conn: NewConnection, game: Arc<RwLock<Game>>) -> HostHandle {
+pub fn spawn_host_task(conn: NewConnection, _game: Arc<RwLock<Game>>) -> HostHandle {
     let (sender, receiver) = flume::bounded(8);
 
     let host = Arc::new(Host::new(conn, receiver));
@@ -101,6 +101,7 @@ impl Host {
                         connection,
                         user_id,
                     } => {
+                        tracing::info!("New client with UUID {:?}", user_id);
                         let mut clients = self.client_connections.write().await;
                         assert!(
                             !clients.contains_key(&connection_id),
@@ -113,6 +114,8 @@ impl Host {
                                 conn: connection.connection,
                             },
                         );
+
+                        tracing::info!("Handling client");
 
                         Arc::clone(&self).handle_client(
                             connection_id,
@@ -166,9 +169,11 @@ impl Host {
         user_id: Uuid,
         mut bi_streams: IncomingBiStreams,
     ) {
-        task::spawn(async move {
+        let handle = task::spawn(async move {
             // Send OpenStream::NewConnection to notify the host of a new connection.
-            let (send_stream, _) = self.conn.open_bi().await?;
+            tracing::info!("Handling client - opening initial stream on host");
+            let (send_stream, _recv_stream) = self.conn.open_bi().await?;
+            tracing::info!("Initial host stream opened");
             let mut writer = codec().new_write(send_stream);
             writer
                 .send(
@@ -184,18 +189,39 @@ impl Host {
                     .into(),
                 )
                 .await?;
+            tracing::info!("Sent OpenStream");
             drop(writer);
 
             // Wait for streams opened by the client and proxy them.
-            while let Some(Ok((send_stream, recv_stream))) = bi_streams.next().await {
-                Arc::clone(&self).proxy_stream_client_to_host(
-                    connection_id,
-                    send_stream,
-                    recv_stream,
-                );
+            tracing::info!("Entering client stream handling loop");
+            while let Some(res) = bi_streams.next().await {
+                match res {
+                    Ok((send_stream, mut recv_stream)) => {
+                        tracing::info!("Client opened bi stream");
+                        // skip the first byte - used to wake the server
+                        let mut buf = [0u8; 1];
+                        recv_stream.read_exact(&mut buf).await?;
+                        Arc::clone(&self).proxy_stream_client_to_host(
+                            connection_id,
+                            send_stream,
+                            recv_stream,
+                        );
+                    }
+                    Err(e) => {
+                        tracing::error!("Failed to handle client stream: {:?}", e);
+                        break;
+                    }
+                }
             }
+            tracing::info!("Client stream handling loop ended");
 
             Result::<(), anyhow::Error>::Ok(())
+        });
+
+        task::spawn(async move {
+            if let Err(e) = handle.await.unwrap() {
+                tracing::error!("Failed to handle client connection: {:?}", e);
+            }
         });
     }
 
@@ -209,7 +235,7 @@ impl Host {
             // Open a new stream to the host.
             let (host_send_stream, host_recv_stream) = self.conn.open_bi().await?;
 
-            // Send the NewStream packet.
+            // Send the OpenStream packet.
             let mut host_send_stream = codec().new_write(host_send_stream);
             let message = OpenStream {
                 inner: Some(open_stream::Inner::ProxiedStream(ProxiedStream {

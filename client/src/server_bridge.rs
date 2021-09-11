@@ -4,17 +4,23 @@ use anyhow::Context as _;
 use bytes::Bytes;
 use flume::{Receiver, Sender};
 use futures::{stream::StreamExt, SinkExt};
-use riposte_backend_api::codec;
+use riposte_backend_api::{codec, join_game_response, quic_addr, JoinGameRequest, Uuid};
 use tokio::{
     io::{AsyncBufReadExt, BufReader},
     process::Command,
     task,
 };
 
-use crate::options::Account;
+use crate::{
+    context::{Context, FutureHandle},
+    options::Account,
+};
 
 fn server_path() -> anyhow::Result<PathBuf> {
-    Ok(std::env::current_exe()?.parent().unwrap().join("riposte-server"))
+    Ok(std::env::current_exe()?
+        .parent()
+        .unwrap()
+        .join("riposte-server"))
 }
 
 /// A bridge abstracting over a connection to the game server.
@@ -36,6 +42,10 @@ impl ServerBridge {
             .env(
                 "RIPOSTE_HOST_UUID",
                 host_account.uuid().to_hyphenated().to_string(),
+            )
+            .env(
+                "RIPOSTE_HOST_AUTH_TOKEN",
+                base64::encode(host_account.auth_token()),
             )
             .kill_on_drop(true)
             .spawn()
@@ -90,6 +100,65 @@ impl ServerBridge {
         Ok(Self {
             sending: sending_tx,
             receiving: receiving_rx,
+        })
+    }
+
+    /// Creates a new multiplayer server connection by
+    /// connecting the Riposte backend service.
+    pub fn new_multiplayer(cx: &Context, game_id: Uuid) -> FutureHandle<anyhow::Result<Self>> {
+        let mut client = cx.backend().client().clone();
+        let quic_endpoint = cx.backend().quic_endpoint().clone();
+        let auth_token = cx.options().account().auth_token().to_vec();
+        cx.spawn_future(async move {
+            let response = client
+                .join_game(JoinGameRequest {
+                    game_id: Some(game_id),
+                    auth_token,
+                })
+                .await?
+                .into_inner();
+            log::info!("Join game response: {:?}", response);
+
+            let session_id = match response.result.context("missing result")? {
+                join_game_response::Result::ErrorMessage(e) => anyhow::bail!("{}", e),
+                join_game_response::Result::SessionId(session_id) => session_id,
+            };
+
+            let new_conn = quic_endpoint.connect(&quic_addr(), "localhost")?.await?;
+            log::info!("Connected to backend QUIC endpoint");
+            let (mut stream, _) = new_conn.connection.open_bi().await?;
+            stream.write_all(&session_id).await?;
+            log::info!("Send session ID to  backend");
+
+            let (mut send_stream, recv_stream) = new_conn.connection.open_bi().await?;
+            send_stream.write_all(&[0]).await?;
+
+            log::info!("Opened streams");
+
+            let (sending_tx, sending_rx) = flume::unbounded();
+            let (receiving_tx, receiving_rx) = flume::unbounded();
+
+            task::spawn(async move {
+                let mut reader = codec().new_read(recv_stream);
+                while let Some(Ok(data)) = reader.next().await {
+                    receiving_tx.send_async(data.freeze()).await.ok();
+                }
+            });
+            task::spawn(async move {
+                let mut writer = codec().new_write(send_stream);
+                while let Ok(data) = sending_rx.recv_async().await {
+                    if let Err(e) = writer.send(data).await {
+                        log::error!("Failed to send data: {:?}", e);
+                    }
+                }
+            });
+
+            log::info!("Server bridge connected to backend");
+
+            Ok(Self {
+                sending: sending_tx,
+                receiving: receiving_rx,
+            })
         })
     }
 
