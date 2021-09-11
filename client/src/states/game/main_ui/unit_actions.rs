@@ -124,7 +124,10 @@ impl UnitActionBar {
                 Message::FoundCity(unit) => {
                     client.do_unit_action(game, unit, UnitAction::FoundCity)
                 }
-                Message::SetWorkerTask(unit, task) => client.set_worker_task(game, unit, &task),
+                Message::SetWorkerTask(unit, task) => {
+                    client.set_worker_task(game, unit, &task);
+                    game.selected_units_mut().clear();
+                }
             }
         }
     }

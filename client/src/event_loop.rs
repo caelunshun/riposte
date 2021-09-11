@@ -1,4 +1,4 @@
-use duit::Vec2;
+use duit::{Vec2, widget::HitTestResult};
 use winit::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
@@ -31,13 +31,15 @@ pub fn run(event_loop: EventLoop<()>, mut context: Context, mut state: RootState
                     .ui_mut()
                     .convert_event(&event, context.window().scale_factor());
 
-                if let Some(event) = &duit_event {
+                let was_captured_by_ui = if let Some(event) = &duit_event {
                     context.ui_mut().handle_window_event(
                         &mut *context.canvas_mut(),
                         event,
                         window_logical_size,
-                    );
-                }
+                    ) == HitTestResult::Hit
+                } else {
+                    false
+                };
 
                 match event {
                     WindowEvent::CloseRequested => *control_flow = ControlFlow::Exit,
@@ -48,7 +50,9 @@ pub fn run(event_loop: EventLoop<()>, mut context: Context, mut state: RootState
                 context.handle_window_event(&event);
 
                 if let Some(event) = duit_event {
-                    state.handle_event(&mut context, &event);
+                    if !was_captured_by_ui {
+                        state.handle_event(&mut context, &event);
+                    }
                 }
             }
 
