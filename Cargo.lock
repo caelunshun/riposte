@@ -956,27 +956,10 @@ checksum = "56899898ce76aaf4a0f24d914c97ea6ed976d42fec6ad33fcbb0a1103e07b2b0"
 [[package]]
 name = "duit"
 version = "0.1.0"
+source = "git+https://github.com/caelunshun/duit#a09651dd7badea9230d2fb694cbee82abacb9a80"
 dependencies = [
  "ahash 0.7.4",
- "duit-core 0.1.0",
- "dume 0.1.0",
- "glam",
- "indexmap",
- "palette",
- "serde",
- "serde_yaml",
- "slotmap",
- "thiserror",
- "winit",
-]
-
-[[package]]
-name = "duit"
-version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#2602f91bd50e0bdccf4710b6fd586f8d8c877fa5"
-dependencies = [
- "ahash 0.7.4",
- "duit-core 0.1.0 (git+https://github.com/caelunshun/duit)",
+ "duit-core",
  "dume 0.1.0 (git+https://github.com/caelunshun/duit)",
  "glam",
  "indexmap",
@@ -991,16 +974,7 @@ dependencies = [
 [[package]]
 name = "duit-core"
 version = "0.1.0"
-dependencies = [
- "serde",
- "serde_yaml",
- "thiserror",
-]
-
-[[package]]
-name = "duit-core"
-version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#2602f91bd50e0bdccf4710b6fd586f8d8c877fa5"
+source = "git+https://github.com/caelunshun/duit#a09651dd7badea9230d2fb694cbee82abacb9a80"
 dependencies = [
  "serde",
  "serde_yaml",
@@ -1010,9 +984,9 @@ dependencies = [
 [[package]]
 name = "duit-platform"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#2602f91bd50e0bdccf4710b6fd586f8d8c877fa5"
+source = "git+https://github.com/caelunshun/duit#a09651dd7badea9230d2fb694cbee82abacb9a80"
 dependencies = [
- "duit 0.1.0 (git+https://github.com/caelunshun/duit)",
+ "duit",
  "dume 0.1.0 (git+https://github.com/caelunshun/duit)",
  "glam",
  "pollster",
@@ -1023,6 +997,7 @@ dependencies = [
 [[package]]
 name = "dume"
 version = "0.1.0"
+source = "git+https://github.com/caelunshun/duit#a09651dd7badea9230d2fb694cbee82abacb9a80"
 dependencies = [
  "ahash 0.7.4",
  "anyhow",
@@ -1051,7 +1026,7 @@ dependencies = [
 [[package]]
 name = "dume"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#2602f91bd50e0bdccf4710b6fd586f8d8c877fa5"
+source = "git+https://github.com/caelunshun/dume#38db1cd572e40791d66f10c8b8c910a5adc25be2"
 dependencies = [
  "ahash 0.7.4",
  "anyhow",
@@ -3293,9 +3268,9 @@ dependencies = [
  "bitflags",
  "bytes",
  "directories-next",
- "duit 0.1.0",
- "duit-core 0.1.0",
- "dume 0.1.0",
+ "duit",
+ "duit-core",
+ "dume 0.1.0 (git+https://github.com/caelunshun/dume)",
  "float-ord",
  "flume",
  "fs-err",
@@ -3414,7 +3389,7 @@ dependencies = [
  "anyhow",
  "cfg-if 1.0.0",
  "directories-next",
- "duit 0.1.0 (git+https://github.com/caelunshun/duit)",
+ "duit",
  "duit-platform",
  "flume",
  "octocrab",

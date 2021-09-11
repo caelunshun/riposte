@@ -13,9 +13,9 @@ base64 = "0.13"
 bitflags = "1"
 bytes = "1"
 directories-next = "2"
-duit = { path = "/Users/caelum/dev/duit/crates/duit" }
-duit-core = { path = "/Users/caelum/dev/duit/crates/duit-core" }
-dume = { path = "/Users/caelum/dev/dume" }
+duit = { git = "https://github.com/caelunshun/duit" }
+duit-core = { git = "https://github.com/caelunshun/duit" }
+dume = { git = "https://github.com/caelunshun/dume" }
 float-ord = "0.3"
 flume = "0.10"
 fs-err = "2"
