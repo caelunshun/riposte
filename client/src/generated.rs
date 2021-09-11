@@ -1,4 +1,4 @@
-use crate::ui::flashing_button::FlashingButton; use crate::ui::turn_indicator::TurnIndicatorCircle;
+use crate::ui::flashing_button::FlashingButton; use crate::ui::turn_indicator::TurnIndicatorCircle; use crate::ui::unit_indicator::UnitIndicator;
 use duit::widgets::*;
 use duit::*;
 pub struct ErrorPopup {
@@ -646,6 +646,33 @@ impl ::duit::InstanceHandle for EconomyWindow {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct UnitSelectionBarWindow {
+    pub units: WidgetHandle<Flex>,
+}
+impl ::duit::InstanceHandle for UnitSelectionBarWindow {
+    fn name() -> &'static str {
+        "UnitSelectionBarWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut units = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "units" => units = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            units: WidgetHandle::new(units.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "units"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct UnitActionButton {
     pub the_button: WidgetHandle<FlashingButton>,
     pub the_text: WidgetHandle<Text>,
@@ -936,6 +963,60 @@ impl ::duit::InstanceHandle for UnitInfoWindow {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "info_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct UnitSelector {
+    pub clickable: WidgetHandle<Clickable>,
+    pub container: WidgetHandle<Container>,
+    pub unit_head: WidgetHandle<Image>,
+    pub indicators: WidgetHandle<UnitIndicator>,
+}
+impl ::duit::InstanceHandle for UnitSelector {
+    fn name() -> &'static str {
+        "UnitSelector"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut clickable = None;
+        let mut container = None;
+        let mut unit_head = None;
+        let mut indicators = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "clickable" => clickable = Some(widget),
+                "container" => container = Some(widget),
+                "unit_head" => unit_head = Some(widget),
+                "indicators" => indicators = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            clickable: WidgetHandle::new(clickable.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "clickable"
+                )
+            })),
+            container: WidgetHandle::new(container.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "container"
+                )
+            })),
+            unit_head: WidgetHandle::new(unit_head.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "unit_head"
+                )
+            })),
+            indicators: WidgetHandle::new(indicators.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "indicators"
                 )
             })),
         }

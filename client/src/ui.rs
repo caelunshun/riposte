@@ -3,6 +3,7 @@ use glam::vec2;
 
 pub mod flashing_button;
 pub mod turn_indicator;
+pub mod unit_indicator;
 
 // Z index constants for window layering
 pub const Z_BACKGROUND: u64 = 1;

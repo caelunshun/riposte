@@ -115,6 +115,14 @@ styles:
     border_radius: 0
     border_color: rgba(50, 50, 50, 180)
 
+  unit_selector_container:
+    background_color: rgba(50, 50, 50, 250)
+    border_radius: 1
+
+  highlighted_container:
+    border_color: rgb(255, 205, 0)
+    border_width: 2
+
   progress_bar:
     border_radius: 1
     border_width: 1

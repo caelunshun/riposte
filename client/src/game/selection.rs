@@ -92,9 +92,17 @@ impl SelectedUnits {
         self.units.contains(&unit)
     }
 
-    pub fn on_unit_moved(&mut self, game: &Game, unit: UnitId, _old_pos: UVec2, new_pos: UVec2) {
-        if self.contains(unit) && self.pos(game) != Some(new_pos) {
-            self.deselect(unit);
+    pub fn on_units_moved(
+        &mut self,
+        game: &Game,
+        units: &[UnitId],
+        _old_pos: UVec2,
+        new_pos: UVec2,
+    ) {
+        for &unit in units {
+            if self.contains(unit) && self.pos(game) != Some(new_pos) {
+                self.deselect(unit);
+            }
         }
     }
 
@@ -237,12 +245,24 @@ impl SelectionDriver {
     ///
     /// The unit movement code updates unit positions as soon as `ConfirmMoveUnits`
     /// is received, which happens _before_ all UpdateUnit packets.
-    pub fn on_unit_moved(&mut self, game: &Game, unit: UnitId, _old_pos: UVec2, new_pos: UVec2) {
-        if let Some(&group_id) = self.unit_to_group.get(unit) {
+    pub fn on_units_moved(
+        &mut self,
+        game: &Game,
+        units: &[UnitId],
+        _old_pos: UVec2,
+        new_pos: UVec2,
+    ) {
+        if self.movement.is_unit_waiting_for_move(units[0]) {
+            return;
+        }
+
+        if let Some(&group_id) = self.unit_to_group.get(units[0]) {
             let group = &mut self.groups[group_id];
             if Some(new_pos) != group.pos(game) {
-                self.remove_unit_from_group(unit);
-                self.create_group(iter::once(unit));
+                for &unit in units {
+                    self.remove_unit_from_group(unit);
+                }
+                self.create_group(units.iter().copied());
             }
         }
     }
@@ -251,7 +271,7 @@ impl SelectionDriver {
         if game.is_view_locked() {
             return;
         }
-        
+
         self.movement.update(game);
 
         if game.are_prompts_open {
@@ -530,6 +550,21 @@ impl MovementDriver {
                     waiting.target_pos,
                     response.success
                 );
+                let units = waiting.units.clone();
+                let old_pos = waiting.start_pos;
+                let new_pos = waiting.target_pos;
+                game.enqueue_operation(move |game| {
+                    let mut updated = false;
+                    for &unit in &units {
+                        if game.unit(unit).pos() == old_pos {
+                            updated = true;
+                        }
+                        game.unit_mut(unit).set_pos_unsafe(new_pos);
+                    }
+                    if updated {
+                        game.on_units_moved(&units, old_pos, new_pos);
+                    }
+                });
                 (waiting.callback)(game, response.success);
                 false
             } else {
@@ -562,6 +597,10 @@ impl MovementDriver {
             target_pos,
             callback: Box::new(callback),
         });
+    }
+
+    pub fn is_unit_waiting_for_move(&self, unit: UnitId) -> bool {
+        self.waiting.iter().any(|w| w.units.contains(&unit))
     }
 }
 

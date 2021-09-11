@@ -100,7 +100,7 @@ impl CityScreen {
         }
 
         if let Event::KeyPress {
-            key: VirtualKeyCode::Escape,
+            key: VirtualKeyCode::Escape, ..
         } = event
         {
             Some(Action::Close)

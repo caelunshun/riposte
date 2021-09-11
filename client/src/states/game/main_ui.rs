@@ -12,6 +12,7 @@ use crate::{
 use self::{
     economy::EconomyScreen, info_bar::InfoBar, research::ResearchBar, tile_tooltip::TileTooltip,
     turn_indicator::TurnIndicator, unit_actions::UnitActionBar, unit_info::UnitInfo,
+    unit_selection_bar::UnitSelectionBar,
 };
 
 mod economy;
@@ -21,6 +22,7 @@ mod tile_tooltip;
 mod turn_indicator;
 mod unit_actions;
 mod unit_info;
+mod unit_selection_bar;
 
 pub enum Action {
     OpenCityScreen(CityId),
@@ -37,6 +39,7 @@ pub struct MainUi {
     turn_indicator: TurnIndicator,
     info_bar: InfoBar,
     tile_tooltip: TileTooltip,
+    unit_selection_bar: UnitSelectionBar,
 
     selected_units_version: VersionSnapshot,
 }
@@ -52,6 +55,7 @@ impl MainUi {
         let mut turn_indicator = TurnIndicator::new(cx, &attachment);
         let mut info_bar = InfoBar::new(cx, &attachment);
         let tile_tooltip = TileTooltip::new(cx, &attachment);
+        let unit_selection_bar = UnitSelectionBar::new(cx, &attachment);
 
         unit_info.update_info(cx, game);
         unit_actions.update_info(cx, game);
@@ -69,6 +73,7 @@ impl MainUi {
             turn_indicator,
             info_bar,
             tile_tooltip,
+            unit_selection_bar,
 
             selected_units_version: game.selected_units().version(),
         }
@@ -78,6 +83,7 @@ impl MainUi {
         self.unit_actions.update(cx, game, client);
         self.economy_screen.update(cx, game, client);
         self.turn_indicator.update(game);
+        self.unit_selection_bar.update(cx, game);
 
         if self.selected_units_version.is_outdated() {
             self.on_selected_units_changed(cx, game);
@@ -106,6 +112,7 @@ impl MainUi {
     fn on_selected_units_changed(&mut self, cx: &mut Context, game: &Game) {
         self.unit_info.on_selected_units_changed(cx, game);
         self.unit_actions.on_selected_units_changed(cx, game);
+        self.unit_selection_bar.on_selected_units_changed(cx, game);
     }
 
     pub fn handle_event(
@@ -120,7 +127,7 @@ impl MainUi {
         if let Event::MousePress {
             pos,
             button: MouseButton::Left,
-            is_double,
+            is_double, ..
         } = event
         {
             if *is_double {
@@ -133,7 +140,7 @@ impl MainUi {
 
         // Toggle cheat mode
         if let Event::KeyPress {
-            key: VirtualKeyCode::L,
+            key: VirtualKeyCode::L, ..
         } = event
         {
             game.cheat_mode = !game.cheat_mode;

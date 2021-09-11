@@ -155,7 +155,7 @@ impl GameState {
             .handle_event(cx, &mut self.game, &mut self.client, event);
 
         if let Event::KeyPress {
-            key: VirtualKeyCode::Return,
+            key: VirtualKeyCode::Return, ..
         } = event
         {
             if self.game.can_end_turn() {

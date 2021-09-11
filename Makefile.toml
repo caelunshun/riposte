@@ -72,6 +72,6 @@ exec cbindgen --config cbindgen.toml -o include/riposte_networking.h
 [tasks.generate-ui-code]
 script = '''
 rm client/src/generated.rs
-echo "use crate::ui::flashing_button::FlashingButton; use crate::ui::turn_indicator::TurnIndicatorCircle;" > client/src/generated.rs
+echo "use crate::ui::flashing_button::FlashingButton; use crate::ui::turn_indicator::TurnIndicatorCircle; use crate::ui::unit_indicator::UnitIndicator;" > client/src/generated.rs
 find client/ui -name "*.yml" | xargs -t -I{} duit-codegen {} --append -o client/src/generated.rs
 '''

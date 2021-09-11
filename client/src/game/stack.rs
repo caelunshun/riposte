@@ -25,6 +25,7 @@ use super::{tile::OutOfBounds, Game, UnitId};
 #[derive(Debug, Default)]
 pub struct UnitStack {
     units: SmallVec<[UnitId; 1]>,
+    top_unit: Option<UnitId>,
 }
 
 impl UnitStack {
@@ -72,20 +73,27 @@ impl UnitStack {
                 None => game.unit(u).strength(),
             };
 
-            if game.selected_units().contains(u) {
-                score += 100000.;
-            }
-
             if game.unit(u).owner() == game.the_player().id() {
                 score += 1000.;
             }
 
-            cmp::Reverse(FloatOrd(score))
+            cmp::Reverse((FloatOrd(score), u))
         });
+
+        self.top_unit = None;
+        for &u in &self.units {
+            if game.selected_units().contains(u) {
+                self.top_unit = Some(u);
+                break;
+            }
+        }
+        if self.top_unit.is_none() {
+            self.top_unit = self.units.first().copied();
+        }
     }
 
     pub fn top_unit(&self) -> Option<UnitId> {
-        self.units().first().copied()
+        self.top_unit
     }
 }
 
@@ -137,22 +145,29 @@ impl StackGrid {
         }
     }
 
-    pub fn on_unit_moved(&self, game: &Game, unit: UnitId, old_pos: UVec2, new_pos: UVec2) {
+    pub fn on_units_moved(&self, game: &Game, units: &[UnitId], old_pos: UVec2, new_pos: UVec2) {
         if let Ok(mut old_stack) = self.get_mut(old_pos) {
-            old_stack.remove_unit(unit);
+            for &unit in units {
+                old_stack.remove_unit(unit);
+            }
         }
 
         if let Ok(mut new_stack) = self.get_mut(new_pos) {
-            new_stack.add_unit(game, unit);
+            for &unit in units {
+                new_stack.add_unit(game, unit);
+            }
         }
 
-        let mut touched_units = ahash::AHashSet::new();
-        for x in 0..self.width {
-            for y in 0..self.height {
-                let pos = glam::uvec2(x, y);
-                let stack = self.get(pos).unwrap();
-                for unit in stack.units() {
-                    assert!(touched_units.insert(*unit), "failed at {:?}", pos);
+        if cfg!(debug_assertions) {
+            let mut touched_units = ahash::AHashSet::new();
+            for x in 0..self.width {
+                for y in 0..self.height {
+                    let pos = glam::uvec2(x, y);
+                    let stack = self.get(pos).unwrap();
+                    for unit in stack.units() {
+                        assert!(touched_units.insert(*unit), "failed at {:?}", pos);
+                        assert_eq!(game.unit(*unit).pos(), pos);
+                    }
                 }
             }
         }

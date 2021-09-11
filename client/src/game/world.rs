@@ -88,6 +88,8 @@ pub struct Game {
     pub are_prompts_open: bool,
     pub current_city_screen: Option<CityId>,
     pub cheat_mode: bool,
+
+    queued_operations: RefCell<Vec<Box<dyn FnOnce(&mut Self)>>>,
 }
 
 impl Game {
@@ -122,6 +124,8 @@ impl Game {
             are_prompts_open: false,
             current_city_screen: None,
             cheat_mode: false,
+
+            queued_operations: RefCell::new(Vec::new()),
         }
     }
 
@@ -167,6 +171,12 @@ impl Game {
         game.set_initial_view_center();
 
         Ok(game)
+    }
+
+    /// Enqueues a function to be run with mutable access to `self`
+    /// on the next frame.
+    pub fn enqueue_operation(&self, op: impl FnOnce(&mut Self) + 'static) {
+        self.queued_operations.borrow_mut().push(Box::new(op));
     }
 
     fn set_initial_view_center(&mut self) {
@@ -427,6 +437,8 @@ impl Game {
 
     /// Called every frame.
     pub fn update(&mut self, cx: &mut Context, client: &mut Client<GameState>) {
+        self.flush_queued_operations();
+
         self.view_mut().update(cx, self);
         self.selection_driver_mut()
             .update(cx, self, client, cx.time());
@@ -436,6 +448,14 @@ impl Game {
             log::info!("Resorted unit stacks");
             self.selection_units_version.update();
         }
+    }
+
+    fn flush_queued_operations(&mut self) {
+        let mut ops = mem::take(&mut *self.queued_operations.borrow_mut());
+        for op in ops.drain(..) {
+            op(self);
+        }
+        *self.queued_operations.borrow_mut() = ops;
     }
 
     pub fn push_event(&self, event: GameEvent) {
@@ -467,7 +487,7 @@ impl Game {
                 let new_pos = unit.pos();
                 if old_pos != new_pos {
                     drop(unit);
-                    self.on_unit_moved(id, old_pos, new_pos);
+                    self.on_units_moved(&[id], old_pos, new_pos);
                 }
 
                 self.push_event(GameEvent::UnitUpdated { unit: id });
@@ -503,12 +523,12 @@ impl Game {
         self.selection_driver_mut().on_unit_added(self, unit);
     }
 
-    pub fn on_unit_moved(&self, unit: UnitId, old_pos: UVec2, new_pos: UVec2) {
-        self.stacks.on_unit_moved(self, unit, old_pos, new_pos);
+    pub fn on_units_moved(&self, units: &[UnitId], old_pos: UVec2, new_pos: UVec2) {
+        self.stacks.on_units_moved(self, units, old_pos, new_pos);
         self.selected_units_mut()
-            .on_unit_moved(self, unit, old_pos, new_pos);
+            .on_units_moved(self, units, old_pos, new_pos);
         self.selection_driver_mut()
-            .on_unit_moved(self, unit, old_pos, new_pos);
+            .on_units_moved(self, units, old_pos, new_pos);
     }
 
     fn on_unit_deleted(&mut self, unit: UnitId) {
