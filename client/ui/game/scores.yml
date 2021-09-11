@@ -1,0 +1,15 @@
+name: ScoresWindow
+child:
+  Row: 
+    align_v: End
+    children:
+      - Container:
+          fill_width: true
+          classes:
+            - game_window_container
+          mode: 
+            Pad: 20
+          child:
+            Column:
+              id: scores_column
+              spacing: 10

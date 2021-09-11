@@ -172,6 +172,42 @@ impl ::duit::InstanceHandle for CityBuildPromptOption {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct PlayerScore {
+    pub clickable: WidgetHandle<Clickable>,
+    pub text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for PlayerScore {
+    fn name() -> &'static str {
+        "PlayerScore"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut clickable = None;
+        let mut text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "clickable" => clickable = Some(widget),
+                "text" => text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            clickable: WidgetHandle::new(clickable.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "clickable"
+                )
+            })),
+            text: WidgetHandle::new(text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct CityEconomyWindow {
     pub beaker_output_text: WidgetHandle<Text>,
     pub gold_output_text: WidgetHandle<Text>,
@@ -891,6 +927,33 @@ impl ::duit::InstanceHandle for TileTooltipWindow {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "tooltip_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct ScoresWindow {
+    pub scores_column: WidgetHandle<Flex>,
+}
+impl ::duit::InstanceHandle for ScoresWindow {
+    fn name() -> &'static str {
+        "ScoresWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut scores_column = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "scores_column" => scores_column = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            scores_column: WidgetHandle::new(scores_column.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "scores_column"
                 )
             })),
         }

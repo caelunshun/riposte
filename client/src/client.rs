@@ -9,11 +9,11 @@ use prost::Message;
 use protocol::{
     any_client, any_server, client_lobby_packet, server_lobby_packet, worker_task_kind, AnyClient,
     AnyServer, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket,
-    ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeleteSlot, DoUnitAction, EndTurn,
-    GameStarted, GetBuildTasks, GetPossibleTechs, InitialGameData, Kicked, LobbyInfo, MoveUnits,
-    Pos, PossibleCityBuildTasks, PossibleTechs, RequestGameStart, ServerLobbyPacket,
-    SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask, WorkerTask,
-    WorkerTaskImprovement,
+    ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeclarePeace, DeclareWar, DeleteSlot,
+    DoUnitAction, EndTurn, GameStarted, GetBuildTasks, GetPossibleTechs, InitialGameData, Kicked,
+    LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs, RequestGameStart,
+    ServerLobbyPacket, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask,
+    WorkerTask, WorkerTaskImprovement,
 };
 
 use crate::{
@@ -21,7 +21,7 @@ use crate::{
     game::{
         city::{self, PreviousBuildTask},
         unit::WorkerTaskKind,
-        CityId, Game, UnitId,
+        CityId, Game, PlayerId, UnitId,
     },
     lobby::GameLobby,
     registry::{Civilization, Leader, Registry, Tech},
@@ -300,6 +300,18 @@ impl Client<GameState> {
                 }),
                 ..Default::default()
             }),
+        }));
+    }
+
+    pub fn declare_war_on(&mut self, game: &Game, player: PlayerId) {
+        self.send_message(any_client::Packet::DeclareWar(DeclareWar {
+            on_player_id: game.player(player).network_id() as i32,
+        }));
+    }
+
+    pub fn make_peace_with(&mut self, game: &Game, player: PlayerId) {
+        self.send_message(any_client::Packet::DeclarePeace(DeclarePeace {
+            on_player_id: game.player(player).network_id() as i32,
         }));
     }
 

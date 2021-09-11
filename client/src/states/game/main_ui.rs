@@ -10,13 +10,14 @@ use crate::{
 };
 
 use self::{
-    economy::EconomyScreen, info_bar::InfoBar, research::ResearchBar, tile_tooltip::TileTooltip,
-    turn_indicator::TurnIndicator, unit_actions::UnitActionBar, unit_info::UnitInfo,
-    unit_selection_bar::UnitSelectionBar,
+    economy::EconomyScreen, info_bar::InfoBar, player_scores::PlayerScores, research::ResearchBar,
+    tile_tooltip::TileTooltip, turn_indicator::TurnIndicator, unit_actions::UnitActionBar,
+    unit_info::UnitInfo, unit_selection_bar::UnitSelectionBar,
 };
 
 mod economy;
 mod info_bar;
+mod player_scores;
 mod research;
 mod tile_tooltip;
 mod turn_indicator;
@@ -40,6 +41,7 @@ pub struct MainUi {
     info_bar: InfoBar,
     tile_tooltip: TileTooltip,
     unit_selection_bar: UnitSelectionBar,
+    player_scores: PlayerScores,
 
     selected_units_version: VersionSnapshot,
 }
@@ -56,6 +58,7 @@ impl MainUi {
         let mut info_bar = InfoBar::new(cx, &attachment);
         let tile_tooltip = TileTooltip::new(cx, &attachment);
         let unit_selection_bar = UnitSelectionBar::new(cx, &attachment);
+        let mut player_scores = PlayerScores::new(&attachment);
 
         unit_info.update_info(cx, game);
         unit_actions.update_info(cx, game);
@@ -63,6 +66,7 @@ impl MainUi {
         economy_screen.update_info(game);
         turn_indicator.update_info(game);
         info_bar.update_info(cx, game);
+        player_scores.update_info(cx, game);
 
         Self {
             attachment,
@@ -74,6 +78,7 @@ impl MainUi {
             info_bar,
             tile_tooltip,
             unit_selection_bar,
+            player_scores,
 
             selected_units_version: game.selected_units().version(),
         }
@@ -84,6 +89,7 @@ impl MainUi {
         self.economy_screen.update(cx, game, client);
         self.turn_indicator.update(game);
         self.unit_selection_bar.update(cx, game);
+        self.player_scores.update(cx, game, client);
 
         if self.selected_units_version.is_outdated() {
             self.on_selected_units_changed(cx, game);
@@ -97,6 +103,8 @@ impl MainUi {
         self.turn_indicator.handle_game_event(game, event);
         self.info_bar.handle_game_event(cx, game, event);
         self.tile_tooltip.handle_game_event(game, event);
+        self.player_scores.handle_game_event(cx, game, event);
+
         match event {
             GameEvent::UnitUpdated { unit } => {
                 // If the unit was selected, we should update the UI
@@ -127,7 +135,8 @@ impl MainUi {
         if let Event::MousePress {
             pos,
             button: MouseButton::Left,
-            is_double, ..
+            is_double,
+            ..
         } = event
         {
             if *is_double {
@@ -140,7 +149,8 @@ impl MainUi {
 
         // Toggle cheat mode
         if let Event::KeyPress {
-            key: VirtualKeyCode::L, ..
+            key: VirtualKeyCode::L,
+            ..
         } = event
         {
             game.cheat_mode = !game.cheat_mode;

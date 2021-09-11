@@ -8,7 +8,7 @@ use crate::{
     ui::{AlignFixed, Z_FOREGROUND},
 };
 
-pub const SIZE: Vec2 = glam::const_vec2!([250., 150.]);
+pub const SIZE: Vec2 = glam::const_vec2!([300., 150.]);
 
 /// Display's the player's civ's flag,
 /// as well as a circle indicating the
@@ -21,7 +21,7 @@ impl TurnIndicator {
     pub fn new(_cx: &Context, state: &StateAttachment) -> Self {
         let (window, _) = state.create_window::<TurnIndicatorWindow, _>(
             AlignFixed::new(SIZE, Align::End, Align::End),
-            Z_FOREGROUND,
+            Z_FOREGROUND + 1,
         );
 
         // Set to temporary image to avoid panicking because the image isn't set.

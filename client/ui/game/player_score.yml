@@ -1,0 +1,9 @@
+name: PlayerScore
+child:
+  Clickable:
+    id: clickable
+    child:
+      Text:
+        id: text
+        classes:
+          - light_text
