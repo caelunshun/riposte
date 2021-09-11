@@ -11,6 +11,7 @@
 #include "mapgen/land.h"
 #include "mapgen/starting_locations.h"
 #include "mapgen/terrain.h"
+#include "mapgen/resources.h"
 
 namespace rip {
     std::pair<Game, std::map<uint32_t, PlayerId>> MapGenerator::generate(const std::vector<proto::LobbySlot> &playerSlots, mapgen::MapgenSettings settings,
@@ -47,12 +48,20 @@ namespace rip {
         mapgen::StartingLocationsGenerator startingLocGen;
         const auto startingLocations = startingLocGen.generateStartingLocations(landGrid, tileGrid, rng, numPlayers);
 
+        mapgen::BalancedResourceGenerator resourceGen;
+        const auto resourceGrid = resourceGen.distributeResources(rng, *registry, tileGrid, startingLocations);
+
         std::cerr << 48 << std::endl;
 
         // Copy the tile grid into the Game.
         for (int y = 0; y < settings.mapheight(); y++) {
             for (int x = 0; x < settings.mapwidth(); x++) {
                 game.setTile(glm::uvec2(x, y), tileGrid.get(x, y));
+
+                const auto &resource = resourceGrid.get(x, y);
+                if (resource.has_value()) {
+                    game.getTile(glm::uvec2(x, y)).setResource(*resource);
+                }
             }
         }
 

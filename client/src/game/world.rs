@@ -83,9 +83,11 @@ pub struct Game {
 
     events: EventBus,
 
+    // UI states that need to be accessed by the renderer / view code
     pub waiting_on_turn_end: bool,
     pub are_prompts_open: bool,
     pub current_city_screen: Option<CityId>,
+    pub cheat_mode: bool,
 }
 
 impl Game {
@@ -119,6 +121,7 @@ impl Game {
             waiting_on_turn_end: false,
             are_prompts_open: false,
             current_city_screen: None,
+            cheat_mode: false,
         }
     }
 

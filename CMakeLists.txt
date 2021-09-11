@@ -68,7 +68,8 @@ set(SOURCES
         src/mapgen/line_mesh.cpp
         src/mapgen/land.cpp
         src/mapgen/terrain.cpp
-        src/mapgen/starting_locations.cpp)
+        src/mapgen/starting_locations.cpp
+        src/mapgen/resources.cpp)
 
 add_library(riposte-core ${SOURCES})
 

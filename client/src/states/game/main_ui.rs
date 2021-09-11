@@ -1,5 +1,5 @@
 use duit::Event;
-use winit::event::MouseButton;
+use winit::event::{MouseButton, VirtualKeyCode};
 
 use crate::{
     client::{Client, GameState},
@@ -103,7 +103,7 @@ impl MainUi {
         self.unit_actions.on_selected_units_changed(cx, game);
     }
 
-    pub fn handle_event(&mut self, _cx: &Context, game: &Game, event: &Event) -> Option<Action> {
+    pub fn handle_event(&mut self, _cx: &Context, game: &mut Game, event: &Event) -> Option<Action> {
         // Check for double-clicked cities
         if let Event::MousePress {
             pos,
@@ -118,6 +118,15 @@ impl MainUi {
                 }
             }
         }
+
+        // Toggle cheat mode
+        if let Event::KeyPress {
+            key: VirtualKeyCode::L,
+        } = event
+        {
+            game.cheat_mode = !game.cheat_mode;
+        }
+
         None
     }
 }

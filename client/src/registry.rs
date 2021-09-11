@@ -113,6 +113,10 @@ impl Registry {
         self.techs.values()
     }
 
+    pub fn resources(&self) -> impl Iterator<Item = &Handle<Resource>> + '_ {
+        self.resources.values()
+    }
+
     pub fn is_unit_replaced_for_civ(&self, unit: &UnitKind, civ: &Civilization) -> bool {
         for u in self.unit_kinds() {
             if u.only_for_civs.contains(&civ.id) {
