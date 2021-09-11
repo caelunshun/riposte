@@ -133,8 +133,15 @@ impl TileRenderLayer for UnitRenderer {
             }
             let unit = game.unit(unit_id);
 
+            if unit.pos() != tile_pos {
+                return;
+            }
+
             // Translation based on spline interpolation for unit movement
-            let interpolated_pos = (unit.movement_spline().clamped_sample(cx.time()).unwrap()
+            let interpolated_pos = (unit
+                .movement_spline()
+                .clamped_sample(cx.time())
+                .unwrap_or_else(|| tile_pos.as_f32())
                 - tile_pos.as_f32())
                 * PIXELS_PER_TILE
                 * game.view().zoom_factor();

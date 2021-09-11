@@ -49,6 +49,8 @@ impl Unit {
 
         unit.update_data(data, game, cx)?;
 
+        unit.on_moved(cx, Default::default(), unit.pos());
+
         Ok(unit)
     }
 
@@ -56,10 +58,8 @@ impl Unit {
         &mut self,
         data: protocol::UpdateUnit,
         game: &Game,
-        cx: &Context,
+        _cx: &Context,
     ) -> anyhow::Result<()> {
-        let old_pos = self.pos();
-
         self.kind = game.registry().unit_kind(&data.kind_id)?;
         self.owner = game.resolve_player_id(data.owner_id as u32)?;
         self.capabilities = data
@@ -70,16 +70,20 @@ impl Unit {
 
         self.data = data;
 
-        let new_pos = self.pos();
-
-        if old_pos != new_pos {
-            self.on_moved(cx, old_pos, new_pos);
-        }
-
         Ok(())
     }
 
-    fn on_moved(&mut self, cx: &Context, old_pos: UVec2, new_pos: UVec2) {
+    pub fn on_moved(&mut self, cx: &Context, old_pos: UVec2, new_pos: UVec2) {
+        if self
+            .movement_spline
+            .keys()
+            .last()
+            .map(|k| k.value.as_u32() == new_pos)
+            .unwrap_or(false)
+        {
+            return;
+        }
+
         let time = self
             .movement_spline
             .keys()

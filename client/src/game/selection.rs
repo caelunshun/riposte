@@ -553,7 +553,7 @@ impl MovementDriver {
                 let units = waiting.units.clone();
                 let old_pos = waiting.start_pos;
                 let new_pos = waiting.target_pos;
-                game.enqueue_operation(move |game| {
+                game.enqueue_operation(move |game, cx| {
                     let mut updated = false;
                     for &unit in &units {
                         if !game.is_unit_valid(unit) {
@@ -565,7 +565,7 @@ impl MovementDriver {
                         game.unit_mut(unit).set_pos_unsafe(new_pos);
                     }
                     if updated {
-                        game.on_units_moved(&units, old_pos, new_pos);
+                        game.on_units_moved(cx, &units, old_pos, new_pos);
                     }
                 });
                 (waiting.callback)(game, response.success);

@@ -92,7 +92,7 @@ pub struct Game {
     pub current_city_screen: Option<CityId>,
     pub cheat_mode: bool,
 
-    queued_operations: RefCell<Vec<Box<dyn FnOnce(&mut Self)>>>,
+    queued_operations: RefCell<Vec<Box<dyn FnOnce(&mut Self, &Context)>>>,
 }
 
 impl Game {
@@ -179,7 +179,7 @@ impl Game {
 
     /// Enqueues a function to be run with mutable access to `self`
     /// on the next frame.
-    pub fn enqueue_operation(&self, op: impl FnOnce(&mut Self) + 'static) {
+    pub fn enqueue_operation(&self, op: impl FnOnce(&mut Self, &Context) + 'static) {
         self.queued_operations.borrow_mut().push(Box::new(op));
     }
 
@@ -458,7 +458,7 @@ impl Game {
 
     /// Called every frame.
     pub fn update(&mut self, cx: &mut Context, client: &mut Client<GameState>) {
-        self.flush_queued_operations();
+        self.flush_queued_operations(cx);
 
         self.view_mut().update(cx, self);
         self.selection_driver_mut()
@@ -479,10 +479,10 @@ impl Game {
         }
     }
 
-    fn flush_queued_operations(&mut self) {
+    fn flush_queued_operations(&mut self, cx: &Context) {
         let mut ops = mem::take(&mut *self.queued_operations.borrow_mut());
         for op in ops.drain(..) {
-            op(self);
+            op(self, cx);
         }
         *self.queued_operations.borrow_mut() = ops;
     }
@@ -516,7 +516,7 @@ impl Game {
                 let new_pos = unit.pos();
                 if old_pos != new_pos {
                     drop(unit);
-                    self.on_units_moved(&[id], old_pos, new_pos);
+                    self.on_units_moved(cx, &[id], old_pos, new_pos);
                 }
 
                 self.push_event(GameEvent::UnitUpdated { unit: id });
@@ -552,12 +552,15 @@ impl Game {
         self.selection_driver_mut().on_unit_added(self, unit);
     }
 
-    pub fn on_units_moved(&self, units: &[UnitId], old_pos: UVec2, new_pos: UVec2) {
+    pub fn on_units_moved(&self, cx: &Context, units: &[UnitId], old_pos: UVec2, new_pos: UVec2) {
         self.stacks.on_units_moved(self, units, old_pos, new_pos);
         self.selected_units_mut()
             .on_units_moved(self, units, old_pos, new_pos);
         self.selection_driver_mut()
             .on_units_moved(self, units, old_pos, new_pos);
+        for &unit in units {
+            self.unit_mut(unit).on_moved(cx, old_pos, new_pos);
+        }
     }
 
     fn on_unit_deleted(&mut self, unit: UnitId) {

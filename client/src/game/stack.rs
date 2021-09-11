@@ -158,6 +158,8 @@ impl StackGrid {
             }
         }
 
+        log::info!("Unit moved from {:?} to {:?}", old_pos, new_pos);
+
         if cfg!(debug_assertions) {
             let mut touched_units = ahash::AHashSet::new();
             for x in 0..self.width {

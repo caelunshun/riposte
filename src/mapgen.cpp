@@ -115,7 +115,9 @@ namespace rip {
                 }
             }
 
-            game.addUnit(Unit(unitKind, unitPos, player));
+            for (int i = 0; i < 10; i++) {
+                game.addUnit(Unit(unitKind, unitPos, player));
+            }
 
             game.getPlayer(player).recomputeVisibility(game);
         }
