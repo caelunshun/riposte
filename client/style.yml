@@ -36,6 +36,9 @@ styles:
     default_size: 13.28
   h6:
     default_size: 10.72
+
+  light_text:
+    default_weight: Light
   
   error_text:
     default_color: rgb(235, 51, 0)
@@ -106,6 +109,11 @@ styles:
     background_color: rgba(50, 50, 50, 253)
     border_radius: 5
     border_width: 1
+
+  tile_tooltip_container:
+    border_width: 0
+    border_radius: 0
+    border_color: rgba(50, 50, 50, 180)
 
   progress_bar:
     border_radius: 1

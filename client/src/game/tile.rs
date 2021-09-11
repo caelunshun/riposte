@@ -115,6 +115,17 @@ impl Tile {
 
         cost
     }
+
+    pub fn defense_bonus(&self) -> u32 {
+        let mut bonus = 0;
+        if self.is_forested() {
+            bonus += 50;
+        }
+        if self.is_hilled() {
+            bonus += 25;
+        }
+        bonus
+    }
 }
 
 #[derive(Debug, thiserror::Error)]

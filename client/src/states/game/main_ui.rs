@@ -10,13 +10,14 @@ use crate::{
 };
 
 use self::{
-    economy::EconomyScreen, info_bar::InfoBar, research::ResearchBar,
+    economy::EconomyScreen, info_bar::InfoBar, research::ResearchBar, tile_tooltip::TileTooltip,
     turn_indicator::TurnIndicator, unit_actions::UnitActionBar, unit_info::UnitInfo,
 };
 
 mod economy;
 mod info_bar;
 mod research;
+mod tile_tooltip;
 mod turn_indicator;
 mod unit_actions;
 mod unit_info;
@@ -35,6 +36,7 @@ pub struct MainUi {
     economy_screen: EconomyScreen,
     turn_indicator: TurnIndicator,
     info_bar: InfoBar,
+    tile_tooltip: TileTooltip,
 
     selected_units_version: VersionSnapshot,
 }
@@ -49,6 +51,7 @@ impl MainUi {
         let mut economy_screen = EconomyScreen::new(cx, &attachment);
         let mut turn_indicator = TurnIndicator::new(cx, &attachment);
         let mut info_bar = InfoBar::new(cx, &attachment);
+        let tile_tooltip = TileTooltip::new(cx, &attachment);
 
         unit_info.update_info(cx, game);
         unit_actions.update_info(cx, game);
@@ -65,6 +68,7 @@ impl MainUi {
             economy_screen,
             turn_indicator,
             info_bar,
+            tile_tooltip,
 
             selected_units_version: game.selected_units().version(),
         }
@@ -86,6 +90,7 @@ impl MainUi {
         self.economy_screen.handle_game_event(cx, game, event);
         self.turn_indicator.handle_game_event(game, event);
         self.info_bar.handle_game_event(cx, game, event);
+        self.tile_tooltip.handle_game_event(game, event);
         match event {
             GameEvent::UnitUpdated { unit } => {
                 // If the unit was selected, we should update the UI
@@ -103,7 +108,14 @@ impl MainUi {
         self.unit_actions.on_selected_units_changed(cx, game);
     }
 
-    pub fn handle_event(&mut self, _cx: &Context, game: &mut Game, event: &Event) -> Option<Action> {
+    pub fn handle_event(
+        &mut self,
+        _cx: &Context,
+        game: &mut Game,
+        event: &Event,
+    ) -> Option<Action> {
+        self.tile_tooltip.handle_event(game, event);
+
         // Check for double-clicked cities
         if let Event::MousePress {
             pos,

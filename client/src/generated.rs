@@ -835,6 +835,42 @@ impl ::duit::InstanceHandle for ResearchPromptOption {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct TileTooltipWindow {
+    pub root: WidgetHandle<Container>,
+    pub tooltip_text: WidgetHandle<Text>,
+}
+impl ::duit::InstanceHandle for TileTooltipWindow {
+    fn name() -> &'static str {
+        "TileTooltipWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut root = None;
+        let mut tooltip_text = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "root" => root = Some(widget),
+                "tooltip_text" => tooltip_text = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            root: WidgetHandle::new(root.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "root"
+                )
+            })),
+            tooltip_text: WidgetHandle::new(tooltip_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "tooltip_text"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct CityBuildPromptWindow {
     pub options_column: WidgetHandle<Flex>,
     pub question_text: WidgetHandle<Text>,

@@ -9,7 +9,7 @@ use crate::{
     ui::{AlignFixed, Z_FOREGROUND},
 };
 
-pub const SIZE: Vec2 = glam::const_vec2!([200., 150.]);
+pub const SIZE: Vec2 = glam::const_vec2!([300., 150.]);
 
 pub struct UnitInfo {
     window: UnitInfoWindow,

@@ -973,7 +973,7 @@ dependencies = [
 [[package]]
 name = "duit"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#630240f273d2933f9cfb32f52d148c834b58b202"
+source = "git+https://github.com/caelunshun/duit#2602f91bd50e0bdccf4710b6fd586f8d8c877fa5"
 dependencies = [
  "ahash 0.7.4",
  "duit-core 0.1.0 (git+https://github.com/caelunshun/duit)",
@@ -1000,7 +1000,7 @@ dependencies = [
 [[package]]
 name = "duit-core"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#630240f273d2933f9cfb32f52d148c834b58b202"
+source = "git+https://github.com/caelunshun/duit#2602f91bd50e0bdccf4710b6fd586f8d8c877fa5"
 dependencies = [
  "serde",
  "serde_yaml",
@@ -1010,7 +1010,7 @@ dependencies = [
 [[package]]
 name = "duit-platform"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#630240f273d2933f9cfb32f52d148c834b58b202"
+source = "git+https://github.com/caelunshun/duit#2602f91bd50e0bdccf4710b6fd586f8d8c877fa5"
 dependencies = [
  "duit 0.1.0 (git+https://github.com/caelunshun/duit)",
  "dume 0.1.0 (git+https://github.com/caelunshun/duit)",
@@ -1040,6 +1040,7 @@ dependencies = [
  "palette",
  "pollster",
  "rustybuzz",
+ "serde",
  "slotmap",
  "thiserror",
  "ttf-parser 0.12.3",
@@ -1050,7 +1051,7 @@ dependencies = [
 [[package]]
 name = "dume"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#630240f273d2933f9cfb32f52d148c834b58b202"
+source = "git+https://github.com/caelunshun/duit#2602f91bd50e0bdccf4710b6fd586f8d8c877fa5"
 dependencies = [
  "ahash 0.7.4",
  "anyhow",
@@ -1068,6 +1069,7 @@ dependencies = [
  "palette",
  "pollster",
  "rustybuzz",
+ "serde",
  "slotmap",
  "thiserror",
  "ttf-parser 0.12.3",
@@ -1186,23 +1188,23 @@ checksum = "3f9eec918d3f24069decb9af1554cad7c880e2da24a9afd88aca000531ab82c1"
 
 [[package]]
 name = "fontdb"
-version = "0.5.4"
+version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e58903f4f8d5b58c7d300908e4ebe5289c1bfdf5587964330f12023b8ff17fd1"
+checksum = "1d66551cc28351f0bc6a73da86459ee7765caaad03ce284f2dc36472dbf539cd"
 dependencies = [
  "log",
- "memmap2 0.2.3",
+ "memmap2 0.3.1",
  "ttf-parser 0.12.3",
 ]
 
 [[package]]
 name = "fontdue"
-version = "0.4.0"
+version = "0.5.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3203e88e086474e56b0785255804a0c23542f76253584d3f43152cd2bb95d0b7"
+checksum = "c75712fff1702bac51b7eaa5a5ca9f9853b8055ef5906088a32f4fe196595a1d"
 dependencies = [
- "hashbrown 0.8.2",
- "ttf-parser 0.8.3",
+ "hashbrown 0.9.1",
+ "ttf-parser 0.12.3",
 ]
 
 [[package]]
@@ -1497,16 +1499,6 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
-]
-
-[[package]]
-name = "hashbrown"
-version = "0.8.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e91b62f79061a0bc2e046024cb7ba44b08419ed238ecbd9adbd787434b9e8c25"
-dependencies = [
- "ahash 0.3.8",
- "autocfg",
 ]
 
 [[package]]
@@ -2149,9 +2141,9 @@ dependencies = [
 
 [[package]]
 name = "memmap2"
-version = "0.2.3"
+version = "0.3.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "723e3ebdcdc5c023db1df315364573789f8857c11b631a2fdfad7c00f5c046b4"
+checksum = "00b6c2ebff6180198788f5db08d7ce3bc1d0b617176678831a7510825973e357"
 dependencies = [
  "libc",
 ]
@@ -3624,9 +3616,9 @@ dependencies = [
 
 [[package]]
 name = "serde_yaml"
-version = "0.8.20"
+version = "0.8.21"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ad104641f3c958dab30eb3010e834c2622d1f3f4c530fef1dee20ad9485f3c09"
+checksum = "d8c608a35705a5d3cdc9fbe403147647ff34b921f8e833e49306df898f9b20af"
 dependencies = [
  "dtoa",
  "indexmap",
@@ -3636,9 +3628,9 @@ dependencies = [
 
 [[package]]
 name = "sha2"
-version = "0.9.7"
+version = "0.9.8"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "91e36fa7752016a6c4483706d634fd82c48860dd2df17a0cfaaebc714f23b2dd"
+checksum = "b69f9a4c9740d74c5baa3fd2e547f9525fa8088a8a958e0ca2409a514e33f5fa"
 dependencies = [
  "block-buffer",
  "cfg-if 1.0.0",
@@ -4270,12 +4262,6 @@ name = "ttf-parser"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "3e5d7cd7ab3e47dda6e56542f4bbf3824c15234958c6e1bd6aaa347e93499fdc"
-
-[[package]]
-name = "ttf-parser"
-version = "0.8.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7622061403fd00f0820df288e5a580e87d3ce15a1c4313c59fd1ffb77129903f"
 
 [[package]]
 name = "ttf-parser"

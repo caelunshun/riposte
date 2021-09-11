@@ -125,7 +125,7 @@ impl Unit {
         self.movement_left() > MOVEMENT_LEFT_EPSILON
     }
 
-    pub fn kind(&self) -> &UnitKind {
+    pub fn kind(&self) -> &Handle<UnitKind> {
         &self.kind
     }
 
