@@ -956,11 +956,11 @@ checksum = "56899898ce76aaf4a0f24d914c97ea6ed976d42fec6ad33fcbb0a1103e07b2b0"
 [[package]]
 name = "duit"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#a09651dd7badea9230d2fb694cbee82abacb9a80"
+source = "git+https://github.com/caelunshun/duit#36aea6a2a7f6c47b6f6f5845513f5dd2024279b5"
 dependencies = [
  "ahash 0.7.4",
  "duit-core",
- "dume 0.1.0 (git+https://github.com/caelunshun/duit)",
+ "dume",
  "glam",
  "indexmap",
  "palette",
@@ -974,7 +974,7 @@ dependencies = [
 [[package]]
 name = "duit-core"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#a09651dd7badea9230d2fb694cbee82abacb9a80"
+source = "git+https://github.com/caelunshun/duit#36aea6a2a7f6c47b6f6f5845513f5dd2024279b5"
 dependencies = [
  "serde",
  "serde_yaml",
@@ -984,43 +984,14 @@ dependencies = [
 [[package]]
 name = "duit-platform"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#a09651dd7badea9230d2fb694cbee82abacb9a80"
+source = "git+https://github.com/caelunshun/duit#36aea6a2a7f6c47b6f6f5845513f5dd2024279b5"
 dependencies = [
  "duit",
- "dume 0.1.0 (git+https://github.com/caelunshun/duit)",
+ "dume",
  "glam",
  "pollster",
  "wgpu",
  "winit",
-]
-
-[[package]]
-name = "dume"
-version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#a09651dd7badea9230d2fb694cbee82abacb9a80"
-dependencies = [
- "ahash 0.7.4",
- "anyhow",
- "bytemuck",
- "fontdb",
- "fontdue",
- "glam",
- "guillotiere",
- "image",
- "log",
- "logos",
- "lru",
- "lyon",
- "once_cell",
- "palette",
- "pollster",
- "rustybuzz",
- "serde",
- "slotmap",
- "thiserror",
- "ttf-parser 0.12.3",
- "unicode-bidi",
- "wgpu",
 ]
 
 [[package]]
@@ -3270,7 +3241,7 @@ dependencies = [
  "directories-next",
  "duit",
  "duit-core",
- "dume 0.1.0 (git+https://github.com/caelunshun/dume)",
+ "dume",
  "float-ord",
  "flume",
  "fs-err",
