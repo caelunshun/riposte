@@ -126,11 +126,13 @@ impl MainUi {
 
     pub fn handle_event(
         &mut self,
-        _cx: &Context,
+        cx: &Context,
         game: &mut Game,
+        client: &mut Client<GameState>,
         event: &Event,
     ) -> Option<Action> {
         self.tile_tooltip.handle_event(game, event);
+        self.unit_actions.handle_event(cx, game, client, event);
 
         // Check for double-clicked cities
         if let Event::MousePress {

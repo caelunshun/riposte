@@ -54,7 +54,7 @@ impl Page {
         match self {
             Page::Main(ui) => {
                 if let Some(main_ui::Action::OpenCityScreen(city)) =
-                    ui.handle_event(cx, game, event)
+                    ui.handle_event(cx, game, client, event)
                 {
                     *self = Page::City(CityScreen::new(cx, game, city));
                     game.current_city_screen = Some(city);

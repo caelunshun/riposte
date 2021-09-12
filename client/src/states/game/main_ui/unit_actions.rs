@@ -4,9 +4,10 @@
 //! Some actions are "recommended" by the algorithm. These
 //! will flash blue in the UI.
 
-use duit::{Rect, Vec2, WindowPositioner};
+use duit::{Event, Rect, Vec2, WindowPositioner};
 use glam::vec2;
 use protocol::UnitAction;
+use winit::event::VirtualKeyCode;
 
 use crate::{
     client::{Client, GameState},
@@ -42,6 +43,7 @@ enum Message {
     Kill(UnitId),
     FoundCity(UnitId),
     SetWorkerTask(UnitId, WorkerTaskKind),
+    Heal(UnitId),
 }
 
 struct PossibleUnitAction {
@@ -61,6 +63,17 @@ fn get_possible_unit_actions(game: &Game, unit: &Unit) -> Vec<PossibleUnitAction
         tooltip: None,
         is_recommended: false,
     });
+
+    // Units not on full health can be healed.
+    if unit.health() < 1. {
+        let is_recommended = unit.health() < 0.7;
+        actions.push(PossibleUnitAction {
+            text: "Heal".to_owned(),
+            message: Message::Heal(unit.id()),
+            tooltip: None,
+            is_recommended,
+        });
+    }
 
     // Settlers can found cities.
     if unit.has_capability(CapabilityType::FoundCity) {
@@ -128,7 +141,34 @@ impl UnitActionBar {
                     client.set_worker_task(game, unit, &task);
                     game.selected_units_mut().clear();
                 }
+                Message::Heal(unit) => {
+                    client.do_unit_action(game, unit, UnitAction::FortifyUntilHealed);
+                    game.selected_units_mut().clear();
+                }
             }
+        }
+    }
+
+    pub fn handle_event(
+        &mut self,
+        _cx: &Context,
+        game: &Game,
+        client: &mut Client<GameState>,
+        event: &Event,
+    ) {
+        if let Event::KeyPress { key, .. } = event {
+            let action = match key {
+                VirtualKeyCode::F => UnitAction::Fortify,
+                VirtualKeyCode::H => UnitAction::FortifyUntilHealed,
+                VirtualKeyCode::Space => UnitAction::SkipTurn,
+                _ => return,
+            };
+
+            for &unit in game.selected_units().get_all() {
+                client.do_unit_action(game, unit, action);
+            }
+
+            game.selected_units_mut().clear();
         }
     }
 

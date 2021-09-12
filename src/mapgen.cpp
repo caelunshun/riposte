@@ -115,7 +115,8 @@ namespace rip {
                 }
             }
 
-            game.addUnit(Unit(unitKind, unitPos, player));
+           auto id =  game.addUnit(Unit(unitKind, unitPos, player));
+            game.getUnit(id).setHealth(0.4);
 
             game.getPlayer(player).recomputeVisibility(game);
         }
