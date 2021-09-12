@@ -14,12 +14,14 @@ use self::{
     main_ui::MainUi,
     music::GameMusic,
     prompts::{city_build::CityBuildPrompt, research::ResearchPrompt, Prompts},
+    sounds::GameSounds,
 };
 
 mod city_screen;
 mod main_ui;
 mod music;
 mod prompts;
+mod sounds;
 
 enum Page {
     Main(MainUi),
@@ -83,6 +85,7 @@ pub struct GameState {
     page: Page,
     prompts: Prompts,
     music: GameMusic,
+    sounds: GameSounds,
 }
 
 impl GameState {
@@ -100,6 +103,7 @@ impl GameState {
             page,
             prompts: Prompts::default(),
             music: GameMusic::new(cx),
+            sounds: GameSounds::new(),
         }
     }
 
@@ -123,6 +127,8 @@ impl GameState {
     }
 
     fn handle_game_event(&mut self, cx: &Context, event: &GameEvent) {
+        self.sounds.handle_game_event(cx, &self.game, event);
+
         match event {
             GameEvent::CityUpdated { city } => {
                 self.handle_city_updated(cx, *city);

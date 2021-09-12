@@ -8,12 +8,13 @@ use glam::{uvec2, UVec2};
 use prost::Message;
 use protocol::{
     any_client, any_server, client_lobby_packet, server_lobby_packet, worker_task_kind, AnyClient,
-    AnyServer, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket,
-    ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeclarePeace, DeclareWar, DeleteSlot,
-    DoUnitAction, EndTurn, GameSaved, GameStarted, GetBuildTasks, GetPossibleTechs,
-    InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs,
-    RequestGameStart, SaveGame, ServerLobbyPacket, SetCityBuildTask, SetEconomySettings,
-    SetResearch, SetSaveFile, SetWorkerTask, WorkerTask, WorkerTaskImprovement,
+    AnyServer, BordersExpanded, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader,
+    ClientLobbyPacket, ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeclarePeace,
+    DeclareWar, DeleteSlot, DoUnitAction, EndTurn, GameSaved, GameStarted, GetBuildTasks,
+    GetPossibleTechs, InitialGameData, Kicked, LobbyInfo, MoveUnits, PeaceDeclared, Pos,
+    PossibleCityBuildTasks, PossibleTechs, RequestGameStart, SaveGame, ServerLobbyPacket,
+    SetCityBuildTask, SetEconomySettings, SetResearch, SetSaveFile, SetWorkerTask, WarDeclared,
+    WorkerTask, WorkerTaskImprovement,
 };
 
 use crate::{
@@ -21,6 +22,7 @@ use crate::{
     game::{
         city::{self, PreviousBuildTask},
         combat::CombatEvent,
+        event::GameEvent,
         unit::WorkerTaskKind,
         CityId, Game, PlayerId, UnitId,
     },
@@ -373,6 +375,15 @@ impl Client<GameState> {
                 any_server::Packet::GameSaved(packet) => {
                     self.handle_game_saved(cx, game, packet, request_id)
                 }
+                any_server::Packet::WarDeclared(packet) => {
+                    self.handle_war_declared(game, packet)?
+                }
+                any_server::Packet::PeaceDeclared(packet) => {
+                    self.handle_peace_declared(game, packet)?
+                }
+                any_server::Packet::BordersExpanded(packet) => {
+                    self.handle_borders_expanded(game, packet)?
+                }
                 p => log::warn!("unhandled packet: {:?}", p),
             }
 
@@ -440,13 +451,42 @@ impl Client<GameState> {
     }
 
     fn handle_game_saved(&mut self, cx: &Context, game: &Game, packet: GameSaved, request_id: u32) {
-        log::info!(
-            "Received game save - {:.1} MiB",
-            packet.game_save_data.len() as f64 / 1024. / 1024.
-        );
-        cx.saves_mut()
-            .add_save(cx, &packet.game_save_data, game.turn());
-        self.handle_server_response(request_id, packet);
+        if self.server_response_senders.contains_key(&request_id) {
+            log::info!(
+                "Received game save - {:.1} MiB",
+                packet.game_save_data.len() as f64 / 1024. / 1024.
+            );
+            cx.saves_mut()
+                .add_save(cx, &packet.game_save_data, game.turn());
+            self.handle_server_response(request_id, packet);
+        }
+    }
+
+    fn handle_war_declared(&mut self, game: &Game, packet: WarDeclared) -> anyhow::Result<()> {
+        game.push_event(GameEvent::WarDeclared {
+            declarer: game.resolve_player_id(packet.declarer_id as u32)?,
+            declared: game.resolve_player_id(packet.declared_id as u32)?,
+        });
+        Ok(())
+    }
+
+    fn handle_peace_declared(&mut self, game: &Game, packet: PeaceDeclared) -> anyhow::Result<()> {
+        game.push_event(GameEvent::PeaceDeclared {
+            declarer: game.resolve_player_id(packet.declarer_id as u32)?,
+            declared: game.resolve_player_id(packet.declared_id as u32)?,
+        });
+        Ok(())
+    }
+
+    fn handle_borders_expanded(
+        &mut self,
+        game: &Game,
+        packet: BordersExpanded,
+    ) -> anyhow::Result<()> {
+        game.push_event(GameEvent::BordersExpanded {
+            city: game.resolve_city_id(packet.city_id)?,
+        });
+        Ok(())
     }
 
     fn register_response_future<T: 'static>(&mut self, request_id: u32) -> ServerResponseFuture<T> {

@@ -1,9 +1,11 @@
 use duit::Event;
 use winit::event::{MouseButton, VirtualKeyCode};
 
+use crate::audio::{SoundCategory, SoundHandle};
 use crate::client::{Client, GameState};
 use crate::game::event::GameEvent;
 use crate::game::{CityId, Game};
+use crate::volumes;
 use crate::{context::Context, state::StateAttachment};
 
 use self::{
@@ -32,6 +34,8 @@ pub struct CityScreen {
     economy: EconomyScreen,
     info_bar: InfoBarScreen,
     resources: ResourcesScreen,
+
+    ambient_sound: SoundHandle,
 }
 
 impl CityScreen {
@@ -49,6 +53,12 @@ impl CityScreen {
         let info_bar = InfoBarScreen::new(cx, &attachment);
         let resources = ResourcesScreen::new(cx, &attachment);
 
+        let ambient_sound = cx.audio().play_looping(
+            "sound/ambient/city1",
+            SoundCategory::Effects,
+            volumes::CITY_SCREEN,
+        );
+
         let mut screen = Self {
             attachment,
             city: city.id(),
@@ -57,6 +67,7 @@ impl CityScreen {
             economy,
             info_bar,
             resources,
+            ambient_sound,
         };
         screen.update_info(cx, game);
         screen

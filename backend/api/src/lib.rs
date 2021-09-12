@@ -3,10 +3,10 @@ tonic::include_proto!("rip.backend");
 pub const PORT: u16 = 19836;
 pub const QUIC_PORT: u16 = 19837;
 
-pub const BACKEND_URL: &str = "http://127.0.0.1:80";
+pub const BACKEND_URL: &str = "http://35.217.91.71:80";
 
 pub fn quic_addr() -> SocketAddr {
-    format!("127.0.0.1:{}", QUIC_PORT).parse().unwrap()
+    format!("35.217.91.71:{}", QUIC_PORT).parse().unwrap()
 }
 
 pub type SessionId = [u8; 16];

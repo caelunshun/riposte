@@ -562,6 +562,12 @@ impl Game {
             .on_units_moved(self, units, old_pos, new_pos);
         for &unit in units {
             self.unit_mut(unit).on_moved(cx, old_pos, new_pos);
+
+            self.push_event(GameEvent::UnitMoved {
+                unit,
+                old_pos,
+                new_pos,
+            });
         }
     }
 
