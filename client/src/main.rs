@@ -7,8 +7,12 @@ use client::Client;
 use context::Context;
 use duit::Event;
 use game::Game;
+use mimalloc::MiMalloc;
 use server_bridge::ServerBridge;
 use simple_logger::SimpleLogger;
+
+#[global_allocator]
+static ALLOCATOR: MiMalloc = MiMalloc;
 
 macro_rules! vars {
     ($(

@@ -3,13 +3,10 @@ use duit::{
     widgets::{Button, Text},
     WidgetHandle,
 };
-use riposte_backend_api::{GameList, Uuid};
 
 use crate::{
-    backend::BackendResponse,
-    context::{Context, FutureHandle},
-    generated::{SavesWindow, ServerListWindow},
-    server_bridge::ServerBridge,
+    context::{Context},
+    generated::{SavesWindow},
     state::StateAttachment,
     ui::{FillScreen, Z_FOREGROUND},
 };

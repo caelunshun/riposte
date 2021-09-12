@@ -71,8 +71,8 @@ int main(int argc, char **argv) {
     } else {
         // TEMP
         rip::mapgen::MapgenSettings settings;
-        settings.set_mapwidth(20);
-        settings.set_mapheight(10);
+        settings.set_mapwidth(48);
+        settings.set_mapheight(32);
         settings.mutable_continents()->set_numcontinents(rip::mapgen::NumContinents::One);
 
         rip::MapGenerator mapgen;
