@@ -33,6 +33,7 @@ namespace rip {
         void handleDeleteSlot(const proto::DeleteSlot &packet);
         void handleRequestGameStart(const proto::RequestGameStart &packet);
         void handleChangeCivAndLeader(const proto::ChangeCivAndLeader &packet);
+        void handleSetSaveFile(const proto::SetSaveFile &packet);
 
         void sendMessage(const proto::ServerLobbyPacket &packet);
         void handleMessage(const proto::ClientLobbyPacket &packet);
@@ -67,16 +68,19 @@ namespace rip {
     class LobbyServer {
         std::shared_ptr<NetworkingContext> networkCtx;
         slot_map<std::shared_ptr<LobbyConnection>> connections;
-        std::vector<proto::LobbySlot> slots;
         uint32_t nextSlotID = 0;
-        bool isStatic = false;
         Rng rng;
         std::shared_ptr<Registry> registry;
         HubServerConnection hubConn;
 
     public:
+        std::vector<proto::LobbySlot> slots;
+
         bool shouldStartGame = false;
         bool shouldExit = false;
+            bool isStatic = false;
+
+        std::optional<proto::GameSave> gameSave;
 
         LobbyServer(std::shared_ptr<NetworkingContext> networkCtx, std::shared_ptr<Registry> registry, std::string authToken);
 
@@ -87,11 +91,13 @@ namespace rip {
         // Will attempt to find a slot for the new player.
         // If there is no available slot, the connection is dropped.
         LobbyConnectionID addConnection(ConnectionHandle handle, proto::UUID userID, bool isAdmin);
+        uint32_t getSlotForPlayer(const proto::UUID &userID);
         // Removes a connection and its associated slot.
         void removeConnection(LobbyConnectionID id);
 
         // Adds a new slot.
         uint32_t addSlot(proto::LobbySlot slot);
+        void removeSlotWithoutBroadcast(uint32_t id);
         // Removes the slot with the given ID, if it exists.
         void removeSlot(uint32_t id);
         // May return null if the ID is invalid.

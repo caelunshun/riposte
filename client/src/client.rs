@@ -6,15 +6,7 @@ use bytes::BytesMut;
 use flume::Receiver;
 use glam::{uvec2, UVec2};
 use prost::Message;
-use protocol::{
-    any_client, any_server, client_lobby_packet, server_lobby_packet, worker_task_kind, AnyClient,
-    AnyServer, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket,
-    ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeclarePeace, DeclareWar, DeleteSlot,
-    DoUnitAction, EndTurn, GameStarted, GetBuildTasks, GetPossibleTechs, InitialGameData, Kicked,
-    LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs, RequestGameStart,
-    ServerLobbyPacket, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask,
-    WorkerTask, WorkerTaskImprovement,
-};
+use protocol::{AnyClient, AnyServer, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket, ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeclarePeace, DeclareWar, DeleteSlot, DoUnitAction, EndTurn, GameSaved, GameStarted, GetBuildTasks, GetPossibleTechs, InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs, RequestGameStart, SaveGame, ServerLobbyPacket, SetCityBuildTask, SetEconomySettings, SetResearch, SetSaveFile, SetWorkerTask, WorkerTask, WorkerTaskImprovement, any_client, any_server, client_lobby_packet, server_lobby_packet, worker_task_kind};
 
 use crate::{
     context::Context,
@@ -113,6 +105,12 @@ impl Client<LobbyState> {
         self.send_message(client_lobby_packet::Packet::RequestGameStart(
             RequestGameStart {},
         ));
+    }
+
+    pub fn set_save_file(&mut self, file: Vec<u8>) {
+        self.send_message(client_lobby_packet::Packet::SetSaveFile(SetSaveFile {
+            save_file_data: file,
+        }));
     }
 
     pub fn to_game_state(&self) -> Client<GameState> {
@@ -316,6 +314,11 @@ impl Client<GameState> {
         }));
     }
 
+    pub fn save_game(&mut self) -> ServerResponseFuture<GameSaved> {
+        let request_id = self.send_message(any_client::Packet::SaveGame(SaveGame {}));
+        self.register_response_future(request_id)
+    }
+
     pub fn end_turn(&mut self, game: &mut Game) {
         self.send_message(any_client::Packet::EndTurn(EndTurn {}));
         game.waiting_on_turn_end = true;
@@ -359,6 +362,7 @@ impl Client<GameState> {
                 any_server::Packet::CombatEvent(packet) => {
                     self.handle_combat_event(cx, game, packet)?
                 }
+                any_server::Packet::GameSaved(packet) => self.handle_game_saved(cx, game, packet, request_id),
                 p => log::warn!("unhandled packet: {:?}", p),
             }
 
@@ -423,6 +427,15 @@ impl Client<GameState> {
     ) -> anyhow::Result<()> {
         game.set_current_combat_event(cx, CombatEvent::from_data(packet, game)?);
         Ok(())
+    }
+
+    fn handle_game_saved(&mut self, cx: &Context, game: &Game, packet: GameSaved, request_id: u32) {
+        log::info!(
+            "Received game save - {:.1} MiB",
+            packet.game_save_data.len() as f64 / 1024. / 1024.
+        );
+        cx.saves_mut().add_save(cx, &packet.game_save_data, game.turn());
+        self.handle_server_response(request_id, packet);
     }
 
     fn register_response_future<T: 'static>(&mut self, request_id: u32) -> ServerResponseFuture<T> {

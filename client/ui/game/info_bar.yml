@@ -11,4 +11,8 @@ child:
         children:
           - Text:
               id: turn_text
+          - Button:
+              id: save_game_button
+              child:
+                Text: Save
           

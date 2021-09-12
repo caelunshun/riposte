@@ -792,6 +792,7 @@ use duit::widgets::*;
 use duit::*;
 pub struct InfoBarWindow {
     pub turn_text: WidgetHandle<Text>,
+    pub save_game_button: WidgetHandle<Button>,
 }
 impl ::duit::InstanceHandle for InfoBarWindow {
     fn name() -> &'static str {
@@ -799,9 +800,11 @@ impl ::duit::InstanceHandle for InfoBarWindow {
     }
     fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
         let mut turn_text = None;
+        let mut save_game_button = None;
         for (name, widget) in widget_handles {
             match name.as_str() {
                 "turn_text" => turn_text = Some(widget),
+                "save_game_button" => save_game_button = Some(widget),
                 _ => {}
             }
         }
@@ -810,6 +813,12 @@ impl ::duit::InstanceHandle for InfoBarWindow {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "turn_text"
+                )
+            })),
+            save_game_button: WidgetHandle::new(save_game_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "save_game_button"
                 )
             })),
         }
@@ -1251,6 +1260,42 @@ impl ::duit::InstanceHandle for MainMenu {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "entries"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
+pub struct SavesWindow {
+    pub saves_table: WidgetHandle<Table>,
+    pub back_button: WidgetHandle<Button>,
+}
+impl ::duit::InstanceHandle for SavesWindow {
+    fn name() -> &'static str {
+        "SavesWindow"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut saves_table = None;
+        let mut back_button = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "saves_table" => saves_table = Some(widget),
+                "back_button" => back_button = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            saves_table: WidgetHandle::new(saves_table.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "saves_table"
+                )
+            })),
+            back_button: WidgetHandle::new(back_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "back_button"
                 )
             })),
         }

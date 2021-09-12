@@ -1,6 +1,7 @@
 use duit::{Align, Vec2};
 
 use crate::{
+    client::{Client, GameState},
     context::Context,
     game::{event::GameEvent, Game},
     generated::InfoBarWindow,
@@ -9,6 +10,8 @@ use crate::{
 };
 
 pub const SIZE: Vec2 = glam::const_vec2!([400., 60.]);
+
+struct SaveGame;
 
 pub struct InfoBar {
     window: InfoBarWindow,
@@ -21,7 +24,15 @@ impl InfoBar {
             Z_FOREGROUND,
         );
 
+        window.save_game_button.get_mut().on_click(|| SaveGame);
+
         Self { window }
+    }
+
+    pub fn update(&mut self, cx: &Context, client: &mut Client<GameState>) {
+        if cx.ui_mut().pop_message::<SaveGame>().is_some() {
+            client.save_game();
+        }
     }
 
     pub fn handle_game_event(&mut self, cx: &Context, game: &Game, event: &GameEvent) {

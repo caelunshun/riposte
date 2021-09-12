@@ -21,6 +21,8 @@ flume = "0.10"
 fs-err = "2"
 futures = "0.3"
 glam = "0.17"
+humantime = "2"
+humantime-serde = "1"
 indexmap = "1"
 indoc = "1"
 lexical = "6"
@@ -45,7 +47,7 @@ smallvec = "1"
 splines = { version = "4", features = [ "glam" ] }
 thiserror = "1"
 tokio = { version = "1", features = [ "full" ] }
-uuid = { version = "0.8", features = [ "serde" ] }
+uuid = { version = "0.8", features = [ "serde", "v4" ] }
 walkdir = "2"
 webpki = "0.21"
 wgpu = "0.10"

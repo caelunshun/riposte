@@ -67,6 +67,7 @@ message ClientLobbyPacket {
     DeleteSlot deleteSlot = 2;
     RequestGameStart requestGameStart = 3;
     ChangeCivAndLeader changeCivAndLeader = 4;
+    SetSaveFile setSaveFile = 5;
   }
 }
 
@@ -107,6 +108,16 @@ message RequestGameStart {}
 message ChangeCivAndLeader {
   string civID = 1;
   string leaderName = 2;
+}
+
+// Sets the save file to load the game from.
+//
+// This also resets the lobby slots so they match
+// the save file.
+//
+// Admin only
+message SetSaveFile {
+  bytes saveFileData = 1;
 }
 
 // A packet sent by the server during the lobby phase.
@@ -612,7 +623,9 @@ message PeaceDeclared {
   int32 declaredID = 2;
 }
 
-message GameSaved {}
+message GameSaved {
+  bytes gameSaveData = 1;
+}
 
 message BordersExpanded {
   uint32 cityID = 1;
@@ -728,6 +741,8 @@ message GameSave {
   repeated UpdatePlayer players = 5;
   repeated UpdateCity cities = 6;
   repeated UpdateUnit units = 7;
+  repeated LobbySlot lobbySlots = 8;
+  map<uint32, uint32> slotIDToPlayerID = 9;
 }
 
 // Culture values for a tile or city.

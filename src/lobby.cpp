@@ -3,6 +3,7 @@
 //
 
 #include "lobby.h"
+#include "saveload.h"
 
 #define SEND(packet, name) { \
     rip::proto::ServerLobbyPacket p; \
@@ -31,6 +32,7 @@ namespace rip {
 
     void LobbyConnection::handleCreateSlot(const proto::CreateSlot &packet) {
         if (!isAdmin) return;
+        if (server->isStatic) return;
 
         proto::LobbySlot slot;
         slot.set_isai(packet.isai());
@@ -40,6 +42,7 @@ namespace rip {
 
     void LobbyConnection::handleDeleteSlot(const proto::DeleteSlot &packet) {
         if (!isAdmin) return;
+        if (server->isStatic) return;
 
         server->removeSlot(packet.slotid());
     }
@@ -51,12 +54,31 @@ namespace rip {
     }
 
     void LobbyConnection::handleChangeCivAndLeader(const proto::ChangeCivAndLeader &packet) {
+        if (server->isStatic) return;
         auto *slot = server->getSlot(slotID);
         if (slot) {
             slot->set_civid(packet.civid());
             slot->set_leadername(packet.leadername());
             server->broadcastLobbyInfo();
         }
+    }
+
+    void LobbyConnection::handleSetSaveFile(const proto::SetSaveFile &packet) {
+        auto gameSave = loadGameSaveFromBytes(packet.savefiledata());
+
+        server->slots.clear();
+        for (auto &slot : *gameSave.mutable_lobbyslots()) {
+            slot.set_occupied(false);
+            server->slots.emplace_back(slot);
+        }
+        server->isStatic = true;
+
+        slotID = server->getSlotForPlayer(userID);
+        server->getSlot(slotID)->set_occupied(true);
+
+        server->gameSave = std::move(gameSave);
+
+        server->broadcastLobbyInfo();
     }
 
     void LobbyConnection::handleMessage(const proto::ClientLobbyPacket &packet) {
@@ -68,6 +90,8 @@ namespace rip {
             handleRequestGameStart(packet.requestgamestart());
         } else if (packet.has_changecivandleader()) {
             handleChangeCivAndLeader(packet.changecivandleader());
+        } else if (packet.has_setsavefile()) {
+            handleSetSaveFile(packet.setsavefile());
         }
     }
 
@@ -143,6 +167,22 @@ namespace rip {
     }
 
     LobbyConnectionID LobbyServer::addConnection(ConnectionHandle handle, proto::UUID userID, bool isAdmin) {
+        const auto slotID = getSlotForPlayer(userID);
+
+        getSlot(slotID)->set_occupied(true);
+        getSlot(slotID)->mutable_owneruuid()->CopyFrom(userID);
+        getSlot(slotID)->set_isadmin(isAdmin);
+
+        const auto id = connections.insert(std::make_shared<LobbyConnection>(std::move(handle), std::move(userID), isAdmin, this));
+        connections[id]->setID(id);
+        connections[id]->setSlotID(slotID);
+
+        broadcastLobbyInfo();
+
+        return id;
+    }
+
+    uint32_t LobbyServer::getSlotForPlayer(const proto::UUID &userID) {
         // Attempt to find a suitable slot.
         std::optional<uint32_t> slotID = {};
         // First pass: check for a slot with the same UUID
@@ -166,22 +206,14 @@ namespace rip {
             }
         }
 
-        if (!slotID.has_value()) {
-            std::cerr << "no available slots" << std::endl;
-            return {};
+        if (slotID.has_value()) {
+            return *slotID;
+        } else {
+            // Create a new slot.
+            proto::LobbySlot newSlot;
+            newSlot.set_isai(false);
+            return addSlot(std::move(newSlot));
         }
-
-        getSlot(*slotID)->set_occupied(true);
-        getSlot(*slotID)->mutable_owneruuid()->CopyFrom(userID);
-        getSlot(*slotID)->set_isadmin(isAdmin);
-
-        const auto id = connections.insert(std::make_shared<LobbyConnection>(std::move(handle), std::move(userID), isAdmin, this));
-        connections[id]->setID(id);
-        connections[id]->setSlotID(*slotID);
-
-        broadcastLobbyInfo();
-
-        return id;
     }
 
     void LobbyServer::removeConnection(LobbyConnectionID id) {
@@ -228,10 +260,14 @@ namespace rip {
     }
 
     void LobbyServer::removeSlot(uint32_t id) {
+        removeSlotWithoutBroadcast(id);
+        broadcastLobbyInfo();
+    }
+
+    void LobbyServer::removeSlotWithoutBroadcast(uint32_t id) {
         for (int i = 0; i < slots.size(); i++) {
             if (slots[i].id() == id) {
                 slots.erase(slots.begin() + i);
-                broadcastLobbyInfo();
                 return;
             }
         }
@@ -275,6 +311,7 @@ namespace rip {
         for (auto &conn : connections) {
             if (conn->getSlotID() == id) return conn->handle;
         }
+        std::cerr << 310 << std::endl;
         throw std::string("missing connection for slot ID");
     }
 }

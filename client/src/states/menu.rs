@@ -9,13 +9,14 @@ use crate::{
 };
 
 use self::{
-    login::LoginState, main_menu::MainMenuState, options::OptionsState,
+    login::LoginState, main_menu::MainMenuState, options::OptionsState, saves_list::SavesListState,
     server_list::ServerListState,
 };
 
 mod login;
 mod main_menu;
 pub mod options;
+mod saves_list;
 mod server_list;
 
 enum State {
@@ -23,6 +24,7 @@ enum State {
     Login(LoginState),
     Options(OptionsState),
     ServerList(ServerListState),
+    SavesList(SavesListState),
 }
 
 pub struct MenuState {
@@ -68,10 +70,13 @@ impl MenuState {
                         self.state = State::Login(LoginState::new(cx));
                     }
                     main_menu::Action::EnterSingleplayerLobby => {
-                        action = Some(crate::Action::EnterSingleplayerLobby)
+                        action = Some(crate::Action::EnterSingleplayerLobby(None))
                     }
                     main_menu::Action::EnterServerList => {
                         self.state = State::ServerList(ServerListState::new(cx))
+                    }
+                    main_menu::Action::EnterSavesList => {
+                        self.state = State::SavesList(SavesListState::new(cx));
                     }
                 },
                 None => {}
@@ -95,7 +100,16 @@ impl MenuState {
                     self.state = State::MainMenu(MainMenuState::new(cx));
                 }
                 Some(server_list::Action::JoinGame(bridge)) => {
-                action = Some(crate::Action::EnterLobby(bridge));
+                    action = Some(crate::Action::EnterLobby(bridge));
+                }
+                _ => {}
+            },
+            State::SavesList(s) => match s.update(cx) {
+                Some(saves_list::Action::Close) => {
+                    self.state = State::MainMenu(MainMenuState::new(cx));
+                }
+                Some(saves_list::Action::LoadGame(save)) => {
+                    action = Some(crate::Action::EnterSingleplayerLobby(Some(save)));
                 }
                 _ => {}
             },

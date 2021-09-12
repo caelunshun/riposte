@@ -7,6 +7,7 @@
 
 #include <riposte.pb.h>
 #include <absl/container/flat_hash_set.h>
+#include <absl/container/flat_hash_map.h>
 #include <readerwriterqueue/readerwriterqueue.h>
 
 #include "game.h"
@@ -103,6 +104,9 @@ namespace rip {
         std::shared_ptr<Registry> registry;
         std::shared_ptr<TechTree> techTree;
 
+        std::vector<proto::LobbySlot> lobbySlots;
+        absl::flat_hash_map<uint32_t, PlayerId> slotIDToPlayerID;
+
         Server(std::shared_ptr<NetworkingContext> networkCtx, std::string gameName, std::string gameCategory);
 
         void startGame();
@@ -136,7 +140,7 @@ namespace rip {
 
         void run(std::shared_ptr<ReaderWriterQueue<ConnectionHandle>> newConnections);
 
-        void saveGame();
+        void saveGame(uint32_t requestID);
     };
 }
 

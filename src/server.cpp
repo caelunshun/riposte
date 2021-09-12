@@ -267,7 +267,7 @@ namespace rip {
 
     void Connection::handleSaveGame() {
         if (isAdmin) {
-            server->saveGame();
+            server->saveGame(currentRequestID);
         }
     }
 
@@ -488,21 +488,14 @@ namespace rip {
         }
     }
 
-    void Server::saveGame() {
+    void Server::saveGame(uint32_t requestID) {
         if (!game) return;
 
-        const auto path = getSavePath(gameCategory, gameName, game->getTurn());
-        std::ofstream f(path);
-
-        const auto data = serializeGameToSave(*game, gameName);
-        f << data;
-
-        f.close();
+        const auto data = serializeGameToSave(*game, lobbySlots, slotIDToPlayerID, gameName);
 
         GameSaved packet;
-        BROADCAST(packet, gamesaved, 0);
-
-        std::cerr << "Saved game to " << path << std::endl;
+        packet.set_gamesavedata(data);
+        BROADCAST(packet, gamesaved, requestID);
     }
 
     void Server::broadcastBordersExpanded(CityId cityID) {

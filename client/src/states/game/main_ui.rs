@@ -89,6 +89,7 @@ impl MainUi {
         self.economy_screen.update(cx, game, client);
         self.turn_indicator.update(game);
         self.unit_selection_bar.update(cx, game);
+        self.info_bar.update(cx, client);
         self.player_scores.update(cx, game, client);
 
         if self.selected_units_version.is_outdated() {

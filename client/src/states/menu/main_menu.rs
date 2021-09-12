@@ -11,6 +11,7 @@ pub enum Action {
     LogOut,
     EnterSingleplayerLobby,
     EnterServerList,
+    EnterSavesList,
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -28,6 +29,7 @@ enum Message {
     BackClicked,
     LogOutClicked,
 
+    LoadGameClicked,
     NewGameClicked,
 }
 
@@ -80,6 +82,8 @@ impl MainMenuState {
                 Message::LogOutClicked => action = Some(Action::LogOut),
                 Message::NewGameClicked => action = Some(Action::EnterSingleplayerLobby),
                 Message::MultiplayerClicked => action = Some(Action::EnterServerList),
+                Message::LoadGameClicked => action = Some(Action::EnterSavesList),
+                
             }
         });
 
@@ -101,7 +105,7 @@ impl MainMenuState {
             }
             Page::Singleplayer => {
                 self.add_entry(cx, "NEW GAME", Some(Message::NewGameClicked))
-                    .add_entry(cx, "LOAD GAME", None)
+                    .add_entry(cx, "LOAD GAME", Some(Message::LoadGameClicked))
                     .add_entry(cx, "BACK", Some(Message::BackClicked));
             }
         }

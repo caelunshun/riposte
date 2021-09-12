@@ -19,23 +19,13 @@ use tokio::runtime::{self, Runtime};
 use walkdir::WalkDir;
 use winit::{dpi::PhysicalSize, event::WindowEvent, event_loop::EventLoop, window::Window};
 
-use crate::{
-    assets::{
+use crate::{assets::{
         loaders::{FontLoader, ImageLoader, JsonLoader, SoundLoader},
         Assets,
-    },
-    audio::Audio,
-    backend::BackendService,
-    options::Options,
-    paths::FilePaths,
-    popups::PopupWindows,
-    registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
-    state::StateManager,
-    ui::{
+    }, audio::Audio, backend::BackendService, options::Options, paths::FilePaths, popups::PopupWindows, registry::{Building, Civilization, Registry, Resource, Tech, UnitKind}, saveload::SaveFiles, state::StateManager, ui::{
         flashing_button::FlashingButton, turn_indicator::TurnIndicatorCircle,
         unit_indicator::UnitIndicator,
-    },
-};
+    }};
 
 mod init;
 
@@ -88,6 +78,8 @@ pub struct Context {
 
     /// Position of the mouse cursor in logical pixxels
     cursor_pos: Vec2,
+
+    saves: RefCell<SaveFiles>,
 }
 
 impl Context {
@@ -131,6 +123,8 @@ impl Context {
 
         let backend = runtime.block_on(async move { BackendService::new(rt_handle).await })?;
 
+        let saves = RefCell::new(SaveFiles::new(&paths));
+
         Ok((
             Self {
                 canvas,
@@ -154,6 +148,7 @@ impl Context {
                 time: 0.,
                 dt: 0.,
                 cursor_pos: Vec2::ZERO,
+                saves,
             },
             event_loop,
         ))
@@ -265,6 +260,14 @@ impl Context {
 
     pub fn cursor_pos(&self) -> Vec2 {
         self.cursor_pos
+    }
+
+    pub fn saves(&self) -> Ref<SaveFiles> {
+        self.saves.borrow()
+    }
+
+    pub fn saves_mut(&self) -> RefMut<SaveFiles> {
+        self.saves.borrow_mut()
     }
 
     /// Asynchronously saves the Options to disk.

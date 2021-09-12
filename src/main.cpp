@@ -2,6 +2,7 @@
 #include "assets.h"
 #include "registry.h"
 #include "mapgen.h"
+#include "saveload.h"
 #include "server.h"
 
 using rip::proto::LobbySlot;
@@ -48,26 +49,46 @@ int main(int argc, char **argv) {
         return 0;
     }
 
-    // TEMP
-    rip::mapgen::MapgenSettings settings;
-    settings.set_mapwidth(20);
-    settings.set_mapheight(10);
-    settings.mutable_continents()->set_numcontinents(rip::mapgen::NumContinents::One);
-
     rip::Server server(networkCtx, "Test Game", "singleplayer");
+    server.lobbySlots = lobbyServer->slots;
 
-    // Start the game.
-    rip::MapGenerator mapgen;
-    auto mapgenResult = mapgen.generate(lobbyServer->getSlots(), settings, registry, techTree, &server);
-    auto playerIDMapping = mapgenResult.second;
+    if (lobbyServer->gameSave.has_value()) {
+        auto saveData = rip::loadGameFromSave(&server, *lobbyServer->gameSave, registry, techTree);
+        server.game = std::make_unique<rip::Game>(std::move(saveData.game));
 
-    server.game = std::make_unique<rip::Game>(std::move(mapgenResult.first));
+        for (const auto &slot : lobbyServer->slots) {
+            std::cerr << slot.id() << std::endl;
+        }
 
-    for (const auto &lobbySlot : lobbyServer->getSlots()) {
-        if (!lobbySlot.isai() && playerIDMapping.find(lobbySlot.id()) != playerIDMapping.end()) {
-            rip::PlayerId player = playerIDMapping[lobbySlot.id()];
-            rip::ConnectionHandle handle = std::move(lobbyServer->getConnectionForSlot(lobbySlot.id()));
-            server.addConnection(std::move(handle), player, lobbySlot.isadmin());
+        for (const auto & [slotID, playerID] : saveData.slotIDToPlayerID) {
+            std::cerr << slotID << ", " << playerID.encode() << std::endl;
+            try {
+                rip::ConnectionHandle handle = std::move(lobbyServer->getConnectionForSlot(slotID));
+                server.addConnection(std::move(handle), playerID, lobbyServer->getSlot(slotID)->isadmin());
+            } catch (std::string &x) {}
+        }
+        server.slotIDToPlayerID = saveData.slotIDToPlayerID;
+    } else {
+        // TEMP
+        rip::mapgen::MapgenSettings settings;
+        settings.set_mapwidth(20);
+        settings.set_mapheight(10);
+        settings.mutable_continents()->set_numcontinents(rip::mapgen::NumContinents::One);
+
+        rip::MapGenerator mapgen;
+        auto mapgenResult = mapgen.generate(lobbyServer->getSlots(), settings, registry, techTree, &server);
+        auto playerIDMapping = mapgenResult.second;
+
+        server.game = std::make_unique<rip::Game>(std::move(mapgenResult.first));
+
+        for (const auto &lobbySlot : lobbyServer->getSlots()) {
+            if (!lobbySlot.isai() && playerIDMapping.find(lobbySlot.id()) != playerIDMapping.end()) {
+                rip::PlayerId player = playerIDMapping[lobbySlot.id()];
+                rip::ConnectionHandle handle = std::move(lobbyServer->getConnectionForSlot(lobbySlot.id()));
+                server.addConnection(std::move(handle), player, lobbySlot.isadmin());
+
+                server.slotIDToPlayerID[lobbySlot.id()] = player;
+            }
         }
     }
 

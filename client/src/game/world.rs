@@ -138,22 +138,15 @@ impl Game {
         cx: &Context,
         data: InitialGameData,
     ) -> anyhow::Result<Self> {
+
         let mut game = Self::new(registry);
 
         let proto_map = data.map.context("missing tile map")?;
-        let tiles = proto_map
-            .tiles
-            .into_iter()
-            .map(|tile_data| Tile::from_data(tile_data, &game))
-            .collect::<Result<Vec<_>, anyhow::Error>>()?;
         let visibility: Vec<Visibility> = data
             .visibility
             .context("missing visibility grid")?
             .visibility()
             .collect();
-
-        let map = Map::new(proto_map.width, proto_map.height, tiles, visibility)?;
-        game.map = map;
 
         let stacks = StackGrid::new(proto_map.width, proto_map.height);
         game.stacks = stacks;
@@ -161,6 +154,14 @@ impl Game {
         for player in data.players {
             game.add_or_update_player(player)?;
         }
+
+        let tiles = proto_map
+        .tiles
+        .into_iter()
+        .map(|tile_data| Tile::from_data(tile_data, &game))
+        .collect::<Result<Vec<_>, anyhow::Error>>()?;
+        let map = Map::new(proto_map.width, proto_map.height, tiles, visibility)?;
+        game.map = map;
 
         game.update_global_data(data.global_data.as_ref().context("missing global data")?)?;
 
@@ -214,12 +215,12 @@ impl Game {
 
     /// Gets a player ID from its network ID.
     pub fn resolve_player_id(&self, network_id: u32) -> Result<PlayerId, InvalidNetworkId> {
-        self.player_ids
+       Ok( self.player_ids
             .get(network_id)
             .ok_or_else(|| InvalidNetworkId {
                 typ: "player",
                 id: network_id,
-            })
+            }).unwrap())
     }
 
     /// Gets a city ID from its network ID.

@@ -54,14 +54,18 @@ pub struct GameLobbyState {
 }
 
 impl GameLobbyState {
-    pub fn new_singleplayer(cx: &Context) -> anyhow::Result<Self> {
+    pub fn new_singleplayer(cx: &Context, save: Option<Vec<u8>>) -> anyhow::Result<Self> {
         let _rt_guard = cx.runtime().enter();
         let bridge = ServerBridge::create_singleplayer(cx.options().account())?;
-        let client = Client::new(bridge);
+        let mut client = Client::new(bridge);
+
+        if let Some(save) = save {
+            client.set_save_file(save);
+        }
 
         Ok(Self::new(cx, client))
     }
-    
+
     pub fn new(cx: &Context, client: Client<client::LobbyState>) -> Self {
         let attachment = cx.state_manager().create_state();
 
@@ -136,7 +140,7 @@ impl GameLobbyState {
         for slot in self.lobby.slots() {
             if let Some(owner_uuid) = &slot.owner_uuid {
                 let owner_uuid: Uuid = owner_uuid.clone().into();
-                if self.user_info.borrow()[&owner_uuid].get().is_some()
+                if self.user_info.borrow().get(&owner_uuid).and_then(|r| r.get()).is_some()
                     && self.missing_user_info.borrow().contains(&owner_uuid)
                 {
                     self.missing_user_info.borrow_mut().remove(&owner_uuid);

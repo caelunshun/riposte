@@ -38,6 +38,7 @@ mod paths;
 mod popups;
 mod registry;
 mod renderer;
+mod saveload;
 mod server_bridge;
 mod state;
 mod states;
@@ -51,7 +52,7 @@ use states::{game::GameState, lobby::GameLobbyState, menu::MenuState};
 extern crate fs_err as fs;
 
 pub enum Action {
-    EnterSingleplayerLobby,
+    EnterSingleplayerLobby(Option<Vec<u8>>),
     EnterLobby(ServerBridge),
 }
 
@@ -67,8 +68,8 @@ impl RootState {
             RootState::MainMenu(menu) => {
                 if let Some(action) = menu.update(cx) {
                     match action {
-                        Action::EnterSingleplayerLobby => {
-                            match GameLobbyState::new_singleplayer(cx) {
+                        Action::EnterSingleplayerLobby(save) => {
+                            match GameLobbyState::new_singleplayer(cx, save) {
                                 Ok(l) => *self = RootState::Lobby(l),
                                 Err(e) => cx.show_error_popup(&format!(
                                     "failed to create singleplayer game: {}",
