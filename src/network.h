@@ -8,6 +8,7 @@
 #define RIPOSTE_NETWORK_H
 
 #include <riposte_networking.h>
+#include <functional>
 
 namespace rip {
     class ConnectionHandle;
