@@ -54,6 +54,10 @@ impl Audio {
         })
     }
 
+    pub fn sounds(&self) -> impl Iterator<Item = &str> + '_ {
+        self.loaded_sounds.keys().map(|s| s.as_str())
+    }
+
     pub fn update(&mut self) {
         self.playing_sounds.borrow_mut().retain(|s| !s.is_stopped());
     }

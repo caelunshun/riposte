@@ -37,6 +37,7 @@ mod game;
 #[allow(warnings)]
 mod generated;
 mod lobby;
+mod fair_random;
 mod options;
 mod paths;
 mod popups;

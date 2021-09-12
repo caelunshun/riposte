@@ -12,11 +12,13 @@ use crate::{
 use self::{
     city_screen::CityScreen,
     main_ui::MainUi,
+    music::GameMusic,
     prompts::{city_build::CityBuildPrompt, research::ResearchPrompt, Prompts},
 };
 
 mod city_screen;
 mod main_ui;
+mod music;
 mod prompts;
 
 enum Page {
@@ -80,6 +82,7 @@ pub struct GameState {
 
     page: Page,
     prompts: Prompts,
+    music: GameMusic,
 }
 
 impl GameState {
@@ -96,6 +99,7 @@ impl GameState {
             client,
             page,
             prompts: Prompts::default(),
+            music: GameMusic::new(cx),
         }
     }
 
@@ -105,6 +109,8 @@ impl GameState {
         self.game.update(cx, &mut self.client);
         self.page.update(cx, &self.game, &mut self.client);
         self.renderer.render(&self.game, cx);
+
+        self.music.update(cx, &self.game);
 
         while let Some(event) = self.game.next_event() {
             self.page.handle_game_event(cx, &self.game, &event);

@@ -113,4 +113,15 @@ impl Assets {
             .values()
             .filter_map(|value| Arc::downcast(Arc::clone(value)).ok())
     }
+
+    /// Iterates over all assets with the given type.
+    pub fn iter_with_id_by_type<T: Send + Sync + 'static>(
+        &self,
+    ) -> impl Iterator<Item = (&str, Handle<T>)> + '_ {
+        self.assets.iter().filter_map(|(id, value)| {
+            Arc::downcast(Arc::clone(value))
+                .ok()
+                .map(|v| (id.as_str(), v))
+        })
+    }
 }
