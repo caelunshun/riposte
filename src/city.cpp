@@ -143,6 +143,11 @@ namespace rip {
         }
 
         for (const auto bfcPos : getBigFatCross(getPos())) {
+            if (std::find(manualWorkedTiles.begin(), manualWorkedTiles.end(), bfcPos) != manualWorkedTiles.end()) {
+                // Tile is already manually worked
+                continue;
+            }
+
             if (!canWorkTile(bfcPos, game)) continue;
             const auto &tile = game.getTile(bfcPos);
             const auto yield = tile.getYield(game, bfcPos, owner);

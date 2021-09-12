@@ -62,8 +62,8 @@ namespace rip {
 
     void ConnectionHandle::sendMessage(const std::string &data, FnCallback &callback) {
         networkctx_conn_send_data(ctx, inner, RipBytes {
-            .ptr = (const unsigned char*) data.data(),
             .len = data.size(),
+            .ptr = (const unsigned char*) data.data(),
         }, callbackFunction, callbackToUserdata(std::move(callback)));
     }
 
