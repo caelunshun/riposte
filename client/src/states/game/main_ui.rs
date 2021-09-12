@@ -143,7 +143,9 @@ impl MainUi {
             if *is_double {
                 let clicked_tile_pos = game.view().tile_pos_for_screen_offset(*pos);
                 if let Some(city) = game.city_at_pos(clicked_tile_pos) {
-                    return Some(Action::OpenCityScreen(city.id()));
+                    if city.owner() == game.the_player().id() {
+                        return Some(Action::OpenCityScreen(city.id()));
+                    }
                 }
             }
         }
