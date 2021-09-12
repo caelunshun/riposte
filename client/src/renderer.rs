@@ -5,7 +5,18 @@ use dume::Canvas;
 use glam::{uvec2, vec2, UVec2};
 use protocol::Visibility;
 
-use crate::{context::Context, game::{Game, Tile}, renderer::{city::CityRenderer, city_worked_tiles::CityWorkedTilesOverlay, cultural_border::CulturalBorderRenderer, fog::FogRenderer, grid_overlay::GridOverlayRenderer, improvement::ImprovementRenderer, resource::ResourceRenderer, staged_path::StagedPathOverlay, status_text::StatusTextOverlay, terrain::TerrainRenderer, tile_yield::TileYieldRenderer, tree::TreeRenderer, unit::UnitRenderer}};
+use crate::{
+    context::Context,
+    game::{Game, Tile},
+    renderer::{
+        city::CityRenderer, city_worked_tiles::CityWorkedTilesOverlay,
+        cultural_border::CulturalBorderRenderer, fog::FogRenderer,
+        grid_overlay::GridOverlayRenderer, improvement::ImprovementRenderer,
+        resource::ResourceRenderer, staged_path::StagedPathOverlay, status_text::StatusTextOverlay,
+        terrain::TerrainRenderer, tile_yield::TileYieldRenderer, tree::TreeRenderer,
+        unit::UnitRenderer,
+    },
+};
 
 mod city;
 mod cultural_border;
@@ -18,9 +29,9 @@ mod tile_yield;
 mod tree;
 mod unit;
 
+mod city_worked_tiles;
 mod staged_path;
 mod status_text;
-mod city_worked_tiles;
 
 trait TileRenderLayer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile);

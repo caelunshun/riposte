@@ -32,6 +32,7 @@ impl UserAccessToken {
         self.user_id
     }
 
+    #[allow(dead_code)]
     pub fn matches(&self, token: &[u8]) -> bool {
         token.ct_eq(self.token_bytes()).into()
     }

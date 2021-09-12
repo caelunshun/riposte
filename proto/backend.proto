@@ -56,14 +56,8 @@ message UserInfo {
     string username = 1;
 }
 
-message GameSettings {
-    uint32 numHumanPlayers = 1;
-    uint32 numAIPlayers = 2;
-}
-
 message CreateGameRequest {
-    GameSettings initialSettings = 1;
-    bytes authToken = 2;
+    bytes authToken = 1;
 }
 
 message CreateGameResponse {
@@ -90,7 +84,9 @@ message GameList {
 
 message GameInfo {
     UUID gameID = 1;
-    GameSettings settings = 2;
+    UUID hostUUID = 2;
+    string hostUsername = 3;
+    uint32 numPlayers = 4;
 }
 
 message JoinGameRequest {
@@ -116,18 +112,24 @@ message OpenStream {
     oneof inner {
         // Notifies the game server that a new client is connected.
         // The stream is closed immediately afterward.
-        NewConnection newConnection = 1;   
+        NewClient newClient = 1;   
         // Sets the stream to be proxied to the given client,
         // indicated by the client's connection ID.
         ProxiedStream proxiedStream = 2;
+        // A client has disconnected.
+        ClientDisconnected clientDisconnected = 3;
     }
 }
 
-message NewConnection {
+message NewClient {
     UUID playerUUID = 1;
     UUID connectionID = 2;
 }
 
 message ProxiedStream {
+    UUID connectionID = 1;
+}
+
+message ClientDisconnected {
     UUID connectionID = 1;
 }

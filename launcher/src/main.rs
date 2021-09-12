@@ -191,7 +191,8 @@ fn show_launcher_window(_download_size: u64, progress_updates: flume::Receiver<M
 
     let mut ui = Ui::new();
     ui.add_spec(Spec::deserialize_from_str(include_str!("../assets/root.yml")).unwrap());
-    ui.add_stylesheet(r#"
+    ui.add_stylesheet(
+        r#"
 styles:
   text:
     default_font_family: Merriweather
@@ -199,8 +200,10 @@ styles:
     border_width: 0
   progress_bar:
     border_radius: 3
-    "#.as_bytes())
-.unwrap();
+    "#
+        .as_bytes(),
+    )
+    .unwrap();
 
     let (root, widget) = ui.create_spec_instance::<RiposteLauncher>();
     ui.create_window(widget, Positioner, 1);

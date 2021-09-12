@@ -1,18 +1,13 @@
 use rand::{rngs::OsRng, Rng};
-use riposte_backend_api::{GameSettings, SessionId};
+use riposte_backend_api::SessionId;
 use uuid::Uuid;
 
-use super::proxy::HostHandle;
+use super::proxy::GameProxyHandle;
 
 /// An ongoing game.
 pub struct Game {
     /// The game's ID.
     id: Uuid,
-    /// The game's settings.
-    settings: GameSettings,
-    /// Session ID for the game host.
-    /// Secret
-    host_session_id: SessionId,
     /// User UUID of the game host.
     host_uuid: Uuid,
     /// Players connected to the game.
@@ -20,31 +15,22 @@ pub struct Game {
     /// Use the `num_players` field to find the number of
     /// connected players
     connected_players: Vec<ConnectedPlayerInfo>,
-    host_handle: Option<HostHandle>,
+
+    proxy_handle: GameProxyHandle,
 }
 
 impl Game {
-    pub fn new(settings: GameSettings, host_uuid: Uuid) -> Self {
+    pub fn new(proxy_handle: GameProxyHandle, host_uuid: Uuid) -> Self {
         Self {
             id: Uuid::new_v4(),
-            settings,
-            host_session_id: OsRng.gen(),
             host_uuid,
             connected_players: Vec::new(),
-            host_handle: None
+            proxy_handle,
         }
     }
 
     pub fn id(&self) -> Uuid {
         self.id
-    }
-
-    pub fn settings(&self) -> &GameSettings {
-        &self.settings
-    }
-
-    pub fn host_session_id(&self) -> SessionId {
-        self.host_session_id
     }
 
     pub fn host_uuid(&self) -> Uuid {
@@ -59,28 +45,18 @@ impl Game {
         &mut self.connected_players
     }
 
-    pub fn set_settings(&mut self, settings: GameSettings) {
-        self.settings = settings;
-    }
-
     pub fn num_players(&self) -> u32 {
         1 + self.connected_players.len() as u32
     }
 
-    pub fn host_handle(&self) -> Option<&HostHandle> {
-        self.host_handle.as_ref()
-    }
-
-    pub fn set_host_handle(&mut self, h: Option<HostHandle>) {
-        self.host_handle = h;
+    pub fn proxy_handle(&self) -> &GameProxyHandle {
+        &self.proxy_handle
     }
 }
 
 pub struct ConnectedPlayerInfo {
     /// Session ID of the player's connection (secret)
     session_id: SessionId,
-    /// Connection ID
-    connection_id: Uuid,
     /// The player's user UUID
     player_uuid: Uuid,
 }
@@ -89,17 +65,12 @@ impl ConnectedPlayerInfo {
     pub fn new(player_uuid: Uuid) -> Self {
         Self {
             session_id: OsRng.gen(),
-            connection_id: Uuid::new_v4(),
             player_uuid,
         }
     }
 
     pub fn session_id(&self) -> SessionId {
         self.session_id
-    }
-
-    pub fn connection_id(&self) -> Uuid {
-        self.connection_id
     }
 
     pub fn player_uuid(&self) -> Uuid {

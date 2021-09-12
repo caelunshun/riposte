@@ -83,7 +83,6 @@ impl MainMenuState {
                 Message::NewGameClicked => action = Some(Action::EnterSingleplayerLobby),
                 Message::MultiplayerClicked => action = Some(Action::EnterServerList),
                 Message::LoadGameClicked => action = Some(Action::EnterSavesList),
-                
             }
         });
 

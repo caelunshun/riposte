@@ -17,15 +17,20 @@ use std::os::raw::c_char;
 use std::slice;
 use std::sync::Arc;
 
+use anyhow::Context;
 use bytes::{Bytes, BytesMut};
 use flume::{Receiver, Sender};
 use futures::{SinkExt, StreamExt};
+use quinn::{Connection, IncomingUniStreams, RecvStream};
 use riposte_backend_api::prost::Message;
 use riposte_backend_api::uuid::Uuid;
 use riposte_backend_api::{
     codec, riposte_backend_client::RiposteBackendClient, tonic::transport::Channel, BACKEND_URL,
 };
-use riposte_backend_api::{open_stream, quic_addr, CreateGameRequest, OpenStream};
+use riposte_backend_api::{
+    open_stream, quic_addr, CreateGameRequest, FramedRead, LengthDelimitedCodec, OpenStream,
+    ProxiedStream,
+};
 use rustls::ServerCertVerified;
 use slotmap::SlotMap;
 use tokio::sync::Mutex;
@@ -54,6 +59,7 @@ pub enum RipResultData {
 }
 
 unsafe impl Send for RipResultData {}
+unsafe impl Sync for RipResultData {}
 
 pub struct RipResult {
     pub success: bool,
@@ -249,20 +255,17 @@ pub unsafe extern "C" fn networkctx_create_game(
         host_auth_token_len,
     ));
     let auth_token = base64::decode(&auth_token).unwrap();
+
+    dbg!();
     let mut client = ctx.client.clone();
     let session_id = ctx
         .runtime
-        .block_on(async move {
-            client
-                .create_game(CreateGameRequest {
-                    initial_settings: Default::default(),
-                    auth_token,
-                })
-                .await
-        })
+        .block_on(async move { client.create_game(CreateGameRequest { auth_token }).await })
         .expect("failed to create game")
         .into_inner()
         .session_id;
+
+    dbg!();
 
     let endpoint = &ctx.endpoint;
     let new_conn = ctx.runtime.block_on(async move {
@@ -273,11 +276,15 @@ pub unsafe extern "C" fn networkctx_create_game(
             .expect("failed to connect")
     });
 
+    dbg!();
+
     let conn = &new_conn.connection;
     ctx.runtime.block_on(async move {
-        let (mut stream, _) = conn.open_bi().await.unwrap();
+        let mut stream = conn.open_uni().await.unwrap();
         stream.write_all(&session_id).await.unwrap();
     });
+
+    dbg!();
 
     let _guard = ctx.runtime.enter();
 
@@ -287,6 +294,9 @@ pub unsafe extern "C" fn networkctx_create_game(
 struct GetNewConnectionRequest {
     request_id: RequestId,
 }
+
+type Connections =
+    Arc<Mutex<HashMap<Uuid, (Receiver<SendDataRequest>, Receiver<RecvDataRequest>)>>>;
 
 pub struct RipHubServerConnection {
     new_connections_req_tx: Sender<GetNewConnectionRequest>,
@@ -298,88 +308,152 @@ impl RipHubServerConnection {
 
         let completed_requests = ctx.completed_requests_sender.clone();
 
-        let connections: Arc<
-            Mutex<HashMap<Uuid, (Receiver<SendDataRequest>, Receiver<RecvDataRequest>)>>,
-        > = Arc::new(Mutex::new(HashMap::new()));
+        let connections = Connections::default();
 
-        let mut incoming_bi = new_conn.bi_streams;
+        let incoming_uni = new_conn.uni_streams;
+        let conn = new_conn.connection;
         task::spawn(async move {
-            while let Some(res) = incoming_bi.next().await {
-                match res {
-                    Ok((send_stream, recv_stream)) => {
-                        eprintln!("Remote opened a stream");
-                        let mut reader = codec().new_read(recv_stream);
-                        let data = reader.next().await.unwrap().unwrap();
-                        let packet = OpenStream::decode(data.as_ref()).unwrap();
-                        eprintln!("Stream type: {:?}", packet);
-                        match packet.inner.unwrap() {
-                            open_stream::Inner::NewConnection(new_connection) => {
-                                if let Ok(GetNewConnectionRequest { request_id }) =
-                                    new_connections_req_rx.recv_async().await
-                                {
-                                    let (sending_data, sending_data_recv) = flume::unbounded();
-                                    let (receiving_data, receiving_data_recv) = flume::unbounded();
-
-                                    let conn = RipConnectionHandle {
-                                        sending_data,
-                                        receiving_data,
-                                        current_recv_id: Default::default(),
-                                    };
-
-                                    connections.lock().await.insert(
-                                        new_connection
-                                            .connection_id
-                                            .clone()
-                                            .unwrap_or_default()
-                                            .into(),
-                                        (sending_data_recv, receiving_data_recv),
-                                    );
-
-                                    let conn = Box::leak(Box::new(conn)) as *mut _;
-
-                                    completed_requests
-                                        .send(CompletedRequest {
-                                            id: request_id,
-                                            result: RipResult::success(RipResultData::Connection(
-                                                conn,
-                                                new_connection
-                                                    .player_uuid
-                                                    .unwrap_or_default()
-                                                    .into(),
-                                            )),
-                                        })
-                                        .ok();
-                                }
-                            }
-                            open_stream::Inner::ProxiedStream(proxied_stream) => {
-                                let (sending_data_rx, receiving_data_rx) = connections.lock().await
-                                    [&proxied_stream
-                                        .connection_id
-                                        .clone()
-                                        .unwrap_or_default()
-                                        .into()]
-                                    .clone();
-
-                                run_connection(
-                                    reader.into_inner(),
-                                    send_stream,
-                                    sending_data_rx,
-                                    receiving_data_rx,
-                                    completed_requests.clone(),
-                                );
-                            }
-                        }
-                    }
-                    Err(e) => eprintln!("Failed to get stream: {:?}", e),
-                }
+            if let Err(e) = handle_backend_streams(
+                incoming_uni,
+                connections,
+                completed_requests,
+                new_connections_req_rx,
+                conn,
+            )
+            .await
+            {
+                eprintln!("Connection to backend lost: {:?}", e);
             }
-            eprintln!("Left stream handling loop");
         });
 
         Self {
             new_connections_req_tx,
         }
     }
+}
+
+async fn handle_backend_streams(
+    mut incoming: IncomingUniStreams,
+    connections: Connections,
+    completed_requests: Sender<CompletedRequest>,
+    new_connections_req_rx: Receiver<GetNewConnectionRequest>,
+    conn: Connection,
+) -> anyhow::Result<()> {
+    loop {
+        let backend_stream = incoming.next().await.context("no stream")??;
+        eprintln!("Remote opened a stream");
+        let backend_reader = codec().new_read(backend_stream);
+
+        let connections1 = connections.clone();
+        let completed_requests1 = completed_requests.clone();
+        let new_connections_req_rx1 = new_connections_req_rx.clone();
+        let conn1 = conn.clone();
+        task::spawn(async move {
+            if let Err(e) = handle_backend_stream(
+                backend_reader,
+                connections1,
+                completed_requests1,
+                new_connections_req_rx1,
+                conn1,
+            )
+            .await
+            {
+                eprintln!("Failed to handle backend stream: {:?}", e);
+            }
+        });
+    }
+}
+
+async fn handle_backend_stream(
+    mut reader: FramedRead<RecvStream, LengthDelimitedCodec>,
+    connections: Connections,
+    completed_requests: Sender<CompletedRequest>,
+    new_connections_req_rx: Receiver<GetNewConnectionRequest>,
+    quic_conn: Connection,
+) -> anyhow::Result<()> {
+    let data = reader.next().await.unwrap().unwrap();
+    let packet = OpenStream::decode(data.as_ref()).unwrap();
+    eprintln!("Stream type: {:?}", packet);
+    match packet.inner.unwrap() {
+        open_stream::Inner::NewClient(new_client) => {
+            if let Ok(GetNewConnectionRequest { request_id }) =
+                new_connections_req_rx.recv_async().await
+            {
+                let (sending_data, sending_data_recv) = flume::unbounded();
+                let (receiving_data, receiving_data_recv) = flume::unbounded();
+
+                let conn = RipConnectionHandle {
+                    sending_data,
+                    receiving_data,
+                    current_recv_id: Default::default(),
+                };
+
+                connections.lock().await.insert(
+                    new_client.connection_id.clone().unwrap_or_default().into(),
+                    (sending_data_recv.clone(), receiving_data_recv.clone()),
+                );
+
+                // Spawn task to send data
+                let send_stream = quic_conn.open_uni().await?;
+                let mut writer = codec().new_write(send_stream);
+
+                writer
+                    .send(
+                        OpenStream {
+                            inner: Some(open_stream::Inner::ProxiedStream(ProxiedStream {
+                                connection_id: new_client.connection_id.clone(),
+                            })),
+                        }
+                        .encode_to_vec()
+                        .into(),
+                    )
+                    .await?;
+
+                let completed_requests1 = completed_requests.clone();
+                task::spawn(async move {
+                    while let Ok(req) = sending_data_recv.recv_async().await {
+                        writer.send(req.data).await?;
+                        completed_requests1.send(CompletedRequest {
+                            id: req.request_id,
+                            result: RipResult::success(RipResultData::None),
+                        })?;
+                    }
+                    Result::<(), anyhow::Error>::Ok(())
+                });
+
+                let conn = Box::leak(Box::new(conn)) as *mut _;
+
+                completed_requests
+                    .send(CompletedRequest {
+                        id: request_id,
+                        result: RipResult::success(RipResultData::Connection(
+                            conn,
+                            new_client.player_uuid.unwrap_or_default().into(),
+                        )),
+                    })
+                    .ok();
+            }
+        }
+        open_stream::Inner::ProxiedStream(proxied_stream) => {
+            let (_, receiving_data_rx) = connections.lock().await[&proxied_stream
+                .connection_id
+                .clone()
+                .unwrap_or_default()
+                .into()]
+                .clone();
+
+            while let Ok(RecvDataRequest { request_id }) = receiving_data_rx.recv_async().await {
+                let msg = reader.next().await.context("end of stream")??;
+                completed_requests.send(CompletedRequest {
+                    id: request_id,
+                    result: RipResult::success(RipResultData::Bytes(msg)),
+                })?;
+            }
+        }
+        open_stream::Inner::ClientDisconnected(_) => {} // TODO
+    }
+
+    Ok(())
 }
 
 #[no_mangle]

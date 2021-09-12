@@ -12,10 +12,10 @@ struct Index {
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SaveFileEntry {
-   pub turn: u32,
+    pub turn: u32,
     #[serde(with = "humantime_serde")]
-  pub  created_at: SystemTime,
-  pub  path: String,
+    pub created_at: SystemTime,
+    pub path: String,
 }
 
 /// Keeps game saves in an index.

@@ -175,7 +175,8 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
                         ", {} ({})",
                         task.present_participle(),
                         task.turns_left()
-                    ).unwrap();
+                    )
+                    .unwrap();
                 }
             };
         }

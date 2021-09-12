@@ -138,7 +138,6 @@ impl Game {
         cx: &Context,
         data: InitialGameData,
     ) -> anyhow::Result<Self> {
-
         let mut game = Self::new(registry);
 
         let proto_map = data.map.context("missing tile map")?;
@@ -156,10 +155,10 @@ impl Game {
         }
 
         let tiles = proto_map
-        .tiles
-        .into_iter()
-        .map(|tile_data| Tile::from_data(tile_data, &game))
-        .collect::<Result<Vec<_>, anyhow::Error>>()?;
+            .tiles
+            .into_iter()
+            .map(|tile_data| Tile::from_data(tile_data, &game))
+            .collect::<Result<Vec<_>, anyhow::Error>>()?;
         let map = Map::new(proto_map.width, proto_map.height, tiles, visibility)?;
         game.map = map;
 
@@ -215,12 +214,14 @@ impl Game {
 
     /// Gets a player ID from its network ID.
     pub fn resolve_player_id(&self, network_id: u32) -> Result<PlayerId, InvalidNetworkId> {
-       Ok( self.player_ids
+        Ok(self
+            .player_ids
             .get(network_id)
             .ok_or_else(|| InvalidNetworkId {
                 typ: "player",
                 id: network_id,
-            }).unwrap())
+            })
+            .unwrap())
     }
 
     /// Gets a city ID from its network ID.

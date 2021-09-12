@@ -140,7 +140,12 @@ impl GameLobbyState {
         for slot in self.lobby.slots() {
             if let Some(owner_uuid) = &slot.owner_uuid {
                 let owner_uuid: Uuid = owner_uuid.clone().into();
-                if self.user_info.borrow().get(&owner_uuid).and_then(|r| r.get()).is_some()
+                if self
+                    .user_info
+                    .borrow()
+                    .get(&owner_uuid)
+                    .and_then(|r| r.get())
+                    .is_some()
                     && self.missing_user_info.borrow().contains(&owner_uuid)
                 {
                     self.missing_user_info.borrow_mut().remove(&owner_uuid);

@@ -237,7 +237,8 @@ impl City {
     }
 
     pub fn turns_needed_for_growth(&self) -> u32 {
-        (self.food_needed_for_growth() as u32 - self.stored_food() as u32 + self.city_yield().food - self.consumed_food() as u32
+        (self.food_needed_for_growth() as u32 - self.stored_food() as u32 + self.city_yield().food
+            - self.consumed_food() as u32
             - 1)
             / (self.city_yield().food - self.consumed_food() as u32)
     }

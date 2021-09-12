@@ -5,7 +5,7 @@ use palette::{Mix, Srgba};
 use winit::event::MouseButton;
 
 use duit::{
-    widget::{Context, LayoutStrategy, HitTestResult},
+    widget::{Context, HitTestResult, LayoutStrategy},
     Color, Event, Widget, WidgetData,
 };
 
@@ -121,7 +121,7 @@ impl Widget for FlashingButton {
                 }
             }
         }
-    } 
+    }
 
     fn hit_test(&self, data: &WidgetData, pos: Vec2) -> HitTestResult {
         if data.bounds().contains(pos) {
@@ -129,5 +129,5 @@ impl Widget for FlashingButton {
         } else {
             HitTestResult::Missed
         }
-    } 
+    }
 }

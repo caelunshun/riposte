@@ -23,7 +23,7 @@ impl TileRenderLayer for FogRenderer {
         if game.cheat_mode {
             return;
         }
-        
+
         if game.map().visibility(tile_pos) == Visibility::Fogged {
             cx.canvas_mut()
                 .begin_path()

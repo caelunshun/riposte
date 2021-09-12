@@ -6,7 +6,15 @@ use bytes::BytesMut;
 use flume::Receiver;
 use glam::{uvec2, UVec2};
 use prost::Message;
-use protocol::{AnyClient, AnyServer, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket, ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeclarePeace, DeclareWar, DeleteSlot, DoUnitAction, EndTurn, GameSaved, GameStarted, GetBuildTasks, GetPossibleTechs, InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs, RequestGameStart, SaveGame, ServerLobbyPacket, SetCityBuildTask, SetEconomySettings, SetResearch, SetSaveFile, SetWorkerTask, WorkerTask, WorkerTaskImprovement, any_client, any_server, client_lobby_packet, server_lobby_packet, worker_task_kind};
+use protocol::{
+    any_client, any_server, client_lobby_packet, server_lobby_packet, worker_task_kind, AnyClient,
+    AnyServer, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader, ClientLobbyPacket,
+    ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeclarePeace, DeclareWar, DeleteSlot,
+    DoUnitAction, EndTurn, GameSaved, GameStarted, GetBuildTasks, GetPossibleTechs,
+    InitialGameData, Kicked, LobbyInfo, MoveUnits, Pos, PossibleCityBuildTasks, PossibleTechs,
+    RequestGameStart, SaveGame, ServerLobbyPacket, SetCityBuildTask, SetEconomySettings,
+    SetResearch, SetSaveFile, SetWorkerTask, WorkerTask, WorkerTaskImprovement,
+};
 
 use crate::{
     context::Context,
@@ -362,7 +370,9 @@ impl Client<GameState> {
                 any_server::Packet::CombatEvent(packet) => {
                     self.handle_combat_event(cx, game, packet)?
                 }
-                any_server::Packet::GameSaved(packet) => self.handle_game_saved(cx, game, packet, request_id),
+                any_server::Packet::GameSaved(packet) => {
+                    self.handle_game_saved(cx, game, packet, request_id)
+                }
                 p => log::warn!("unhandled packet: {:?}", p),
             }
 
@@ -434,7 +444,8 @@ impl Client<GameState> {
             "Received game save - {:.1} MiB",
             packet.game_save_data.len() as f64 / 1024. / 1024.
         );
-        cx.saves_mut().add_save(cx, &packet.game_save_data, game.turn());
+        cx.saves_mut()
+            .add_save(cx, &packet.game_save_data, game.turn());
         self.handle_server_response(request_id, packet);
     }
 

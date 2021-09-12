@@ -14,6 +14,9 @@ with a 32-bit length delimiter over a QUIC stream. Multiple packets may use the 
 of streams is allowed; the purpose of using multiple streams is to improve performance
 when packets don't need to be received in the same order they were sent.
 
+All QUIC streams should be unidirectional. The backend ignores all bidirectional streams
+opened by clients.
+
 Clients can connect to a game server in two ways:
 1. Using the backend service as a proxy. The client sends the `JoinGame` gRPC request, which
 returns a session ID. It then connects to the backend via QUIC and opens a single stream,
@@ -22,7 +25,7 @@ The backend then notifies the server of the new connection.
 Any streams opened after this point are proxied directly between the client and the server.
 
 2. By directly connecting to the game server. Currently, this is only used for singleplayer games,
-where the server is running on localhost. 
+where the server is running on localhost.
 
 ### Game servers
 
@@ -42,3 +45,9 @@ The server can now open new streams with the client. Since all clients are proxi
 QUIC connection, we need a way to associate a stream with a single client. Therefore, the first
 data sent on each stream in either direction needs to be the `OpenStream` packet containing the
 connection ID of the client using that stream.
+
+## Disconnect handling
+
+If a client disconnects, the backend sends `OpenStream::ClientDisconnected` to the game server.
+If the game server disconnects, the backend sends `OpenStream::ConnectionLost` to all clients,
+then terminates the connection.

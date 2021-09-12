@@ -93,7 +93,7 @@ impl Widget for UnitIndicator {
         data.set_size(max_size);
     }
 
-    fn paint(&mut self, _style: &Self::Style, data: &mut WidgetData,  cx: Context) {
+    fn paint(&mut self, _style: &Self::Style, data: &mut WidgetData, cx: Context) {
         cx.canvas
             .begin_path()
             .rect(Vec2::splat(-5.), Vec2::splat(10.))

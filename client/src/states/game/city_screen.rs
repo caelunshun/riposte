@@ -84,7 +84,6 @@ impl CityScreen {
         game: &Game,
         client: &mut Client<GameState>,
         event: &Event,
-
     ) -> Option<Action> {
         // Toggle worked tiles
         if let Event::MousePress {
@@ -100,7 +99,8 @@ impl CityScreen {
         }
 
         if let Event::KeyPress {
-            key: VirtualKeyCode::Escape, ..
+            key: VirtualKeyCode::Escape,
+            ..
         } = event
         {
             Some(Action::Close)

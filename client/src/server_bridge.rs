@@ -126,23 +126,34 @@ impl ServerBridge {
 
             let new_conn = quic_endpoint.connect(&quic_addr(), "localhost")?.await?;
             log::info!("Connected to backend QUIC endpoint");
-            let (mut stream, _) = new_conn.connection.open_bi().await?;
+            let mut stream = new_conn.connection.open_uni().await?;
             stream.write_all(&session_id).await?;
-            log::info!("Send session ID to  backend");
+            log::info!("Sent session ID to  backend");
 
-            let (mut send_stream, recv_stream) = new_conn.connection.open_bi().await?;
-            send_stream.write_all(&[0]).await?;
+            let send_stream = new_conn.connection.open_uni().await?;
 
-            log::info!("Opened streams");
+            log::info!("Opened initial send stream");
 
             let (sending_tx, sending_rx) = flume::unbounded();
             let (receiving_tx, receiving_rx) = flume::unbounded();
 
+            let mut incoming = new_conn.uni_streams;
+
             task::spawn(async move {
-                let mut reader = codec().new_read(recv_stream);
-                while let Some(Ok(data)) = reader.next().await {
-                    receiving_tx.send_async(data.freeze()).await.ok();
+                loop {
+                    let recv_stream = incoming.next().await.context("no stream")??;
+                    let mut reader = codec().new_read(recv_stream);
+
+                    let receiving_tx = receiving_tx.clone();
+                    task::spawn(async move {
+                        while let Some(Ok(bytes)) = reader.next().await {
+                            receiving_tx.send_async(bytes.freeze()).await?;
+                        }
+                        Result::<(), anyhow::Error>::Ok(())
+                    });
                 }
+                #[allow(unreachable_code)] // needed to indicate task return type
+                Result::<(), anyhow::Error>::Ok(())
             });
             task::spawn(async move {
                 let mut writer = codec().new_write(send_stream);

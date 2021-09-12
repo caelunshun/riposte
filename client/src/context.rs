@@ -19,13 +19,24 @@ use tokio::runtime::{self, Runtime};
 use walkdir::WalkDir;
 use winit::{dpi::PhysicalSize, event::WindowEvent, event_loop::EventLoop, window::Window};
 
-use crate::{assets::{
+use crate::{
+    assets::{
         loaders::{FontLoader, ImageLoader, JsonLoader, SoundLoader},
         Assets,
-    }, audio::Audio, backend::BackendService, options::Options, paths::FilePaths, popups::PopupWindows, registry::{Building, Civilization, Registry, Resource, Tech, UnitKind}, saveload::SaveFiles, state::StateManager, ui::{
+    },
+    audio::Audio,
+    backend::BackendService,
+    options::Options,
+    paths::FilePaths,
+    popups::PopupWindows,
+    registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
+    saveload::SaveFiles,
+    state::StateManager,
+    ui::{
         flashing_button::FlashingButton, turn_indicator::TurnIndicatorCircle,
         unit_indicator::UnitIndicator,
-    }};
+    },
+};
 
 mod init;
 

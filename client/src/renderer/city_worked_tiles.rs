@@ -2,9 +2,12 @@ use duit::Vec2;
 use glam::UVec2;
 use palette::Srgba;
 
-use crate::{context::Context, game::{Game, Tile, view::PIXELS_PER_TILE}};
+use crate::{
+    context::Context,
+    game::{view::PIXELS_PER_TILE, Game, Tile},
+};
 
-use super::{ TileRenderLayer};
+use super::TileRenderLayer;
 
 pub struct CityWorkedTilesOverlay;
 
@@ -14,11 +17,11 @@ impl TileRenderLayer for CityWorkedTilesOverlay {
             let city = game.city(city_id);
             if city.worked_tiles().any(|t| t == tile_pos) {
                 cx.canvas_mut()
-                .begin_path()
-                .circle(Vec2::splat(PIXELS_PER_TILE / 2.), PIXELS_PER_TILE / 2.)
-                .stroke_width(1.5)
-                .solid_color(Srgba::new(u8::MAX, u8::MAX, u8::MAX, u8::MAX))
-                .stroke();
+                    .begin_path()
+                    .circle(Vec2::splat(PIXELS_PER_TILE / 2.), PIXELS_PER_TILE / 2.)
+                    .stroke_width(1.5)
+                    .solid_color(Srgba::new(u8::MAX, u8::MAX, u8::MAX, u8::MAX))
+                    .stroke();
             }
         }
     }

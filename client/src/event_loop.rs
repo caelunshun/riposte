@@ -1,4 +1,4 @@
-use duit::{Vec2, widget::HitTestResult};
+use duit::{widget::HitTestResult, Vec2};
 use winit::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},

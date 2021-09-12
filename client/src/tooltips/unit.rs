@@ -60,7 +60,12 @@ pub fn unit_tooltip(registry: &Registry, unit: &UnitKind) -> String {
         match &bonus.typ {
             CombatBonusType::WhenInCity => line += "when in city",
             CombatBonusType::AgainstUnit => {
-                write!(line, "against {}", registry.unit_kind(&bonus.unit).unwrap().name).ok();
+                write!(
+                    line,
+                    "against {}",
+                    registry.unit_kind(&bonus.unit).unwrap().name
+                )
+                .ok();
             }
             CombatBonusType::AgainstUnitCategory => {
                 write!(line, "against {:?} units", bonus.unit_category).ok();

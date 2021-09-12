@@ -156,16 +156,16 @@ impl RiposteBackend for RiposteBackendImpl {
 
     async fn delete_game(
         &self,
-        request: Request<DeleteGameRequest>,
+        _request: Request<DeleteGameRequest>,
     ) -> Result<Response<()>, Status> {
-        todo!()
+        Err(Status::unimplemented("endpoint unimplemented"))
     }
 
     async fn update_game_settings(
         &self,
-        request: Request<UpdateGameSettingsRequest>,
+        _request: Request<UpdateGameSettingsRequest>,
     ) -> Result<Response<()>, Status> {
-        todo!()
+        Err(Status::unimplemented("endpoint unimplemented"))
     }
 
     async fn join_game(
@@ -187,10 +187,10 @@ impl RiposteBackend for RiposteBackendImpl {
 
     async fn request_game_list(
         &self,
-        request: Request<GameListRequest>,
+        _request: Request<GameListRequest>,
     ) -> Result<Response<GameList>, Status> {
         Ok(Response::new(GameList {
-            games: self.hub.games().await,
+            games: self.hub.games(&*self.repo).await.map_err(internal)?,
         }))
     }
 }

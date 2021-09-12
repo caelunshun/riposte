@@ -5,8 +5,8 @@ use duit::{
 };
 
 use crate::{
-    context::{Context},
-    generated::{SavesWindow},
+    context::Context,
+    generated::SavesWindow,
     state::StateAttachment,
     ui::{FillScreen, Z_FOREGROUND},
 };
@@ -76,7 +76,7 @@ impl SavesListState {
         }
 
         if let Some(LoadSave(index)) = cx.ui_mut().pop_message::<LoadSave>() {
-            let saves=  cx.saves();
+            let saves = cx.saves();
             let save = saves.list_saves().skip(index).next().unwrap();
             let data = saves.load_save(cx, save);
             return Some(Action::LoadGame(data));

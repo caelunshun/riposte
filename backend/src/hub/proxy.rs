@@ -1,276 +1,291 @@
-use std::sync::Arc;
+//! The proxy between game clients and the game server.
+//!
+//! The game server is connected to the backend via a single QUIC connection.
+//! See `architecture.md` for details.
+//!
+//! Every stream opened by the client or the game server is proxied to
+//! the corresponding peer.
+//!
+//! # Terminology
+//! Host - the game server, connected to the backend, that runs
+//! all game logic.
+//! Client - an instance of the game connected to the host through this proxy.\
+//!
+//! # Backplane
+//! The proxy uses `async-backplane` to propate errors through the multitude
+//! of async tasks it spawns.
 
 use ahash::AHashMap;
-use flume::Receiver;
+use anyhow::{bail, Context};
+use async_backplane::{Crash, Device, Line, LinkMode};
+use flume::{Receiver, Sender};
 use futures::{SinkExt, StreamExt};
-use futures_lite::FutureExt;
 use prost::Message;
-use quinn::{Connection, IncomingBiStreams, NewConnection, RecvStream, SendStream};
-use riposte_backend_api::{codec, open_stream, OpenStream, ProxiedStream};
-use tokio::{
-    sync::{Mutex, RwLock},
-    task,
+use quinn::{Connection, IncomingUniStreams, NewConnection, RecvStream, SendStream};
+use riposte_backend_api::{
+    codec, open_stream, FramedRead, FramedWrite, LengthDelimitedCodec, NewClient, OpenStream,
+    ProxiedStream,
 };
+use tokio::{sync::RwLock, task};
 use uuid::Uuid;
 
-use super::game::Game;
+use std::{
+    fmt::Debug,
+    future::{self, Future},
+    sync::Arc,
+};
 
-/// Spawns a Tokio task that handles a connection to a game server host.
-///
-/// Returns a [`HostHandle`] to communicate.
-pub fn spawn_host_task(conn: NewConnection, _game: Arc<RwLock<Game>>) -> HostHandle {
-    let (sender, receiver) = flume::bounded(8);
+#[derive(Debug, thiserror::Error)]
+#[error("game has closed")]
+pub struct GameClosed;
 
-    let host = Arc::new(Host::new(conn, receiver));
-    host.run();
-
-    HostHandle { sender }
+/// Handle to a game proxy, allowing:
+/// 1) creating new clients; and
+/// 2) polling whether the game has closed
+/// as a result of a connection failure or disconnect.
+pub struct GameProxyHandle {
+    sender: Sender<MessageToProxy>,
 }
 
-enum MessageToHost {
+impl GameProxyHandle {
+    pub async fn send_new_client(
+        &self,
+        new_conn: NewConnection,
+        player_uuid: Uuid,
+    ) -> Result<(), GameClosed> {
+        self.sender
+            .send_async(MessageToProxy::NewClient {
+                new_conn,
+                player_uuid,
+            })
+            .await
+            .map_err(|_| GameClosed)
+    }
+
+    pub fn is_game_closed(&self) -> bool {
+        self.sender.is_disconnected()
+    }
+}
+
+enum MessageToProxy {
+    /// A new client has connected to the game.
     NewClient {
-        connection_id: Uuid,
-        connection: NewConnection,
-        user_id: Uuid,
+        new_conn: NewConnection,
+        player_uuid: Uuid,
     },
 }
 
-#[derive(Debug, thiserror::Error)]
-#[error("game host has disconnected from the hub")]
-pub struct HostDisconnected;
+pub struct GameProxy {
+    receiver: Receiver<MessageToProxy>,
+    host: Connection,
+    clients: RwLock<AHashMap<Uuid, Connection>>,
 
-#[derive(Clone)]
-pub struct HostHandle {
-    sender: flume::Sender<MessageToHost>,
+    supervisor_line: Line,
 }
 
-impl HostHandle {
-    pub async fn create_new_client(
-        &self,
-        connection_id: Uuid,
-        connection: NewConnection,
-        user_id: Uuid,
-    ) -> Result<(), HostDisconnected> {
-        self.sender
-            .send_async(MessageToHost::NewClient {
-                connection_id,
-                connection,
-                user_id,
-            })
-            .await
-            .map_err(|_| HostDisconnected)
-    }
-}
+impl GameProxy {
+    pub fn new(host_conn: NewConnection) -> GameProxyHandle {
+        let (sender, receiver) = flume::bounded(1);
 
-struct Host {
-    conn: Connection,
-    bi_streams: Mutex<IncomingBiStreams>,
-    receiver: Receiver<MessageToHost>,
-    client_connections: RwLock<AHashMap<Uuid, ClientConnection>>,
-}
+        let supervisor = Device::new();
+        let supervisor_line = supervisor.line();
 
-impl Host {
-    pub fn new(conn: NewConnection, receiver: Receiver<MessageToHost>) -> Self {
-        Self {
-            conn: conn.connection,
-            bi_streams: Mutex::new(conn.bi_streams),
+        let proxy = Arc::new(GameProxy {
             receiver,
-            client_connections: RwLock::new(AHashMap::new()),
+            host: host_conn.connection,
+            clients: RwLock::new(AHashMap::new()),
+            supervisor_line,
+        });
+
+        // Spawn the supervisor.
+        task::spawn(async move {
+            if let Err(c) = supervisor
+                .manage(future::pending::<anyhow::Result<()>>())
+                .await
+            {
+                tracing::error!("Game has closed: {:?}", c);
+            }
+        });
+
+        // Spawn the two root tasks - one to handle messages,
+        // and the other to handle streams opened by the host.
+        proxy.spawn(Box::pin(proxy.clone().handle_messages()), LinkMode::Peer);
+        proxy.spawn(
+            Box::pin(proxy.clone().handle_host_streams(host_conn.uni_streams)),
+            LinkMode::Peer,
+        );
+
+        GameProxyHandle { sender }
+    }
+
+    async fn client(&self, connection_id: Uuid) -> Option<Connection> {
+        self.clients.read().await.get(&connection_id).cloned()
+    }
+
+    /// Handles all incoming `MessageToProxy`s.
+    async fn handle_messages(self: Arc<Self>) -> anyhow::Result<()> {
+        loop {
+            let msg = self.receiver.recv_async().await?;
+
+            match msg {
+                MessageToProxy::NewClient {
+                    new_conn,
+                    player_uuid,
+                } => self.add_new_client(new_conn, player_uuid).await?,
+            }
         }
     }
 
-    // Spawns several tasks to manage the connection:
-    // * a task that waits for MessageToHosts and handles them
-    // * a task that waits on new streams from the host and proxies
-    // them
-    // * whenever MessageToHost::NewClient is received, launches
-    // a task to wait on streams from the client. Whenever a stream
-    // is opened, proxies the stream.
-    pub fn run(self: Arc<Self>) {
-        Arc::clone(&self).spawn_message_handler();
-        Arc::clone(&self).spawn_stream_handler();
+    async fn add_new_client(
+        self: &Arc<Self>,
+        new_conn: NewConnection,
+        player_uuid: Uuid,
+    ) -> anyhow::Result<()> {
+        let connection_id = Uuid::new_v4();
+
+        self.send_new_client(player_uuid, connection_id).await?;
+
+        self.clients
+            .write()
+            .await
+            .insert(connection_id, new_conn.connection);
+
+        let this = Arc::clone(self);
+        self.spawn(
+            Box::pin(this.handle_client_streams(new_conn.uni_streams, connection_id)),
+            LinkMode::Peer,
+        );
+
+        Ok(())
     }
 
-    fn spawn_message_handler(self: Arc<Self>) {
-        // Handle messages.
-        task::spawn(async move {
-            while let Ok(msg) = self.receiver.recv_async().await {
-                match msg {
-                    MessageToHost::NewClient {
-                        connection_id,
-                        connection,
-                        user_id,
-                    } => {
-                        tracing::info!("New client with UUID {:?}", user_id);
-                        let mut clients = self.client_connections.write().await;
-                        assert!(
-                            !clients.contains_key(&connection_id),
-                            "connection created twice"
-                        );
-
-                        clients.insert(
-                            connection_id,
-                            ClientConnection {
-                                conn: connection.connection,
-                            },
-                        );
-
-                        tracing::info!("Handling client");
-
-                        Arc::clone(&self).handle_client(
-                            connection_id,
-                            user_id,
-                            connection.bi_streams,
-                        );
-                    }
+    async fn send_new_client(&self, player_uuid: Uuid, connection_id: Uuid) -> anyhow::Result<()> {
+        // Send OpenStream::NewClient to the host.
+        let stream = self.host.open_uni().await?;
+        let mut writer = codec().new_write(stream);
+        writer
+            .send(
+                OpenStream {
+                    inner: Some(open_stream::Inner::NewClient(NewClient {
+                        player_uuid: Some(player_uuid.into()),
+                        connection_id: Some(connection_id.into()),
+                    })),
                 }
-            }
-        });
+                .encode_to_vec()
+                .into(),
+            )
+            .await?;
+        Ok(())
     }
 
-    fn spawn_stream_handler(self: Arc<Self>) {
-        // Wait for streams opened by the host and proxy them.
-        task::spawn(async move {
-            while let Some(Ok((send_stream, recv_stream))) =
-                self.bi_streams.lock().await.next().await
-            {
-                // Wait for OpenStream to indicate which client to proxy to.
-                let mut reader = codec().new_read(recv_stream);
-                if let Some(Ok(bytes)) = reader.next().await {
-                    let msg = OpenStream::decode(bytes)?;
-
-                    if let Some(open_stream::Inner::NewConnection(msg)) = msg.inner {
-                        let clients = self.client_connections.read().await;
-                        let client = clients.get(&msg.connection_id.unwrap_or_default().into());
-
-                        if let Some(client) = client {
-                            let (client_send_stream, client_recv_stream) =
-                                client.conn.open_bi().await?;
-
-                            proxy(
-                                send_stream,
-                                reader.into_inner(),
-                                client_send_stream,
-                                client_recv_stream,
-                            )
-                            .await;
-                        }
-                    }
-                }
-            }
-
-            Result::<(), anyhow::Error>::Ok(())
-        });
-    }
-
-    fn handle_client(
+    // Handles all client incoming streams, proxying them to the host.
+    async fn handle_client_streams(
         self: Arc<Self>,
+        mut incoming: IncomingUniStreams,
         connection_id: Uuid,
-        user_id: Uuid,
-        mut bi_streams: IncomingBiStreams,
-    ) {
-        let handle = task::spawn(async move {
-            // Send OpenStream::NewConnection to notify the host of a new connection.
-            tracing::info!("Handling client - opening initial stream on host");
-            let (send_stream, _recv_stream) = self.conn.open_bi().await?;
-            tracing::info!("Initial host stream opened");
-            let mut writer = codec().new_write(send_stream);
-            writer
-                .send(
-                    OpenStream {
-                        inner: Some(open_stream::Inner::NewConnection(
-                            riposte_backend_api::NewConnection {
-                                player_uuid: Some(user_id.into()),
-                                connection_id: Some(connection_id.into()),
-                            },
-                        )),
-                    }
-                    .encode_to_vec()
-                    .into(),
-                )
-                .await?;
-            tracing::info!("Sent OpenStream");
-            drop(writer);
-
-            // Wait for streams opened by the client and proxy them.
-            tracing::info!("Entering client stream handling loop");
-            while let Some(res) = bi_streams.next().await {
-                match res {
-                    Ok((send_stream, mut recv_stream)) => {
-                        tracing::info!("Client opened bi stream");
-                        // skip the first byte - used to wake the server
-                        let mut buf = [0u8; 1];
-                        recv_stream.read_exact(&mut buf).await?;
-                        Arc::clone(&self).proxy_stream_client_to_host(
-                            connection_id,
-                            send_stream,
-                            recv_stream,
-                        );
-                    }
-                    Err(e) => {
-                        tracing::error!("Failed to handle client stream: {:?}", e);
-                        break;
-                    }
-                }
-            }
-            tracing::info!("Client stream handling loop ended");
-
-            Result::<(), anyhow::Error>::Ok(())
-        });
-
-        task::spawn(async move {
-            if let Err(e) = handle.await.unwrap() {
-                tracing::error!("Failed to handle client connection: {:?}", e);
-            }
-        });
+    ) -> anyhow::Result<()> {
+        loop {
+            let stream = incoming.next().await.context("no more streams")??;
+            let this = Arc::clone(&self);
+            self.spawn(
+                Box::pin(this.proxy_stream_client_to_host(stream, connection_id)),
+                LinkMode::Peer,
+            );
+        }
     }
 
-    fn proxy_stream_client_to_host(
+    // Proxies a stream from a client to the host.
+    async fn proxy_stream_client_to_host(
         self: Arc<Self>,
+        client_stream: RecvStream,
         connection_id: Uuid,
-        send_stream: SendStream,
-        recv_stream: RecvStream,
-    ) {
-        task::spawn(async move {
-            // Open a new stream to the host.
-            let (host_send_stream, host_recv_stream) = self.conn.open_bi().await?;
+    ) -> anyhow::Result<()> {
+        let host_stream = self.host.open_uni().await?;
+        let client_reader = codec().new_read(client_stream);
+        let mut host_writer = codec().new_write(host_stream);
 
-            // Send the OpenStream packet.
-            let mut host_send_stream = codec().new_write(host_send_stream);
-            let message = OpenStream {
-                inner: Some(open_stream::Inner::ProxiedStream(ProxiedStream {
-                    connection_id: Some(connection_id.into()),
-                })),
+        // Send OpenStream::ProxiedStream.
+        host_writer
+            .send(
+                OpenStream {
+                    inner: Some(open_stream::Inner::ProxiedStream(ProxiedStream {
+                        connection_id: Some(connection_id.into()),
+                    })),
+                }
+                .encode_to_vec()
+                .into(),
+            )
+            .await?;
+
+        self.proxy_streams(client_reader, host_writer).await
+    }
+
+    async fn proxy_streams(
+        &self,
+        mut recv_stream: FramedRead<RecvStream, LengthDelimitedCodec>,
+        mut send_stream: FramedWrite<SendStream, LengthDelimitedCodec>,
+    ) -> anyhow::Result<()> {
+        loop {
+            let msg = match recv_stream.next().await {
+                Some(res) => res?,
+                None => return Ok(()), // end of stream
             };
-            host_send_stream
-                .send(message.encode_to_vec().into())
-                .await?;
+            send_stream.send(msg.into()).await?;
+        }
+    }
 
-            let host_send_stream = host_send_stream.into_inner();
+    // Handles all incoming host streams, proxying them to the associated clients.
+    async fn handle_host_streams(
+        self: Arc<Self>,
+        mut incoming: IncomingUniStreams,
+    ) -> anyhow::Result<()> {
+        loop {
+            let stream = incoming.next().await.context("no host stream")??;
 
-            proxy(host_send_stream, host_recv_stream, send_stream, recv_stream).await;
+            let this = Arc::clone(&self);
+            self.spawn(Box::pin(this.handle_host_stream(stream)), LinkMode::Peer);
+        }
+    }
 
-            Result::<(), anyhow::Error>::Ok(())
+    async fn handle_host_stream(self: Arc<Self>, host_stream: RecvStream) -> anyhow::Result<()> {
+        let mut host_reader = codec().new_read(host_stream);
+        let msg = host_reader.next().await.context("end of stream")??;
+        let msg = OpenStream::decode(&*msg)?;
+
+        if let Some(open_stream::Inner::ProxiedStream(ProxiedStream {
+            connection_id: Some(connection_id),
+        })) = msg.inner
+        {
+            let client = self
+                .client(connection_id.into())
+                .await
+                .context("invalid client connection ID")?;
+            let client_stream = client.open_uni().await?;
+            let client_writer = codec().new_write(client_stream);
+
+            self.proxy_streams(host_reader, client_writer).await?;
+        } else {
+            bail!("invalid OpenStream message from host");
+        }
+
+        Ok(())
+    }
+
+    fn spawn<T: Send + Debug + 'static, E: Send + Debug + 'static>(
+        &self,
+        task: impl Future<Output = Result<T, E>> + Send + 'static + Unpin,
+        link_mode: LinkMode,
+    ) {
+        let device = Device::new();
+
+        device
+            .link_line(self.supervisor_line.clone(), link_mode)
+            .unwrap();
+
+        task::spawn(async move {
+            if let Err(Crash::Error(e)) = device.manage(task).await {
+                tracing::warn!("{:?}", e);
+            }
         });
     }
-}
-
-async fn proxy(
-    mut send_stream_a: SendStream,
-    mut recv_stream_a: RecvStream,
-    mut send_stream_b: SendStream,
-    mut recv_stream_b: RecvStream,
-) {
-    // Proxy in both directions.
-    let a_to_b = tokio::io::copy(&mut recv_stream_a, &mut send_stream_b);
-    let b_to_a = tokio::io::copy(&mut recv_stream_b, &mut send_stream_a);
-
-    match a_to_b.race(b_to_a).await {
-        Ok(bytes) => tracing::info!("Proxied {:.1} KiB over stream", (bytes as f64 / 1024.)),
-        Err(e) => tracing::error!("Failed to proxy streams: {}", e),
-    }
-}
-
-struct ClientConnection {
-    conn: Connection,
 }

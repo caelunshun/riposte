@@ -19,7 +19,7 @@ pub struct PathPoint {
     /// The number of turns from the start it takes to arrive here
     pub turn: u32,
     /// The movement the unit has left at this point.
-    pub movement_left: f64
+    pub movement_left: f64,
 }
 
 /// A path between two points.

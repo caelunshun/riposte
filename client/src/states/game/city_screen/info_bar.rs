@@ -38,7 +38,8 @@ impl InfoBarScreen {
         );
 
         let growth_progress = city.stored_food() as f32 / city.food_needed_for_growth() as f32;
-        let growth_projected_progress = (city.stored_food() + city.city_yield().food as i32 - city.consumed_food()) as f32
+        let growth_projected_progress = (city.stored_food() + city.city_yield().food as i32
+            - city.consumed_food()) as f32
             / city.food_needed_for_growth() as f32;
         self.window
             .growth_progress_bar

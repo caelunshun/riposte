@@ -6,7 +6,10 @@ use futures_lite::FutureExt as _;
 use tokio::{signal::ctrl_c, task};
 use tracing::{Instrument, Level};
 
-use crate::{hub::Hub, repository::{Repository, postgres::PostgresRepository}};
+use crate::{
+    hub::Hub,
+    repository::{postgres::PostgresRepository, Repository},
+};
 
 mod hub;
 mod models;

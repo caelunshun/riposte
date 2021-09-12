@@ -30,10 +30,7 @@ impl EconomyScreen {
             vars! {},
         );
         self.window.gold_output_text.get_mut().set_text(
-            format!(
-                "+{} @icon{{gold}} / turn",
-                city.gold_per_turn(game)
-            ),
+            format!("+{} @icon{{gold}} / turn", city.gold_per_turn(game)),
             vars! {},
         );
         self.window.maintenance_text.get_mut().set_text(

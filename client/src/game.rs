@@ -1,5 +1,7 @@
 pub mod city;
+pub mod combat;
 pub mod culture;
+pub mod event;
 pub mod improvement;
 pub mod path;
 pub mod player;
@@ -8,8 +10,6 @@ pub mod stack;
 pub mod tile;
 pub mod unit;
 pub mod view;
-pub mod event;
-pub mod combat;
 
 mod id_mapper;
 mod world;
