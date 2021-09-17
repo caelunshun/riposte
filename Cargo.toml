@@ -1,13 +1,14 @@
 [workspace]
 members = [
-    "client",
-    "client/protocol",
-    "launcher",
-    "lobby",
-    "bundler",
-    "backend",
-    "backend/api",
-    "c-bindings",
+    "crates/common",
+    "crates/server",
+    "crates/client",
+    "crates/client/protocol",
+    "crates/launcher",
+    "crates/lobby",
+    "crates/bundler",
+    "crates/backend",
+    "crates/backend/api",
 ]
 
 resolver = "2"

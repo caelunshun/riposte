@@ -3344,22 +3344,8 @@ dependencies = [
 ]
 
 [[package]]
-name = "riposte-c-bindings"
+name = "riposte-common"
 version = "0.1.0"
-dependencies = [
- "anyhow",
- "base64",
- "bytes",
- "flume",
- "futures",
- "quinn",
- "riposte-backend-api",
- "rustls",
- "slotmap",
- "tokio",
- "webpki",
- "zeno",
-]
 
 [[package]]
 name = "riposte-launcher"
@@ -3392,6 +3378,10 @@ dependencies = [
  "prost-types",
  "uuid",
 ]
+
+[[package]]
+name = "riposte-server"
+version = "0.1.0"
 
 [[package]]
 name = "rodio"
@@ -4793,12 +4783,6 @@ checksum = "e262a29d0e61ccf2b6190d7050d4b237535fc76ce4c1210d9caa316f71dffa75"
 dependencies = [
  "chrono",
 ]
-
-[[package]]
-name = "zeno"
-version = "0.2.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c110ba09c9b3a43edd4803d570df0da2414fed6e822e22b976a4e3ef50860701"
 
 [[package]]
 name = "zstd"
