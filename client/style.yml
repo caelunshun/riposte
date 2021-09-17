@@ -1,0 +1,176 @@
+variables:
+  window: rgb(40, 40, 40)
+  background: rgb(65, 65, 65)
+  lighter: rgb(80, 80, 80)
+  border: rgb(100, 100, 100)
+  active: rgb(100, 105, 100)
+  foreground: rgb(120, 120, 120)
+  text_color: rgb(255, 255, 255)
+  faded_text_color: rgb(180, 180, 180)
+  emphasis: rgb(255, 191, 63)
+  border_active: rgb(0, 112, 150)
+  
+  default_font_family: Merriweather
+  icon_font_family: Cormorant Garamond
+
+styles:
+  text:
+    default_font_family: $default_font_family
+    default_size: 14
+    default_color: $text_color
+  text & hoverable_text & hovered:
+    default_color: $emphasis
+  emphasized_text:
+    default_color: $emphasis
+  text & tooltip_text:
+    default_size: 15
+  h1:
+    default_size: 32
+  h2:
+    default_size: 24
+  h3:
+    default_size: 18.72
+  h4:
+    default_size: 16
+  h5:
+    default_size: 13.28
+  h6:
+    default_size: 10.72
+
+  light_text:
+    default_weight: Light
+  
+  error_text:
+    default_color: rgb(235, 51, 0)
+
+  text_input:
+    border_radius: 2
+    cursor_width: 1
+    padding: 5
+    font: $default_font_family
+    font_size: 16
+    font_color: $text_color
+    placeholder_font_color: $faded_text_color
+    background_color: $background
+    cursor_color: $foreground
+    border_color: $border
+    border_width: 1
+
+  text_input & focused:
+    background_color: $lighter
+    cursor_color: rgb(255, 255, 255)
+    border_color: $border_active
+    border_width: 1
+  
+  button | flashing_button:
+    padding: 5
+    border_radius: 2
+    border_width: 1
+    border_color: $border
+    background_color: $background
+
+  button | flashing_button & hovered:
+    background_color: $active
+
+  button | flashing_button & pressed:
+    border_color: $border_active
+    background_color: $foreground
+
+  flashing_button:
+    flash_color_a: rgb(25, 97, 174)
+    flash_color_b: rgb(0, 118, 165)
+    flash_period: 0.75
+
+  unit_action_button:
+    padding: 10
+    border_radius: 0.2
+
+  container:
+    border_radius: 0
+    border_width: 1
+    background_color: rgba(50, 50, 50, 240)
+    border_color: $background
+
+  container & window_container:
+    background_color: rgba(45, 45, 45, 254)
+    border_color: rgb(120, 120, 120)
+
+  container & light_container:
+    border_width: 0
+    background_color: rgba(50, 50, 50, 254)
+    border_color: rgb(120, 120, 120)
+
+  container & game_window_container:
+    background_color: rgba(50, 50, 50, 250)
+    border_color: rgb(160, 160, 160)
+
+  container & popup_container:
+    border_color: rgb(180, 180, 180)
+    background_color: rgba(50, 50, 50, 253)
+    border_radius: 5
+    border_width: 1
+
+  tile_tooltip_container:
+    border_width: 0
+    border_radius: 0
+    border_color: rgba(50, 50, 50, 180)
+
+  unit_selector_container:
+    background_color: rgba(50, 50, 50, 250)
+    border_radius: 1
+
+  highlighted_container:
+    border_color: rgb(255, 205, 0)
+    border_width: 2
+
+  progress_bar:
+    border_radius: 1
+    border_width: 1
+    border_color: rgb(0, 0, 0)
+    background_color: $background
+    progress_color: rgb(91, 197, 0)
+    projected_progress_color: rgb(62, 154, 44)
+  
+  production_progress_bar:
+    progress_color: rgba(82, 159, 223, 160)
+    projected_progress_color: rgba(141, 200, 232, 160)
+
+  population_progress_bar:
+    progress_color: rgb(237, 155, 51)
+    projected_progress_color: rgb(185, 112, 0)
+
+  culture_progress_bar:
+    progress_color: rgb(119, 37, 131)
+    projected_progress_color: rgb(213, 150, 200)
+
+  slider:
+    line_width: 3
+    line_color: rgb(150, 150, 150)
+    handle_border_radius: 2
+    handle_border_width: 1
+    handle_border_color: $border
+    handle_color: rgb(180, 180, 180)
+    handle_width: 7.5
+    handle_height: 30
+
+  slider & grabbed:
+    handle_border_color: $border_active
+    handle_color: rgb(200, 200, 200)
+
+  table:
+    background_color_a: rgb(70, 70, 70)
+    background_color_b: rgb(80, 80, 80)
+
+  scrollable:
+    bar_width: 10
+    bar_border_radius: 1
+    bar_color: rgb(120, 120, 120)
+    hovered_bar_color: rgb(140, 140, 140)
+    grabbed_bar_color: rgb(160, 160, 160)
+
+  pick_list:
+    arrow_font_family: $icon_font_family
+
+  pick_list_option & hovered:
+    background_color: $border_active
+  

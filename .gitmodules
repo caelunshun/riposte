@@ -4,27 +4,9 @@
 [submodule "external/FastNoise2"]
 	path = external/FastNoise2
 	url = https://github.com/Auburn/FastNoise2
-[submodule "external/Rea"]
-	path = external/Rea
-	url = https://github.com/im95able/Rea
 [submodule "external/Nuklear"]
 	path = external/Nuklear
 	url = https://github.com/Immediate-Mode-UI/Nuklear
-[submodule "external/lunajson"]
-	path = external/lunajson
-	url = https://github.com/grafi-tt/lunajson
-[submodule "external/sol2"]
-	path = external/sol2
-	url = https://github.com/ThePhD/sol2
-[submodule "external/lua-protobuf"]
-	path = external/lua-protobuf
-	url = https://github.com/starwing/lua-protobuf
-[submodule "external/lua-profiler"]
-	path = external/lua-profiler
-	url = https://github.com/charlesmallah/lua-profiler
-[submodule "external/dume"]
-	path = external/dume
-	url = https://github.com/caelunshun/dume
 [submodule "external/filesystem"]
 	path = external/filesystem
 	url = https://github.com/gulrak/filesystem

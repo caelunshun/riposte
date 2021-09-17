@@ -9,6 +9,7 @@
   "improvedBonus": {
     "food": 2
   },
-  "scarcity": 8,
-  "healthBonus": 1
+  "abundance": 10,
+  "healthBonus": 1,
+  "allowDeserts": false
 }

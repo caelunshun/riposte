@@ -22,14 +22,16 @@ namespace rip {
 
     void WorkerCapability::onTurnEnd(Game &game) {
         if (currentTask.has_value()) {
-            (*currentTask)->onTurnEnd(game);
+            auto &unit = game.getUnit(unitID);
+            if (unit.getMovementLeft() > 0) {
+                (*currentTask)->onTurnEnd(game);
+            }
 
             if ((*currentTask)->isFinished()) {
                 (*currentTask)->onFinished(game);
                 currentTask = {};
             }
 
-            auto &unit = game.getUnit(unitID);
             unit.setMovementLeft(0); // hard at work!
         }
     }

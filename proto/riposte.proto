@@ -2,6 +2,10 @@
 // Created by Caelum van Ispelen on 6/14/21.
 //
 
+syntax = "proto3";
+
+package rip.proto;
+
 // Defines the packets. All of them.
 //
 // The client connects to the server and sends ClientInfo.
@@ -48,9 +52,147 @@
 //
 // Some fields are not used in game saves.
 
-syntax = "proto3";
+// ----------------------------
+// ---------- LOBBY -----------
+// ----------------------------
 
-package rip.proto;
+message UUID {
+  string uuid = 1;
+}
+
+// A packet sent by the client during the lobby phase.
+message ClientLobbyPacket {
+  oneof packet {
+    CreateSlot createSlot = 1;
+    DeleteSlot deleteSlot = 2;
+    RequestGameStart requestGameStart = 3;
+    ChangeCivAndLeader changeCivAndLeader = 4;
+    SetSaveFile setSaveFile = 5;
+  }
+}
+
+// Sent by the client to add a new player slot to the game.
+//
+// Rejected if the lobby isStatic.
+//
+// Admin only
+message CreateSlot {
+  // Whether the slot should be a human or AI player
+  bool isAI = 1;
+}
+
+// Sent by the client to remove a player slot from the game.
+// If the player was human and had joined, the player is kicked.
+//
+// Rejected if the lobby isStatic.
+//
+// Admin only
+message DeleteSlot {
+  // ID of the slot to delete
+  uint32 slotID = 1;
+}
+
+// Sent by the client to start the game.
+//
+// Rejected if not all slots are filled.
+//
+// Admin only
+message RequestGameStart {}
+
+// Sent by the client to change its selected leader
+// and civilization.
+//
+// Rejected if the lobby isStatic. Also rejected
+// if the civilization is already in use by another
+// player.
+message ChangeCivAndLeader {
+  string civID = 1;
+  string leaderName = 2;
+}
+
+// Sets the save file to load the game from.
+//
+// This also resets the lobby slots so they match
+// the save file.
+//
+// Admin only
+message SetSaveFile {
+  bytes saveFileData = 1;
+}
+
+// A packet sent by the server during the lobby phase.
+message ServerLobbyPacket {
+  oneof packet {
+    LobbyInfo lobbyInfo = 1;
+    Kicked kicked = 2;
+    GameStarted gameStarted = 3;
+  }
+}
+
+// Sent by the server on join and whenever slot data changes.
+message LobbyInfo {
+  repeated LobbySlot slots = 1;
+  // Whether the game was loaded from a game save and, as
+  // a result, settings (including civ/leader choices) cannot be
+  // changed.
+  bool isStatic = 2;
+  // The slot ID occupied by this client.
+  uint32 yourSlotID = 3;
+}
+
+// Sent by the server when the client was kicked from the game.
+//
+// The connection is terminated immediately after this message is sent.
+message Kicked {}
+
+// Sent by the server when the game has started.
+//
+// This closes the game lobby. It includes all initial
+// data for the game.
+message GameStarted {
+  InitialGameData gameData = 1;
+}
+
+// A slot represents a player in the game.
+//
+// A slot may be empty or occupied. When a slot
+// is empty, the game cannot start.
+// A slot is filled when a player takes its place.
+//
+// If `ownerUUID` is set to a user UUID but `occupied` is
+// set to false, then only that user is allowed to join
+// in this slot. (This functionality is used when loading a saved
+// game - the same users will join the same slots.)
+message LobbySlot {
+  // Whether the slot is occupied.
+  bool occupied = 1;
+  // UUID of the slot owner. If null, either
+  // the slot is empty or the player is an AI.
+  UUID ownerUUID = 2;
+  // Whether the slot is an AI or a human player.
+  bool isAI = 3;
+  // The civilization selected by this player.
+  string civID = 4;
+  // The leader selected by this player.
+  string leaderName = 5;
+  // Unique ID of the slot
+  uint32 id = 6;
+  // Whether the player occupying this slot is the game admin
+  bool isAdmin = 7;
+}
+
+// ----------------------------
+// ---------- GAME ------------
+// ----------------------------
+
+message InitialGameData {
+  UpdateMap map = 1;
+  repeated UpdateCity cities = 2;
+  repeated UpdateUnit units = 3;
+  repeated UpdatePlayer players = 4;
+  UpdateGlobalData globalData = 5;
+  UpdateVisibility visibility = 6;
+}
 
 message Pos {
   uint32 x = 1;
@@ -61,7 +203,6 @@ message Pos {
 message AnyClient {
   int32 requestID = 1;
   oneof packet {
-    ClientInfo clientInfo = 2;
     ComputePath computePath = 3;
     MoveUnits moveUnits = 4;
     EndTurn endTurn = 5;
@@ -74,9 +215,6 @@ message AnyClient {
     SetWorkerTask setWorkerTask = 12;
     DeclareWar declareWar = 13;
     ConfigureWorkedTiles configureWorkedTiles = 14;
-    GameOptions gameOptions = 15;
-    AdminStartGame adminStartGame = 16;
-    SetLeader setLeader = 17;
     BombardCity bombardCity = 18;
     SaveGame saveGame = 19;
     DeclarePeace declarePeace = 20;
@@ -90,9 +228,6 @@ message AnyServer {
   // Otherwise, always equal to zero.
   int32 requestID = 1;
   oneof packet {
-    ServerInfo serverInfo = 2;
-    StartGame startGame = 3;
-    LobbyError lobbyError = 4;
     UpdateGlobalData updateGlobalData = 5;
     UpdateMap updateMap = 6;
     UpdateCity updateCity = 7;
@@ -117,85 +252,9 @@ message AnyServer {
   }
 }
 
-// PRE-GAME
-
-// Sent by the client upon connecting.
-message ClientInfo {
-  string username = 1;
-}
-
-message LobbyPlayer {
-  string username = 1;
-  bool isHuman = 2;
-  string civID = 3;
-  string leaderName = 4;
-  int32 playerID = 5;
-  // If `false`, then we're still waiting for a human player in this slot.
-  bool exists = 6;
-  bool isAdmin = 7;
-}
-
-// Response to ClientInfo. Indicates lobby data.
-//
-// Also sent whenever lobby data changes (a player leaves/joins, etc.)
-message ServerInfo {
-  // Players in the lobby.
-  repeated LobbyPlayer players = 1;
-  // The ID of the player in this connection.
-  int32 thePlayerID = 2;
-}
-
-// Can only be sent by the admin.
-message KickPlayer {
-  int32 id = 1;
-  string reason = 2;
-}
-
-// Might fail if another player has chosen the same leader.
-//
-// Initially, the player's leader is randomly chosen (sent in ServerInfo)
-message SetLeader {
-  string civID = 1;
-  string leader = 2;
-}
-
-// Can only be sent by the admin.
-// Might be rejected.
-message AdminStartGame {}
-
-// Sent by the server when an action cannot be performed
-// (game cannot start, etc.)
-message LobbyError {
-  string message = 1;
-}
-
-// Updates game options. Can only be sent by the admin.
-message GameOptions {
-  uint32 mapWidth = 1;
-  uint32 mapHeight = 2;
-  uint32 numHumanPlayers = 3;
-  uint32 numAIPlayers = 4;
-}
-
 // ---------------------
 // SERVER
 // ---------------------
-
-// Enters the game state.
-message StartGame {
-  // empty
-}
-
-message PlayerInfo {
-  // The player's username.
-  string username = 1;
-  string civID = 2;
-  string leaderName = 3;
-  int32 score = 4;
-  // A unique ID.
-  int32 id = 5;
-  bool isAdmin = 6;
-}
 
 enum Era {
   Ancient = 0;
@@ -209,14 +268,10 @@ enum Era {
 
 // Sets global data for the entire game.
 message UpdateGlobalData {
-  // List of players in the game.
-  repeated PlayerInfo players = 1;
   // The current turn number.
-  int32 turn = 2;
-  // The current era.
-  Era era = 3;
+  int32 turn = 1;
   // The ID of the connected client.
-  int32 playerID = 4;
+  int32 playerID = 2;
 }
 
 enum Terrain {
@@ -372,6 +427,9 @@ message UpdateCity {
   repeated string resources = 21;
   CultureValues cultureValues = 22;
   repeated Pos manualWorkedTiles = 23;
+  int32 culturePerTurn = 24;
+  string cultureLevel = 25;
+  int32 maintenanceCost = 26;
 }
 
 message Path {
@@ -445,7 +503,7 @@ message ResearchingTech {
   int32 progress = 2;
 }
 
-// Updates the client's own player data.
+// Updates a player's data.
 message UpdatePlayer {
   int32 id = 1;
   string username = 2;
@@ -468,7 +526,6 @@ message UpdatePlayer {
 
   repeated int32 atWarWithIDs = 13;
 
-  // Saveload-specific. Not set in protocol
   Era era = 14;
   bool hasAI = 15;
   UpdateVisibility visibility = 16;
@@ -485,8 +542,11 @@ message PathComputed {
 }
 
 // Response to MoveUnits.
+//
+// Sent before UpdateUnit is sent to update the moved
+// units' positions.
 message ConfirmMoveUnits {
-  // Whether the units were moved at least one tile.
+  // Whether the units were moved to the target tile.
   bool success = 1;
 }
 
@@ -563,7 +623,9 @@ message PeaceDeclared {
   int32 declaredID = 2;
 }
 
-message GameSaved {}
+message GameSaved {
+  bytes gameSaveData = 1;
+}
 
 message BordersExpanded {
   uint32 cityID = 1;
@@ -583,13 +645,18 @@ message BuildTaskFailed {
 // CLIENT
 // ---------------------
 
-// Moves multiple units along a path.
-// The units will all go to the same destination.
+// Moves multiple units to an adjacent tile.
+// This operation is atomic: either all units
+// move, or none of them do. Therefore, all
+// units need enough movement left to reach the destination.
+//
+// The target position _must_ be adjacent to the units' position;
+// the server will not attempt to pathfind through multiple tiles to the target.
 //
 // Response: ConfirmMoveUnits
 message MoveUnits {
   repeated int32 unitIDs = 1;
-  Path pathToFollow = 2;
+  Pos targetPos = 2;
 }
 
 message SetCityBuildTask {
@@ -674,6 +741,8 @@ message GameSave {
   repeated UpdatePlayer players = 5;
   repeated UpdateCity cities = 6;
   repeated UpdateUnit units = 7;
+  repeated LobbySlot lobbySlots = 8;
+  map<uint32, uint32> slotIDToPlayerID = 9;
 }
 
 // Culture values for a tile or city.

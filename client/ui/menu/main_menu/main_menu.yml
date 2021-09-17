@@ -1,0 +1,11 @@
+name: MainMenu
+child:
+  Container:
+    mode:
+      Pad: 50
+    child:
+      Column:
+        align_h: Center
+        align_v: Center
+        spacing: 20
+        id: entries

@@ -8,13 +8,9 @@ conan_basic_setup()
 
 set(CMAKE_CXX_STANDARD 17)
 
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_SOURCE_DIR}/cmake/)
-
 set(Protobuf_USE_STATIC_LIBS ON)
 include(FindProtobuf)
 find_package(Protobuf REQUIRED)
-
-find_package(LuaJIT REQUIRED)
 
 include(FetchContent)
 
@@ -26,43 +22,70 @@ FetchContent_Declare(
 
 FetchContent_MakeAvailable(Corrosion)
 
-corrosion_import_crate(MANIFEST_PATH external/dume/renderer/Cargo.toml)
+corrosion_import_crate(MANIFEST_PATH c-bindings/Cargo.toml CRATES riposte-c-bindings)
 
-add_library(pb SHARED external/lua-protobuf/pb.c)
-target_include_directories(pb PRIVATE ${LUA_INCLUDE_DIR})
-target_link_libraries(pb ${CONAN_LIBS} ${LUA_LIBRARY})
-
-set(DUME_SOURCES external/dume/src/dume.cpp)
-add_library(dume ${DUME_SOURCES})
-target_include_directories(dume PUBLIC external/dume/include/ external/dume/renderer/include/)
-target_include_directories(dume PRIVATE external/sol2/include ${LUA_INCLUDE_DIR})
-target_link_libraries(dume ${LUA_LIBRARY} ${CONAN_LIBS} dume-renderer)
-
-protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/riposte.proto)
+protobuf_generate_cpp(PROTO_SRCS PROTO_HDRS proto/riposte.proto proto/mapgen.proto)
 
 set(NANOVG_SOURCES external/nanovg/src/nanovg.c)
-set(SOURCES ${NANOVG_SOURCES} ${PROTO_SRCS} client/main.cpp src/ripmath.h src/tile.cpp src/tile.h src/game.cpp src/game.h src/renderer.cpp src/renderer.h src/assets.cpp src/assets.h src/view.cpp src/view.h src/cursor.cpp src/cursor.h src/mapgen.cpp src/mapgen.h src/rng.cpp src/rng.h src/city.cpp src/city.h src/player.cpp src/player.h src/registry.cpp src/registry.h src/unit.cpp src/unit.h src/ripmath.cpp src/hud.cpp src/hud.h src/ui.cpp src/ui.h src/path.cpp src/path.h src/ai.cpp src/ai.h src/worker.cpp src/traversal.h src/culture.cpp src/culture.h src/tech.cpp src/yield.cpp src/yield.h src/trade.cpp src/trade.h src/audio.cpp src/audio.h src/era.cpp src/era.h src/combat.cpp src/combat.h src/stack.cpp src/stack.h src/event.cpp src/event.h src/script.cpp src/script.h src/ship.cpp src/ship.h src/bridge.cpp src/server.cpp src/server.h src/slot_map.cpp src/slot_map.h src/network.cpp src/network.h client/lua_networking.cpp client/lua_networking.h src/protocol.cpp src/protocol.h src/saveload.cpp src/saveload.h)
+set(SOURCES
+        ${PROTO_SRCS}
+        ${NANOVG_SOURCES}
+        src/ai.cpp
+        src/assets.cpp
+        src/city.cpp
+        src/combat.cpp
+        src/culture.cpp
+        src/cursor.cpp
+        src/era.cpp
+        src/event.cpp
+        src/game.cpp
+        src/hud.cpp
+        src/lobby.cpp
+        src/mapgen.cpp
+        src/network.cpp
+        src/path.cpp
+        src/player.cpp
+        src/protocol.cpp
+        src/registry.cpp
+        src/renderer.cpp
+        src/ripmath.cpp
+        src/rng.cpp
+        src/saveload.cpp
+        src/server.cpp
+        src/ship.cpp
+        src/slot_map.cpp
+        src/stack.cpp
+        src/tech.cpp
+        src/tile.cpp
+        src/trade.cpp
+        src/ui.cpp
+        src/unit.cpp
+        src/view.cpp
+        src/worker.cpp
+        src/yield.cpp
 
-add_executable(riposte ${SOURCES})
+        src/mapgen/grid.cpp
+        src/mapgen/line_mesh.cpp
+        src/mapgen/land.cpp
+        src/mapgen/terrain.cpp
+        src/mapgen/starting_locations.cpp
+        src/mapgen/resources.cpp)
+
+add_library(riposte-core ${SOURCES})
 
 set(FASTNOISE2_NOISETOOL OFF CACHE BOOL "" FORCE)
 add_subdirectory(external/FastNoise2)
 
-corrosion_import_crate(MANIFEST_PATH crodio/Cargo.toml)
-
-target_compile_definitions(riposte PRIVATE FONS_USE_FREETYPE SOL_ALL_SAFETIES_ON)
-target_include_directories(riposte PRIVATE
+target_include_directories(riposte-core PUBLIC
         src/
         external/nanovg/src
         external/FastNoise2/include
-        external/Rea/Rea
         external/Nuklear
-        external/sol2/include
         external/filesystem/include
-        crodio/include
+        c-bindings/include
         ${CMAKE_CURRENT_BINARY_DIR} // for protobuf files
-        ${PROTOBUF_INCLUDE_DIR}
-        ${LUA_INCLUDE_DIR})
+        ${PROTOBUF_INCLUDE_DIR})
+target_compile_definitions(riposte-core PRIVATE FONS_USE_FREETYPE)
 
 #set(CMAKE_C_COMPILER "/usr/bin/clang-11")
 #set(CMAKE_CXX_COMPILER "/usr/bin/clang++-11")
@@ -81,4 +104,10 @@ elseif(UNIX)
     SET(NATIVE_AUDIO_LIBS rt ${ALSA_LIBRARIES} Threads::Threads)
 endif()
 
-target_link_libraries(riposte dume ${CONAN_LIBS} ${PROTOBUF_LIBRARY} ${LUA_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} crodio)
+target_link_libraries(riposte-core ${CONAN_LIBS} ${PROTOBUF_LIBRARY} FastNoise ${NATIVE_AUDIO_LIBS} riposte-c-bindings)
+
+add_executable(riposte-server src/main.cpp)
+target_link_libraries(riposte-server riposte-core)
+
+add_executable(mapgen-test src/mapgen/mapgen_test.cpp)
+target_link_libraries(mapgen-test riposte-core)

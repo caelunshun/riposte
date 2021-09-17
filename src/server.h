@@ -7,12 +7,13 @@
 
 #include <riposte.pb.h>
 #include <absl/container/flat_hash_set.h>
+#include <absl/container/flat_hash_map.h>
 #include <readerwriterqueue/readerwriterqueue.h>
 
-#include "bridge.h"
 #include "game.h"
 #include "tech.h"
 #include "saveload.h"
+#include "network.h"
 
 using namespace moodycamel;
 using namespace rip::proto;
@@ -24,7 +25,7 @@ namespace rip {
     // Represents a connection to the server from a client.
     class Connection {
         // The bridge used to transfer packets.
-        std::unique_ptr<Bridge> bridge;
+        ConnectionHandle handle;
         // ID of the player using this connection.
         PlayerId playerID;
 
@@ -34,27 +35,25 @@ namespace rip {
 
         Server *server;
 
-        proto::LobbyPlayer lobbyPlayerInfo;
-
-        std::string username;
-
     public:
         // Whether the player has ended their current turn.
         bool endedTurn = false;
 
-        Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID, bool isAdmin, Server *server);
+        Connection(ConnectionHandle handle, PlayerId playerID, bool isAdmin, Server *server);
 
         template<typename T>
         void send(T &packet) {
             std::string data;
             packet.SerializeToString(&data);
-            bridge->sendPacket(std::move(data));
+            FnCallback callback = [](const RipResult &res) {};
+            handle.sendMessage(data, callback);
         }
 
-        void sendGameData(Game &game);
+        void requestMoreData();
+
+        void sendGameStarted(Game &game);
         void sendUpdateTile(Game &game, glm::uvec2 pos);
         void sendUpdateVisibility(Game &game);
-        void sendPlayerData(Game &game);
         void sendGlobalData(Game &game);
         void sendTradeNetworks(Game &game);
 
@@ -73,18 +72,9 @@ namespace rip {
         void handleBombardCity(Game &game, const BombardCity &packet);
         void handleSaveGame();
 
-        void handleClientInfo(const ClientInfo &packet);
-        void handleGameOptions(const GameOptions &packet);
-        void handleAdminStartGame(const AdminStartGame &packet);
-        void handleSetLeader(const SetLeader &packet);
-
         void handlePacket(Game *game, AnyClient &packet);
 
-        void update(Game *game);
-
         PlayerId getPlayerID() const;
-        const LobbyPlayer &getLobbyPlayerInfo() const;
-        const std::string &getUsername() const;
         bool getIsAdmin() const;
     };
 
@@ -92,9 +82,7 @@ namespace rip {
     //
     // Wraps a Game and handles connections by sending/handling packets.
     class Server {
-        std::vector<Connection> connections;
-
-        slot_map<uint16_t> playerIDAllocator;
+        std::vector<std::shared_ptr<Connection>> connections;
 
         absl::flat_hash_set<UnitId> dirtyUnits;
         absl::flat_hash_set<CityId> dirtyCities;
@@ -102,31 +90,28 @@ namespace rip {
         absl::flat_hash_set<glm::uvec2, PosHash> dirtyTiles;
         absl::flat_hash_set<PlayerId> dirtyPlayers;
 
-        GameOptions gameOptions;
-
         // fields used for saving
         std::string gameName;
         std::string gameCategory;
 
-        std::optional<SaveFile> saveFileToLoadFrom;
+        std::shared_ptr<NetworkingContext> networkCtx;
 
     public:
-        bool inLobby = true;
-
-        // NB: may be null if we're still in the lobby phase.
+        // Must be initialized by the Server creator.
+        // Not initialized by the constructor because
+        // Game requires a Server pointer.
         std::unique_ptr<Game> game;
         std::shared_ptr<Registry> registry;
         std::shared_ptr<TechTree> techTree;
 
-        Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree, std::string gameCategory);
-        void setGameOptions(GameOptions gameOptions);
-        void setSaveFileToLoadFrom(SaveFile f);
+        std::vector<proto::LobbySlot> lobbySlots;
+        absl::flat_hash_map<uint32_t, PlayerId> slotIDToPlayerID;
+
+        Server(std::shared_ptr<NetworkingContext> networkCtx, std::string gameName, std::string gameCategory);
 
         void startGame();
 
-        void addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin);
-
-        void updateServerInfo();
+        void addConnection(ConnectionHandle handle, PlayerId playerID, bool isAdmin);
 
         void broadcastUnitDeath(UnitId unitID);
 
@@ -153,11 +138,9 @@ namespace rip {
         void sendBuildTaskFinished(CityId cityID, const BuildTask *task);
         void sendBuildTaskFailed(CityId cityID, const BuildTask &task);
 
-        void run(std::shared_ptr<ReaderWriterQueue<std::unique_ptr<Bridge>>> newConnections);
+        void run(std::shared_ptr<ReaderWriterQueue<ConnectionHandle>> newConnections);
 
-        bool hasPlayerWithCiv(const std::string &civID) const;
-
-        void saveGame();
+        void saveGame(uint32_t requestID);
     };
 }
 

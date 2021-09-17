@@ -11,7 +11,6 @@
 #include "player.h"
 #include "trade.h"
 
-#include <crodio.h>
 #include <ghc/filesystem.hpp>
 #include <sstream>
 
@@ -22,58 +21,7 @@ namespace fs = ghc::filesystem;
 namespace rip {
     const size_t headerSize = 128;
 
-    fs::path getSavesDir(const std::string &category) {
-        const fs::path dataDir(riposte_data_dir());
-        const auto saveDir = dataDir / "saves";
-        fs::create_directories(saveDir);
-        const auto categoryDir = saveDir / category;
-        fs::create_directories(categoryDir);
-        return categoryDir;
-    }
-
-    bool hasEnding (std::string const &fullString, std::string const &ending) {
-        if (fullString.length() >= ending.length()) {
-            return (0 == fullString.compare (fullString.length() - ending.length(), ending.length(), ending));
-        } else {
-            return false;
-        }
-    }
-
-    std::vector<SaveFile> getAllSaves(const std::string &category) {
-        const auto categoryDir = getSavesDir(category);
-
-        std::vector<SaveFile> results;
-        for (const auto entry : fs::directory_iterator(categoryDir)) {
-            if (!hasEnding(entry.path().string(), ".rip")) {
-                continue;
-            }
-
-            std::ifstream f(entry.path().string());
-
-            std::vector<char> buf(headerSize, 0);
-            f.read(buf.data(), buf.size());
-
-            size_t headerLen = buf[0];
-
-            SaveFileHeader header;
-            header.ParseFromString(std::string(buf.data() + 1, headerLen));
-
-            results.push_back(SaveFile {
-                .category = category,
-                .name = header.name(),
-                .path = entry.path().string(),
-                .turn = header.turn(),
-            });
-        }
-
-        return results;
-    }
-
-    std::string getSavePath(const std::string &category, const std::string &name, uint32_t turn) {
-        return getSavesDir(category) / std::string(name + ".T" + std::to_string(turn) + ".rip");
-    }
-
-    std::string serializeGameToSave(Game &game, std::string name) {
+    std::string serializeGameToSave(Game &game, const std::vector<proto::LobbySlot> &lobbySlots, const absl::flat_hash_map<uint32_t, PlayerId> slotIDToPlayerID, std::string name) {
         GameSave packet;
 
         for (auto &player : game.getPlayers()) {
@@ -94,6 +42,14 @@ namespace rip {
             for (int x = 0; x < game.getMapWidth(); x++) {
                 setTile(game, PlayerId(0), glm::uvec2(x, y), game.getTile(glm::uvec2(x, y)), *packet.add_tiles());
             }
+        }
+
+        for (const auto &slot : lobbySlots) {
+            packet.add_lobbyslots()->CopyFrom(slot);
+        }
+
+        for (const auto & [slotID, playerID] : slotIDToPlayerID) {
+            (*packet.mutable_slotidtoplayerid())[slotID] = playerID.encode();
         }
 
         std::string data;
@@ -122,14 +78,7 @@ namespace rip {
         return data;
     }
 
-    SaveData loadGameFromSave(Server *server, const SaveFile &file, std::shared_ptr<Registry> registry,
-                              std::shared_ptr<TechTree> techTree) {
-        std::ifstream f(file.path);
-        std::stringstream buf;
-        buf << f.rdbuf();
-
-        std::string data = buf.str();
-
+    proto::GameSave loadGameSaveFromBytes(std::string data) {
         // skip header
         data.erase(data.begin(), data.begin() + headerSize);
 
@@ -142,6 +91,11 @@ namespace rip {
         GameSave packet;
         packet.ParseFromString(decompressedData);
 
+        return packet;
+    }
+
+    SaveData loadGameFromSave(Server *server, proto::GameSave &packet, std::shared_ptr<Registry> registry,
+                              std::shared_ptr<TechTree> techTree) {
         // First pass: compute ID mappings
         IdConverter playerIDs;
         IdConverter cityIDs;
@@ -196,8 +150,14 @@ namespace rip {
             player.onLoaded(game);
         }
 
+        absl::flat_hash_map<uint32_t, PlayerId> slotIDToPlayerID;
+        for (auto &[slotID, playerID] : packet.slotidtoplayerid()) {
+            slotIDToPlayerID[slotID] = playerIDs.get(playerID);
+        }
+
         return SaveData {
             .game = std::move(game),
+            .slotIDToPlayerID = std::move(slotIDToPlayerID),
         };
     }
 }

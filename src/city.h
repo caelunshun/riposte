@@ -7,7 +7,6 @@
 
 #include <memory>
 #include <glm/vec2.hpp>
-#include <rea.h>
 #include <absl/container/flat_hash_set.h>
 #include "player.h"
 #include "registry.h"
@@ -203,6 +202,7 @@ namespace rip {
         const Culture &getCulture() const;
         int getCulturePerTurn() const;
         CultureLevel getCultureLevel() const;
+        int getCultureNeeded() const;
 
         void setName(std::string name);
 

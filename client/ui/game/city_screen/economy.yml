@@ -1,0 +1,23 @@
+name: CityEconomyWindow
+child:
+  Container:
+    classes:
+      - game_window_container
+    mode: 
+      FillParentAndPad: 20
+    child:
+      Column:
+        spacing: 10
+        children:
+          - Text:
+              text: Output
+              classes:
+                - h3
+          - Divider: {}
+          - Text:
+              id: beaker_output_text
+          - Text:
+              id: gold_output_text
+          - Text:
+              id: maintenance_text
+            

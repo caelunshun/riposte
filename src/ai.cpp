@@ -273,7 +273,7 @@ namespace rip {
 
         void log(std::string message) const {
             //if (playerID == thePlayerID) {
-                std::cout << "[ai-" << playerName << "] " << message << std::endl;
+                std::cerr << "[ai-" << playerName << "] " << message << std::endl;
             //}
         }
 

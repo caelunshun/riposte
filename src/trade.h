@@ -7,7 +7,6 @@
 
 #include <absl/container/flat_hash_set.h>
 #include <absl/container/flat_hash_map.h>
-#include <rea.h>
 #include "ripmath.h"
 #include "ids.h"
 

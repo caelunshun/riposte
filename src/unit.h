@@ -9,7 +9,6 @@
 #include "registry.h"
 #include "ids.h"
 #include "path.h"
-
 struct nk_context;
 
 namespace rip {

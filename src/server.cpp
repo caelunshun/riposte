@@ -18,22 +18,15 @@
 
 #define PACKET(packet, anyservername, id) AnyServer _anyServer; _anyServer.set_requestid(id); _anyServer.mutable_##anyservername()->CopyFrom(packet);
 #define SEND(packet, anyservername, id)  { PACKET(packet, anyservername, id); send(_anyServer); }
-#define BROADCAST(packet, anyservername, id) { PACKET(packet, anyservername, id); for (auto &connection : connections) { connection.send(_anyServer); }}
-#define SENDTOCONN(packet, anyservername, id, playerID) { PACKET(packet, anyservername, id); for (auto &connection : connections) { if (connection.getPlayerID() == playerID) { connection.send(_anyServer); } } }
+#define BROADCAST(packet, anyservername, id) { PACKET(packet, anyservername, id); for (auto &connection : connections) { connection->send(_anyServer); }}
+#define SENDTOCONN(packet, anyservername, id, playerID) { PACKET(packet, anyservername, id); for (auto &connection : connections) { if (connection->getPlayerID() == playerID) { connection->send(_anyServer); } } }
 
 namespace rip {
-    Connection::Connection(std::unique_ptr<Bridge> bridge, PlayerId playerID, bool isAdmin, Server *server)
-        : bridge(std::move(bridge)), playerID(playerID), isAdmin(isAdmin), server(server) {
-        // choose random initial civ and leader
-        Rng rng;
-        while (true) {
-            auto civ = server->registry->getCivs()[rng.u32(0, server->registry->getCivs().size())];
-            if (!server->hasPlayerWithCiv(civ->id)) {
-                lobbyPlayerInfo.set_civid(civ->id);
-                lobbyPlayerInfo.set_leadername(civ->leaders[rng.u32(0, civ->leaders.size())].name);
-                break;
-            }
-        }
+    Connection::Connection(ConnectionHandle handle, PlayerId playerID, bool isAdmin, Server *server)
+        : handle(std::move(handle)), playerID(playerID), isAdmin(isAdmin), server(server) {
+
+        // Start receiving packets
+        requestMoreData();
     }
 
     void Connection::sendUpdateTile(Game &game, glm::uvec2 pos) {
@@ -46,11 +39,6 @@ namespace rip {
         SEND(packet, updatevisibility, 0);
     }
 
-    void Connection::sendPlayerData(Game &game) {
-        auto packet = getUpdatePlayerPacket(game, game.getPlayer(playerID));
-        SEND(packet, updateplayer, 0);
-    }
-
     PlayerId Connection::getPlayerID() const {
         return playerID;
     }
@@ -59,18 +47,27 @@ namespace rip {
         SEND(getUpdateGlobalDataPacket(game, playerID), updateglobaldata, 0);
     }
 
-    void Connection::sendGameData(Game &game) {
-        sendGlobalData(game);
-        sendPlayerData(game);
-        sendUpdateVisibility(game);
-        SEND(getUpdateMapPacket(game, playerID), updatemap, 0);
+    void Connection::sendGameStarted(Game &game) {
+        GameStarted gameStarted;
+        auto *gameData = gameStarted.mutable_gamedata();
 
-        for (auto &unit : game.getUnits()) {
-            SEND(getUpdateUnitPacket(game, unit), updateunit, 0);
+        for (auto &player : game.getPlayers()) {
+            gameData->add_players()->CopyFrom(getUpdatePlayerPacket(game, player));
         }
         for (auto &city : game.getCities()) {
-            SEND(getUpdateCityPacket(game, city), updatecity, 0);
+            gameData->add_cities()->CopyFrom(getUpdateCityPacket(game, city));
         }
+        for (auto &unit : game.getUnits()) {
+            gameData->add_units()->CopyFrom(getUpdateUnitPacket(game, unit));
+        }
+
+        gameData->mutable_globaldata()->CopyFrom(getUpdateGlobalDataPacket(game, playerID));
+        gameData->mutable_map()->CopyFrom(getUpdateMapPacket(game, playerID));
+        gameData->mutable_visibility()->CopyFrom(getUpdateVisibilityPacket(game, playerID));
+
+        ServerLobbyPacket packet;
+        packet.mutable_gamestarted()->CopyFrom(gameStarted);
+        send(packet);
     }
 
     void Connection::sendTradeNetworks(Game &game) {
@@ -103,43 +100,26 @@ namespace rip {
     }
 
     void Connection::handleMoveUnits(Game &game, const MoveUnits &packet) {
-        bool success = false;
+        bool success = true;
 
-        std::deque<glm::uvec2> path(packet.pathtofollow().positions_size() / 2);
-        for (int i = 0; i < packet.pathtofollow().positions_size() / 2; i++) {
-            path[i] = glm::uvec2(packet.pathtofollow().positions(i * 2), packet.pathtofollow().positions(i * 2 + 1));
+        glm::uvec2 targetPos(packet.targetpos().x(), packet.targetpos().y());
+
+        // First, check if we can move all units.
+        for (const auto unitID : packet.unitids()) {
+            const auto &unit = game.getUnit(UnitId(unitID));
+            if (!unit.canMove(targetPos, game)) {
+                success = false;
+                break;
+            }
         }
 
-        while (!path.empty()) {
-            auto targetPos = path[0];
-            path.pop_front();
-
-            bool possible = true;
-            bool skip = false;
-            for (const auto unitID : packet.unitids()) {
-                auto &unit = game.getUnit(UnitId(unitID));
-                if (unit.getPos() == targetPos) {
-                    skip = true;
-                    break;
-                }
-                if (!unit.canMove(targetPos, game)) {
-                    possible = false;
-                    break;
-                }
-            }
-
-            if (skip) continue;
-
-            if (!possible) break;
-
-            success = true;
+        if (success) {
+            // Now actually move the units.
             for (const auto unitID : packet.unitids()) {
                 auto &unit = game.getUnit(UnitId(unitID));
                 unit.moveTo(targetPos, game, true);
             }
         }
-
-        game.getServer().flushDirtyItems();
 
         ConfirmMoveUnits response;
         response.set_success(success);
@@ -246,7 +226,7 @@ namespace rip {
         } else if (kind.improvementid() == "Mine") {
             improvement = std::make_unique<Mine>(worker.getPos());
         } else {
-            std::cout << "[server-err] invalid improvement ID " << kind.improvementid() << std::endl;
+            std::cerr << "[server-err] invalid improvement ID " << kind.improvementid() << std::endl;
             return;
         }
 
@@ -287,227 +267,105 @@ namespace rip {
 
     void Connection::handleSaveGame() {
         if (isAdmin) {
-            server->saveGame();
+            server->saveGame(currentRequestID);
         }
     }
 
-    void Connection::handleGameOptions(const GameOptions &packet) {
-        if (isAdmin) {
-            server->setGameOptions(packet);
-        }
-    }
+    void Connection::requestMoreData() {
+        FnCallback callback = [&](const RipResult &res) {
+            if (rip_result_is_success(&res)) {
+                const auto bytes = rip_result_get_bytes(&res);
+                AnyClient packet;
+                packet.ParseFromArray((void*) bytes.ptr, bytes.len);
+                handlePacket(&*server->game, packet);
 
-    void Connection::handleAdminStartGame(const AdminStartGame &packet) {
-        if (isAdmin) {
-            server->startGame();
-        }
-    }
-
-    void Connection::handleSetLeader(const SetLeader &packet) {
-        lobbyPlayerInfo.set_civid(packet.civid());
-        lobbyPlayerInfo.set_leadername(packet.leader());
-    }
-
-    void Connection::handleClientInfo(const ClientInfo &packet) {
-        username = packet.username();
-        server->updateServerInfo();
+                requestMoreData();
+            }
+        };
+        handle.recvMessage(callback);
     }
 
     void Connection::handlePacket(Game *gamePtr, AnyClient &packet) {
         currentRequestID = packet.requestid();
-        if (gamePtr && !server->inLobby) {
-            auto &game = *gamePtr;
-            if (packet.has_computepath()) {
-                handleComputePath(game, packet.computepath());
-            } else if (packet.has_moveunits()) {
-                handleMoveUnits(game, packet.moveunits());
-            } else if (packet.has_endturn()) {
-                endedTurn = true;
-            } else if (packet.has_getbuildtasks()) {
-                handleGetBuildTasks(game, packet.getbuildtasks());
-            } else if (packet.has_setcitybuildtask()) {
-                handleSetBuildTask(game, packet.setcitybuildtask());
-            } else if (packet.has_setresearch()) {
-                handleSetResearch(game, packet.setresearch());
-            } else if (packet.has_getpossibletechs()) {
-                handleGetPossibleTechs(game, packet.getpossibletechs());
-            } else if (packet.has_seteconomysettings()) {
-                handleSetEconomySettings(game, packet.seteconomysettings());
-            } else if (packet.has_dounitaction()) {
-                handleDoUnitAction(game, packet.dounitaction());
-            } else if (packet.has_setworkertask()) {
-                handleSetWorkerTask(game, packet.setworkertask());
-            } else if (packet.has_declarewar()) {
-                handleDeclareWar(game, packet.declarewar());
-            } else if (packet.has_configureworkedtiles()) {
-                handleConfigureWorkedTiles(game, packet.configureworkedtiles());
-            } else if (packet.has_bombardcity()) {
-                handleBombardCity(game, packet.bombardcity());
-            } else if (packet.has_savegame()) {
-                handleSaveGame();
-            } else if (packet.has_declarepeace()) {
-                handleDeclarePeace(game, packet.declarepeace());
-            }
-        } else {
-            // game hasn't started; we're in the lobby phase
-            if (packet.has_gameoptions()) {
-                handleGameOptions(packet.gameoptions());
-            } else if (packet.has_adminstartgame()) {
-                handleAdminStartGame(packet.adminstartgame());
-            } else if (packet.has_setleader()) {
-                handleSetLeader(packet.setleader());
-            } else if (packet.has_clientinfo()) {
-                handleClientInfo(packet.clientinfo());
-            }
+        auto &game = *gamePtr;
+        if (packet.has_computepath()) {
+            handleComputePath(game, packet.computepath());
+        } else if (packet.has_moveunits()) {
+            handleMoveUnits(game, packet.moveunits());
+        } else if (packet.has_endturn()) {
+            endedTurn = true;
+        } else if (packet.has_getbuildtasks()) {
+            handleGetBuildTasks(game, packet.getbuildtasks());
+        } else if (packet.has_setcitybuildtask()) {
+            handleSetBuildTask(game, packet.setcitybuildtask());
+        } else if (packet.has_setresearch()) {
+            handleSetResearch(game, packet.setresearch());
+        } else if (packet.has_getpossibletechs()) {
+            handleGetPossibleTechs(game, packet.getpossibletechs());
+        } else if (packet.has_seteconomysettings()) {
+            handleSetEconomySettings(game, packet.seteconomysettings());
+        } else if (packet.has_dounitaction()) {
+            handleDoUnitAction(game, packet.dounitaction());
+        } else if (packet.has_setworkertask()) {
+            handleSetWorkerTask(game, packet.setworkertask());
+        } else if (packet.has_declarewar()) {
+            handleDeclareWar(game, packet.declarewar());
+        } else if (packet.has_configureworkedtiles()) {
+            handleConfigureWorkedTiles(game, packet.configureworkedtiles());
+        } else if (packet.has_bombardcity()) {
+            handleBombardCity(game, packet.bombardcity());
+        } else if (packet.has_savegame()) {
+            handleSaveGame();
+        } else if (packet.has_declarepeace()) {
+            handleDeclarePeace(game, packet.declarepeace());
         }
-    }
-
-    void Connection::update(Game *game) {
-        while (true) {
-            auto packetData = bridge->pollReceivedPacket();
-            if (!packetData.has_value()) break;
-
-            // Parse the packet.
-            AnyClient packet;
-            if (!packet.ParseFromString(*packetData)) {
-                std::cout << "received malformed packet!" << std::endl;
-                continue;
-            }
-
-            try {
-                handlePacket(game, packet);
-            } catch (std::exception &e) {
-                std::cout << "ERROR while handling packet: " << e.what() << std::endl;
-            }
-        }
-    }
-
-    const LobbyPlayer &Connection::getLobbyPlayerInfo() const {
-        return lobbyPlayerInfo;
-    }
-
-    const std::string &Connection::getUsername() const {
-        return username;
     }
 
     bool Connection::getIsAdmin() const {
         return isAdmin;
     }
 
-    Server::Server(std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree, std::string gameCategory)
-        : registry(registry), techTree(techTree), gameCategory(std::move(gameCategory)) {
-        gameOptions.set_mapwidth(32);
-        gameOptions.set_mapheight(32);
-        gameOptions.set_numhumanplayers(1);
-        gameOptions.set_numaiplayers(1);
-
-        gameName = "Beta Game - #" + std::to_string(Rng().u32(0, 10000));
+    Server::Server(std::shared_ptr<NetworkingContext> networkCtx, std::string gameName, std::string gameCategory)
+        : networkCtx(networkCtx),
+        gameName(std::move(gameName)), gameCategory(std::move(gameCategory)) {
     }
 
-    void Server::addConnection(std::unique_ptr<Bridge> bridge, bool isAdmin) {
-        connections.emplace_back(std::move(bridge), playerIDAllocator.insert(0), isAdmin, this);
+    void Server::addConnection(ConnectionHandle handle, PlayerId playerID, bool isAdmin) {
+        connections.emplace_back(std::make_shared<Connection>(std::move(handle), playerID, isAdmin, this));
     }
 
-    void Server::updateServerInfo() {
-        ServerInfo packet;
-        
-        // Add human players
-        for (auto &conn : connections) {
-            auto *player = packet.add_players();
-            player->set_civid(conn.getLobbyPlayerInfo().civid());
-            player->set_leadername(conn.getLobbyPlayerInfo().leadername());
-            player->set_username(conn.getUsername());
-            player->set_ishuman(true);
-            player->set_playerid(conn.getPlayerID().encode());
-            player->set_exists(true);
-            player->set_isadmin(conn.getIsAdmin());
-        }
+    void Server::run(std::shared_ptr<ReaderWriterQueue<ConnectionHandle>> newConnections) {
+        startGame();
 
-        // Add empty slots
-        int neededPlayers = gameOptions.numhumanplayers() - connections.size();
-        for (int i = 0; i < neededPlayers; i++) {
-            auto *player = packet.add_players();
-            player->set_exists(false);
-            player->set_ishuman(true);
-        }
-
-        for (auto &conn : connections) {
-            packet.set_theplayerid(conn.getPlayerID().encode());
-            AnyServer anyServer;
-            anyServer.mutable_serverinfo()->CopyFrom(packet);
-            conn.send(anyServer);
-        }
-    }
-
-    void Server::run(std::shared_ptr<ReaderWriterQueue<std::unique_ptr<Bridge>>> newConnections) {
         while (!connections.empty()) {
+            networkCtx->waitAndInvokeCallbacks();
+
+            bool haveAllTurnsEnded = true;
             for (auto &connection : connections) {
-                connection.update(game.get());
+                if (!connection->endedTurn) {
+                    haveAllTurnsEnded = false;
+                    break;
+                }
             }
 
-            if (!inLobby) {
-                bool haveAllTurnsEnded = true;
+            if (haveAllTurnsEnded) {
+                game->advanceTurn();
+                // saveGame();
                 for (auto &connection : connections) {
-                    if (!connection.endedTurn) {
-                        haveAllTurnsEnded = false;
-                        break;
-                    }
-                }
-
-                if (haveAllTurnsEnded) {
-                    game->advanceTurn();
-                    // saveGame();
-                    for (auto &connection : connections) {
-                        connection.endedTurn = false;
-                        connection.sendGlobalData(*game);
-                        connection.sendTradeNetworks(*game);
-                    }
-                }
-
-                game->tick();
-                flushDirtyItems();
-            } else {
-                std::unique_ptr<Bridge> newBridge;
-                while (newConnections->try_dequeue(newBridge)) {
-                    addConnection(std::move(newBridge), false);
+                    connection->endedTurn = false;
+                    connection->sendGlobalData(*game);
+                    connection->sendTradeNetworks(*game);
                 }
             }
 
-            std::this_thread::sleep_for(std::chrono::milliseconds(15));
+            game->tick();
+            flushDirtyItems();
         }
-    }
-
-    void Server::setGameOptions(GameOptions gameOptions) {
-        this->gameOptions = std::move(gameOptions);
     }
 
     void Server::startGame() {
-        const int minMapWidth = 16, minMapHeight = 16;
-
-        if (gameOptions.mapwidth() < minMapWidth) {
-            gameOptions.set_mapwidth(minMapWidth);
-        }
-        if (gameOptions.mapheight() < minMapHeight) {
-            gameOptions.set_mapheight(minMapHeight);
-        }
-
-        if (gameOptions.numhumanplayers() < 1) {
-            gameOptions.set_numhumanplayers(1);
-        }
-
-        if (!game) {
-            // Generate a new game.
-            auto theGame = MapGenerator().generate(gameOptions, registry, techTree, this);
-            game = std::make_unique<Game>(std::move(theGame));
-        }
-
-        inLobby = false;
-
-        StartGame startGame;
-        BROADCAST(startGame, startgame, 0);
-
         for (auto &conn : connections) {
-            conn.sendGameData(*game);
+            conn->sendGameStarted(*game);
         }
     }
 
@@ -557,8 +415,8 @@ namespace rip {
 
         for (const auto playerID : playersWithDirtyVisibility) {
             for (auto &conn : connections) {
-                if (conn.getPlayerID() == playerID) {
-                    conn.sendUpdateVisibility(game);
+                if (conn->getPlayerID() == playerID) {
+                    conn->sendUpdateVisibility(game);
                     break;
                 }
             }
@@ -566,18 +424,14 @@ namespace rip {
 
         for (const auto tile : dirtyTiles) {
             for (auto &conn : connections) {
-                conn.sendUpdateTile(game, tile);
+                conn->sendUpdateTile(game, tile);
             }
         }
 
         for (const auto playerID : dirtyPlayers) {
             auto &player = game.getPlayer(playerID);
-            for (auto &conn : connections) {
-                if (conn.getPlayerID() == playerID) {
-                    conn.sendPlayerData(game);
-                    break;
-                }
-            }
+            auto packet = getUpdatePlayerPacket(game, player);
+            BROADCAST(packet, updateplayer, 0);
         }
 
         dirtyUnits.clear();
@@ -628,43 +482,20 @@ namespace rip {
         const auto &attacker = game->getUnit(attackerID);
         const auto &defender = game->getUnit(defenderID);
         for (auto &conn : connections) {
-            if (attacker.getOwner() == conn.getPlayerID() || defender.getOwner() == conn.getPlayerID()) {
-                conn.send(wrappedPacket);
+            if (attacker.getOwner() == conn->getPlayerID() || defender.getOwner() == conn->getPlayerID()) {
+                conn->send(wrappedPacket);
             }
         }
     }
 
-    bool Server::hasPlayerWithCiv(const std::string &civID) const {
-        for (const auto &conn : connections) {
-            if (conn.getLobbyPlayerInfo().civid() == civID) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void Server::setSaveFileToLoadFrom(SaveFile f) {
-        saveFileToLoadFrom = std::move(f);
-
-        auto loadedGame = loadGameFromSave(this, *saveFileToLoadFrom, registry, techTree);
-        game = std::make_unique<Game>(std::move(loadedGame.game));
-    }
-
-    void Server::saveGame() {
+    void Server::saveGame(uint32_t requestID) {
         if (!game) return;
 
-        const auto path = getSavePath(gameCategory, gameName, game->getTurn());
-        std::ofstream f(path);
-
-        const auto data = serializeGameToSave(*game, gameName);
-        f << data;
-
-        f.close();
+        const auto data = serializeGameToSave(*game, lobbySlots, slotIDToPlayerID, gameName);
 
         GameSaved packet;
-        BROADCAST(packet, gamesaved, 0);
-
-        std::cout << "Saved game to " << path << std::endl;
+        packet.set_gamesavedata(data);
+        BROADCAST(packet, gamesaved, requestID);
     }
 
     void Server::broadcastBordersExpanded(CityId cityID) {

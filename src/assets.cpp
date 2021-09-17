@@ -39,7 +39,7 @@ namespace rip {
             assetString << assetFile.rdbuf();
 
             auto asset = loader->loadAsset(entry.id, assetString.str());
-            std::cout << "[assets] Loaded " << entry.id << std::endl;
+            std::cerr << "[assets] Loaded " << entry.id << std::endl;
 
             assets[entry.id] = std::move(asset);
 

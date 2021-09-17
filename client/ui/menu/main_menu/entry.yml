@@ -1,0 +1,10 @@
+name: MenuEntry
+child:
+  Clickable:
+    id: clickable
+    child:
+      Text:
+        id: the_text
+        classes:
+          - hoverable_text
+          - h2

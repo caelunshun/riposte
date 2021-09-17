@@ -1,0 +1,31 @@
+syntax = "proto3";
+
+package rip.mapgen;
+
+// Settings given to the map generator.
+message MapgenSettings {
+  oneof mapType {
+    // A map of continents and oceans.
+    ContinentsSettings continents = 1;
+  };
+  uint32 mapWidth = 2;
+  uint32 mapHeight = 3;
+}
+
+message ContinentsSettings {
+  // The number of continents to generate.
+  NumContinents numContinents = 1;
+}
+
+// The possible continent counts for a map.
+//
+// Fixed to a few allowed values.
+enum NumContinents {
+  One = 0;
+  Two = 1;
+  Three = 2;
+  Four = 3;
+  Five = 4;
+  Six = 5;
+  Seven = 6;
+}

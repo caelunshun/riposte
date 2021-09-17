@@ -215,8 +215,9 @@ namespace rip {
         Yield improvedBonus;
 
         // Determines how frequently the resource is generated.
-        // Units are in resources/1000 tiles.
-        float scarcity;
+        float abundance;
+        // Whether the resource can generate on desert tiles.
+        bool allowDeserts;
 
         uint32_t healthBonus = 0;
         uint32_t happyBonus = 0;
@@ -228,7 +229,8 @@ namespace rip {
             nlohmann_json_j.at("yieldBonus").get_to(nlohmann_json_t.yieldBonus);
             nlohmann_json_j.at("improvement").get_to(nlohmann_json_t.improvement);
             nlohmann_json_j.at("improvedBonus").get_to(nlohmann_json_t.improvedBonus);
-            nlohmann_json_j.at("scarcity").get_to(nlohmann_json_t.scarcity);
+            nlohmann_json_j.at("abundance").get_to(nlohmann_json_t.abundance);
+            nlohmann_json_j.at("allowDeserts").get_to(nlohmann_json_t.allowDeserts);
             if (nlohmann_json_j.contains("healthBonus")) {
                 nlohmann_json_j.at("healthBonus").get_to(nlohmann_json_t.healthBonus);
             }

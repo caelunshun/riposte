@@ -1,0 +1,22 @@
+name: CityResourcesWindow
+child:
+  Container:
+    classes:
+      - game_window_container
+    mode: 
+      FillParentAndPad: 20
+    child:
+      Column:
+        spacing: 10
+        children:
+          - Text:
+              text: Resources
+              classes:
+                - h3
+          - Divider: {}
+          - Scrollable:
+              scroll_axis: Vertical
+              child:
+                Column:
+                  id: resources_list
+                  spacing: 30

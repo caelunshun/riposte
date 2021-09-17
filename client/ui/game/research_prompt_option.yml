@@ -1,0 +1,20 @@
+name: ResearchPromptOption
+child:
+  Tooltip:
+    child:
+      Clickable:
+        id: clickable
+        child:
+          Text:
+            id: option_text
+            classes:
+              - hoverable_text
+    tooltip:
+      Container:
+        classes:
+          - tooltip_container
+        mode:
+          Pad: 10
+        child:
+          Text:
+            id: tooltip_text

@@ -75,6 +75,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/eaten_bread.png",
+    "id": "icon/eaten_bread",
+    "loader": "image"
+  },
+  {
     "path": "icon/coin.png",
     "id": "icon/coin",
     "loader": "image"
@@ -87,6 +92,11 @@
   {
     "path": "icon/gold.png",
     "id": "icon/gold",
+    "loader": "image"
+  },
+  {
+    "path": "icon/culture.png",
+    "id": "icon/culture",
     "loader": "image"
   },
   {
@@ -247,6 +257,11 @@
   {
     "path": "font/Merriweather-LightItalic.ttf",
     "id": "font/merriweather/regular",
+    "loader": "font"
+  },
+  {
+    "path": "font/CormorantGaramond-Regular.ttf",
+    "id": "font/icons",
     "loader": "font"
   },
   {

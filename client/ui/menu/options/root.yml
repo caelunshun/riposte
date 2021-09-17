@@ -1,0 +1,41 @@
+name: OptionsWindow
+child:
+  Container:
+    mode:
+      Pad: 50
+    child:
+      Row:
+        align_h: Center
+        align_v: Center
+        children:
+          - Column:
+              spacing: 50
+              children:
+                - Text: 
+                    text: Options
+                    classes:
+                      - h1
+                - Text:
+                    text: Sound
+                    classes:
+                      - h3
+                - Row:
+                    spacing: 20
+                    children:
+                      - Text: Music Volume
+                      - Slider:
+                          id: music_volume_slider
+                          width: 200
+                - Row:
+                    spacing: 20
+                    children:
+                      - Text: FX Volume
+                      - Slider:
+                          id: effects_volume_slider
+                          width: 200
+                
+                - Button:
+                    id: back_button
+                    child:
+                      Text: Back
+ 

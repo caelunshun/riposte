@@ -1,0 +1,17 @@
+name: TileTooltipWindow
+child:
+  Row:
+    align_v: End
+    children:
+      - Container:
+          id: root
+          fill_width: true
+          mode:
+            Pad: 10
+          classes:
+            - tile_tooltip_container
+          child:
+            Text:
+              classes:
+                - light_text
+              id: tooltip_text

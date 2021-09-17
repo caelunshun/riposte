@@ -1,0 +1,19 @@
+name: UnitSelector
+child:
+  Clickable:
+    id: clickable
+    child:
+      Container:
+        id: container
+        mode: Shrink
+        classes:
+          - unit_selector_container
+        child:
+          Image:
+            size: 35
+            id: unit_head
+            child:
+              Custom:
+                type: UnitIndicator
+                params: {}
+                id: indicators

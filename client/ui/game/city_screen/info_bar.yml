@@ -1,0 +1,123 @@
+name: CityInfoBarWindow
+child:
+  Container:
+    classes:
+      - game_window_container
+    mode: 
+      FillParentAndPad: 20
+    child:
+      Column:
+        spacing: 10
+        children:
+          - Row:
+              align_h: Center
+              children:
+                - Text:
+                    id: city_name
+                    classes:
+                      - h3
+          - Divider: {}
+          - Row:
+              children:
+                - Column:
+                    spacing: 20
+                    flex: 1
+                    children:
+                      - Text:
+                          id: food_text
+                      - Text:
+                          id: hammers_text
+                - Column:
+                    spacing: 20
+                    children:
+                      - ProgressBar:
+                          id: growth_progress_bar
+                          width: 400
+                          height: 20
+                          classes:
+                            - population_progress_bar
+                          child:
+                            Row:
+                              align_h: Center
+                              align_v: Center
+                              children:
+                                - Text:
+                                    id: growth_text
+                      - ProgressBar:
+                          id: production_progress_bar
+                          width: 400
+                          height: 20
+                          classes:
+                            - production_progress_bar
+                          child:
+                            Row:
+                              align_h: Center
+                              align_v: Center
+                              children:
+                                - Text:
+                                    id: production_text                          
+                - Column:
+                    spacing: 20
+                    flex: 1
+                    align_h: End
+                    children:
+                      - Row:
+                          children:
+                            - Tooltip:
+                                child:
+                                  Text:
+                                    id: health_text
+                                tooltip:
+                                  Container:
+                                    classes:
+                                      - tooltip_container
+                                    mode:
+                                      Pad: 10
+                                    child:
+                                      Text:
+                                        id: health_tooltip_text
+                            - Text:
+                                id: health_sign_text
+                            - Tooltip:
+                                child:
+                                  Text:
+                                    id: sick_text
+                                tooltip:
+                                  Container:
+                                    classes:
+                                      - tooltip_container
+                                    mode:
+                                      Pad: 10
+                                    child:
+                                      Text:
+                                        id: sick_tooltip_text
+                      - Row:
+                          children:
+                            - Tooltip:
+                                child:
+                                  Text:
+                                    id: happy_text
+                                tooltip:
+                                  Container:
+                                    classes:
+                                      - tooltip_container
+                                    mode:
+                                      Pad: 10
+                                    child:
+                                      Text:
+                                        id: happy_tooltip_text
+                            - Text:
+                                id: happy_sign_text
+                            - Tooltip:
+                                child:
+                                  Text:
+                                    id: unhappy_text
+                                tooltip:
+                                  Container:
+                                    classes:
+                                      - tooltip_container
+                                    mode:
+                                      Pad: 10
+                                    child:
+                                      Text:
+                                        id: unhappy_tooltip_text

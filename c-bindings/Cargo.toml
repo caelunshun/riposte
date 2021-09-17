@@ -1,0 +1,25 @@
+[package]
+name = "riposte-c-bindings"
+version = "0.1.0"
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+# Networking
+anyhow = "1"
+base64 = "0.13"
+bytes = "1"
+flume = "0.10"
+futures = "0.3"
+riposte-backend-api = { path = "../backend/api" }
+# enable dangerous futures for rustls
+rustls = { version = "0.19", features = [ "dangerous_configuration", "quic" ] }
+slotmap = "1"
+tokio = { version = "1", features = [ "full" ] }
+quinn = "0.7"
+webpki = "0.21"
+
+# Path rendering used for mapgen
+zeno = "0.2"

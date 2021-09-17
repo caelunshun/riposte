@@ -1,0 +1,20 @@
+name: UnitInfoWindow
+child:
+  Container:
+    classes:
+      - game_window_container
+    mode: 
+      FillParentAndPad: 20
+    child:
+      Column:
+        spacing: 10
+        children:
+          - Text:
+              id: header_text
+              classes:
+                - h3
+                - emphasized_text
+          - Divider: {}
+          - Text:
+              id: info_text
+          

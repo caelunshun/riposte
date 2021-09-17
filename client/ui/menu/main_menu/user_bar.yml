@@ -1,0 +1,18 @@
+name: UserBar
+child:
+  Container:
+    mode:
+      Pad: 10
+    classes:
+        - light_container
+    child:
+      Row:
+        spacing: 20
+        align_v: End
+        children:
+          - Text:
+              id: user_text
+          - Button:
+              id: log_out_button
+              child:
+                Text: Log Out

@@ -1,48 +1,65 @@
 //
 // Created by Caelum van Ispelen on 7/1/21.
 //
+// Revised on 08/23/21.
+//
 
 #ifndef RIPOSTE_NETWORK_H
 #define RIPOSTE_NETWORK_H
 
-#include <memory>
-#include <optional>
+#include <riposte_networking.h>
+#include <functional>
 
 namespace rip {
-    // A TCP connection to a server.
-    //
-    // Implements a simple length-prefixing codec,
-    // where each message is prefixed with a 4-byte, big-endian length field.
-    class NetworkConnection {
-        class impl;
-        std::unique_ptr<impl> _impl;
+    class ConnectionHandle;
+    class HubServerConnection;
 
-        void setError(std::string message);
+    typedef std::function<void(const RipResult&)> FnCallback;
 
-        std::optional<uint32_t> decodeLengthField();
-        std::optional<uint32_t> hasEnoughData();
+    // C++ wrapper over riposte-c-bindings networking support.
+    class NetworkingContext {
+    public:
+        RipNetworkingContext *inner;
+
+        NetworkingContext();
+        ~NetworkingContext();
+
+        ConnectionHandle connectStdio();
+
+        HubServerConnection connectToHub(const std::string &authToken);
+
+        void waitAndInvokeCallbacks();
+
+        RipNetworkingContext *getInner();
+    };
+
+    // C++ wrapper over a RipConnectionHandle.
+    class ConnectionHandle {
+        RipConnectionHandle *inner;
+        RipNetworkingContext *ctx;
 
     public:
-        NetworkConnection(const std::string &address, uint16_t port);
-        ~NetworkConnection();
+        ConnectionHandle(RipConnectionHandle *inner, RipNetworkingContext *ctx);
+        ~ConnectionHandle();
 
-        NetworkConnection(const NetworkConnection &other) = delete;
-        NetworkConnection(NetworkConnection &&other) noexcept;
+        ConnectionHandle(ConnectionHandle &&other);
+        ConnectionHandle(const ConnectionHandle &other) = delete;
 
-        // Sends a message. _Blocks_.
-        //
-        // You should call getError() after calling this method
-        // to determine whether an error occurred.
-        void sendMessage(const std::string &data);
+        ConnectionHandle &operator=(ConnectionHandle &&other);
 
-        // Waits for a message to be received and returns it. _Blocks_.
-        //
-        // You should call getError() after calling this method
-        // to determine whether an error occurred. If so,
-        // the returned message should be ignored.
-        std::string recvMessage();
+        void sendMessage(const std::string &data, FnCallback &callback);
+        void recvMessage(FnCallback &callback);
+    };
 
-        std::optional<std::string> getError();
+    // C++ wrapper over a RipHubServerConnection
+    class HubServerConnection {
+        RipHubServerConnection *inner;
+        RipNetworkingContext *ctx;
+
+    public:
+        HubServerConnection(RipHubServerConnection *inner, RipNetworkingContext *ctx);
+        
+        void getNewConnection(FnCallback &callback);
     };
 }
 

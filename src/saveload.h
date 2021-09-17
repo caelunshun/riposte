@@ -12,19 +12,14 @@
 #include "game.h"
 
 namespace rip {
-    struct SaveFile {
-        std::string category;
-        std::string name;
-        std::string path;
-        uint32_t turn;
-    };
-
-    std::vector<SaveFile> getAllSaves(const std::string &category);
-
-    std::string getSavePath(const std::string &category, const std::string &name, uint32_t turn);
+    namespace proto {
+        class GameSave;
+        class LobbySlot;
+    }
 
     struct SaveData {
         Game game;
+        absl::flat_hash_map<uint32_t, PlayerId> slotIDToPlayerID;
     };
 
     // Handles conversion of serialized IDs back to internal slotmap IDs.
@@ -43,9 +38,10 @@ namespace rip {
             return id;
         }
     };
-
-    std::string serializeGameToSave(Game &game, std::string name);
-    SaveData loadGameFromSave(Server *server, const SaveFile &file, std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree);
+ 
+    std::string serializeGameToSave(Game &game, const std::vector<proto::LobbySlot> &lobbySlots, const absl::flat_hash_map<uint32_t, PlayerId> slotIDToPlayerID, std::string name);
+    proto::GameSave loadGameSaveFromBytes(std::string data);
+    SaveData loadGameFromSave(Server *server, proto::GameSave &save, std::shared_ptr<Registry> registry, std::shared_ptr<TechTree> techTree);
 }
 
 #endif //RIPOSTE_SAVELOAD_H

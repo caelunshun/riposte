@@ -1,0 +1,20 @@
+[workspace]
+members = [
+    "client",
+    "client/protocol",
+    "launcher",
+    "lobby",
+    "bundler",
+    "backend",
+    "backend/api",
+    "c-bindings",
+]
+
+resolver = "2"
+
+# Build dependencies in release mode for better debug performance.
+[profile.dev.package."*"]
+opt-level = 3
+
+[patch.crates-io]
+slotmap = { git = "https://github.com/caelunshun/slotmap", branch = "feature/try_insert_with_key" }

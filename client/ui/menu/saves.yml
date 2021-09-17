@@ -1,0 +1,29 @@
+name: SavesWindow
+child:
+  Container:
+    mode:
+      Pad: 50
+    child:
+      Column:
+        spacing: 20
+        children:
+          - Text:
+              text: Game Saves
+              classes:
+                - h1
+          - Divider: {}
+          - Scrollable:
+              flex: 1
+              scroll_axis: Vertical
+              child:
+                Table:
+                    id: saves_table
+                    columns:
+                      - created_at
+                      - turn
+                      - load_button
+          - Button:
+              id: back_button
+              child:
+                Text: Back
+              

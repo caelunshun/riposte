@@ -1,0 +1,66 @@
+name: GameLobbyWindow
+child:
+  Container:
+    mode:
+      FillParentAndPad: 50
+    child:
+      Column:
+        spacing: 20
+        children:
+          - Text:
+              text: Game Lobby
+              classes:
+                - h1
+          - Divider: {}
+          - Row:
+              spacing: 20
+              children:
+                # players / slots
+                - Column:
+                    flex: 2
+                    spacing: 10
+                    children:
+                      - Text:
+                          text: Players
+                          classes:
+                            - h3
+                      - Divider: {}
+                      - Row:
+                          align_h: End
+                          spacing: 30
+                          children:
+                          - Button:
+                              id: add_ai_slot_button
+                              child:
+                                Text: Add AI Slot
+                          - Button:
+                              id: add_human_slot_button
+                              child:
+                                Text: Add Human Slot
+                      - Scrollable:
+                          flex: 1
+                          scroll_axis: Vertical
+                          child:
+                            Table:
+                                id: slots_table
+                                columns:
+                                  - name # player username, "AI," or "empty"
+                                  - status # "AI," "vacant", or "human"
+                                  - civ
+                                  - leader
+                                  - delete_button
+
+                # game settings
+                - Column:
+                    flex: 1
+                    spacing: 10
+                    children:
+                      - Text:
+                          text: Game Settings
+                          classes:
+                            - h3
+                      - Divider: {}
+                      - Button:
+                          id: start_game_button
+                          child:
+                            Text: Start Game

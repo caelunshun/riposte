@@ -1,0 +1,13 @@
+name: UnitActionBarWindow
+child:
+  Container:
+    classes:
+      - game_window_container
+    mode: 
+      FillParentAndPad: 20
+    child:
+      Row:
+        id: actions
+        spacing: 20
+        align_v: Center
+        
