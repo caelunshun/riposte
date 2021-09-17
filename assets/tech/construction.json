@@ -2,5 +2,10 @@
   "name": "Construction",
   "cost": 420,
   "prerequisites": ["Mathematics"],
-  "era": "classical"
+  "era": "classical",
+
+  "quote": {
+    "text": "And on the pedestal, these words appear: My name is Ozymandias, King of Kings; Look on my Works, ye Mighty, and despair!\nNothing beside remains.",
+    "attribution": "Percy Bysshe Shelley, \"Ozymandias\""
+  }
 }

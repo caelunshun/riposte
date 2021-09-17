@@ -2,5 +2,10 @@
   "name": "Monarchy",
   "cost": 300,
   "prerequisites": ["Priesthood", "Monotheism"],
-  "era": "classical"
+  "era": "classical",
+
+  "quote": {
+    "text": "Neither shall thy name anymore be called Abram, but thy name shall be Abraham; for a father of many nations have I made thee.",
+    "attribution": "Genesis 17:5"
+  }
 }
