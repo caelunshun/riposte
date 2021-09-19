@@ -1,9 +1,16 @@
-use std::{any::Any, path::Path, sync::Arc};
+use std::{
+    any::Any,
+    borrow::Borrow,
+    fmt::Debug,
+    hash::{Hash, Hasher},
+    ops::Deref,
+    path::Path,
+    ptr,
+    sync::Arc,
+};
 
 use ahash::AHashMap;
 use anyhow::Context;
-
-pub mod loaders;
 
 /// A loader for an asset.
 ///
@@ -32,7 +39,60 @@ pub trait Loader: 'static {
 pub struct MissingAsset(String);
 
 /// Handle to an asset.
-pub type Handle<T> = Arc<T>;
+pub struct Handle<T> {
+    arc: Arc<T>,
+}
+
+impl<T> Deref for Handle<T> {
+    type Target = T;
+
+    fn deref(&self) -> &Self::Target {
+        &self.arc
+    }
+}
+
+impl<T> Borrow<T> for Handle<T> {
+    fn borrow(&self) -> &T {
+        &self.arc
+    }
+}
+
+impl<T> AsRef<T> for Handle<T> {
+    fn as_ref(&self) -> &T {
+        &self.arc
+    }
+}
+
+impl<T> Clone for Handle<T> {
+    fn clone(&self) -> Self {
+        Self {
+            arc: Arc::clone(&self.arc),
+        }
+    }
+}
+
+impl<T> PartialEq<Handle<T>> for Handle<T> {
+    fn eq(&self, other: &Handle<T>) -> bool {
+        Arc::ptr_eq(&self.arc, &other.arc)
+    }
+}
+
+impl<T> Eq for Handle<T> {}
+
+impl<T> Hash for Handle<T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        ptr::hash(Arc::as_ptr(&self.arc), state);
+    }
+}
+
+impl<T> Debug for Handle<T>
+where
+    T: Debug,
+{
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        self.arc.fmt(f)
+    }
+}
 
 #[derive(Debug, serde::Deserialize)]
 struct IndexEntry {
@@ -104,7 +164,7 @@ impl Assets {
                     std::any::type_name::<T>(),
                 )
             });
-        Ok(asset)
+        Ok(Handle { arc: asset })
     }
 
     /// Iterates over all assets with the given type.
@@ -112,16 +172,20 @@ impl Assets {
         self.assets
             .values()
             .filter_map(|value| Arc::downcast(Arc::clone(value)).ok())
+            .map(|arc| Handle { arc })
     }
 
     /// Iterates over all assets with the given type.
     pub fn iter_with_id_by_type<T: Send + Sync + 'static>(
         &self,
     ) -> impl Iterator<Item = (&str, Handle<T>)> + '_ {
-        self.assets.iter().filter_map(|(id, value)| {
-            Arc::downcast(Arc::clone(value))
-                .ok()
-                .map(|v| (id.as_str(), v))
-        })
+        self.assets
+            .iter()
+            .filter_map(|(id, value)| {
+                Arc::downcast(Arc::clone(value))
+                    .ok()
+                    .map(|v| (id.as_str(), v))
+            })
+            .map(|(id, arc)| (id, Handle { arc }))
     }
 }

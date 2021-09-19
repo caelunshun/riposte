@@ -1,7 +1,5 @@
 use std::str::FromStr;
 
-use super::Game;
-
 #[derive(Debug, thiserror::Error)]
 #[error("unknown cottage level '{0}'")]
 pub struct InvalidCottageLevel(String);
@@ -21,22 +19,6 @@ pub enum Improvement {
 }
 
 impl Improvement {
-    pub fn from_data(data: &protocol::Improvement, _game: &Game) -> anyhow::Result<Self> {
-        match data.id.as_str() {
-            "Farm" => Ok(Improvement::Farm),
-            "Mine" => Ok(Improvement::Mine),
-            "Road" => Ok(Improvement::Road),
-            "Pasture" => Ok(Improvement::Pasture),
-            "Cottage" => {
-                let cottage = Cottage {
-                    level: CottageLevel::from_str(&data.cottage_level)?,
-                };
-                Ok(Improvement::Cottage(cottage))
-            }
-            s => Err(InvalidImprovementType(s.to_owned()).into()),
-        }
-    }
-
     pub fn name(&self) -> String {
         match self {
             Improvement::Farm => "Farm".to_owned(),

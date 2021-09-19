@@ -6,7 +6,6 @@ mod unit_kind;
 
 pub use building::*;
 pub use civ::*;
-use indexmap::IndexMap;
 pub use resource::*;
 pub use tech::*;
 pub use unit_kind::*;
@@ -15,6 +14,8 @@ use crate::{
     assets::{Assets, Handle},
     utils::delimit_string,
 };
+
+use indexmap::IndexMap;
 
 /// A registry of data-driven game files - unit kinds, civilizations,
 /// buildings, etc.

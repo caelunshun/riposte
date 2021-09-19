@@ -38,6 +38,7 @@ quinn = "0.7"
 rand = "0.8"
 rand_pcg = "0.3"
 riposte-backend-api = { path = "../backend/api" }
+riposte-common = { path = "../common" }
 rodio = { version = "0.14", default-features = false, features = [ "vorbis", "wav" ] }
 rustls = { version = "0.19", features = [ "dangerous_configuration", "quic" ] }
 serde = { version = "1", features = [ "derive" ] }

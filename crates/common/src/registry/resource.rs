@@ -1,4 +1,4 @@
-use crate::game::Yield;
+use crate::Yield;
 
 #[derive(Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]

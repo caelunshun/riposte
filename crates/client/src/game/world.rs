@@ -35,17 +35,7 @@ use super::{
     Tile, View,
 };
 
-slotmap::new_key_type! {
-    pub struct PlayerId;
-}
 
-slotmap::new_key_type! {
-    pub struct CityId;
-}
-
-slotmap::new_key_type! {
-    pub struct UnitId;
-}
 
 #[derive(Debug, thiserror::Error)]
 #[error("invalid {typ} network ID: {id}")]

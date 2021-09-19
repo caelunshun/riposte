@@ -213,7 +213,7 @@ styles:
         window,
         ui,
         |cv| {
-            cv.load_font(include_bytes!("../../assets/font/Merriweather-Regular.ttf").to_vec());
+            cv.load_font(include_bytes!("../../../assets/font/Merriweather-Regular.ttf").to_vec());
         },
         move |_| {
             if let Some(latest_progress) = progress_updates.try_iter().last() {
