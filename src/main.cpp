@@ -3,6 +3,7 @@
 #include "registry.h"
 #include "mapgen.h"
 #include "saveload.h"
+#include "player.h"
 #include "server.h"
 
 using rip::proto::LobbySlot;
@@ -71,8 +72,8 @@ int main(int argc, char **argv) {
     } else {
         // TEMP
         rip::mapgen::MapgenSettings settings;
-        settings.set_mapwidth(48);
-        settings.set_mapheight(32);
+        settings.set_mapwidth(40);
+        settings.set_mapheight(24);
         settings.mutable_continents()->set_numcontinents(rip::mapgen::NumContinents::One);
 
         rip::MapGenerator mapgen;
@@ -88,6 +89,8 @@ int main(int argc, char **argv) {
                 server.addConnection(std::move(handle), player, lobbySlot.isadmin());
 
                 server.slotIDToPlayerID[lobbySlot.id()] = player;
+
+                server.game->getPlayer(player).userUUID = lobbySlot.owneruuid();
             }
         }
     }

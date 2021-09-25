@@ -559,9 +559,18 @@ impl MovementDriver {
                         if !game.is_unit_valid(unit) {
                             return;
                         }
+                        // Don't move if there are still enemy units on the target tile
+                        if game.unit_stack(new_pos).unwrap().units().iter().any(|&u| {
+                            game.player(game.unit(u).owner())
+                                .is_at_war_with(game.the_player().id())
+                        }) {
+                            return;
+                        }
+
                         if game.unit(unit).pos() == old_pos {
                             updated = true;
                         }
+
                         game.unit_mut(unit).set_pos_unsafe(new_pos);
                     }
                     if updated {

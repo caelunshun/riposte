@@ -151,7 +151,7 @@ impl Game {
         game.stacks = stacks;
 
         for player in data.players {
-            game.add_or_update_player(player)?;
+            game.add_or_update_player(player, cx)?;
         }
 
         let tiles = proto_map
@@ -599,7 +599,7 @@ impl Game {
         }
     }
 
-    pub fn add_or_update_player(&mut self, data: UpdatePlayer) -> anyhow::Result<()> {
+    pub fn add_or_update_player(&mut self, data: UpdatePlayer, cx: &Context) -> anyhow::Result<()> {
         let data_id = data.id as u32;
         match self.player_ids.get(data_id) {
             Some(id) => {
@@ -610,7 +610,7 @@ impl Game {
             None => {
                 let mut players = mem::take(&mut self.players);
                 let res = players
-                    .try_insert_with_key(|k| Player::from_data(data, k, self).map(RefCell::new));
+                    .try_insert_with_key(|k| Player::from_data(data, k, self, cx).map(RefCell::new));
                 self.players = players;
                 if let Ok(id) = &res {
                     self.player_ids.insert(data_id, *id);

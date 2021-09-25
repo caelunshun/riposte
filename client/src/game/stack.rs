@@ -77,6 +77,12 @@ impl UnitStack {
                 score += 1000.;
             }
 
+            if let Some(combat_event) = game.current_combat_event() {
+                if combat_event.attacker_id() == u || combat_event.defender_id() == u {
+                    score += 10_000.;
+                }
+            }
+
             cmp::Reverse((FloatOrd(score), u))
         });
 

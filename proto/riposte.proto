@@ -535,6 +535,8 @@ message UpdatePlayer {
 
   repeated uint32 cityIDs = 19;
   int32 score = 20;
+
+  UUID userUUID = 21;
 }
 
 message PathComputed {

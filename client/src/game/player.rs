@@ -4,14 +4,14 @@ use ahash::AHashSet;
 use protocol::Era;
 
 use crate::{
-    assets::Handle,
+    assets::Handle, context::Context, backend::BackendResponse,
     registry::{Civilization, Leader, Tech},
 };
+use riposte_backend_api::UserInfo;
 
 use super::{Game, InvalidNetworkId, PlayerId};
 
 /// A player / civilization in the game.
-#[derive(Debug)]
 pub struct Player {
     data: protocol::UpdatePlayer,
     id: PlayerId,
@@ -21,6 +21,8 @@ pub struct Player {
     era: Era,
 
     civ: Handle<Civilization>,
+
+    user_info: Option<BackendResponse<UserInfo>>,
 }
 
 impl Player {
@@ -28,6 +30,7 @@ impl Player {
         data: protocol::UpdatePlayer,
         id: PlayerId,
         game: &Game,
+        cx: &Context,
     ) -> anyhow::Result<Self> {
         let mut player = Self {
             data: protocol::UpdatePlayer::default(),
@@ -37,6 +40,9 @@ impl Player {
             at_war_with: AHashSet::new(),
             era: Era::Ancient,
             civ: game.registry().civ(&data.civ_id)?,
+            user_info: data.user_uuid.clone().map(|uuid| {
+                cx.backend().fetch_user_data(uuid.into())
+            })
         };
 
         player.update_data(data, game)?;
@@ -96,8 +102,12 @@ impl Player {
             .unwrap_or_else(|| &self.civ.leaders[0])
     }
 
-    pub fn username(&self) -> &str {
-        &self.leader().name
+    pub fn username(&self) -> String {
+        if let Some(user_info) = self.user_info.as_ref().and_then(|res| res.get().and_then(|r| r.as_ref().ok())) {
+            user_info.get_ref().username .clone()
+        } else {
+            self.leader().name.clone()
+        }
     }
 
     pub fn base_revenue(&self) -> i32 {

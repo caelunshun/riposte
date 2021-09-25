@@ -346,7 +346,7 @@ impl Client<GameState> {
                 }
                 any_server::Packet::UpdateUnit(packet) => game.add_or_update_unit(cx, packet)?,
                 any_server::Packet::UpdateCity(packet) => game.add_or_update_city(packet)?,
-                any_server::Packet::UpdatePlayer(packet) => game.add_or_update_player(packet)?,
+                any_server::Packet::UpdatePlayer(packet) => game.add_or_update_player(packet, cx)?,
                 any_server::Packet::UpdateVisibility(packet) => game
                     .map_mut()
                     .set_visibility(packet.visibility().collect())?,
