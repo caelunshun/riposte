@@ -132,13 +132,6 @@ impl Tile {
 #[error("not enough tiles sent")]
 pub struct MapNotFull;
 
-#[derive(Debug, thiserror::Error)]
-#[error("map position ({x}, {y}) is out of bounds")]
-pub struct OutOfBounds {
-    pub x: u32,
-    pub y: u32,
-}
-
 /// The map. Stores all tiles and visibility data.
 #[derive(Default)]
 pub struct Map {
