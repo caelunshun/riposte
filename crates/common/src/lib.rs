@@ -14,6 +14,9 @@ pub mod game;
 pub mod registry;
 pub mod types;
 pub mod utils;
+pub mod lobby;
+pub mod protocol;
+pub mod bridge;
 
 pub use game::{
     culture::CultureLevel,

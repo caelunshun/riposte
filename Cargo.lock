@@ -3355,6 +3355,7 @@ dependencies = [
  "anyhow",
  "arrayvec 0.7.1",
  "bincode",
+ "flume",
  "fs-err",
  "glam",
  "indexmap",
@@ -3364,6 +3365,7 @@ dependencies = [
  "serde_json",
  "slotmap",
  "thiserror",
+ "tokio",
  "uuid",
 ]
 

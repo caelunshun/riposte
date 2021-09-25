@@ -1,6 +1,10 @@
+//! The Riposte game logic.
+
 use std::cell::{Ref, RefCell, RefMut};
 
 use glam::UVec2;
+use rand::{Rng, SeedableRng};
+use rand_pcg::Pcg64Mcg;
 use riposte_common::{game::tile::OutOfBounds, CityId, Map, PlayerId, UnitId};
 use slotmap::SlotMap;
 
@@ -22,6 +26,8 @@ pub struct Game {
     players: SlotMap<PlayerId, RefCell<Player>>,
     cities: SlotMap<CityId, RefCell<City>>,
     units: SlotMap<UnitId, RefCell<Unit>>,
+
+    rng: RefCell<Pcg64Mcg>,
 }
 
 impl Game {
@@ -32,6 +38,8 @@ impl Game {
             players: SlotMap::default(),
             cities: SlotMap::default(),
             units: SlotMap::default(),
+
+            rng: RefCell::new(Pcg64Mcg::from_entropy()),
         }
     }
 
@@ -126,5 +134,15 @@ impl Game {
     /// Mutably gets the tile at `pos`.
     pub fn tile_mut(&self, pos: UVec2) -> Result<RefMut<Tile>, OutOfBounds> {
         self.map.get_mut(pos)
+    }
+
+    /// Gets the RNG used for all random game events, such as combat.
+    ///
+    /// Note that the RNG state is serialized when the game is saved
+    /// to disk, so that reloading a game does not change the outcome
+    /// of game events. For this to work, calls to the RNG need to be entirely
+    /// deterministic.
+    pub fn rng(&self) -> RefMut<impl Rng> {
+        self.rng.borrow_mut()
     }
 }
