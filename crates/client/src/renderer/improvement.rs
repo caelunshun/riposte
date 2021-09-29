@@ -5,7 +5,7 @@ use palette::Srgba;
 
 use crate::{
     context::Context,
-    game::{view::PIXELS_PER_TILE, Game, Improvement, Tile},
+    game::{view::PIXELS_PER_TILE, Game, Tile},
 };
 
 use super::TileRenderLayer;
@@ -43,9 +43,7 @@ impl ImprovementRenderer {
         let mut num_connections = 0;
         for adjacent_pos in game.tile_neighbors(tile_pos) {
             let adjacent_tile = game.tile(adjacent_pos).unwrap();
-            if adjacent_tile
-                .improvements()
-                .any(|i| matches!(i, Improvement::Road))
+            if adjacent_tile.improvements().any(|i| todo!())
                 || game.city_at_pos(adjacent_pos).is_some()
             {
                 num_connections += 1;
@@ -74,11 +72,12 @@ impl TileRenderLayer for ImprovementRenderer {
         let mut canvas = cx.canvas_mut();
         for improvement in tile.improvements() {
             match improvement {
-                Improvement::Farm => self.render_improvement_icon(&mut canvas, self.farm),
+                _ => todo!(),
+               /*  Improvement::Farm => self.render_improvement_icon(&mut canvas, self.farm),
                 Improvement::Mine => self.render_improvement_icon(&mut canvas, self.mine),
                 Improvement::Road => self.render_road(game, tile_pos, &mut canvas),
                 Improvement::Pasture => self.render_improvement_icon(&mut canvas, self.pasture),
-                Improvement::Cottage(_) => self.render_improvement_icon(&mut canvas, self.cottage),
+                Improvement::Cottage(_) => self.render_improvement_icon(&mut canvas, self.cottage),*/
             }
         }
     }

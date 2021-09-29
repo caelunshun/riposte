@@ -7,15 +7,14 @@ use flume::Receiver;
 use glam::{uvec2, UVec2};
 use prost::Message;
 use protocol::{
-    any_client, any_server, client_lobby_packet, server_lobby_packet, worker_task_kind, AnyClient,
-    AnyServer, BordersExpanded, BuildTaskFailed, BuildTaskFinished, ChangeCivAndLeader,
-    ClientLobbyPacket, ConfigureWorkedTiles, ConfirmMoveUnits, CreateSlot, DeclarePeace,
-    DeclareWar, DeleteSlot, DoUnitAction, EndTurn, GameSaved, GameStarted, GetBuildTasks,
-    GetPossibleTechs, InitialGameData, Kicked, LobbyInfo, MoveUnits, PeaceDeclared, Pos,
-    PossibleCityBuildTasks, PossibleTechs, RequestGameStart, SaveGame, ServerLobbyPacket,
-    SetCityBuildTask, SetEconomySettings, SetResearch, SetSaveFile, SetWorkerTask, WarDeclared,
+    any_client, any_server, worker_task_kind, AnyClient, AnyServer, BordersExpanded,
+    BuildTaskFailed, BuildTaskFinished, ConfigureWorkedTiles, ConfirmMoveUnits, DeclarePeace,
+    DeclareWar, DoUnitAction, EndTurn, GameSaved, GameStarted, GetBuildTasks, GetPossibleTechs,
+    InitialGameData, MoveUnits, PeaceDeclared, Pos, PossibleCityBuildTasks, PossibleTechs,
+    SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask, WarDeclared,
     WorkerTask, WorkerTaskImprovement,
 };
+use riposte_common::{CityId, PlayerId, UnitId, assets::Handle, bridge::{Bridge, ClientSide}, lobby::{GameLobby, SlotId}, protocol::{ClientPacket, ServerPacket, lobby::{ChangeCivAndLeader, ClientLobbyPacket, CreateSlot, DeleteSlot, Kicked, LobbyInfo, ServerLobbyPacket}}, registry::{Civilization, Leader, Registry, Tech}};
 
 use crate::{
     context::Context,
@@ -24,11 +23,8 @@ use crate::{
         combat::CombatEvent,
         event::GameEvent,
         unit::WorkerTaskKind,
-        CityId, Game, PlayerId, UnitId,
+        Game,
     },
-    lobby::GameLobby,
-    registry::{Civilization, Leader, Registry, Tech},
-    server_bridge::ServerBridge,
 };
 
 #[derive(Debug, thiserror::Error)]
@@ -57,7 +53,7 @@ pub enum LobbyEvent {
 /// of the connection: either Lobby or Game. Different
 /// methods are available on `Client` depending on the current state.
 pub struct Client<State> {
-    bridge: ServerBridge,
+    bridge: Bridge<ClientSide>,
     _marker: PhantomData<State>,
 
     next_request_id: Cell<u32>,
@@ -68,7 +64,7 @@ impl<S> Client<S>
 where
     S: State,
 {
-    pub fn new(bridge: ServerBridge) -> Self {
+    pub fn new(bridge: Bridge<ClientSide>) -> Self {
         Self {
             bridge,
             _marker: PhantomData,
@@ -77,50 +73,41 @@ where
             server_response_senders: AHashMap::new(),
         }
     }
-
-    fn poll_for_message(&self) -> Result<Option<S::RecvPacket>> {
-        if !self.bridge.is_connected() {
-            return Err(ClientError::Disconnected);
-        }
-
-        match self.bridge.poll_for_message() {
-            Some(bytes) => {
-                let msg: S::RecvPacket = S::RecvPacket::decode(bytes)?;
-                Ok(Some(msg))
-            }
-            None => Ok(None),
-        }
-    }
 }
 
 impl Client<LobbyState> {
+    fn poll_for_message(&self) -> Result<Option<ServerLobbyPacket>> {
+        if self.bridge.is_disconnected() {
+            return Err(ClientError::Disconnected);
+        }
+
+        match self.bridge.try_recv() {
+            Some(ServerPacket::Lobby(packet)) => Ok(Some(packet)),
+            _ => Ok(None),
+        }
+    }
+
     pub fn create_slot(&mut self, req: CreateSlot) {
-        self.send_message(client_lobby_packet::Packet::CreateSlot(req));
+        self.send_message(ClientLobbyPacket::CreateSlot(req));
     }
 
     pub fn delete_slot(&mut self, req: DeleteSlot) {
-        self.send_message(client_lobby_packet::Packet::DeleteSlot(req));
+        self.send_message(ClientLobbyPacket::DeleteSlot(req));
     }
 
-    pub fn set_civ_and_leader(&mut self, civ: &Civilization, leader: &Leader) {
-        self.send_message(client_lobby_packet::Packet::ChangeCivAndLeader(
-            ChangeCivAndLeader {
-                civ_id: civ.id.clone(),
-                leader_name: leader.name.clone(),
-            },
-        ));
+    pub fn set_civ_and_leader(&mut self, civ: &Handle<Civilization>, leader: &Leader) {
+        self.send_message(ClientLobbyPacket::ChangeCivAndLeader(ChangeCivAndLeader {
+            civ: civ.clone(),
+            leader: leader.clone(),
+        }));
     }
 
     pub fn request_start_game(&mut self) {
-        self.send_message(client_lobby_packet::Packet::RequestGameStart(
-            RequestGameStart {},
-        ));
+        todo!()
     }
 
     pub fn set_save_file(&mut self, file: Vec<u8>) {
-        self.send_message(client_lobby_packet::Packet::SetSaveFile(SetSaveFile {
-            save_file_data: file,
-        }));
+        todo!()
     }
 
     pub fn to_game_state(&self) -> Client<GameState> {
@@ -135,22 +122,20 @@ impl Client<LobbyState> {
     pub fn handle_messages(
         &mut self,
         lobby: &mut GameLobby,
+        our_slot: &mut SlotId,
         registry: &Registry,
     ) -> Result<Vec<LobbyEvent>> {
         let mut events = Vec::new();
         while let Some(msg) = self.poll_for_message()? {
-            match msg.packet.ok_or(ClientError::MissingPacket)? {
-                server_lobby_packet::Packet::LobbyInfo(packet) => {
+            match msg {
+                ServerLobbyPacket::LobbyInfo(packet) => {
+                    *our_slot = packet.our_slot;
                     self.handle_lobby_info(packet, lobby, registry)?;
                     events.push(LobbyEvent::InfoUpdated);
+     
                 }
-                server_lobby_packet::Packet::Kicked(packet) => {
+                ServerLobbyPacket::Kicked(packet) => {
                     self.handle_kicked(packet, lobby)?;
-                }
-                server_lobby_packet::Packet::GameStarted(packet) => {
-                    let game_data = self.handle_game_started(packet, lobby)?;
-                    events.push(LobbyEvent::GameStarted(game_data));
-                    break;
                 }
             }
         }
@@ -165,7 +150,7 @@ impl Client<LobbyState> {
         registry: &Registry,
     ) -> Result<()> {
         log::info!("Received new lobby info: {:?}", packet);
-        lobby.set_info(packet, registry)?;
+        *lobby = packet.lobby;
         Ok(())
     }
 
@@ -183,13 +168,8 @@ impl Client<LobbyState> {
         packet.game_data.ok_or(ClientError::MissingPacket)
     }
 
-    fn send_message(&self, packet: client_lobby_packet::Packet) {
-        let mut bytes = BytesMut::new();
-        let packet = ClientLobbyPacket {
-            packet: Some(packet),
-        };
-        packet.encode(&mut bytes).expect("failed to encode message");
-        self.bridge.send_message(bytes.freeze());
+    fn send_message(&self, packet: ClientLobbyPacket) {
+        self.bridge.send(ClientPacket::Lobby(packet));
     }
 }
 
@@ -302,7 +282,7 @@ impl Client<GameState> {
                     WorkerTaskKind::BuildImprovement(improvement) => protocol::WorkerTaskKind {
                         kind: Some(worker_task_kind::Kind::BuildImprovement(
                             WorkerTaskImprovement {
-                                improvement_id: improvement.name().to_owned(),
+                                improvement_id: todo!(),
                             },
                         )),
                     },
@@ -338,7 +318,8 @@ impl Client<GameState> {
         if game.has_combat_event() {
             return Ok(());
         }
-        while let Some(msg) = self.poll_for_message()? {
+        todo!()
+        /*while let Some(msg) = self.poll_for_message()? {
             let request_id = msg.request_id as u32;
             match msg.packet.ok_or(ClientError::MissingPacket)? {
                 any_server::Packet::ConfirmMoveUnits(packet) => {
@@ -391,7 +372,7 @@ impl Client<GameState> {
                 return Ok(());
             }
         }
-        Ok(())
+        Ok(())*/
     }
 
     fn handle_confirm_move_units(&mut self, packet: ConfirmMoveUnits, request_id: u32) {
@@ -516,8 +497,7 @@ impl Client<GameState> {
             packet: Some(packet),
         };
         packet.encode(&mut bytes).expect("failed to encode message");
-        self.bridge.send_message(bytes.freeze());
-        request_id
+        todo!()
     }
 }
 
@@ -529,8 +509,8 @@ pub trait State {
 pub struct LobbyState;
 
 impl State for LobbyState {
-    type SendPacket = ClientLobbyPacket;
-    type RecvPacket = ServerLobbyPacket;
+    type SendPacket = protocol::ClientLobbyPacket;
+    type RecvPacket = protocol::ServerLobbyPacket;
 }
 
 pub struct GameState;

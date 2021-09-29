@@ -1,11 +1,15 @@
 use std::cell::{Ref, RefCell, RefMut};
 
 use glam::UVec2;
-use protocol::{Terrain, Visibility};
+use protocol::{Improvement, Terrain, Visibility};
+use riposte_common::{
+    assets::Handle,
+    game::{culture::Culture, tile::OutOfBounds},
+    registry::Resource,
+    PlayerId,
+};
 
-use crate::{assets::Handle, registry::Resource};
-
-use super::{culture::Culture, player::Player, Game, Improvement, PlayerId, Yield};
+use super::{player::Player, Game, Yield};
 
 /// A tile on the map.
 #[derive(Debug)]
@@ -41,7 +45,7 @@ impl Tile {
         };
 
         if let Some(culture_values) = &data.culture_values {
-            self.culture.set_data(game, culture_values)?;
+            //  self.culture.set_data(game, culture_values)?;
         }
 
         self.owner = data
@@ -52,7 +56,7 @@ impl Tile {
         self.improvements = data
             .improvements
             .iter()
-            .map(|data| Improvement::from_data(data, game))
+            .map(|data| todo!())
             .collect::<anyhow::Result<_>>()?;
 
         self.data = data;
@@ -102,7 +106,7 @@ impl Tile {
             cost += 1.;
         }
 
-        if self.improvements().any(|i| matches!(i, Improvement::Road)) {
+        if self.improvements().any(|i| todo!()) {
             let can_use_road = match self.owner() {
                 Some(owner) => !player.is_at_war_with(owner),
                 None => true,

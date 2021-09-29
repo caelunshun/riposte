@@ -15,21 +15,21 @@ use dume::Canvas;
 use flume::Receiver;
 use glam::vec2;
 use once_cell::sync::OnceCell;
+use riposte_common::{
+    assets::Assets,
+    registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
+};
 use tokio::runtime::{self, Runtime};
 use walkdir::WalkDir;
 use winit::{dpi::PhysicalSize, event::WindowEvent, event_loop::EventLoop, window::Window};
 
 use crate::{
-    assets::{
-        loaders::{FontLoader, ImageLoader, JsonLoader, SoundLoader},
-        Assets,
-    },
+    asset_loaders::{FontLoader, ImageLoader, JsonLoader, SoundLoader},
     audio::Audio,
     backend::BackendService,
     options::Options,
     paths::FilePaths,
     popups::PopupWindows,
-    registry::{Building, Civilization, Registry, Resource, Tech, UnitKind},
     saveload::SaveFiles,
     state::StateManager,
     ui::{

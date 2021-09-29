@@ -1,19 +1,19 @@
 use std::{convert::TryInto, num::NonZeroUsize, str::FromStr};
 
-use crate::{
-    assets::Handle,
-    context::Context,
-    game::InvalidNetworkId,
-    registry::{CapabilityType, CombatBonusType, UnitKind},
-};
+use crate::{context::Context, game::InvalidNetworkId};
 
-use super::{Game, Improvement, PlayerId, UnitId};
+use super::Game;
 
 use anyhow::anyhow;
 use duit::Vec2;
 use glam::UVec2;
 use lexical::WriteFloatOptions;
-use protocol::{capability, worker_task_kind};
+use protocol::{capability, worker_task_kind, Improvement};
+use riposte_common::{
+    assets::Handle,
+    registry::{CapabilityType, CombatBonusType, UnitKind},
+    PlayerId, UnitId,
+};
 use splines::{Interpolation, Key, Spline};
 
 pub const MOVEMENT_LEFT_EPSILON: f64 = 0.001;
@@ -395,7 +395,7 @@ impl WorkerTask {
             .ok_or_else(|| anyhow!("unknown worker task kind"))?
         {
             worker_task_kind::Kind::BuildImprovement(task) => {
-                WorkerTaskKind::BuildImprovement(Improvement::from_str(&task.improvement_id)?)
+                todo!()
             }
         };
 

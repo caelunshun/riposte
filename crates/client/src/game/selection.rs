@@ -6,6 +6,7 @@ use duit::{Event, Vec2};
 use float_ord::FloatOrd;
 use glam::UVec2;
 use protocol::ConfirmMoveUnits;
+use riposte_common::{UnitId, utils::{Version, VersionSnapshot}};
 use slotmap::{SecondaryMap, SlotMap};
 use smallvec::SmallVec;
 use winit::event::MouseButton;
@@ -13,10 +14,9 @@ use winit::event::MouseButton;
 use crate::{
     client::{Client, GameState, ServerResponseFuture},
     context::Context,
-    utils::{Version, VersionSnapshot},
 };
 
-use super::{path::Path, unit::MOVEMENT_LEFT_EPSILON, Game, UnitId};
+use super::{path::Path, unit::MOVEMENT_LEFT_EPSILON, Game};
 
 /// The time after no units are selected at which we will
 /// attempt to auto-select the next unit group.

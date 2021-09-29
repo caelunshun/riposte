@@ -1,8 +1,7 @@
 use std::{cell::RefCell, collections::VecDeque};
 
 use glam::UVec2;
-
-use super::{CityId, PlayerId, UnitId};
+use riposte_common::{CityId, PlayerId, UnitId};
 
 /// An event indicates that some piece of game data was updated.
 ///

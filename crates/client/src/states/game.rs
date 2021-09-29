@@ -1,10 +1,11 @@
 use duit::Event;
+use riposte_common::{CityId, PlayerId};
 use winit::event::VirtualKeyCode;
 
 use crate::{
     client::{self, Client},
     context::Context,
-    game::{event::GameEvent, CityId, Game, PlayerId},
+    game::{event::GameEvent, Game},
     renderer::GameRenderer,
     state::StateAttachment,
 };

@@ -8,6 +8,7 @@ use crate::{
 #[derive(Debug)]
 pub enum ServerLobbyPacket {
     LobbyInfo(LobbyInfo),
+    Kicked(Kicked),
 }
 
 /// Updates slot data for the lobby.
@@ -16,6 +17,14 @@ pub struct LobbyInfo {
     pub lobby: GameLobby,
     /// The slot belonging the connected player.
     pub our_slot: SlotId,
+}
+
+/// The player has been removed from the game.
+///
+/// The connections is terminated after this packet is sent.
+#[derive(Debug)]
+pub struct Kicked {
+    pub reason: String,
 }
 
 /// A packet sent by the client during the lobby state.

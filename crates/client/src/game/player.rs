@@ -2,13 +2,9 @@ use std::convert::TryInto;
 
 use ahash::AHashSet;
 use protocol::Era;
+use riposte_common::{PlayerId, assets::Handle, registry::{Civilization, Leader, Tech}};
 
-use crate::{
-    assets::Handle,
-    registry::{Civilization, Leader, Tech},
-};
-
-use super::{Game, InvalidNetworkId, PlayerId};
+use super::{Game, InvalidNetworkId};
 
 /// A player / civilization in the game.
 #[derive(Debug)]

@@ -5,9 +5,10 @@ use std::{
 
 use float_ord::FloatOrd;
 use glam::UVec2;
+use riposte_common::{UnitId, game::tile::OutOfBounds};
 use smallvec::SmallVec;
 
-use super::{tile::OutOfBounds, Game, UnitId};
+use super::{ Game};
 
 /// A stack of units all on the same tile.
 ///

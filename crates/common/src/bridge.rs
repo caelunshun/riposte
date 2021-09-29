@@ -34,6 +34,12 @@ pub struct Bridge<S: Side> {
     receiver: Receiver<S::RecvPacket>,
 }
 
+impl <S: Side> Clone for Bridge<S> {
+    fn clone(&self) -> Self {
+        Self { sender: self.sender.clone(), receiver: self.receiver.clone() }
+    }
+}
+
 impl<S: Side> Bridge<S> {
     pub fn send(&self, packet: S::SendPacket) {
         self.sender.send(packet).ok();
@@ -41,6 +47,10 @@ impl<S: Side> Bridge<S> {
 
     pub fn try_recv(&self) -> Option<S::RecvPacket> {
         self.receiver.try_recv().ok()
+    }
+
+    pub async fn recv(&self) -> Option<S::RecvPacket> {
+        self.receiver.recv_async().await.ok()
     }
 
     pub fn is_disconnected(&self) -> bool {

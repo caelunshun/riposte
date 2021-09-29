@@ -1,11 +1,10 @@
 use std::{any::Any, cell::RefCell, marker::PhantomData, rc::Rc, sync::Arc};
 
 use dume::{Canvas, SpriteData, SpriteDescriptor};
+use riposte_common::assets::Loader;
 use serde::de::DeserializeOwned;
 
 use crate::audio::Audio;
-
-use super::Loader;
 
 pub struct ImageLoader {
     canvas: Rc<RefCell<Canvas>>,

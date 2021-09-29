@@ -3,13 +3,9 @@ use std::convert::TryInto;
 use anyhow::{anyhow, bail};
 use glam::UVec2;
 use protocol::{HappinessEntry, HealthEntry, SicknessEntry, UnhappinessEntry};
+use riposte_common::{CityId, PlayerId, assets::Handle, game::culture::Culture, registry::{Building, RegistryItemNotFound, Resource, UnitKind}};
 
-use crate::{
-    assets::Handle,
-    registry::{Building, RegistryItemNotFound, Resource, UnitKind},
-};
-
-use super::{CityId, Culture, Game, PlayerId, Yield};
+use super::{Game, Yield};
 
 #[derive(Debug)]
 pub struct City {
@@ -73,7 +69,7 @@ impl City {
             .collect::<Result<_, RegistryItemNotFound>>()?;
 
         if let Some(culture_values) = &data.culture_values {
-            self.culture.set_data(game, culture_values)?;
+            // self.culture.set_data(game, culture_values)?;
         }
 
         self.data = data;

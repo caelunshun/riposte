@@ -100,7 +100,8 @@ impl MenuState {
                     self.state = State::MainMenu(MainMenuState::new(cx));
                 }
                 Some(server_list::Action::JoinGame(bridge)) => {
-                    action = Some(crate::Action::EnterLobby(bridge));
+                    todo!()
+                    // action = Some(crate::Action::EnterLobby(bridge));
                 }
                 _ => {}
             },

@@ -1,7 +1,9 @@
 //! Generates tooltip text for various objects: unit kinds,
 //! buildings, tiles.
 
-use crate::{game::city::BuildTaskKind, registry::Registry};
+use riposte_common::registry::Registry;
+
+use crate::{game::city::BuildTaskKind};
 
 pub mod building;
 pub mod happiness;

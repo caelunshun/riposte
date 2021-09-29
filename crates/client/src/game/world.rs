@@ -12,13 +12,12 @@ use glam::{ivec2, UVec2};
 use protocol::{
     Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit, Visibility,
 };
+use riposte_common::{CityId, PlayerId, UnitId, game::tile::OutOfBounds, registry::{CapabilityType, Registry}, utils::VersionSnapshot};
 use slotmap::SlotMap;
 
 use crate::{
     client::{Client, GameState},
     context::Context,
-    registry::{CapabilityType, Registry},
-    utils::VersionSnapshot,
 };
 
 use super::{
@@ -30,7 +29,7 @@ use super::{
     player::Player,
     selection::{SelectedUnits, SelectionDriver},
     stack::{StackGrid, UnitStack},
-    tile::{Map, OutOfBounds},
+    tile::{Map},
     unit::Unit,
     Tile, View,
 };

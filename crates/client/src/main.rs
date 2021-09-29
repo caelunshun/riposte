@@ -8,6 +8,7 @@ use context::Context;
 use duit::Event;
 use game::Game;
 use mimalloc::MiMalloc;
+use riposte_common::bridge::{Bridge, ClientSide};
 use server_bridge::ServerBridge;
 use simple_logger::SimpleLogger;
 
@@ -27,44 +28,41 @@ macro_rules! vars {
     }}
 }
 
-mod assets;
+mod asset_loaders;
 mod audio;
 mod backend;
 mod client;
 mod context;
 mod event_loop;
+mod fair_random;
 mod game;
 #[allow(warnings)]
 mod generated;
-mod lobby;
-mod fair_random;
 mod options;
 mod paths;
 mod popups;
-mod registry;
 mod renderer;
 mod saveload;
 mod server_bridge;
 mod state;
 mod states;
-mod tooltips;
+// mod tooltips;
 mod ui;
-mod utils;
 mod volumes;
 
-use states::{game::GameState, lobby::GameLobbyState, menu::MenuState};
+use states::{lobby::GameLobbyState, menu::MenuState};
 
 extern crate fs_err as fs;
 
 pub enum Action {
     EnterSingleplayerLobby(Option<Vec<u8>>),
-    EnterLobby(ServerBridge),
+    EnterLobby(Bridge<ClientSide>),
 }
 
 pub enum RootState {
     MainMenu(MenuState),
     Lobby(GameLobbyState),
-    Game(GameState),
+    //  Game(GameState),
 }
 
 impl RootState {
@@ -83,7 +81,6 @@ impl RootState {
                             }
                         }
                         Action::EnterLobby(bridge) => {
-                            dbg!();
                             *self = RootState::Lobby(GameLobbyState::new(cx, Client::new(bridge)));
                         }
                     }
@@ -101,7 +98,7 @@ impl RootState {
                             }
                         };
                     let client = lobby.client().to_game_state();
-                    *self = RootState::Game(GameState::new(cx, client, game));
+                    // *self = RootState::Game(GameState::new(cx, client, game));
                 }
                 Ok(None) => {}
                 Err(e) => {
@@ -109,18 +106,18 @@ impl RootState {
                     *self = RootState::MainMenu(MenuState::new(cx));
                 }
             },
-            RootState::Game(game) => {
+            /*  RootState::Game(game) => {
                 if let Err(e) = game.update(cx) {
                     cx.show_error_popup(&format!("disconnected from the game: {}", e));
                     *self = RootState::MainMenu(MenuState::new(cx));
                 }
-            }
+            }*/
         }
     }
 
     pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
         match self {
-            RootState::Game(g) => g.handle_event(cx, event),
+            // RootState::Game(g) => g.handle_event(cx, event),
             _ => {}
         }
     }

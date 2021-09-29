@@ -1,8 +1,9 @@
 use protocol::CombatRound;
+use riposte_common::UnitId;
 
 use crate::context::Context;
 
-use super::{Game, UnitId};
+use super::{Game};
 
 #[derive(Debug)]
 pub struct CombatEvent {
