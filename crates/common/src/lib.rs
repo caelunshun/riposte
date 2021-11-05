@@ -16,11 +16,13 @@ pub mod types;
 pub mod utils;
 pub mod lobby;
 pub mod protocol;
+pub mod mapgen;
 pub mod bridge;
+pub mod poisson;
 
 pub use game::{
     culture::CultureLevel,
-    tile::{Map, Terrain},
+    tile::{Grid, Terrain},
     CityId, PlayerId, UnitId,
 };
 pub use types::{Era, Turn, Visibility, Year, Yield};

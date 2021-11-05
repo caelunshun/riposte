@@ -18,6 +18,7 @@ extern crate fs_err as fs;
 mod connection;
 mod game;
 mod lobby;
+mod mapgen;
 
 /// Configuration for a Riposte server.
 pub struct ServerConfig {

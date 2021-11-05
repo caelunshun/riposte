@@ -5,7 +5,7 @@ use std::cell::{Ref, RefCell, RefMut};
 use glam::UVec2;
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
-use riposte_common::{game::tile::OutOfBounds, CityId, Map, PlayerId, UnitId};
+use riposte_common::{game::tile::OutOfBounds, CityId, Grid, PlayerId, UnitId};
 use slotmap::SlotMap;
 
 pub mod city;
@@ -21,7 +21,7 @@ pub use unit::Unit;
 /// Stores the entire game state.
 #[derive(Debug)]
 pub struct Game {
-    map: Map<Tile>,
+    map: Grid<RefCell<Tile>>,
 
     players: SlotMap<PlayerId, RefCell<Player>>,
     cities: SlotMap<CityId, RefCell<City>>,
@@ -31,7 +31,7 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(map: Map<Tile>) -> Self {
+    pub fn new(map: Grid<RefCell<Tile>>) -> Self {
         Self {
             map,
 
@@ -122,18 +122,18 @@ impl Game {
     }
 
     /// Gets the tile map.
-    pub fn map(&self) -> &Map<Tile> {
+    pub fn map(&self) -> &Grid<RefCell<Tile>> {
         &self.map
     }
 
     /// Gets the tile at `pos`.
     pub fn tile(&self, pos: UVec2) -> Result<Ref<Tile>, OutOfBounds> {
-        self.map.get(pos)
+        self.map.get(pos).map(RefCell::borrow)
     }
 
     /// Mutably gets the tile at `pos`.
     pub fn tile_mut(&self, pos: UVec2) -> Result<RefMut<Tile>, OutOfBounds> {
-        self.map.get_mut(pos)
+        self.map.get(pos).map(RefCell::borrow_mut)
     }
 
     /// Gets the RNG used for all random game events, such as combat.

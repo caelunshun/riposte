@@ -6,10 +6,12 @@ edition = "2021"
 [dependencies]
 ahash = "0.7"
 anyhow = "1"
+float-ord = "0.3"
 fs-err = "2"
 futures-util = "0.3"
 glam = "0.17"
 log = "0.4"
+noise = { version = "0.7", default-features = false }
 quinn = "0.7"
 rand = "0.8"
 rand_pcg =   "0.3"
@@ -19,3 +21,6 @@ slotmap = "1"
 thiserror = "1"
 tokio = { version = "1", features = [ "full" ] }
 uuid = "0.8"
+
+[dev-dependencies]
+image = { version = "0.23", default-features = false, features = [ "png" ] }

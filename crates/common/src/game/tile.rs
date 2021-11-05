@@ -1,5 +1,3 @@
-use std::cell::{Ref, RefCell, RefMut};
-
 use glam::UVec2;
 
 use crate::assets::Handle;
@@ -38,6 +36,8 @@ pub enum Terrain {
     Desert,
     Plains,
     Grassland,
+    Tundra,
+    Mountains,
 }
 
 #[derive(Debug, thiserror::Error)]
@@ -47,35 +47,56 @@ pub struct OutOfBounds {
     pub y: u32,
 }
 
-/// A map of tiles.
+/// A 2D array that can be used to store tiles.
 #[derive(Debug, Clone)]
-pub struct Map<T> {
-    tiles: Box<[RefCell<T>]>,
+pub struct Grid<T> {
+    tiles: Box<[T]>,
     width: u32,
     height: u32,
 }
 
-impl<T> Map<T> {
+impl<T> Grid<T> {
     pub fn new(initial_value: T, width: u32, height: u32) -> Self
     where
         T: Clone,
     {
         Self {
-            tiles: vec![RefCell::new(initial_value); width as usize * height as usize]
-                .into_boxed_slice(),
+            tiles: vec![initial_value; width as usize * height as usize].into_boxed_slice(),
             width,
             height,
         }
     }
 
-    pub fn get(&self, pos: UVec2) -> Result<Ref<T>, OutOfBounds> {
+    pub fn get(&self, pos: UVec2) -> Result<&T, OutOfBounds> {
         let index = self.index(pos)?;
-        Ok(self.tiles[index].borrow())
+        Ok(&self.tiles[index])
     }
 
-    pub fn get_mut(&self, pos: UVec2) -> Result<RefMut<T>, OutOfBounds> {
+    pub fn get_mut(&mut self, pos: UVec2) -> Result<&mut T, OutOfBounds> {
         let index = self.index(pos)?;
-        Ok(self.tiles[index].borrow_mut())
+        Ok(&mut self.tiles[index])
+    }
+
+    pub fn set(&mut self, pos: UVec2, value: T) -> Result<(), OutOfBounds> {
+        let index = self.index(pos)?;
+        self.tiles[index] = value;
+        Ok(())
+    }
+
+    pub fn width(&self) -> u32 {
+        self.width 
+    }
+
+    pub fn height(&self) -> u32 {
+        self.height
+    }
+
+    pub fn fill(&mut self, value: T) where T: Copy {
+        self.tiles.fill(value);
+    }
+
+    pub fn as_slice(&self) -> &[T] {
+        &self.tiles
     }
 
     fn index(&self, pos: UVec2) -> Result<usize, OutOfBounds> {
