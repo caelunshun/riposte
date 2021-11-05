@@ -1,4 +1,5 @@
-use glam::UVec2;
+use arrayvec::ArrayVec;
+use glam::{UVec2, Vec2, uvec2};
 
 use crate::assets::Handle;
 use crate::registry::Resource;
@@ -84,14 +85,31 @@ impl<T> Grid<T> {
     }
 
     pub fn width(&self) -> u32 {
-        self.width 
+        self.width
     }
 
     pub fn height(&self) -> u32 {
         self.height
     }
 
-    pub fn fill(&mut self, value: T) where T: Copy {
+    pub fn adjacent(&self, pos: UVec2) -> ArrayVec<UVec2, 4> {
+        let mut adjacent = ArrayVec::new();
+
+        for [dx, dy] in [[1, 0], [-1, 0], [0, 1], [0, -1]] {
+            let x = pos.x as i32 + dx;
+            let y = pos.y as i32 + dy;
+            if x >= 0 && y >= 0 && x < self.width as i32 && y < self.height as i32 {
+                adjacent.push(uvec2(x as u32, y as u32));
+            }
+        }
+
+        adjacent
+    }
+
+    pub fn fill(&mut self, value: T)
+    where
+        T: Copy,
+    {
         self.tiles.fill(value);
     }
 
@@ -106,4 +124,12 @@ impl<T> Grid<T> {
             Ok(pos.x as usize + pos.y as usize * self.width as usize)
         }
     }
+}
+
+impl Grid<f64> {
+    /// Samples the grid at the given point with linear interpolation.
+    ///
+    /// Unlike other grid functions, this interprets the grid as a continuous
+    /// field instead of a discrete list of tiles.
+    pub fn sample(&self, pos: Vec2)
 }

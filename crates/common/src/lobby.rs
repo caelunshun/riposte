@@ -42,7 +42,7 @@ impl GameLobby {
         self.slots.iter()
     }
 
-    pub fn slots_mut(&mut self) -> impl Iterator<Item=(SlotId, &mut LobbySlot)> + '_ {
+    pub fn slots_mut(&mut self) -> impl Iterator<Item = (SlotId, &mut LobbySlot)> + '_ {
         self.slots.iter_mut()
     }
 

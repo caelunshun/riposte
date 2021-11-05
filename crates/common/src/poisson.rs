@@ -92,6 +92,6 @@ mod tests {
             image.put_pixel(x as u32, y as u32, Rgba([u8::MAX; 4]));
         }
 
-       // image.save("poisson.png").unwrap();
+        // image.save("poisson.png").unwrap();
     }
 }

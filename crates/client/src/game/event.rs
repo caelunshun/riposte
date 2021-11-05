@@ -35,7 +35,9 @@ pub enum GameEvent {
         winner: UnitId,
         loser: UnitId,
     },
-    BordersExpanded { city: CityId, }
+    BordersExpanded {
+        city: CityId,
+    },
 }
 
 #[derive(Default)]

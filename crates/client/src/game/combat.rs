@@ -3,7 +3,7 @@ use riposte_common::UnitId;
 
 use crate::context::Context;
 
-use super::{Game};
+use super::Game;
 
 #[derive(Debug)]
 pub struct CombatEvent {

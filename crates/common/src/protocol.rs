@@ -12,8 +12,8 @@
 
 use self::lobby::{ClientLobbyPacket, ServerLobbyPacket};
 
-pub mod lobby;
 pub mod game;
+pub mod lobby;
 
 /// Any packet sent by the server.
 #[derive(Debug)]

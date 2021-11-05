@@ -73,7 +73,7 @@ impl TileRenderLayer for ImprovementRenderer {
         for improvement in tile.improvements() {
             match improvement {
                 _ => todo!(),
-               /*  Improvement::Farm => self.render_improvement_icon(&mut canvas, self.farm),
+                /*  Improvement::Farm => self.render_improvement_icon(&mut canvas, self.farm),
                 Improvement::Mine => self.render_improvement_icon(&mut canvas, self.mine),
                 Improvement::Road => self.render_road(game, tile_pos, &mut canvas),
                 Improvement::Pasture => self.render_improvement_icon(&mut canvas, self.pasture),

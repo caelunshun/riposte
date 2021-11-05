@@ -3429,6 +3429,7 @@ version = "0.1.0"
 dependencies = [
  "ahash 0.7.4",
  "anyhow",
+ "arrayvec 0.7.1",
  "float-ord",
  "fs-err",
  "futures-util",

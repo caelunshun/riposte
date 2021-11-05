@@ -114,9 +114,9 @@ impl GameLobbyState {
     }
 
     pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<Option<Action>> {
-        let events = self
-            .client
-            .handle_messages(&mut self.lobby, &mut self.our_slot, cx.registry())?;
+        let events =
+            self.client
+                .handle_messages(&mut self.lobby, &mut self.our_slot, cx.registry())?;
 
         for event in events {
             match event {

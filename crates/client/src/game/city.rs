@@ -3,7 +3,12 @@ use std::convert::TryInto;
 use anyhow::{anyhow, bail};
 use glam::UVec2;
 use protocol::{HappinessEntry, HealthEntry, SicknessEntry, UnhappinessEntry};
-use riposte_common::{CityId, PlayerId, assets::Handle, game::culture::Culture, registry::{Building, RegistryItemNotFound, Resource, UnitKind}};
+use riposte_common::{
+    assets::Handle,
+    game::culture::Culture,
+    registry::{Building, RegistryItemNotFound, Resource, UnitKind},
+    CityId, PlayerId,
+};
 
 use super::{Game, Yield};
 

@@ -10,15 +10,15 @@
 extern crate fs_err as fs;
 
 pub mod assets;
+pub mod bridge;
 pub mod game;
+pub mod lobby;
+pub mod mapgen;
+pub mod poisson;
+pub mod protocol;
 pub mod registry;
 pub mod types;
 pub mod utils;
-pub mod lobby;
-pub mod protocol;
-pub mod mapgen;
-pub mod bridge;
-pub mod poisson;
 
 pub use game::{
     culture::CultureLevel,

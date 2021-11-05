@@ -14,7 +14,20 @@ use protocol::{
     SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask, WarDeclared,
     WorkerTask, WorkerTaskImprovement,
 };
-use riposte_common::{CityId, PlayerId, UnitId, assets::Handle, bridge::{Bridge, ClientSide}, lobby::{GameLobby, SlotId}, protocol::{ClientPacket, ServerPacket, lobby::{ChangeCivAndLeader, ClientLobbyPacket, CreateSlot, DeleteSlot, Kicked, LobbyInfo, ServerLobbyPacket}}, registry::{Civilization, Leader, Registry, Tech}};
+use riposte_common::{
+    assets::Handle,
+    bridge::{Bridge, ClientSide},
+    lobby::{GameLobby, SlotId},
+    protocol::{
+        lobby::{
+            ChangeCivAndLeader, ClientLobbyPacket, CreateSlot, DeleteSlot, Kicked, LobbyInfo,
+            ServerLobbyPacket,
+        },
+        ClientPacket, ServerPacket,
+    },
+    registry::{Civilization, Leader, Registry, Tech},
+    CityId, PlayerId, UnitId,
+};
 
 use crate::{
     context::Context,
@@ -132,7 +145,6 @@ impl Client<LobbyState> {
                     *our_slot = packet.our_slot;
                     self.handle_lobby_info(packet, lobby, registry)?;
                     events.push(LobbyEvent::InfoUpdated);
-     
                 }
                 ServerLobbyPacket::Kicked(packet) => {
                     self.handle_kicked(packet, lobby)?;

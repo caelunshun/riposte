@@ -2,7 +2,11 @@ use std::convert::TryInto;
 
 use ahash::AHashSet;
 use protocol::Era;
-use riposte_common::{PlayerId, assets::Handle, registry::{Civilization, Leader, Tech}};
+use riposte_common::{
+    assets::Handle,
+    registry::{Civilization, Leader, Tech},
+    PlayerId,
+};
 
 use super::{Game, InvalidNetworkId};
 

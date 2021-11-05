@@ -12,7 +12,12 @@ use glam::{ivec2, UVec2};
 use protocol::{
     Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit, Visibility,
 };
-use riposte_common::{CityId, PlayerId, UnitId, game::tile::OutOfBounds, registry::{CapabilityType, Registry}, utils::VersionSnapshot};
+use riposte_common::{
+    game::tile::OutOfBounds,
+    registry::{CapabilityType, Registry},
+    utils::VersionSnapshot,
+    CityId, PlayerId, UnitId,
+};
 use slotmap::SlotMap;
 
 use crate::{
@@ -29,12 +34,10 @@ use super::{
     player::Player,
     selection::{SelectedUnits, SelectionDriver},
     stack::{StackGrid, UnitStack},
-    tile::{Map},
+    tile::Map,
     unit::Unit,
     Tile, View,
 };
-
-
 
 #[derive(Debug, thiserror::Error)]
 #[error("invalid {typ} network ID: {id}")]

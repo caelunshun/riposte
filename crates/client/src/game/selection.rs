@@ -6,7 +6,10 @@ use duit::{Event, Vec2};
 use float_ord::FloatOrd;
 use glam::UVec2;
 use protocol::ConfirmMoveUnits;
-use riposte_common::{UnitId, utils::{Version, VersionSnapshot}};
+use riposte_common::{
+    utils::{Version, VersionSnapshot},
+    UnitId,
+};
 use slotmap::{SecondaryMap, SlotMap};
 use smallvec::SmallVec;
 use winit::event::MouseButton;

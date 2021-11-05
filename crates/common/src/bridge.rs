@@ -34,9 +34,12 @@ pub struct Bridge<S: Side> {
     receiver: Receiver<S::RecvPacket>,
 }
 
-impl <S: Side> Clone for Bridge<S> {
+impl<S: Side> Clone for Bridge<S> {
     fn clone(&self) -> Self {
-        Self { sender: self.sender.clone(), receiver: self.receiver.clone() }
+        Self {
+            sender: self.sender.clone(),
+            receiver: self.receiver.clone(),
+        }
     }
 }
 
