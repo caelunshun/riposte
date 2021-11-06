@@ -6,7 +6,7 @@ use riposte_common::{
 };
 
 /// A tile on the map.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Tile {
     data: TileData,
 }

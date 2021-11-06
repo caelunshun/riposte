@@ -1,5 +1,5 @@
 use arrayvec::ArrayVec;
-use glam::{UVec2, Vec2, uvec2};
+use glam::{uvec2, DVec2, UVec2};
 
 use crate::assets::Handle;
 use crate::registry::Resource;
@@ -131,5 +131,27 @@ impl Grid<f64> {
     ///
     /// Unlike other grid functions, this interprets the grid as a continuous
     /// field instead of a discrete list of tiles.
-    pub fn sample(&self, pos: Vec2)
+    pub fn sample(&self, pos: DVec2) -> f64 {
+        let x1 = pos.x.floor() as u32;
+        let y1 = pos.y.floor() as u32;
+        let x2 = x1 + 1;
+        let y2 = y1 + 1;
+
+        let pos_a = uvec2(x1, y1);
+        let pos_b = uvec2(x2, y1);
+        let pos_c = uvec2(x2, y2);
+        let pos_d = uvec2(x1, y2);
+
+        let a = self.get(pos_a).map(|x| *x).unwrap_or_default();
+        let b = self.get(pos_b).map(|x| *x).unwrap_or_default();
+        let c = self.get(pos_c).map(|x| *x).unwrap_or_default();
+        let d = self.get(pos_d).map(|x| *x).unwrap_or_default();
+
+        let x_coeff = pos.x.fract();
+        let y_coeff = pos.y.fract();
+
+        let ab = a * (1. - x_coeff) + b * x_coeff;
+        let cd = c * (1. - x_coeff) + d * x_coeff;
+        ab * (1. - y_coeff) + cd * y_coeff
+    }
 }

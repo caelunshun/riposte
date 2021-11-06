@@ -1,18 +1,14 @@
-use std::{collections::VecDeque, f64::consts::TAU};
+use std::collections::VecDeque;
 
 use float_ord::FloatOrd;
 use glam::{uvec2, DVec2};
-use noise::{Fbm, MultiFractal, NoiseFn, RangeFunction, Seedable};
-use rand::{Rng, SeedableRng};
-use rand_pcg::Pcg64Mcg;
-use riposte_common::Grid;
+use noise::{Fbm, MultiFractal, NoiseFn, Seedable};
+use rand::Rng;
+use riposte_common::{Grid, Terrain};
 
 use crate::game::Tile;
 
 use super::{land::TileType, MapgenContext};
-
-const EROSION_THRESHOLD: f64 = 0.7;
-const WIND_SPEED: f64 = 2.;
 
 /// Generates terrain from the land map by performing climate and plate tectonics simulation.
 pub struct TerrainGenerator<'a> {
@@ -37,6 +33,7 @@ impl<'a> TerrainGenerator<'a> {
             elevation: Grid::new(0., land_map.width(), land_map.height()),
             rainfall: Grid::new(0., land_map.width(), land_map.height()),
             distance_to_ocean: Grid::new(0., land_map.width(), land_map.height()),
+            vector_to_ocean: Grid::new(DVec2::ZERO, land_map.width(), land_map.height()),
             temperature: Grid::new(0., land_map.width(), land_map.height()),
             land_map,
 
@@ -47,7 +44,9 @@ impl<'a> TerrainGenerator<'a> {
     pub fn generate(mut self) -> Grid<Tile> {
         self.generate_distance_to_ocean();
         self.generate_elevation();
-        todo!()
+        self.generate_temperature();
+        self.generate_rainfall();
+        self.finish()
     }
 
     /// Initializes the `distance_to_ocean` field.
@@ -123,14 +122,139 @@ impl<'a> TerrainGenerator<'a> {
         normalize_grid(&mut self.elevation);
     }
 
-    pub fn generate_temperature(&mut self) {
+    fn generate_temperature(&mut self) {
         let noise = Fbm::new().set_seed(self.cx.rng.gen()).set_frequency(0.3);
         for x in 0..self.temperature.width() {
             for y in 0..self.temperature.height() {
                 let pos = uvec2(x, y);
-                
+
+                let mut temperature = 0.;
+
+                // Temperature from randomness
+                let noise_value = (noise.get([pos.x as f64 + 0.5, pos.y as f64 + 0.5]) + 1.) / 2.;
+                temperature += noise_value * 5.;
+
+                // Temperature from elevation
+                temperature += (1. - *self.elevation.get(pos).unwrap()) * 10.;
+
+                // Temperature from latitude (in the poles = cold)
+                let pole_threshold = 4;
+                if y < pole_threshold
+                    || y >= self.temperature.height().saturating_sub(pole_threshold)
+                {
+                    let mut factor = y as f64;
+                    if y >= pole_threshold {
+                        factor = (self.temperature.height() - 1 - y) as f64;
+                    }
+                    factor = pole_threshold as f64 - factor;
+
+                    temperature -= 2. * factor.powf(1.5);
+                }
+
+                self.temperature.set(pos, temperature).unwrap();
             }
         }
+        normalize_grid(&mut self.temperature);
+    }
+
+    fn generate_rainfall(&mut self) {
+        let noise = Fbm::new().set_seed(self.cx.rng.gen()).set_frequency(0.4);
+        for x in 0..self.rainfall.width() {
+            for y in 0..self.rainfall.height() {
+                let pos = uvec2(x, y);
+
+                let mut rainfall = 0.;
+
+                // Random factor from noise
+                let noise_value = (noise.get([pos.x as f64 + 0.5, pos.y as f64 + 0.5]) + 1.) / 2.;
+                rainfall += noise_value * 5.;
+
+                // Proximity to ocean
+                let distance_to_ocean = *self.distance_to_ocean.get(pos).unwrap();
+                if distance_to_ocean <= 2. {
+                    rainfall += (2. - distance_to_ocean) / 2.;
+                }
+
+                // In front of mountains (relative to ocean) = high rainfall.
+                let direction = *self.vector_to_ocean.get(pos).unwrap();
+                let factor = self.sample_highest_elevation(pos.as_f64(), -direction, 4.) - 0.6;
+                if factor >= 0. {
+                    rainfall += factor * 12.;
+                }
+
+                // Behind mountains (relative to ocean) = low rainfall.
+                let factor = self.sample_highest_elevation(pos.as_f64(), direction, 3.) - 0.6;
+                if factor >= 0. {
+                    rainfall -= factor * 10.;
+                }
+
+                self.rainfall.set(pos, rainfall).unwrap();
+            }
+        }
+        normalize_grid(&mut self.rainfall);
+    }
+
+    fn sample_highest_elevation(&self, from: DVec2, vector: DVec2, max_distance: f64) -> f64 {
+        let vector = vector.normalize();
+        let steps = 10;
+        let step_size = max_distance / steps as f64;
+
+        let mut pos = from;
+        let mut highest = -f64::INFINITY;
+        for _ in 0..steps {
+            highest = highest.max(self.elevation.sample(pos));
+
+            pos += vector * step_size;
+        }
+
+        highest
+    }
+
+    fn finish(self) -> Grid<Tile> {
+        let mut tiles = Grid::new(
+            Tile::new(Terrain::Ocean),
+            self.land_map.width(),
+            self.land_map.height(),
+        );
+
+        for x in 0..tiles.width() {
+            for y in 0..tiles.height() {
+                let pos = uvec2(x, y);
+                if *self.land_map.get(pos).unwrap() == TileType::Ocean {
+                    continue;
+                }
+
+                let elevation = *self.elevation.get(pos).unwrap();
+                let temperature = *self.temperature.get(pos).unwrap();
+                let rainfall = *self.rainfall.get(pos).unwrap();
+
+                let terrain = if elevation >= 0.65 {
+                    Terrain::Mountains
+                } else if rainfall < 0.3 {
+                    Terrain::Desert
+                } else if temperature < 0.65 {
+                    Terrain::Tundra
+                } else if temperature >= 0.4 && rainfall >= 0.4 {
+                    Terrain::Grassland
+                } else {
+                    Terrain::Plains
+                };
+
+                let is_hilled = terrain != Terrain::Mountains && elevation >= 0.4;
+                let is_forested = matches!(
+                    terrain,
+                    Terrain::Plains | Terrain::Grassland | Terrain::Desert | Terrain::Tundra
+                ) && rainfall > 0.3
+                    && self.cx.rng.gen_bool(0.9);
+
+                let tile = tiles.get_mut(pos).unwrap();
+                tile.set_terrain(terrain);
+                tile.set_hilled(is_hilled);
+                tile.set_forested(is_forested);
+            }
+        }
+
+        tiles
     }
 }
 
@@ -175,9 +299,9 @@ mod tests {
     use super::*;
 
     #[test]
-    fn visualize_elevation() {
+    fn visualize() {
         let mut cx = MapgenContext {
-            rng: Pcg64Mcg::seed_from_u64(235),
+            rng: Pcg64Mcg::seed_from_u64(236),
         };
         let size = uvec2(80, 48);
         let mut land = Grid::new(TileType::Land, size.x, size.y);
@@ -192,9 +316,16 @@ mod tests {
 
         gen.generate_distance_to_ocean();
         gen.generate_elevation();
+        gen.generate_rainfall();
+        gen.generate_temperature();
         save_grid(&gen.elevation, "elevation.png");
         normalize_grid(&mut gen.distance_to_ocean);
         save_grid(&gen.distance_to_ocean, "distance_field.png");
+        save_grid(&gen.rainfall, "rainfall.png");
+        save_grid(&gen.temperature, "temperature.png");
+
+        let tiles = gen.finish();
+        save_tiles(&tiles, "tiles.png");
     }
 
     fn save_grid(grid: &Grid<f64>, path: &str) {
@@ -207,6 +338,29 @@ mod tests {
                 let component = (value * 255.) as u8;
                 let color = Rgb([component; 3]);
                 image.put_pixel(x, y, color);
+            }
+        }
+
+        image.save(path).unwrap();
+    }
+
+    fn save_tiles(tiles: &Grid<Tile>, path: &str) {
+        let mut image = ImageBuffer::<Rgb<u8>, _>::new(tiles.width(), tiles.height());
+
+        for x in 0..tiles.width() {
+            for y in 0..tiles.height() {
+                let tile = tiles.get(uvec2(x, y)).unwrap();
+
+                let color = match tile.terrain() {
+                    Terrain::Ocean => [40, 60, 200],
+                    Terrain::Desert => [200, 200, 200],
+                    Terrain::Plains => [210, 200, 20],
+                    Terrain::Grassland => [30, 200, 60],
+                    Terrain::Tundra => [50, 20, 20],
+                    Terrain::Mountains => [0, 0, 0],
+                };
+
+                image.put_pixel(x, y, Rgb(color));
             }
         }
 
