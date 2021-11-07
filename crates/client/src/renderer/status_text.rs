@@ -1,6 +1,6 @@
 use std::f32::consts::PI;
 
-use dume::{Align, Baseline, Text, TextLayout, TextSection, TextStyle};
+use dume::{Align, Baseline, Text, TextOptions, TextSection, TextStyle};
 use glam::vec2;
 use palette::Srgba;
 
@@ -28,29 +28,28 @@ impl OverlayRenderLayer for StatusTextOverlay {
         };
 
         let time = cx.time() - self.start_time;
-        let alpha = ((-(time * PI).cos() + 1.) / 2. * 255.) as u8;
+        let alpha = (-(time * PI).cos() + 1.) / 2.;
 
         let section = TextSection::Text {
-            text: text.to_owned(),
+            text: text.into(),
             style: TextStyle {
-                color: Srgba::new(u8::MAX, u8::MAX, u8::MAX, alpha),
-                size: 18.,
+                color: Some(Srgba::new(u8::MAX, u8::MAX, u8::MAX, u8::MAX)),
+                size: Some(18.),
                 font: Default::default(),
             },
         };
         let text = Text::from_sections(vec![section]);
 
-        let paragraph = cx.canvas_mut().create_paragraph(
+        let blob = cx.canvas().context().create_text_blob(
             text,
-            TextLayout {
-                max_dimensions: game.view().window_size(),
-                line_breaks: false,
+            TextOptions {
+                wrap_lines: false,
                 baseline: Baseline::Middle,
                 align_h: Align::Center,
                 align_v: Align::Start,
             },
         );
         cx.canvas_mut()
-            .draw_paragraph(vec2(0., game.view().window_size().y - 150.), &paragraph);
+            .draw_text(&blob, vec2(0., game.view().window_size().y - 150.), alpha);
     }
 }

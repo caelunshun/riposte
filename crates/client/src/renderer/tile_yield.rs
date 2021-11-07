@@ -1,4 +1,4 @@
-use dume::SpriteId;
+use dume::TextureId;
 use glam::{vec2, UVec2};
 
 use crate::{
@@ -9,14 +9,14 @@ use crate::{
 use super::TileRenderLayer;
 
 struct Icon {
-    sprite: SpriteId,
+    sprite: TextureId,
     pos: f32,
 }
 
 pub struct TileYieldRenderer {
-    hammer: SpriteId,
-    coin: SpriteId,
-    bread: SpriteId,
+    hammer: TextureId,
+    coin: TextureId,
+    bread: TextureId,
 
     // cached heap allocation
     icons: Vec<Icon>,
@@ -25,9 +25,17 @@ pub struct TileYieldRenderer {
 impl TileYieldRenderer {
     pub fn new(cx: &Context) -> Self {
         Self {
-            hammer: cx.canvas().sprite_by_name("icon/hammer").unwrap(),
-            coin: cx.canvas().sprite_by_name("icon/coin").unwrap(),
-            bread: cx.canvas().sprite_by_name("icon/bread").unwrap(),
+            hammer: cx
+                .canvas()
+                .context()
+                .texture_for_name("icon/hammer")
+                .unwrap(),
+            coin: cx.canvas().context().texture_for_name("icon/coin").unwrap(),
+            bread: cx
+                .canvas()
+                .context()
+                .texture_for_name("icon/bread")
+                .unwrap(),
 
             icons: Vec::new(),
         }

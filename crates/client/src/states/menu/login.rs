@@ -77,10 +77,9 @@ impl LogInPage {
                 Err(e) => {
                     log::error!("Login error: {}", e);
                     self.handle.error_text.get_mut().set_text(
-                        "Error: %error".to_owned(),
-                        vars! {
-                            error => e.message(),
-                        },
+                        text!("Error: {}", e.message())
+                      
+                       
                     );
                     self.response_handle = None;
                 }
@@ -136,7 +135,7 @@ impl RegisterPage {
                         self.handle
                             .error_text
                             .get_mut()
-                            .set_text("Passwords do not match".to_owned(), vars! {});
+                            .set_text(text!("Passwords do not match"));
                     } else {
                         self.response_handle =
                             Some(cx.backend().register_account(RegisterRequest {
@@ -161,10 +160,8 @@ impl RegisterPage {
                 Err(e) => {
                     log::error!("Register error: {}", e);
                     self.handle.error_text.get_mut().set_text(
-                        "Error: %error".to_owned(),
-                        vars! {
-                            error => e.message(),
-                        },
+                        text!("Error: {}", e.message())
+                        
                     );
                     self.response_handle = None;
                 }

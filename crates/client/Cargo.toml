@@ -15,7 +15,7 @@ bytes = "1"
 directories-next = "2"
 duit = { git = "https://github.com/caelunshun/duit" }
 duit-core = { git = "https://github.com/caelunshun/duit" }
-dume = { git = "https://github.com/caelunshun/dume" }
+dume = { git = "https://github.com/caelunshun/dume", branch = "experimental" }
 float-ord = "0.3"
 flume = "0.10"
 fs-err = "2"
@@ -29,7 +29,7 @@ lexical = "6"
 log = "0.4"
 mimalloc = { version = "0.1", default-features = false }
 once_cell = "1"
-palette = "0.5"
+palette = "0.6"
 pollster = "0.2"
 prost = "0.8"
 prost-types = "0.8"
@@ -53,5 +53,5 @@ tokio = { version = "1", features = [ "full" ] }
 uuid = { version = "0.8", features = [ "serde", "v4" ] }
 walkdir = "2"
 webpki = "0.21"
-wgpu = "0.10"
+wgpu = "0.11"
 winit = "0.25"

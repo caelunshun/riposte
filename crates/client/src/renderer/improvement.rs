@@ -1,5 +1,5 @@
 use duit::Vec2;
-use dume::{Canvas, SpriteId};
+use dume::{Canvas, TextureId};
 use glam::{vec2, UVec2};
 use palette::Srgba;
 
@@ -11,24 +11,24 @@ use crate::{
 use super::TileRenderLayer;
 
 pub struct ImprovementRenderer {
-    cottage: SpriteId,
-    farm: SpriteId,
-    pasture: SpriteId,
-    mine: SpriteId,
+    cottage: TextureId,
+    farm: TextureId,
+    pasture: TextureId,
+    mine: TextureId,
 }
 
 impl ImprovementRenderer {
     pub fn new(cx: &Context) -> Self {
         let canvas = cx.canvas();
         Self {
-            cottage: canvas.sprite_by_name("icon/cottage").unwrap(),
-            farm: canvas.sprite_by_name("icon/farm").unwrap(),
-            pasture: canvas.sprite_by_name("icon/pasture").unwrap(),
-            mine: canvas.sprite_by_name("icon/mine").unwrap(),
+            cottage: canvas.context().texture_for_name("icon/cottage").unwrap(),
+            farm: canvas.context().texture_for_name("icon/farm").unwrap(),
+            pasture: canvas.context().texture_for_name("icon/pasture").unwrap(),
+            mine: canvas.context().texture_for_name("icon/mine").unwrap(),
         }
     }
 
-    fn render_improvement_icon(&self, canvas: &mut Canvas, icon: SpriteId) {
+    fn render_improvement_icon(&self, canvas: &mut Canvas, icon: TextureId) {
         let aspect_ratio = 640. / 512.;
         let size = vec2(30., 30. * aspect_ratio);
         canvas.draw_sprite(icon, vec2(50., 15.) - size / 2., size.x);

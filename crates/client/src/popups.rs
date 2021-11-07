@@ -20,12 +20,10 @@ impl PopupWindows {
     pub fn show_error_popup(&mut self, ui: &mut Ui, error: &str) {
         let (window, root) = ui.create_spec_instance::<ErrorPopup>();
 
-        window.error_text.get_mut().set_text(
-            "@color{rgb(200, 30, 40)}{Error: %error}",
-            vars! {
-                error => error,
-            },
-        );
+        window
+            .error_text
+            .get_mut()
+            .set_text(text!("@color[200,30,40][Error: {}]", error));
 
         let window_id = ui.create_window(root, Center::with_size(vec2(400., 200.)), Z_POPUP);
 

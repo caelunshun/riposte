@@ -2,7 +2,7 @@ use ahash::AHashMap;
 use duit::Vec2;
 use dume::{
     font::{Query, Weight},
-    Align, Baseline, Canvas, Paragraph, SpriteId, Text, TextLayout, TextSection, TextStyle,
+    Align, Baseline, Canvas, Text, TextBlob, TextOptions, TextSection, TextStyle, TextureId,
 };
 use glam::{vec2, UVec2};
 use palette::{Shade, Srgba};
@@ -18,96 +18,105 @@ use crate::{
 use super::TileRenderLayer;
 
 pub struct CityRenderer {
-    house: SpriteId,
+    house: TextureId,
 
     /// Used to display the first letter of a building's name, as
     /// well as the city population.
-    letter_paragraphs: AHashMap<String, Paragraph>,
+    letter_blobs: AHashMap<String, TextBlob>,
 
     /// Used for the production progress bar and city name.
-    text_paragraphs: AHashMap<String, Paragraph>,
+    text_blobs: AHashMap<String, TextBlob>,
 
-    unit_heads: AHashMap<String, SpriteId>,
+    unit_heads: AHashMap<String, TextureId>,
 }
 
 const BUBBLE_SIZE: Vec2 = glam::const_vec2!([100., 20.]);
 
 impl CityRenderer {
     pub fn new(cx: &Context) -> Self {
-        let house = cx.canvas().sprite_by_name("icon/house").unwrap();
+        let house = cx
+            .canvas()
+            .context()
+            .texture_for_name("icon/house")
+            .unwrap();
 
         let mut unit_heads = AHashMap::new();
         for unit in cx.registry().unit_kinds() {
             let unit_head = cx
                 .canvas()
-                .sprite_by_name(&format!("icon/unit_head/{}", unit.id))
-                .unwrap_or_else(|| panic!("missing unit head icon for unit '{}", unit.id));
+                .context()
+                .texture_for_name(&format!("icon/unit_head/{}", unit.id))
+                .unwrap_or_else(|_| panic!("missing unit head icon for unit '{}", unit.id));
             unit_heads.insert(unit.id.clone(), unit_head);
         }
 
         Self {
             house,
 
-            letter_paragraphs: AHashMap::new(),
-            text_paragraphs: AHashMap::new(),
+            letter_blobs: AHashMap::new(),
+            text_blobs: AHashMap::new(),
 
             unit_heads,
         }
     }
 
-    fn letter_paragraph(&mut self, canvas: &mut Canvas, c: String) -> &Paragraph {
-        self.letter_paragraphs
-            .entry(c.clone())
-            .or_insert_with(move || {
-                let text = Text::from_sections(vec![TextSection::Text {
-                    text: c,
-                    style: TextStyle {
-                        color: Srgba::new(0, 0, 0, u8::MAX),
-                        size: 18.,
-                        font: Query {
-                            weight: Weight::Light,
-                            ..Default::default()
-                        },
+    fn letter_blob(&mut self, canvas: &mut Canvas, c: String) -> &TextBlob {
+        self.letter_blobs.entry(c.clone()).or_insert_with(move || {
+            let text = Text::from_sections(vec![TextSection::Text {
+                text: c.into(),
+                style: TextStyle {
+                    color: Some(Srgba::new(0, 0, 0, u8::MAX)),
+                    size: Some(18.),
+                    font: Query {
+                        weight: Weight::Light,
+                        ..Default::default()
                     },
-                }]);
-                canvas.create_paragraph(
-                    text,
-                    TextLayout {
-                        max_dimensions: vec2(20., f32::INFINITY),
-                        line_breaks: false,
-                        baseline: Baseline::Middle,
-                        align_h: Align::Center,
-                        align_v: Align::Start,
-                    },
-                )
-            })
+                },
+            }]);
+            let mut blob = canvas.context().create_text_blob(
+                &text,
+                TextOptions {
+                    wrap_lines: false,
+                    baseline: Baseline::Middle,
+                    align_h: Align::Center,
+                    align_v: Align::Start,
+                },
+            );
+            canvas
+                .context()
+                .resize_text_blob(&mut blob, vec2(20., f32::INFINITY));
+            blob
+        })
     }
 
-    fn text_paragraph(&mut self, canvas: &mut Canvas, text: String) -> &Paragraph {
-        self.letter_paragraphs
+    fn text_blob(&mut self, canvas: &mut Canvas, text: String) -> &TextBlob {
+        self.letter_blobs
             .entry(text.clone())
             .or_insert_with(move || {
                 let text = Text::from_sections(vec![TextSection::Text {
-                    text,
+                    text: text.into(),
                     style: TextStyle {
-                        color: Srgba::new(u8::MAX, u8::MAX, u8::MAX, u8::MAX),
-                        size: 8.,
+                        color: Some(Srgba::new(u8::MAX, u8::MAX, u8::MAX, u8::MAX)),
+                        size: Some(8.),
                         font: Query {
                             weight: Weight::Light,
                             ..Default::default()
                         },
                     },
                 }]);
-                canvas.create_paragraph(
+                let mut blob = canvas.context().create_text_blob(
                     text,
-                    TextLayout {
-                        max_dimensions: vec2(100., f32::INFINITY),
-                        line_breaks: false,
+                    TextOptions {
+                        wrap_lines: false,
                         baseline: Baseline::Top,
                         align_h: Align::Center,
                         align_v: Align::Start,
                     },
-                )
+                );
+                canvas
+                    .context()
+                    .resize_text_blob(&mut blob, vec2(100., f32::INFINITY));
+                blob
             })
     }
 
@@ -149,8 +158,8 @@ impl CityRenderer {
             .solid_color(projected_progress_color)
             .fill();
 
-        let text = self.text_paragraph(canvas, text);
-        canvas.draw_paragraph(pos, text);
+        let text = self.text_blob(canvas, text);
+        canvas.draw_text(text, pos, 1.);
     }
 
     fn render_production_progress_bar(&mut self, canvas: &mut Canvas, city: &City) {
@@ -205,7 +214,7 @@ impl CityRenderer {
         }
 
         let color = if city.owner() != game.the_player().id() {
-            // Brighten the civ's color so it contrasts with black tex
+            // Brighten the civ's color so it contrasts with black text
             let col = game.player(city.owner()).civ().color.clone();
             Srgba::new(col[0], col[1], col[2], u8::MAX)
                 .into_format::<f32, f32>()
@@ -228,8 +237,8 @@ impl CityRenderer {
             .stroke();
 
         let population = lexical::to_string(city.population());
-        let population_text = self.letter_paragraph(canvas, population);
-        canvas.draw_paragraph(vec2(-5., 80.), population_text);
+        let population_text = self.letter_blob(canvas, population);
+        canvas.draw_text(population_text, vec2(-5., 80.), 1.);
     }
 
     fn render_right_circle(&mut self, canvas: &mut Canvas, city: &City) {
@@ -252,11 +261,11 @@ impl CityRenderer {
                 }
                 BuildTaskKind::Building(building) => {
                     // First character of the building name
-                    let text = self.letter_paragraph(
+                    let text = self.letter_blob(
                         canvas,
                         building.name.chars().next().unwrap_or('0').to_string(),
                     );
-                    canvas.draw_paragraph(pos + vec2(0., radius), text);
+                    canvas.draw_text(text, pos + vec2(0., radius), 1.);
                 }
             }
         }

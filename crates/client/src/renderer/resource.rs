@@ -1,6 +1,6 @@
 use ahash::AHashMap;
 use duit::Vec2;
-use dume::SpriteId;
+use dume::TextureId;
 use glam::UVec2;
 
 use crate::{
@@ -11,7 +11,7 @@ use crate::{
 use super::TileRenderLayer;
 
 pub struct ResourceRenderer {
-    textures: AHashMap<String, SpriteId>,
+    textures: AHashMap<String, TextureId>,
 }
 
 impl ResourceRenderer {
@@ -20,8 +20,9 @@ impl ResourceRenderer {
         for resource in cx.registry().resources() {
             let texture = cx
                 .canvas()
-                .sprite_by_name(&format!("texture/resource/{}", resource.id))
-                .unwrap_or_else(|| panic!("missing texture for resource '{}", resource.name));
+                .context()
+                .texture_for_name(&format!("texture/resource/{}", resource.id))
+                .unwrap_or_else(|_| panic!("missing texture for resource '{}", resource.name));
             textures.insert(resource.id.clone(), texture);
         }
         Self { textures }

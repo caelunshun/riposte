@@ -60,27 +60,27 @@ impl ServerListState {
 
                 let mut table = self.window.games_table.get_mut();
                 table.add_row([
-                    ("id", widget(Text::from_markup("Game ID", vars! {}))),
+                    ("id", widget(Text::new(text!("Game ID")))),
                     (
                         "join_button",
-                        widget(Text::from_markup("Actions", vars! {})),
+                        widget(Text::new(text!("Actions"))),
                     ),
                 ]);
                 for game in &res.games {
-                    let id_text = Text::from_markup(
-                        format!(
+                    let id_text = Text::new(
+                        text!(
                             "{}",
                             uuid::Uuid::from(game.game_id.clone().unwrap_or_default())
                                 .to_hyphenated()
                         ),
-                        vars! {},
+                        
                     );
 
                     let join_button = widget(Button::new());
                     join_button
                         .borrow_mut()
                         .data_mut()
-                        .add_child(widget(Text::from_markup("Join", vars! {})));
+                        .add_child(widget(Text::new(text!("Join"))));
                     let id = game.game_id.clone().unwrap_or_default();
                     WidgetHandle::<Button>::new(join_button.clone())
                         .get_mut()

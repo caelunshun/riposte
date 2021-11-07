@@ -2,7 +2,7 @@ use std::{
     cell::{Ref, RefCell, RefMut},
     ffi::OsStr,
     future::Future,
-    iter, mem,
+    mem,
     path::PathBuf,
     rc::Rc,
     sync::Arc,
@@ -11,7 +11,7 @@ use std::{
 
 use anyhow::Context as _;
 use duit::{Spec, Ui, Vec2};
-use dume::Canvas;
+use dume::{Canvas, TextureSetBuilder};
 use flume::Receiver;
 use glam::vec2;
 use once_cell::sync::OnceCell;
@@ -39,6 +39,9 @@ use crate::{
 };
 
 mod init;
+
+const MIN_TEXTURE_ATLAS_SIZE: u32 = 1024;
+const MAX_TEXTURE_ATLAS_SIZE: u32 = 8192;
 
 /// Global state for Riposte.
 pub struct Context {
@@ -91,11 +94,13 @@ pub struct Context {
     cursor_pos: Vec2,
 
     saves: RefCell<SaveFiles>,
+
+    texture_set_builder: Rc<RefCell<Option<TextureSetBuilder>>>,
 }
 
 impl Context {
     pub fn new() -> anyhow::Result<(Self, EventLoop<()>)> {
-        let (event_loop, window, canvas, surface, sample_texture, device, queue) =
+        let (event_loop, window, dume_context, canvas, surface, sample_texture, device, queue) =
             init::init_graphics_state()?;
 
         let canvas = Rc::new(RefCell::new(canvas));
@@ -116,9 +121,16 @@ impl Context {
             Audio::new(Rc::clone(&options)).context("failed to initialize audio player")?,
         ));
 
+        let texture_set_builder = Rc::new(RefCell::new(Some(
+            dume_context.create_texture_set_builder(),
+        )));
+
         let mut assets = Assets::new();
         assets
-            .add_loader("image", ImageLoader::new(Rc::clone(&canvas)))
+            .add_loader(
+                "image",
+                ImageLoader::new(&dume_context, Rc::clone(&texture_set_builder)),
+            )
             .add_loader("font", FontLoader::new(Rc::clone(&canvas)))
             .add_loader("sound", SoundLoader::new(Rc::clone(&audio)))
             .add_loader("civ", JsonLoader::<Civilization>::new())
@@ -160,6 +172,7 @@ impl Context {
                 dt: 0.,
                 cursor_pos: Vec2::ZERO,
                 saves,
+                texture_set_builder,
             },
             event_loop,
         ))
@@ -170,6 +183,16 @@ impl Context {
         Arc::get_mut(&mut self.registry)
             .unwrap()
             .load_from_assets(&self.assets);
+
+        let texture_set = self
+            .texture_set_builder
+            .borrow_mut()
+            .take()
+            .unwrap()
+            .build(MIN_TEXTURE_ATLAS_SIZE, MAX_TEXTURE_ATLAS_SIZE)
+            .expect("too many textures - can't fit into texture atlas");
+        self.canvas().context().add_texture_set(texture_set);
+
         Ok(())
     }
 
@@ -318,6 +341,10 @@ impl Context {
                 present_mode: init::PRESENT_MODE,
             },
         );
+        self.canvas_mut().resize(
+            init::logical_size(new_size, self.window.scale_factor()),
+            self.window.scale_factor() as f32,
+        );
     }
 
     pub fn show_error_popup(&mut self, error: &str) {
@@ -348,24 +375,20 @@ impl Context {
             .window
             .inner_size()
             .to_logical(self.window.scale_factor());
-        let window_logical_size = Vec2::new(window_logical_size.width, window_logical_size.height);
+        let window_logical_size = vec2(window_logical_size.width, window_logical_size.height);
         self.ui_mut()
             .render(&mut *self.canvas.borrow_mut(), window_logical_size);
 
-        let mut encoder = self.device.create_command_encoder(&Default::default());
-
         let frame = self
             .surface
-            .get_current_frame()
+            .get_current_texture()
             .expect("failed to get next swapchain frame");
         self.canvas_mut().render(
+            &frame.texture.create_view(&Default::default()),
             &self.sample_texture.create_view(&Default::default()),
-            &frame.output.texture.create_view(&Default::default()),
-            &mut encoder,
-            window_logical_size,
         );
 
-        self.queue.submit(iter::once(encoder.finish()));
+        frame.present();
     }
 }
 

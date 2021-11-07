@@ -1,5 +1,5 @@
 use ahash::AHashMap;
-use dume::SpriteId;
+use dume::TextureId;
 use glam::{UVec2, Vec2};
 use protocol::Terrain;
 
@@ -26,7 +26,7 @@ impl TextureKey {
 }
 
 pub struct TerrainRenderer {
-    textures: AHashMap<TextureKey, SpriteId>,
+    textures: AHashMap<TextureKey, TextureId>,
 }
 
 impl TerrainRenderer {
@@ -49,11 +49,12 @@ impl TerrainRenderer {
                 if is_hilled {
                     texture_id.push_str("/hill");
                 }
-                let sprite_id = cx
+                let texture_id = cx
                     .canvas()
-                    .sprite_by_name(&texture_id)
-                    .unwrap_or_else(|| panic!("missing terrain texture '{}'", texture_id));
-                textures.insert(key, sprite_id);
+                    .context()
+                    .texture_for_name(&texture_id)
+                    .unwrap_or_else(|_| panic!("missing terrain texture '{}'", texture_id));
+                textures.insert(key, texture_id);
             }
         }
 

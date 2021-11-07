@@ -99,8 +99,8 @@ pub struct WorkerCapability {
 
 #[derive(Debug)]
 pub struct WorkerTask {
-    turns_left: u32,
-    kind: WorkerTaskKind,
+    pub turns_left: u32,
+    pub kind: WorkerTaskKind,
 }
 
 #[derive(Debug)]

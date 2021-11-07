@@ -40,7 +40,7 @@ impl FromStr for Improvement {
             "Road" => Ok(Improvement::Road),
             "Pasture" => Ok(Improvement::Pasture),
             "Cottage" => Ok(Improvement::Cottage(Cottage::default())),
-            s => Err(InvalidImprovementType(s.to_owned()).into()),
+            s => Err(InvalidImprovementType(s.to_owned())),
         }
     }
 }

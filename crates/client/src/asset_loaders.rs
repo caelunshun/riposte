@@ -1,18 +1,22 @@
 use std::{any::Any, cell::RefCell, marker::PhantomData, rc::Rc, sync::Arc};
 
-use dume::{Canvas, SpriteData, SpriteDescriptor};
+use dume::{Canvas, TextureSetBuilder};
 use riposte_common::assets::Loader;
 use serde::de::DeserializeOwned;
 
 use crate::audio::Audio;
 
 pub struct ImageLoader {
-    canvas: Rc<RefCell<Canvas>>,
+    builder: Rc<RefCell<Option<TextureSetBuilder>>>,
+    context: dume::Context,
 }
 
 impl ImageLoader {
-    pub fn new(canvas: Rc<RefCell<Canvas>>) -> Self {
-        Self { canvas }
+    pub fn new(context: &dume::Context, builder: Rc<RefCell<Option<TextureSetBuilder>>>) -> Self {
+        Self {
+            builder,
+            context: context.clone(),
+        }
     }
 }
 
@@ -22,10 +26,7 @@ impl Loader for ImageLoader {
         id: &str,
         bytes: &[u8],
     ) -> anyhow::Result<Option<Arc<dyn Any + Send + Sync>>> {
-        self.canvas.borrow_mut().create_sprite(SpriteDescriptor {
-            name: id,
-            data: SpriteData::Encoded(bytes),
-        });
+        self.builder.borrow_mut().as_mut().unwrap().add_texture(bytes, id)?;
         Ok(None)
     }
 }
@@ -46,7 +47,7 @@ impl Loader for FontLoader {
         _id: &str,
         bytes: &[u8],
     ) -> anyhow::Result<Option<Arc<dyn Any + Send + Sync>>> {
-        self.canvas.borrow_mut().load_font(bytes.to_owned());
+        self.canvas.borrow().context().add_font(bytes.to_owned())?;
         Ok(None)
     }
 }

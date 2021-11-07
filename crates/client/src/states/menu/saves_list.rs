@@ -36,25 +36,25 @@ impl SavesListState {
 
         let mut table = window.saves_table.get_mut();
         table.add_row([
-            ("created_at", widget(Text::from_markup("Created", vars! {}))),
-            ("turn", widget(Text::from_markup("Turn", vars! {}))),
+            ("created_at", widget(Text::new(text!("Created")))),
+            ("turn", widget(Text::new(text!("Turn" )))),
             (
                 "load_button",
-                widget(Text::from_markup("Actions", vars! {})),
+                widget(Text::new(text!("Actions"))),
             ),
         ]);
         for (i, save) in cx.saves().list_saves().enumerate() {
-            let created_at = widget(Text::from_markup(
-                format!("{}", humantime::format_rfc3339(save.created_at)),
-                vars! {},
+            let created_at = widget(Text::new(
+                text!("{}", humantime::format_rfc3339(save.created_at)),
+            
             ));
-            let turn = widget(Text::from_markup(format!("{}", save.turn), vars! {}));
+            let turn = widget(Text::new(text!("{}", save.turn)));
 
             let load_button = widget(Button::new());
             load_button
                 .borrow_mut()
                 .data_mut()
-                .add_child(widget(Text::from_markup("Load", vars! {})));
+                .add_child(widget(Text::new(text!("Load"))));
             WidgetHandle::<Button>::new(load_button.clone())
                 .get_mut()
                 .on_click(move || LoadSave(i));

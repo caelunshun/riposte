@@ -213,7 +213,9 @@ styles:
         window,
         ui,
         |cv| {
-            cv.load_font(include_bytes!("../../../assets/font/Merriweather-Regular.ttf").to_vec());
+            cv.context()
+                .add_font(include_bytes!("../../../assets/font/Merriweather-Regular.ttf").to_vec())
+                .unwrap();
         },
         move |_| {
             if let Some(latest_progress) = progress_updates.try_iter().last() {
@@ -222,14 +224,11 @@ styles:
                         root.progress_bar
                             .get_mut()
                             .set_progress(progress.downloaded as f32 / progress.needed as f32);
-                        root.progress_text.get_mut().set_text(
-                            format!(
-                                "{:.1} / {:.1} MiB",
-                                mib(progress.downloaded),
-                                mib(progress.needed)
-                            ),
-                            Default::default(),
-                        );
+                        root.progress_text.get_mut().set_text(duit::text!(
+                            "{} / {} MiB",
+                            format!("{:.1}", mib(progress.downloaded)),
+                            format!("{:.1}", mib(progress.needed))
+                        ));
                     }
                 }
             }

@@ -101,7 +101,7 @@ impl Widget for FlashingButton {
             .solid_color(background_color)
             .fill();
         canvas
-            .solid_color(style.border_color.into())
+            .solid_color(style.border_color)
             .stroke_width(style.border_width)
             .stroke();
 

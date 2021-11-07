@@ -1,7 +1,9 @@
 use std::sync::Arc;
 
 use anyhow::Context;
+use duit::Vec2;
 use dume::Canvas;
+use glam::vec2;
 use pollster::block_on;
 use winit::{
     dpi::{LogicalSize, PhysicalSize},
@@ -15,6 +17,7 @@ pub const PRESENT_MODE: wgpu::PresentMode = wgpu::PresentMode::Fifo;
 pub fn init_graphics_state() -> anyhow::Result<(
     EventLoop<()>,
     Window,
+    dume::Context,
     Canvas,
     wgpu::Surface,
     wgpu::Texture,
@@ -34,6 +37,7 @@ pub fn init_graphics_state() -> anyhow::Result<(
     let adapter = block_on(instance.request_adapter(&wgpu::RequestAdapterOptions {
         power_preference: wgpu::PowerPreference::HighPerformance,
         compatible_surface: Some(&surface),
+        force_fallback_adapter: false,
     }))
     .context("failed to find a suitable graphics adapter")?;
 
@@ -64,14 +68,19 @@ pub fn init_graphics_state() -> anyhow::Result<(
         },
     );
 
-    let mut canvas = Canvas::new(Arc::clone(&device), Arc::clone(&queue));
-    canvas.set_scale_factor(window.scale_factor());
+    let context = dume::Context::builder(Arc::clone(&device), Arc::clone(&queue)).build();
+
+    let mut canvas = context.create_canvas(
+        logical_size(window.inner_size(), window.scale_factor()),
+        window.scale_factor() as f32,
+    );
 
     let sample_texture = create_sample_texture(&device, window.inner_size());
 
     Ok((
         event_loop,
         window,
+        context,
         canvas,
         surface,
         sample_texture,
@@ -97,4 +106,9 @@ pub fn create_sample_texture(
         format: dume::TARGET_FORMAT,
         usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
     })
+}
+
+pub fn logical_size(physical: PhysicalSize<u32>, scale: f64) -> Vec2 {
+    let logical = physical.to_logical(scale);
+    vec2(logical.width, logical.height)
 }

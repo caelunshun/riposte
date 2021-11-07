@@ -232,14 +232,11 @@ impl GameLobbyState {
 
         // Header row
         table.add_row([
-            ("name", widget(Text::from_markup("Name", vars! {}))),
-            ("status", widget(Text::from_markup("Status", vars! {}))),
-            (
-                "delete_button",
-                widget(Text::from_markup("Actions", vars! {})),
-            ),
-            ("civ", widget(Text::from_markup("Civilization", vars! {}))),
-            ("leader", widget(Text::from_markup("Leader", vars! {}))),
+            ("name", widget(Text::new(text!("Name")))),
+            ("status", widget(Text::new(text!("Status")))),
+            ("delete_button", widget(Text::new(text!("Actions")))),
+            ("civ", widget(Text::new(text!("Civilization")))),
+            ("leader", widget(Text::new(text!("Leader")))),
         ]);
 
         for (id, slot) in self.lobby.slots() {
@@ -282,43 +279,41 @@ impl GameLobbyState {
                 ("-".to_owned(), "-")
             };
 
-            let (civ_widget, leader_widget) =
-                if slot.is_occupied() && ptr::eq(slot, self.our_slot()) {
-                    let mut civ_picklist = PickList::new(Some(250.), Some(200.));
-                    for civ in cx.registry().civs() {
-                        let civ = civ.clone();
-                        let option = widget(Text::from_markup(
-                            cx.registry().describe_civ(&civ),
-                            vars! {},
-                        ));
-                        civ_picklist.add_option(option, move || SetCiv(civ.clone()));
-                    }
-                    let civ_picklist = widget(civ_picklist);
-                    civ_picklist
-                        .borrow_mut()
-                        .data_mut()
-                        .add_child(widget(Text::from_markup(&civ, vars! {})));
+            let (civ_widget, leader_widget) = if slot.is_occupied()
+                && ptr::eq(slot, self.our_slot())
+            {
+                let mut civ_picklist = PickList::new(Some(250.), Some(200.));
+                for civ in cx.registry().civs() {
+                    let civ = civ.clone();
+                    let option = widget(Text::new(text!("{}", cx.registry().describe_civ(&civ))));
+                    civ_picklist.add_option(option, move || SetCiv(civ.clone()));
+                }
+                let civ_picklist = widget(civ_picklist);
+                civ_picklist
+                    .borrow_mut()
+                    .data_mut()
+                    .add_child(widget(Text::new(text!("{}", civ))));
 
-                    let mut leader_picklist = PickList::new(Some(150.), Some(200.));
-                    let our_civ = self.our_slot().player.civ().unwrap();
-                    for leader in &our_civ.leaders {
-                        let leader = leader.clone();
-                        let option = widget(Text::from_markup(&leader.name, vars! {}));
-                        leader_picklist.add_option(option, move || SetLeader(leader.clone()));
-                    }
-                    let leader_picklist = widget(leader_picklist);
-                    leader_picklist
-                        .borrow_mut()
-                        .data_mut()
-                        .add_child(widget(Text::from_markup(leader, vars! {})));
+                let mut leader_picklist = PickList::new(Some(150.), Some(200.));
+                let our_civ = self.our_slot().player.civ().unwrap();
+                for leader in &our_civ.leaders {
+                    let leader = leader.clone();
+                    let option = widget(Text::new(text!("{}", leader.name)));
+                    leader_picklist.add_option(option, move || SetLeader(leader.clone()));
+                }
+                let leader_picklist = widget(leader_picklist);
+                leader_picklist
+                    .borrow_mut()
+                    .data_mut()
+                    .add_child(widget(Text::new(text!("{}", leader))));
 
-                    (civ_picklist, leader_picklist)
-                } else {
-                    (
-                        widget(Text::from_markup(&civ, vars! {})),
-                        widget(Text::from_markup(leader, vars! {})),
-                    )
-                };
+                (civ_picklist, leader_picklist)
+            } else {
+                (
+                    widget(Text::new(text!("{}", civ))),
+                    widget(Text::new(text!("{}", leader))),
+                )
+            };
 
             let mut delete_button = Button::new();
             delete_button.on_click(move || Message::DeleteSlot(id));
@@ -326,15 +321,15 @@ impl GameLobbyState {
             delete_button
                 .borrow_mut()
                 .data_mut()
-                .add_child(widget(Text::from_markup(delete_text, vars! {})));
+                .add_child(widget(Text::new(text!("{}", delete_text))));
 
             if id == self.our_slot {
                 delete_button.borrow_mut().data_mut().set_hidden(true);
             }
 
             table.add_row([
-                ("name", widget(Text::from_markup(name, vars! {}))),
-                ("status", widget(Text::from_markup(status, vars! {}))),
+                ("name", widget(Text::new(text!("{}", name)))),
+                ("status", widget(Text::new(text!("{}", status)))),
                 ("civ", civ_widget),
                 ("leader", leader_widget),
                 ("delete_button", delete_button),

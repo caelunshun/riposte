@@ -2,29 +2,7 @@
 # Disables tasks running for every Cargo workspace member.
 default_to_workspace = false
 
-[tasks.build-server-release]
-script_runner = "@duckscript"
-script = '''
-mkdir cmake-build-release
-cd cmake-build-release
-exec conan install ..
-exec cmake .. -DCMAKE_BUILD_TYPE=Release
-exec cmake --build . --target riposte-server -j2
-cp bin/riposte-server ../target/release/riposte-server
-'''
-
-[tasks.build-server-debug]
-script_runner = "@duckscript"
-script = '''
-mkdir cmake-build-debug
-cd cmake-build-debug
-exec conan install ..
-exec cmake .. -DCMAKE_BUILD_TYPE=Debug
-exec cmake --build . --target riposte-server -j2
-cp bin/riposte-server ../target/debug/riposte-server
-'''
-
-[tasks.build-client-release]
+[tasks.build]
 command = "cargo"
 args = [
     "build",
@@ -32,42 +10,30 @@ args = [
     "-p", "riposte"
 ]
 
-[tasks.build-client-debug]
+[tasks.build-debug]
 command = "cargo"
 args = [
     "build",
     "-p", "riposte"
 ]
 
-[tasks.run-client-debug]
-dependencies = ["build-server-debug", "build-client-debug"]
-command = "target/debug/riposte"
-env = { "RIPOSTE_UI_BASE_DIR" = "crates/client" }
-
-[tasks.debug]
-dependencies = ["build-client-debug"]
-command = "target/debug/riposte"
-env = { "RIPOSTE_UI_BASE_DIR" = "crates/client" }
-
-[tasks.run-client-release]
-dependencies = ["build-server-release", "build-client-release"]
+[tasks.run]
+dependencies = ["build"]
 command = "target/release/riposte"
 env = { "RIPOSTE_UI_BASE_DIR" = "crates/client" }
 
+[tasks.run-debug]
+dependencies = ["build-debug"]
+command = "target/debug/riposte"
+env = { "RIPOSTE_UI_BASE_DIR" = "crates/client" }
+
 [tasks.bundle]
-dependencies = ["build-client-release", "build-server-release"]
+dependencies = ["build"]
 command = "cargo"
 args = [
     "run",
     "-p", "riposte-bundler"
 ]
-
-[tasks.generate-c-bindings]
-script_runner = "@duckscript"
-script = '''
-cd c-bindings
-exec cbindgen --config cbindgen.toml -o include/riposte_networking.h
-'''
 
 [tasks.generate-ui-code]
 script = '''

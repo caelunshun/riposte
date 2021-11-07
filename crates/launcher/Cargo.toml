@@ -9,8 +9,9 @@ cfg-if = "1"
 directories-next = "2"
 duit = { git = "https://github.com/caelunshun/duit" }
 duit-platform = { git = "https://github.com/caelunshun/duit" }
+dume = { git = "https://github.com/caelunshun/dume", branch = "experimental" }
 flume = "0.10"
-octocrab = { version = "0.10", default-features = false, features = [ "rustls"] }
+octocrab = { version = "0.13", default-features = false, features = [ "rustls"] }
 reqwest = { version = "0.11", default-features = false }
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"

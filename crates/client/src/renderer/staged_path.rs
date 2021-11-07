@@ -2,7 +2,7 @@ use ahash::AHashMap;
 use duit::Vec2;
 use dume::{
     font::{Query, Weight},
-    Align, Baseline, Canvas, Paragraph, Text, TextLayout, TextSection, TextStyle,
+    Align, Baseline, Canvas, Text, TextBlob, TextOptions, TextSection, TextStyle,
 };
 use glam::UVec2;
 use palette::Srgba;
@@ -17,7 +17,7 @@ use super::OverlayRenderLayer;
 
 /// Paints the currently staged path for unit selection / movement.
 pub struct StagedPathOverlay {
-    digit_paragraphs: AHashMap<u32, Paragraph>,
+    digit_blobs: AHashMap<u32, TextBlob>,
 
     circle_alpha_spline: Spline<f32, f32>,
 }
@@ -25,7 +25,7 @@ pub struct StagedPathOverlay {
 impl StagedPathOverlay {
     pub fn new(_cx: &Context) -> Self {
         Self {
-            digit_paragraphs: AHashMap::new(),
+            digit_blobs: AHashMap::new(),
             circle_alpha_spline: Spline::from_vec(vec![
                 Key::new(0., 0., Interpolation::Cosine),
                 Key::new(2., 200., Interpolation::Step(1.)),
@@ -33,24 +33,23 @@ impl StagedPathOverlay {
         }
     }
 
-    fn digit_paragraph(&mut self, canvas: &mut Canvas, digit: u32) -> &Paragraph {
-        self.digit_paragraphs.entry(digit).or_insert_with(|| {
+    fn digit_blob(&mut self, canvas: &mut Canvas, digit: u32) -> &TextBlob {
+        self.digit_blobs.entry(digit).or_insert_with(|| {
             let text = Text::from_sections(vec![TextSection::Text {
-                text: digit.to_string(),
+                text: digit.to_string().into(),
                 style: TextStyle {
-                    color: Srgba::new(u8::MAX, u8::MAX, u8::MAX, u8::MAX),
-                    size: 36.,
+                    color: Some(Srgba::new(u8::MAX, u8::MAX, u8::MAX, u8::MAX)),
+                    size: Some(36.),
                     font: Query {
                         weight: Weight::Bold,
                         ..Default::default()
                     },
                 },
             }]);
-            canvas.create_paragraph(
+            canvas.context().create_text_blob(
                 text,
-                TextLayout {
-                    max_dimensions: Vec2::splat(PIXELS_PER_TILE),
-                    line_breaks: false,
+                TextOptions {
+                    wrap_lines: false,
                     baseline: Baseline::Top,
                     align_h: Align::Center,
                     align_v: Align::Center,
@@ -79,8 +78,8 @@ impl StagedPathOverlay {
 
             // Draw the marker.
             if next_has_marker {
-                let text = self.digit_paragraph(&mut canvas, next_point.turn);
-                canvas.draw_paragraph(next_pos - offset, text);
+                let text = self.digit_blob(&mut canvas, next_point.turn);
+                canvas.draw_text(text, next_pos - offset, 1.);
 
                 canvas.begin_path();
                 super::dashed_circle(&mut canvas, next_pos, 30., 16, 0.1, cx.time());

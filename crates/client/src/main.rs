@@ -15,18 +15,8 @@ use simple_logger::SimpleLogger;
 #[global_allocator]
 static ALLOCATOR: MiMalloc = MiMalloc;
 
-macro_rules! vars {
-    ($(
-        $name:ident => $val:expr
-    ),* $(,)?) => {{
-        #[allow(unused_mut)]
-        let mut map = ahash::AHashMap::new();
-        $(
-            map.insert(stringify!($name).to_owned(), $val.to_string());
-        )*
-        map
-    }}
-}
+#[macro_use]
+extern crate dume;
 
 mod asset_loaders;
 mod audio;

@@ -1,4 +1,4 @@
-use dume::SpriteId;
+use dume::TextureId;
 use glam::{vec2, UVec2};
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
@@ -12,7 +12,7 @@ use super::TileRenderLayer;
 
 /// Renders trees for forests.
 pub struct TreeRenderer {
-    tree: SpriteId,
+    tree: TextureId,
     tree_size: UVec2,
 }
 
@@ -20,9 +20,10 @@ impl TreeRenderer {
     pub fn new(cx: &Context) -> Self {
         let tree = cx
             .canvas()
-            .sprite_by_name("icon/tree")
+            .context()
+            .texture_for_name("icon/tree")
             .expect("missing tree texture");
-        let tree_size = cx.canvas().sprite_dimensions(tree);
+        let tree_size = cx.canvas().context().texture_dimensions(tree);
         Self { tree, tree_size }
     }
 }
