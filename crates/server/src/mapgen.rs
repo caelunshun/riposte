@@ -4,6 +4,7 @@
 
 use std::cell::RefCell;
 
+use glam::UVec2;
 use rand::SeedableRng;
 use rand_pcg::Pcg64Mcg;
 use riposte_common::{mapgen::MapgenSettings, Grid};
@@ -11,10 +12,12 @@ use riposte_common::{mapgen::MapgenSettings, Grid};
 use crate::game::Tile;
 
 mod land;
+mod starting_locations;
 mod terrain;
 
 pub struct MapgenOutput {
     pub map: Grid<RefCell<Tile>>,
+    pub player_starting_locations: Vec<UVec2>,
 }
 
 pub struct MapgenContext {
@@ -28,7 +31,7 @@ impl MapgenContext {
         }
     }
 }
-  
+
 pub struct MapGenerator {
     context: MapgenContext,
     settings: MapgenSettings,

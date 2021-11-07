@@ -289,6 +289,7 @@ fn normalize_grid(grid: &mut Grid<f64>) {
 
 #[cfg(test)]
 mod tests {
+    use glam::UVec2;
     use image::{ImageBuffer, Rgb};
     use rand::SeedableRng;
     use rand_pcg::Pcg64Mcg;
@@ -325,7 +326,10 @@ mod tests {
         save_grid(&gen.temperature, "temperature.png");
 
         let tiles = gen.finish();
-        save_tiles(&tiles, "tiles.png");
+
+        let starting_locations =
+            super::super::starting_locations::generate_starting_locations(&tiles, 7);
+        save_tiles(&tiles, &starting_locations, "tiles.png");
     }
 
     fn save_grid(grid: &Grid<f64>, path: &str) {
@@ -344,14 +348,15 @@ mod tests {
         image.save(path).unwrap();
     }
 
-    fn save_tiles(tiles: &Grid<Tile>, path: &str) {
+    fn save_tiles(tiles: &Grid<Tile>, starting_locations: &[UVec2], path: &str) {
         let mut image = ImageBuffer::<Rgb<u8>, _>::new(tiles.width(), tiles.height());
 
         for x in 0..tiles.width() {
             for y in 0..tiles.height() {
-                let tile = tiles.get(uvec2(x, y)).unwrap();
+                let pos = uvec2(x, y);
+                let tile = tiles.get(pos).unwrap();
 
-                let color = match tile.terrain() {
+                let mut color = match tile.terrain() {
                     Terrain::Ocean => [40, 60, 200],
                     Terrain::Desert => [200, 200, 200],
                     Terrain::Plains => [210, 200, 20],
@@ -359,6 +364,10 @@ mod tests {
                     Terrain::Tundra => [50, 20, 20],
                     Terrain::Mountains => [0, 0, 0],
                 };
+
+                if starting_locations.contains(&pos) {
+                    color = [200, 30, 40];
+                }
 
                 image.put_pixel(x, y, Rgb(color));
             }

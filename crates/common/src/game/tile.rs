@@ -1,5 +1,5 @@
 use arrayvec::ArrayVec;
-use glam::{uvec2, DVec2, UVec2};
+use glam::{ivec2, uvec2, DVec2, IVec2, UVec2};
 
 use crate::assets::Handle;
 use crate::registry::Resource;
@@ -92,18 +92,50 @@ impl<T> Grid<T> {
         self.height
     }
 
+    /// Gets up to 4 adjacent positions of the given tile.
+    ///
+    /// Does not return positions that are out of bounds.
     pub fn adjacent(&self, pos: UVec2) -> ArrayVec<UVec2, 4> {
         let mut adjacent = ArrayVec::new();
 
         for [dx, dy] in [[1, 0], [-1, 0], [0, 1], [0, -1]] {
             let x = pos.x as i32 + dx;
             let y = pos.y as i32 + dy;
-            if x >= 0 && y >= 0 && x < self.width as i32 && y < self.height as i32 {
+            if self.is_in_bounds(ivec2(x, y)) {
                 adjacent.push(uvec2(x as u32, y as u32));
             }
         }
 
         adjacent
+    }
+
+    /// Gets the tiles in the "big fat cross" of a city
+    /// at `pos`.
+    ///
+    /// Does not return positions that are out of bounds.
+    pub fn big_fat_cross(&self, pos: UVec2) -> ArrayVec<UVec2, 21> {
+        let mut bfc = ArrayVec::new();
+
+        for dx in -2i32..=2 {
+            for dy in -2i32..=2 {
+                // Skip the four corners
+                if dx.abs() == 2 && dy.abs() == 2 {
+                    continue;
+                }
+
+                let bfc_pos = pos.as_i32() + ivec2(dx, dy);
+                if self.is_in_bounds(bfc_pos) {
+                    bfc.push(bfc_pos.as_u32());
+                }
+            }
+        }
+
+        bfc
+    }
+
+    fn is_in_bounds(&self, pos: IVec2) -> bool {
+        let (x, y) = (pos.x, pos.y);
+        x >= 0 && y >= 0 && x < self.width as i32 && y < self.height as i32
     }
 
     pub fn fill(&mut self, value: T)

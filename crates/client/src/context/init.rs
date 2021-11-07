@@ -70,7 +70,7 @@ pub fn init_graphics_state() -> anyhow::Result<(
 
     let context = dume::Context::builder(Arc::clone(&device), Arc::clone(&queue)).build();
 
-    let mut canvas = context.create_canvas(
+    let canvas = context.create_canvas(
         logical_size(window.inner_size(), window.scale_factor()),
         window.scale_factor() as f32,
     );
