@@ -65,7 +65,7 @@ impl<'a> TerrainGenerator<'a> {
 
                 if *self.land_map.get(pos).unwrap() == TileType::Ocean {
                     // Check if there is at least one bordering land tile.
-                    for apos in self.land_map.adjacent(pos) {
+                    for apos in self.land_map.straight_adjacent(pos) {
                         if *self.land_map.get(apos).unwrap() == TileType::Land {
                             queue.push_back((pos, pos));
                             break;
@@ -82,7 +82,7 @@ impl<'a> TerrainGenerator<'a> {
                 .set(pos, origin.as_f64() - pos.as_f64())
                 .unwrap();
 
-            for apos in self.land_map.adjacent(pos) {
+            for apos in self.land_map.straight_adjacent(pos) {
                 if !*visited.get(apos).unwrap()
                     && *self.land_map.get(apos).unwrap() == TileType::Land
                 {

@@ -41,6 +41,12 @@ pub enum Terrain {
     Mountains,
 }
 
+impl Terrain {
+    pub fn is_passable(self) -> bool {
+        self != Terrain::Mountains && self != Terrain::Ocean
+    }
+}
+
 #[derive(Debug, thiserror::Error)]
 #[error("map position ({x}, {y}) is out of bounds")]
 pub struct OutOfBounds {
@@ -92,10 +98,31 @@ impl<T> Grid<T> {
         self.height
     }
 
-    /// Gets up to 4 adjacent positions of the given tile.
+    /// Gets up to 8 adjacent positions of the given tile.
     ///
     /// Does not return positions that are out of bounds.
     pub fn adjacent(&self, pos: UVec2) -> ArrayVec<UVec2, 4> {
+        let mut result = ArrayVec::new();
+
+        for dx in -1..=1 {
+            for dy in -1..=1 {
+                if dx == 0 && dy == 0 {
+                    continue;
+                }
+                let p = pos.as_i32() + ivec2(dx, dy);
+                if self.is_in_bounds(p) {
+                    result.push(p.as_u32());
+                }
+            }
+        }
+
+        result
+    }
+
+    /// Gets up to 4 adjacent positions of the given tile.
+    ///
+    /// Does not return positions that are out of bounds.
+    pub fn straight_adjacent(&self, pos: UVec2) -> ArrayVec<UVec2, 4> {
         let mut adjacent = ArrayVec::new();
 
         for [dx, dy] in [[1, 0], [-1, 0], [0, 1], [0, -1]] {
@@ -131,6 +158,17 @@ impl<T> Grid<T> {
         }
 
         bfc
+    }
+
+    pub fn map<G>(&self, mapper: impl Fn(T) -> G) -> Grid<G>
+    where
+        T: Clone,
+    {
+        Grid {
+            tiles: self.tiles.into_iter().cloned().map(mapper).collect(),
+            width: self.width,
+            height: self.height,
+        }
     }
 
     fn is_in_bounds(&self, pos: IVec2) -> bool {
