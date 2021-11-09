@@ -60,6 +60,40 @@ child:
                           classes:
                             - h3
                       - Divider: {}
+
+                      - Column:
+                          id: non_admin_group
+                          children:
+                            - Text:
+                                id: land_type
+                            - Text:
+                                id: num_continents
+                            - Text:
+                                id: map_size
+
+                      - Column:
+                          id: admin_group
+                          spacing: 10
+                          children:
+                            - PickList:
+                                id: land_type_picklist
+                                width: 200
+                                child:
+                                  Text:
+                                    id: land_type_admin
+                            - PickList:
+                                id: num_continents_picklist
+                                width: 200
+                                child:
+                                  Text:
+                                    id: num_continents_admin
+                            - PickList:
+                                id: map_size_picklist
+                                width: 200
+                                child:
+                                  Text:
+                                    id: map_size_admin
+                              
                       - Button:
                           id: start_game_button
                           child:

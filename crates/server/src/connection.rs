@@ -1,5 +1,5 @@
 use futures_util::future::select_all;
-use riposte_common::{bridge::{Bridge, ServerSide}, lobby::{GameLobby, SlotId}, protocol::{ClientPacket, ServerPacket, lobby::{Kicked, LobbyInfo, ServerLobbyPacket}}};
+use riposte_common::{bridge::{Bridge, ServerSide}, lobby::{GameLobby, SlotId}, mapgen::MapgenSettings, protocol::{ClientPacket, ServerPacket, lobby::{Kicked, LobbyInfo, ServerLobbyPacket}}};
 use slotmap::SlotMap;
 
 slotmap::new_key_type! {
@@ -56,9 +56,10 @@ impl Connection {
         self.send_packet(ServerPacket::Lobby(packet));
     }
 
-    pub fn send_lobby_info(&self, lobby: &GameLobby, our_slot: SlotId) {
+    pub fn send_lobby_info(&self, lobby: &GameLobby, settings: &MapgenSettings, our_slot: SlotId) {
         self.send_lobby_packet(ServerLobbyPacket::LobbyInfo(LobbyInfo {
             lobby: lobby.clone(),
+            settings: settings.clone(),
             our_slot,
         }));
     }

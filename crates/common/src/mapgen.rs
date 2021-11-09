@@ -12,12 +12,38 @@ pub struct MapgenSettings {
     pub size: MapSize,
 }
 
+impl Default for MapgenSettings {
+    fn default() -> Self {
+        Self {
+            land: LandGeneratorSettings::Continents(ContinentsSettings {
+                num_continents: NumContinents::Two,
+            }),
+            size: MapSize::Normal,
+        }
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum LandGeneratorSettings {
     /// A map consisting of land dotted with optional lakes.
     Flat(FlatSettings),
     /// A map consisting of one or more continents separated by ocean.
     Continents(ContinentsSettings),
+}
+
+impl Display for LandGeneratorSettings {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LandGeneratorSettings::Flat(settings) => write!(
+                f,
+                "Flat - {}",
+                if settings.lakes { "Lakes" } else { "No Lakes" }
+            ),
+            LandGeneratorSettings::Continents(_) => {
+                write!(f, "Continents")
+            }
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

@@ -5,6 +5,7 @@ use rand::Rng;
 use riposte_common::{
     assets::Handle,
     lobby::{GameLobby, LobbySlot, SlotId, SlotPlayer},
+    mapgen::MapgenSettings,
     protocol::lobby::ClientLobbyPacket,
     registry::{Civilization, Leader, Registry},
 };
@@ -30,6 +31,8 @@ pub struct LobbyServer {
     slot_connections: SecondaryMap<SlotId, ConnectionId>,
     connection_slots: SecondaryMap<ConnectionId, SlotId>,
 
+    settings: MapgenSettings,
+
     registry: Arc<Registry>,
 }
 
@@ -43,6 +46,7 @@ impl LobbyServer {
             lobby,
             slot_connections: SecondaryMap::new(),
             connection_slots: SecondaryMap::new(),
+            settings: Default::default(),
             registry,
         }
     }
@@ -60,10 +64,10 @@ impl LobbyServer {
         packet: ClientLobbyPacket,
         sender: ConnectionId,
     ) -> anyhow::Result<()> {
-        let sender_id = self.slot_for_connection(sender).expect("connection not registered with lobby");
-        let sender = self
-            .lobby
-            .slot_mut(sender_id);
+        let sender_id = self
+            .slot_for_connection(sender)
+            .expect("connection not registered with lobby");
+        let sender = self.lobby.slot_mut(sender_id);
 
         match packet {
             ClientLobbyPacket::CreateSlot(create_slot) => {
@@ -98,11 +102,13 @@ impl LobbyServer {
                     bail!("leader does not belong to this civilization");
                 }
 
-                if *sender.player.civ().as_ref().unwrap() != &packet.civ && !self.lobby.is_civ_available(&packet.civ) {
+                if *sender.player.civ().as_ref().unwrap() != &packet.civ
+                    && !self.lobby.is_civ_available(&packet.civ)
+                {
                     bail!("civilization is already in use");
                 }
 
-                let sender =self.lobby.slot_mut(sender_id);
+                let sender = self.lobby.slot_mut(sender_id);
                 if let SlotPlayer::Human { civ, leader, .. } = &mut sender.player {
                     *civ = packet.civ;
                     *leader = packet.leader;
@@ -171,7 +177,7 @@ impl LobbyServer {
         for (connection_id, &slot_id) in &self.connection_slots {
             connections
                 .get(connection_id)
-                .send_lobby_info(&self.lobby, slot_id);
+                .send_lobby_info(&self.lobby, &self.settings, slot_id);
         }
     }
 }

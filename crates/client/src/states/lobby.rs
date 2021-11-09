@@ -25,6 +25,9 @@ use riposte_common::{
     assets::Handle,
     bridge,
     lobby::{GameLobby, LobbySlot, SlotId, SlotPlayer},
+    mapgen::{
+        ContinentsSettings, FlatSettings, LandGeneratorSettings, MapgenSettings, NumContinents,
+    },
     protocol::lobby::{CreateSlot, DeleteSlot},
     registry::{Civilization, Leader},
     utils::color_to_string,
@@ -42,6 +45,7 @@ enum Message {
     AddHumanSlot,
     DeleteSlot(SlotId),
     StartGame,
+    UpdateSettings(Box<dyn FnOnce(&mut MapgenSettings)>),
 }
 
 struct SetCiv(Handle<Civilization>);
@@ -53,6 +57,8 @@ pub struct GameLobbyState {
 
     lobby: GameLobby,
     our_slot: SlotId,
+    settings: MapgenSettings,
+
     client: Client<client::LobbyState>,
 
     window: GameLobbyWindow,
@@ -89,11 +95,28 @@ impl GameLobbyState {
 
         let (window, _) = attachment.create_window::<GameLobbyWindow, _>(FillScreen, Z_FOREGROUND);
 
+        {
+            let mut land_type_picklist = window.land_type_picklist.get_mut();
+            land_type_picklist.add_option(widget(Text::new(text!("Continents"))), || {
+                Message::UpdateSettings(Box::new(|settings| {
+                    settings.land = LandGeneratorSettings::Continents(ContinentsSettings {
+                        num_continents: NumContinents::Two,
+                    })
+                }))
+            });
+            land_type_picklist.add_option(widget(Text::new(text!("Flat"))), || {
+                Message::UpdateSettings(Box::new(|settings| {
+                    settings.land = LandGeneratorSettings::Flat(FlatSettings { lakes: true })
+                }))
+            });
+        }
+
         let mut state = Self {
             attachment,
 
             lobby: GameLobby::new(),
             our_slot: SlotId::null(),
+            settings: MapgenSettings::default(),
             client,
 
             window,
@@ -114,9 +137,12 @@ impl GameLobbyState {
     }
 
     pub fn update(&mut self, cx: &mut Context) -> anyhow::Result<Option<Action>> {
-        let events =
-            self.client
-                .handle_messages(&mut self.lobby, &mut self.our_slot, cx.registry())?;
+        let events = self.client.handle_messages(
+            &mut self.lobby,
+            &mut self.settings,
+            &mut self.our_slot,
+            cx.registry(),
+        )?;
 
         for event in events {
             match event {
@@ -143,6 +169,10 @@ impl GameLobbyState {
                 }
                 Message::DeleteSlot(slot_id) => self.client.delete_slot(DeleteSlot { id: slot_id }),
                 Message::StartGame => self.client.request_start_game(),
+                Message::UpdateSettings(f) => {
+                    f(&mut self.settings);
+                    self.recreate_ui(cx);
+                }
             }
         }
         while let Some(msg) = ui.pop_message::<SetCiv>() {
@@ -224,6 +254,42 @@ impl GameLobbyState {
             .start_game_button
             .get_mut()
             .on_click(|| Message::StartGame);
+
+        if self.lobby.slots().count() == 0 {
+            return;
+        }
+
+        let (mut map_size, mut land_type, num_continents) = if self.our_slot().is_admin() {
+            (
+                self.window.map_size_admin.get_mut(),
+                self.window.land_type_admin.get_mut(),
+                &self.window.num_continents_admin,
+            )
+        } else {
+            (
+                self.window.map_size.get_mut(),
+                self.window.land_type.get_mut(),
+                &self.window.num_continents,
+            )
+        };
+
+        map_size.set_text(text!("Map Size: {:?}", self.settings.size));
+        land_type.set_text(text!("Land Type: {}", self.settings.land));
+
+        if let LandGeneratorSettings::Continents(settings) = &self.settings.land {
+            num_continents
+                .get_mut()
+                .set_text(text!("# of Continents: {:?}", settings.num_continents));
+            num_continents.unhide();
+        } else {
+            num_continents.hide();
+        };
+
+        if self.our_slot().is_admin() {
+            self.window.non_admin_group.hide();
+        } else {
+            self.window.admin_group.hide();
+        }
     }
 
     fn recreate_table_slots(&mut self, cx: &Context) {
@@ -261,7 +327,7 @@ impl GameLobbyState {
                 SlotPlayer::Human {
                     is_admin: false, ..
                 } => "@color{rgb(240, 78, 152)}{Human}",
-                SlotPlayer::Ai { civ, leader } => "@color{rgb(30, 120, 200)}{AI}",
+                SlotPlayer::Ai { .. } => "@color{rgb(30, 120, 200)}{AI}",
             };
 
             let delete_text = if !matches!(&slot.player, SlotPlayer::Human { .. }) {

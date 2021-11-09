@@ -1,6 +1,4 @@
-use crate::ui::flashing_button::FlashingButton;
-use crate::ui::turn_indicator::TurnIndicatorCircle;
-use crate::ui::unit_indicator::UnitIndicator;
+use crate::ui::flashing_button::FlashingButton; use crate::ui::turn_indicator::TurnIndicatorCircle; use crate::ui::unit_indicator::UnitIndicator;
 use duit::widgets::*;
 use duit::*;
 pub struct ErrorPopup {
@@ -43,6 +41,17 @@ pub struct GameLobbyWindow {
     pub add_ai_slot_button: WidgetHandle<Button>,
     pub add_human_slot_button: WidgetHandle<Button>,
     pub slots_table: WidgetHandle<Table>,
+    pub non_admin_group: WidgetHandle<Flex>,
+    pub land_type: WidgetHandle<Text>,
+    pub num_continents: WidgetHandle<Text>,
+    pub map_size: WidgetHandle<Text>,
+    pub admin_group: WidgetHandle<Flex>,
+    pub land_type_picklist: WidgetHandle<PickList>,
+    pub land_type_admin: WidgetHandle<Text>,
+    pub num_continents_picklist: WidgetHandle<PickList>,
+    pub num_continents_admin: WidgetHandle<Text>,
+    pub map_size_picklist: WidgetHandle<PickList>,
+    pub map_size_admin: WidgetHandle<Text>,
     pub start_game_button: WidgetHandle<Button>,
 }
 impl ::duit::InstanceHandle for GameLobbyWindow {
@@ -53,12 +62,34 @@ impl ::duit::InstanceHandle for GameLobbyWindow {
         let mut add_ai_slot_button = None;
         let mut add_human_slot_button = None;
         let mut slots_table = None;
+        let mut non_admin_group = None;
+        let mut land_type = None;
+        let mut num_continents = None;
+        let mut map_size = None;
+        let mut admin_group = None;
+        let mut land_type_picklist = None;
+        let mut land_type_admin = None;
+        let mut num_continents_picklist = None;
+        let mut num_continents_admin = None;
+        let mut map_size_picklist = None;
+        let mut map_size_admin = None;
         let mut start_game_button = None;
         for (name, widget) in widget_handles {
             match name.as_str() {
                 "add_ai_slot_button" => add_ai_slot_button = Some(widget),
                 "add_human_slot_button" => add_human_slot_button = Some(widget),
                 "slots_table" => slots_table = Some(widget),
+                "non_admin_group" => non_admin_group = Some(widget),
+                "land_type" => land_type = Some(widget),
+                "num_continents" => num_continents = Some(widget),
+                "map_size" => map_size = Some(widget),
+                "admin_group" => admin_group = Some(widget),
+                "land_type_picklist" => land_type_picklist = Some(widget),
+                "land_type_admin" => land_type_admin = Some(widget),
+                "num_continents_picklist" => num_continents_picklist = Some(widget),
+                "num_continents_admin" => num_continents_admin = Some(widget),
+                "map_size_picklist" => map_size_picklist = Some(widget),
+                "map_size_admin" => map_size_admin = Some(widget),
                 "start_game_button" => start_game_button = Some(widget),
                 _ => {}
             }
@@ -80,6 +111,74 @@ impl ::duit::InstanceHandle for GameLobbyWindow {
                 panic!(
                     "missing widget with ID '{}' (generated code not up to date)",
                     "slots_table"
+                )
+            })),
+            non_admin_group: WidgetHandle::new(non_admin_group.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "non_admin_group"
+                )
+            })),
+            land_type: WidgetHandle::new(land_type.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "land_type"
+                )
+            })),
+            num_continents: WidgetHandle::new(num_continents.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "num_continents"
+                )
+            })),
+            map_size: WidgetHandle::new(map_size.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "map_size"
+                )
+            })),
+            admin_group: WidgetHandle::new(admin_group.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "admin_group"
+                )
+            })),
+            land_type_picklist: WidgetHandle::new(land_type_picklist.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "land_type_picklist"
+                )
+            })),
+            land_type_admin: WidgetHandle::new(land_type_admin.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "land_type_admin"
+                )
+            })),
+            num_continents_picklist: WidgetHandle::new(num_continents_picklist.unwrap_or_else(
+                || {
+                    panic!(
+                        "missing widget with ID '{}' (generated code not up to date)",
+                        "num_continents_picklist"
+                    )
+                },
+            )),
+            num_continents_admin: WidgetHandle::new(num_continents_admin.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "num_continents_admin"
+                )
+            })),
+            map_size_picklist: WidgetHandle::new(map_size_picklist.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "map_size_picklist"
+                )
+            })),
+            map_size_admin: WidgetHandle::new(map_size_admin.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "map_size_admin"
                 )
             })),
             start_game_button: WidgetHandle::new(start_game_button.unwrap_or_else(|| {

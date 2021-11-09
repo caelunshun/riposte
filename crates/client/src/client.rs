@@ -14,20 +14,13 @@ use protocol::{
     SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask, WarDeclared,
     WorkerTask, WorkerTaskImprovement,
 };
-use riposte_common::{
-    assets::Handle,
-    bridge::{Bridge, ClientSide},
-    lobby::{GameLobby, SlotId},
-    protocol::{
+use riposte_common::{CityId, PlayerId, UnitId, assets::Handle, bridge::{Bridge, ClientSide}, lobby::{GameLobby, SlotId}, mapgen::MapgenSettings, protocol::{
         lobby::{
             ChangeCivAndLeader, ClientLobbyPacket, CreateSlot, DeleteSlot, Kicked, LobbyInfo,
             ServerLobbyPacket,
         },
         ClientPacket, ServerPacket,
-    },
-    registry::{Civilization, Leader, Registry, Tech},
-    CityId, PlayerId, UnitId,
-};
+    }, registry::{Civilization, Leader, Registry, Tech}};
 
 use crate::{
     context::Context,
@@ -135,6 +128,7 @@ impl Client<LobbyState> {
     pub fn handle_messages(
         &mut self,
         lobby: &mut GameLobby,
+        settings: &mut MapgenSettings,
         our_slot: &mut SlotId,
         registry: &Registry,
     ) -> Result<Vec<LobbyEvent>> {
@@ -143,7 +137,7 @@ impl Client<LobbyState> {
             match msg {
                 ServerLobbyPacket::LobbyInfo(packet) => {
                     *our_slot = packet.our_slot;
-                    self.handle_lobby_info(packet, lobby, registry)?;
+                    self.handle_lobby_info(packet, lobby, settings, registry)?;
                     events.push(LobbyEvent::InfoUpdated);
                 }
                 ServerLobbyPacket::Kicked(packet) => {
@@ -159,10 +153,12 @@ impl Client<LobbyState> {
         &mut self,
         packet: LobbyInfo,
         lobby: &mut GameLobby,
+        settings: &mut MapgenSettings,
         registry: &Registry,
     ) -> Result<()> {
         log::info!("Received new lobby info: {:?}", packet);
         *lobby = packet.lobby;
+        *settings = packet.settings;
         Ok(())
     }
 

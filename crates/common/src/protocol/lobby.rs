@@ -1,8 +1,4 @@
-use crate::{
-    assets::Handle,
-    lobby::{GameLobby, SlotId},
-    registry::{Civilization, Leader},
-};
+use crate::{assets::Handle, lobby::{GameLobby, SlotId}, mapgen::MapgenSettings, registry::{Civilization, Leader}};
 
 /// A packet sent by the server during the lobby state.
 #[derive(Debug)]
@@ -17,6 +13,8 @@ pub struct LobbyInfo {
     pub lobby: GameLobby,
     /// The slot belonging the connected player.
     pub our_slot: SlotId,
+    /// The map generation settings.
+    pub settings: MapgenSettings,
 }
 
 /// The player has been removed from the game.
