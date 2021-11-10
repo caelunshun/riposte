@@ -1,4 +1,9 @@
-use crate::{assets::Handle, lobby::{GameLobby, SlotId}, mapgen::MapgenSettings, registry::{Civilization, Leader}};
+use crate::{
+    assets::Handle,
+    lobby::{GameLobby, SlotId},
+    mapgen::MapgenSettings,
+    registry::{Civilization, Leader},
+};
 
 /// A packet sent by the server during the lobby state.
 #[derive(Debug)]
@@ -30,6 +35,7 @@ pub struct Kicked {
 pub enum ClientLobbyPacket {
     CreateSlot(CreateSlot),
     DeleteSlot(DeleteSlot),
+    SetMapgenSettings(SetMapgenSettings),
     ChangeCivAndLeader(ChangeCivAndLeader),
 }
 
@@ -48,6 +54,12 @@ pub struct CreateSlot {
 pub struct DeleteSlot {
     pub id: SlotId,
 }
+
+/// Sets the map generation settings.
+///
+/// Admin only.
+#[derive(Debug)]
+pub struct SetMapgenSettings(pub MapgenSettings);
 
 /// Sets the player's civ and leader.
 #[derive(Debug)]

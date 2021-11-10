@@ -26,7 +26,8 @@ use riposte_common::{
     bridge,
     lobby::{GameLobby, LobbySlot, SlotId, SlotPlayer},
     mapgen::{
-        ContinentsSettings, FlatSettings, LandGeneratorSettings, MapgenSettings, NumContinents,
+        ContinentsSettings, FlatSettings, LandGeneratorSettings, MapSize, MapgenSettings,
+        NumContinents,
     },
     protocol::lobby::{CreateSlot, DeleteSlot},
     registry::{Civilization, Leader},
@@ -34,6 +35,7 @@ use riposte_common::{
 };
 use riposte_server::{Server, ServerConfig};
 use slotmap::Key;
+use strum::IntoEnumIterator;
 use uuid::Uuid;
 
 pub enum Action {
@@ -109,6 +111,33 @@ impl GameLobbyState {
                     settings.land = LandGeneratorSettings::Flat(FlatSettings { lakes: true })
                 }))
             });
+
+            let mut map_size_picklist = window.map_size_picklist.get_mut();
+            for map_size in MapSize::iter() {
+                map_size_picklist.add_option(
+                    widget(Text::new(text!("{:?}", map_size))),
+                    move || {
+                        Message::UpdateSettings(Box::new(move |settings| {
+                            settings.size = map_size;
+                        }))
+                    },
+                );
+            }
+
+            let mut num_continents_picklist = window.num_continents_picklist.get_mut();
+            for num in NumContinents::iter() {
+                num_continents_picklist.add_option(
+                    widget(Text::new(text!("{:?}", num))),
+                    move || {
+                        Message::UpdateSettings(Box::new(move |settings| {
+                            if let LandGeneratorSettings::Continents(settings) = &mut settings.land
+                            {
+                                settings.num_continents = num;
+                            }
+                        }))
+                    },
+                );
+            }
         }
 
         let mut state = Self {
@@ -171,7 +200,7 @@ impl GameLobbyState {
                 Message::StartGame => self.client.request_start_game(),
                 Message::UpdateSettings(f) => {
                     f(&mut self.settings);
-                    self.recreate_ui(cx);
+                    self.client.set_mapgen_settings(&self.settings);
                 }
             }
         }
@@ -280,9 +309,9 @@ impl GameLobbyState {
             num_continents
                 .get_mut()
                 .set_text(text!("# of Continents: {:?}", settings.num_continents));
-            num_continents.unhide();
+            self.window.num_continents_picklist.unhide();
         } else {
-            num_continents.hide();
+            self.window.num_continents_picklist.hide();
         };
 
         if self.our_slot().is_admin() {

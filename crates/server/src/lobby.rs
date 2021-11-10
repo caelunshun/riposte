@@ -92,6 +92,13 @@ impl LobbyServer {
 
                 self.lobby.remove_slot(delete_slot.id);
             }
+            ClientLobbyPacket::SetMapgenSettings(settings) => {
+                if !sender.is_admin() {
+                    bail!(AdminRequired);
+                }
+
+                self.settings = settings.0;
+            }
             ClientLobbyPacket::ChangeCivAndLeader(packet) => {
                 if !packet
                     .civ

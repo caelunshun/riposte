@@ -1,5 +1,6 @@
 use std::fmt::Display;
 
+use strum::EnumIter;
 use glam::{uvec2, UVec2};
 
 /// Settings provided to the map generator.
@@ -58,7 +59,7 @@ pub struct ContinentsSettings {
     pub num_continents: NumContinents,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, EnumIter)]
 pub enum NumContinents {
     One = 1,
     Two = 2,
@@ -69,7 +70,7 @@ pub enum NumContinents {
     Seven = 7,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, EnumIter)]
 pub enum MapSize {
     Tiny,
     Small,

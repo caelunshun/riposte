@@ -29,8 +29,8 @@ impl Culture {
                 owner: player,
                 amount,
             });
-            self.sort();
         }
+        self.sort();
     }
 
     pub fn add_culture_to(&mut self, player: PlayerId, amount: u32) {

@@ -14,13 +14,21 @@ use protocol::{
     SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask, WarDeclared,
     WorkerTask, WorkerTaskImprovement,
 };
-use riposte_common::{CityId, PlayerId, UnitId, assets::Handle, bridge::{Bridge, ClientSide}, lobby::{GameLobby, SlotId}, mapgen::MapgenSettings, protocol::{
+use riposte_common::{
+    assets::Handle,
+    bridge::{Bridge, ClientSide},
+    lobby::{GameLobby, SlotId},
+    mapgen::MapgenSettings,
+    protocol::{
         lobby::{
             ChangeCivAndLeader, ClientLobbyPacket, CreateSlot, DeleteSlot, Kicked, LobbyInfo,
-            ServerLobbyPacket,
+            ServerLobbyPacket, SetMapgenSettings,
         },
         ClientPacket, ServerPacket,
-    }, registry::{Civilization, Leader, Registry, Tech}};
+    },
+    registry::{Civilization, Leader, Registry, Tech},
+    CityId, PlayerId, UnitId,
+};
 
 use crate::{
     context::Context,
@@ -106,6 +114,12 @@ impl Client<LobbyState> {
             civ: civ.clone(),
             leader: leader.clone(),
         }));
+    }
+
+    pub fn set_mapgen_settings(&mut self, settings: &MapgenSettings) {
+        self.send_message(ClientLobbyPacket::SetMapgenSettings(SetMapgenSettings(
+            settings.clone(),
+        )));
     }
 
     pub fn request_start_game(&mut self) {
