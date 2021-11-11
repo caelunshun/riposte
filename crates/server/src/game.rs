@@ -5,7 +5,7 @@ use std::cell::{Ref, RefCell, RefMut};
 use glam::UVec2;
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
-use riposte_common::{game::tile::OutOfBounds, CityId, Grid, PlayerId, UnitId};
+use riposte_common::{CityId, Grid, PlayerId, Turn, UnitId, game::tile::OutOfBounds};
 use slotmap::SlotMap;
 
 pub mod city;
@@ -28,6 +28,8 @@ pub struct Game {
     units: SlotMap<UnitId, RefCell<Unit>>,
 
     rng: RefCell<Pcg64Mcg>,
+
+    turn: Turn,
 }
 
 impl Game {
@@ -40,6 +42,8 @@ impl Game {
             units: SlotMap::default(),
 
             rng: RefCell::new(Pcg64Mcg::from_entropy()),
+
+            turn: Turn::new(0),
         }
     }
 

@@ -14,7 +14,7 @@ use super::{CityId, PlayerId, UnitId};
 /// Fields are exposed because this struct
 /// is always wrapped in a `client::Player` or `server::Player`,
 /// each of which does its own encapsulation of these fields.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PlayerData {
     /// The player's ID.
     pub id: PlayerId,
@@ -71,7 +71,7 @@ impl PlayerData {
 }
 
 /// Cached economy data for a player.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct PlayerEconomy {
     /// Total gold revenue before conversion to gold / beakers based on slider percents.
     pub base_revenue: u32,
@@ -83,7 +83,7 @@ pub struct PlayerEconomy {
     pub expenses: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum PlayerKind {
     Human { account_uuid: Uuid },
     Ai,

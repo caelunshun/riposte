@@ -19,7 +19,7 @@ use super::{
 /// Fields are exposed because this struct
 /// is always wrapped in a `client::City` or `server::City`,
 /// each of which does its own encapsulation of these fields.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CityData {
     pub id: CityId,
     pub owner: PlayerId,
@@ -108,7 +108,7 @@ pub enum BuildTask {
     Building(Handle<Building>),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct CityEconomy {
     // gold + beakers = commerce
     pub commerce: f64,

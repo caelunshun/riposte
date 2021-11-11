@@ -19,6 +19,7 @@ mod connection;
 mod game;
 mod lobby;
 mod mapgen;
+mod game_server;
 
 /// Configuration for a Riposte server.
 pub struct ServerConfig {

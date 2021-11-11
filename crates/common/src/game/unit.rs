@@ -8,7 +8,7 @@ use crate::{assets::Handle, registry::UnitKind};
 use super::{improvement::Improvement, PlayerId, UnitId};
 
 /// Base data for a unit.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct UnitData {
     pub id: UnitId,
     pub owner: PlayerId,
@@ -85,25 +85,25 @@ impl Display for MovementPoints {
 
 /// A special capability for a unit - founding cities,
 /// carrying units across oceans, et al.
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum Capability {
     FoundCity,
     BombardCity { max_per_turn: u32 },
     Worker(WorkerCapability),
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WorkerCapability {
     pub current_task: Option<WorkerTask>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WorkerTask {
     pub turns_left: u32,
     pub kind: WorkerTaskKind,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub enum WorkerTaskKind {
     BuildImprovement(Improvement),
 }

@@ -5,11 +5,14 @@ use crate::{
     registry::{Civilization, Leader},
 };
 
+use super::game::server::InitialGameData;
+
 /// A packet sent by the server during the lobby state.
 #[derive(Debug)]
 pub enum ServerLobbyPacket {
     LobbyInfo(LobbyInfo),
     Kicked(Kicked),
+    GameStarted(InitialGameData),
 }
 
 /// Updates slot data for the lobby.

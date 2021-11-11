@@ -157,6 +157,7 @@ impl Client<LobbyState> {
                 ServerLobbyPacket::Kicked(packet) => {
                     self.handle_kicked(packet, lobby)?;
                 }
+                
             }
         }
 
