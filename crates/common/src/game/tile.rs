@@ -101,7 +101,7 @@ impl<T> Grid<T> {
     /// Gets up to 8 adjacent positions of the given tile.
     ///
     /// Does not return positions that are out of bounds.
-    pub fn adjacent(&self, pos: UVec2) -> ArrayVec<UVec2, 4> {
+    pub fn adjacent(&self, pos: UVec2) -> ArrayVec<UVec2, 8> {
         let mut result = ArrayVec::new();
 
         for dx in -1..=1 {

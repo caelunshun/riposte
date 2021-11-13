@@ -63,7 +63,7 @@ impl LobbyServer {
         &mut self,
         packet: ClientLobbyPacket,
         sender: ConnectionId,
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<bool> {
         let sender_id = self
             .slot_for_connection(sender)
             .expect("connection not registered with lobby");
@@ -121,9 +121,17 @@ impl LobbyServer {
                     *leader = packet.leader;
                 }
             }
+            ClientLobbyPacket::StartGame(_) => {
+                if !sender.is_admin() {
+                    bail!(AdminRequired);
+                }
+
+                log::info!("Game start was requested");
+                return Ok(true);
+            }
         }
 
-        Ok(())
+        Ok(false)
     }
 
     fn random_available_civ(&self) -> Result<Handle<Civilization>, LobbyFull> {
@@ -186,6 +194,18 @@ impl LobbyServer {
                 .get(connection_id)
                 .send_lobby_info(&self.lobby, &self.settings, slot_id);
         }
+    }
+
+    pub fn lobby(&self) -> &GameLobby {
+        &self.lobby
+    }
+
+    pub fn settings(&self) -> &MapgenSettings {
+        &self.settings
+    }
+
+    pub fn slots_and_connections(&self) -> impl Iterator<Item = (SlotId, ConnectionId)> + '_ {
+        self.slot_connections.iter().map(|(a, &b)| (a, b))
     }
 }
 

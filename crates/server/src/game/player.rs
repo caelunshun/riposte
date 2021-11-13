@@ -2,8 +2,9 @@ use ahash::{AHashMap, AHashSet};
 use riposte_common::{
     assets::Handle,
     game::player::{EconomySettings, PlayerData, PlayerEconomy, PlayerKind},
+    lobby::SlotId,
     registry::{Civilization, Leader},
-    Era, PlayerId,
+    Era, Grid, PlayerId, Visibility,
 };
 
 #[derive(Debug)]
@@ -12,10 +13,19 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn new(kind: PlayerKind, civ: Handle<Civilization>, leader: &Leader, id: PlayerId) -> Self {
+    pub fn new(
+        kind: PlayerKind,
+        civ: Handle<Civilization>,
+        leader: &Leader,
+        id: PlayerId,
+        lobby_id: SlotId,
+        map_width: u32,
+        map_height: u32,
+    ) -> Self {
         Self {
             data: PlayerData {
                 id,
+                lobby_id,
                 cities: Vec::new(),
                 units: Vec::new(),
                 capital: None,
@@ -37,11 +47,16 @@ impl Player {
                 tech_progress: AHashMap::new(),
                 research: None,
                 unlocked_techs: AHashSet::new(),
+                visibility: Grid::new(Visibility::Hidden, map_width, map_height),
             },
         }
     }
 
     pub fn data(&self) -> &PlayerData {
         &self.data
+    }
+
+    pub fn id(&self) -> PlayerId {
+        self.data.id
     }
 }

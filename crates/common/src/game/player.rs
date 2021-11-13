@@ -1,13 +1,13 @@
 use ahash::{AHashMap, AHashSet};
 use uuid::Uuid;
 
+use super::{CityId, PlayerId, UnitId};
+use crate::lobby::SlotId;
 use crate::{
     assets::Handle,
     registry::{Civilization, Tech},
-    Era,
+    Era, Grid, Visibility,
 };
-
-use super::{CityId, PlayerId, UnitId};
 
 /// Base data for a player.
 ///
@@ -18,6 +18,8 @@ use super::{CityId, PlayerId, UnitId};
 pub struct PlayerData {
     /// The player's ID.
     pub id: PlayerId,
+    /// The player's ID when in the game lobby.
+    pub lobby_id: SlotId,
 
     /// Cities owned by this player.
     pub cities: Vec<CityId>,
@@ -62,6 +64,8 @@ pub struct PlayerData {
     pub research: Option<Handle<Tech>>,
 
     pub unlocked_techs: AHashSet<Handle<Tech>>,
+
+    pub visibility: Grid<Visibility>,
 }
 
 impl PlayerData {

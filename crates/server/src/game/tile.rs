@@ -26,6 +26,10 @@ impl Tile {
         }
     }
 
+    pub fn data(&self) -> &TileData {
+        &self.data
+    }
+
     pub fn terrain(&self) -> Terrain {
         self.data.terrain
     }

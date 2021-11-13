@@ -9,7 +9,7 @@ use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
 use riposte_common::{
     game::player::PlayerKind,
-    lobby::{LobbySlot, SlotPlayer},
+    lobby::{GameLobby, LobbySlot, SlotPlayer},
     mapgen::{LandGeneratorSettings, MapgenSettings},
     registry::Registry,
     Grid,
@@ -55,7 +55,7 @@ impl MapGenerator {
         }
     }
 
-    pub fn generate(mut self, players: &[LobbySlot], registry: &Registry) -> Game {
+    pub fn generate(mut self, lobby: &GameLobby, registry: &Registry) -> Game {
         let mut land = Grid::new(
             land::TileType::Ocean,
             self.settings.size.dimensions().x,
@@ -72,11 +72,11 @@ impl MapGenerator {
         };
 
         let tiles = TerrainGenerator::new(land, &mut self.context).generate();
-        let starting_locations = generate_starting_locations(&tiles, players.len());
+        let starting_locations = generate_starting_locations(&tiles, lobby.slots().count());
         let tiles = tiles.map(RefCell::new);
 
         let mut game = Game::new(tiles);
-        self.add_players_and_starting_units(&mut game, registry, players, &starting_locations);
+        self.add_players_and_starting_units(&mut game, registry, lobby, &starting_locations);
         game
     }
 
@@ -84,10 +84,12 @@ impl MapGenerator {
         &mut self,
         game: &mut Game,
         registry: &Registry,
-        players: &[LobbySlot],
+        lobby: &GameLobby,
         starting_locations: &[UVec2],
     ) {
-        for (player_desc, &starting_location) in players.iter().zip(starting_locations) {
+        let map_width = game.map().width();
+        let map_height = game.map().height();
+        for ((lobby_id, player_desc), &starting_location) in lobby.slots().zip(starting_locations) {
             let player = game.add_player(|id| {
                 let kind = match &player_desc.player {
                     SlotPlayer::Empty => panic!("empty player added to game"),
@@ -101,6 +103,9 @@ impl MapGenerator {
                     player_desc.player.civ().unwrap().clone(),
                     player_desc.player.leader().unwrap(),
                     id,
+                    lobby_id,
+                    map_width,
+                    map_height,
                 )
             });
 

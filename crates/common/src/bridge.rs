@@ -1,6 +1,6 @@
 use flume::{Receiver, Sender};
 
-use crate::protocol::{ClientPacket, ServerPacket};
+use crate::protocol::{GenericClientPacket, GenericServerPacket};
 
 use std::fmt::Debug;
 
@@ -12,15 +12,15 @@ pub trait Side {
 pub struct ServerSide;
 
 impl Side for ServerSide {
-    type SendPacket = ServerPacket;
-    type RecvPacket = ClientPacket;
+    type SendPacket = GenericServerPacket;
+    type RecvPacket = GenericClientPacket;
 }
 
 pub struct ClientSide;
 
 impl Side for ClientSide {
-    type SendPacket = ClientPacket;
-    type RecvPacket = ServerPacket;
+    type SendPacket = GenericClientPacket;
+    type RecvPacket = GenericServerPacket;
 }
 
 /// A bridge between the client and a server.

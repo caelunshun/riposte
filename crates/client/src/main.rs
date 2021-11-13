@@ -116,7 +116,7 @@ impl RootState {
 fn init_logging() {
     SimpleLogger::new()
         .with_level(log::LevelFilter::Info)
-        .with_module_level("wgpu", log::LevelFilter::Warn) // wgpu spams Info level
+        .with_module_level("wgpu", log::LevelFilter::Off) // wgpu spams Info level
         .init()
         .unwrap();
 }

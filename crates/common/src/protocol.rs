@@ -10,19 +10,20 @@
 //! The protocol _state_ determines which packet types are being transferred.
 //! The state starts as the `Lobby` state. When the game starts, we go into the `Game` state.
 
-use self::lobby::{ClientLobbyPacket, ServerLobbyPacket};
+use self::{game::server::ServerGamePacket, lobby::{ClientLobbyPacket, ServerLobbyPacket}};
 
 pub mod game;
 pub mod lobby;
 
 /// Any packet sent by the server.
 #[derive(Debug)]
-pub enum ServerPacket {
+pub enum GenericServerPacket {
     Lobby(ServerLobbyPacket),
+    Game(ServerGamePacket)
 }
 
 /// Any packet sent by the client.
 #[derive(Debug)]
-pub enum ClientPacket {
+pub enum GenericClientPacket {
     Lobby(ClientLobbyPacket),
 }

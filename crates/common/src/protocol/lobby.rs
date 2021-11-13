@@ -40,6 +40,7 @@ pub enum ClientLobbyPacket {
     DeleteSlot(DeleteSlot),
     SetMapgenSettings(SetMapgenSettings),
     ChangeCivAndLeader(ChangeCivAndLeader),
+    StartGame(StartGame),
 }
 
 /// Creates a new slot in the lobby.
@@ -70,3 +71,9 @@ pub struct ChangeCivAndLeader {
     pub civ: Handle<Civilization>,
     pub leader: Leader,
 }
+
+/// Requests the game to start. The server will send'
+/// `GameStarted` to all players, and the connection switches into
+/// the Game state thereafter.
+#[derive(Debug)]
+pub struct StartGame;

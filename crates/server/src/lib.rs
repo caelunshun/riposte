@@ -4,10 +4,15 @@ use std::sync::Arc;
 
 use anyhow::bail;
 use connection::{Connection, ConnectionId, Connections};
-use lobby::LobbyServer;
+use game::Game;
+use game_server::GameServer;
+use lobby_server::LobbyServer;
+use mapgen::MapGenerator;
 use riposte_common::{
     bridge::{Bridge, ServerSide},
-    protocol::ClientPacket,
+    lobby::GameLobby,
+    mapgen::MapgenSettings,
+    protocol::GenericClientPacket,
     registry::Registry,
 };
 use tokio::runtime;
@@ -17,9 +22,9 @@ extern crate fs_err as fs;
 
 mod connection;
 mod game;
-mod lobby;
-mod mapgen;
 mod game_server;
+mod lobby_server;
+mod mapgen;
 
 /// Configuration for a Riposte server.
 pub struct ServerConfig {
@@ -44,10 +49,13 @@ impl Server {
 
     /// Runs the server, handling packets in a loop until shutdown is requested.
     pub async fn run(&mut self) {
+        log::info!("Server running");
         self.update();
-        
+
         loop {
             let (packet, sender) = self.connections.recv_packet().await;
+
+            log::trace!("Server got packet: {:?}", packet);
 
             match packet {
                 Ok(packet) => {
@@ -68,18 +76,28 @@ impl Server {
     fn update(&mut self) {
         match &mut self.state {
             State::Lobby(l) => l.update(&self.connections),
+            State::Game(g) => {}
         }
     }
 
-    fn handle_packet(&mut self, packet: ClientPacket, sender: ConnectionId) -> anyhow::Result<()> {
+    fn handle_packet(
+        &mut self,
+        packet: GenericClientPacket,
+        sender: ConnectionId,
+    ) -> anyhow::Result<()> {
         match &mut self.state {
             State::Lobby(l) => {
-                if let ClientPacket::Lobby(p) = packet {
-                    l.handle_packet(p, sender)
+                if let GenericClientPacket::Lobby(p) = packet {
+                    let should_start_game = l.handle_packet(p, sender)?;
+                    if should_start_game {
+                        self.start_game();
+                    }
+                    Ok(())
                 } else {
                     bail!("expected a lobby packet")
                 }
             }
+            State::Game(g) => todo!(),
         }
     }
 
@@ -92,6 +110,12 @@ impl Server {
         let conn = Connection::new(bridge);
         let id = self.connections.add(conn);
 
+        log::info!(
+            "Adding connection from {} (admin={})",
+            player_uuid.to_hyphenated(),
+            is_admin
+        );
+
         match &mut self.state {
             State::Lobby(l) => {
                 if let Err(e) = l.add_connection(id, player_uuid, is_admin) {
@@ -99,6 +123,7 @@ impl Server {
                     self.kick(id, e.to_string());
                 }
             }
+            State::Game(g) => todo!("add connections while in Game state"),
         }
 
         id
@@ -114,12 +139,47 @@ impl Server {
     fn remove_connection(&mut self, id: ConnectionId) {
         match &mut self.state {
             State::Lobby(l) => l.remove_connection(id),
+            State::Game(_) => todo!("handle disconnecting during game"),
         }
 
         self.connections.remove(id);
+    }
+
+    fn start_game(&mut self) {
+        if let State::Lobby(l) = &self.state {
+            let game = self.initialize_game(l.lobby(), l.settings());
+            let mut server = GameServer::new(game);
+
+            // Initialize connections and send GameData
+            for (slot_id, conn_id) in l.slots_and_connections() {
+                let player_id = server.game().players().find_map(|p| {
+                    if p.data().lobby_id == slot_id {
+                        Some(p.id())
+                    } else {
+                        None
+                    }
+                });
+
+                if let Some(player_id) = player_id {
+                    server.add_connection(&self.connections, conn_id, player_id);
+
+                    let game_data = server.make_initial_game_data(player_id);
+                    self.connections.get(conn_id).send_game_started(game_data);
+                }
+            }
+
+            self.state = State::Game(server);
+            log::info!("Entered Game state");
+        }
+    }
+
+    fn initialize_game(&self, lobby: &GameLobby, settings: &MapgenSettings) -> Game {
+        let gen = MapGenerator::new(settings.clone());
+        gen.generate(lobby, &self.config.registry)
     }
 }
 
 enum State {
     Lobby(LobbyServer),
+    Game(GameServer),
 }

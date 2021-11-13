@@ -22,9 +22,9 @@ use riposte_common::{
     protocol::{
         lobby::{
             ChangeCivAndLeader, ClientLobbyPacket, CreateSlot, DeleteSlot, Kicked, LobbyInfo,
-            ServerLobbyPacket, SetMapgenSettings,
+            ServerLobbyPacket, SetMapgenSettings, StartGame,
         },
-        ClientPacket, ServerPacket,
+        GenericClientPacket, GenericServerPacket,
     },
     registry::{Civilization, Leader, Registry, Tech},
     CityId, PlayerId, UnitId,
@@ -96,7 +96,7 @@ impl Client<LobbyState> {
         }
 
         match self.bridge.try_recv() {
-            Some(ServerPacket::Lobby(packet)) => Ok(Some(packet)),
+            Some(GenericServerPacket::Lobby(packet)) => Ok(Some(packet)),
             _ => Ok(None),
         }
     }
@@ -123,7 +123,7 @@ impl Client<LobbyState> {
     }
 
     pub fn request_start_game(&mut self) {
-        todo!()
+        self.send_message(ClientLobbyPacket::StartGame(StartGame));
     }
 
     pub fn set_save_file(&mut self, file: Vec<u8>) {
@@ -157,7 +157,7 @@ impl Client<LobbyState> {
                 ServerLobbyPacket::Kicked(packet) => {
                     self.handle_kicked(packet, lobby)?;
                 }
-                
+                ServerLobbyPacket::GameStarted(_) => todo!(),
             }
         }
 
@@ -192,7 +192,7 @@ impl Client<LobbyState> {
     }
 
     fn send_message(&self, packet: ClientLobbyPacket) {
-        self.bridge.send(ClientPacket::Lobby(packet));
+        self.bridge.send(GenericClientPacket::Lobby(packet));
     }
 }
 

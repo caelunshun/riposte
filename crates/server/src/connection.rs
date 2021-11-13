@@ -1,5 +1,14 @@
 use futures_util::future::select_all;
-use riposte_common::{bridge::{Bridge, ServerSide}, lobby::{GameLobby, SlotId}, mapgen::MapgenSettings, protocol::{ClientPacket, ServerPacket, lobby::{Kicked, LobbyInfo, ServerLobbyPacket}}};
+use riposte_common::{
+    bridge::{Bridge, ServerSide},
+    lobby::{GameLobby, SlotId},
+    mapgen::MapgenSettings,
+    protocol::{
+        game::server::InitialGameData,
+        lobby::{Kicked, LobbyInfo, ServerLobbyPacket},
+        GenericClientPacket, GenericServerPacket,
+    },
+};
 use slotmap::SlotMap;
 
 slotmap::new_key_type! {
@@ -27,7 +36,16 @@ impl Connections {
         self.connections.remove(id);
     }
 
-    pub async fn recv_packet(&self) -> (Result<ClientPacket, ConnectionInterrupted>, ConnectionId) {
+    pub fn iter(&self) -> impl Iterator<Item = (ConnectionId, &Connection)> + '_ {
+        self.connections.iter()
+    }
+
+    pub async fn recv_packet(
+        &self,
+    ) -> (
+        Result<GenericClientPacket, ConnectionInterrupted>,
+        ConnectionId,
+    ) {
         select_all(self.connections.iter().map(|(id, conn)| {
             Box::pin(async move {
                 let res = conn.bridge.recv().await.ok_or(ConnectionInterrupted);
@@ -48,12 +66,12 @@ impl Connection {
         Self { bridge }
     }
 
-    fn send_packet(&self, packet: ServerPacket) {
+    pub fn send_packet(&self, packet: GenericServerPacket) {
         self.bridge.send(packet);
     }
 
     fn send_lobby_packet(&self, packet: ServerLobbyPacket) {
-        self.send_packet(ServerPacket::Lobby(packet));
+        self.send_packet(GenericServerPacket::Lobby(packet));
     }
 
     pub fn send_lobby_info(&self, lobby: &GameLobby, settings: &MapgenSettings, our_slot: SlotId) {
@@ -65,6 +83,10 @@ impl Connection {
     }
 
     pub fn send_lobby_kicked(&self, reason: String) {
-        self.send_lobby_packet(ServerLobbyPacket::Kicked(Kicked { reason}))
+        self.send_lobby_packet(ServerLobbyPacket::Kicked(Kicked { reason }));
+    }
+
+    pub fn send_game_started(&self, game_data: InitialGameData) {
+        self.send_lobby_packet(ServerLobbyPacket::GameStarted(game_data));
     }
 }

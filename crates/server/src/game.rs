@@ -5,10 +5,11 @@ use std::cell::{Ref, RefCell, RefMut};
 use glam::UVec2;
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
-use riposte_common::{CityId, Grid, PlayerId, Turn, UnitId, game::tile::OutOfBounds};
+use riposte_common::{game::tile::OutOfBounds, CityId, Grid, PlayerId, Turn, UnitId};
 use slotmap::SlotMap;
 
 pub mod city;
+pub mod event;
 pub mod player;
 pub mod tile;
 pub mod unit;
@@ -17,6 +18,8 @@ pub use city::City;
 pub use player::Player;
 pub use tile::Tile;
 pub use unit::Unit;
+
+use self::event::Event;
 
 /// Stores the entire game state.
 #[derive(Debug)]
@@ -30,6 +33,8 @@ pub struct Game {
     rng: RefCell<Pcg64Mcg>,
 
     turn: Turn,
+
+    events: Vec<Event>,
 }
 
 impl Game {
@@ -44,6 +49,8 @@ impl Game {
             rng: RefCell::new(Pcg64Mcg::from_entropy()),
 
             turn: Turn::new(0),
+
+            events: Vec::new(),
         }
     }
 
@@ -148,5 +155,19 @@ impl Game {
     /// deterministic.
     pub fn rng(&self) -> RefMut<impl Rng> {
         self.rng.borrow_mut()
+    }
+
+    /// Pushes an event into the event bus.
+    pub fn push_event(&mut self, event: Event) {
+        self.events.push(event);
+    }
+
+    /// Drains all events for handling.
+    pub fn drain_events(&mut self) -> impl Iterator<Item = Event> + '_ {
+        self.events.drain(..)
+    }
+
+    pub fn turn(&self) -> Turn {
+        self.turn
     }
 }
