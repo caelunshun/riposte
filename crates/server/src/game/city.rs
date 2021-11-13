@@ -43,10 +43,12 @@ impl City {
                     culture_per_turn: 0,
                     maintenance_cost: 0.,
                 },
+
                 happiness_sources: Vec::new(),
                 anger_sources: Vec::new(),
                 health_sources: Vec::new(),
                 sickness_sources: Vec::new(),
+                buildings: Vec::new(),
             },
         }
     }

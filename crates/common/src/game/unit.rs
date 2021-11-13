@@ -1,7 +1,9 @@
 use std::{
     fmt::Display,
-    ops::{Add, Sub},
+    ops::{Add, AddAssign, Sub, SubAssign},
 };
+
+use glam::UVec2;
 
 use crate::{assets::Handle, registry::UnitKind};
 
@@ -13,6 +15,8 @@ pub struct UnitData {
     pub id: UnitId,
     pub owner: PlayerId,
     pub kind: Handle<UnitKind>,
+
+    pub pos: UVec2,
 
     /// On [0, 1]
     pub health: f64,
@@ -43,9 +47,11 @@ impl UnitData {
 #[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub struct MovementPoints(u32);
 
+pub const ONE_MOVEMENT_POINT: u32 = 30;
+
 impl MovementPoints {
     pub fn as_f64(self) -> f64 {
-        self.0 as f64 / 30.
+        self.0 as f64 / ONE_MOVEMENT_POINT as f64
     }
 
     pub fn as_fixed_u32(self) -> u32 {
@@ -57,7 +63,15 @@ impl MovementPoints {
     }
 
     pub fn from_u32(x: u32) -> Self {
-        Self(x * 30)
+        Self(x * ONE_MOVEMENT_POINT)
+    }
+
+    pub fn min(&self, x: u32) -> Self {
+        MovementPoints(self.0.min(x * ONE_MOVEMENT_POINT))
+    }
+
+    pub fn is_exhausted(&self) -> bool {
+        self.0 == 0
     }
 }
 
@@ -74,6 +88,18 @@ impl Sub<MovementPoints> for MovementPoints {
 
     fn sub(self, rhs: MovementPoints) -> Self::Output {
         Self(self.0 - rhs.0)
+    }
+}
+
+impl AddAssign<MovementPoints> for MovementPoints {
+    fn add_assign(&mut self, rhs: MovementPoints) {
+        *self = *self + rhs;
+    }
+}
+
+impl SubAssign<MovementPoints> for MovementPoints {
+    fn sub_assign(&mut self, rhs: MovementPoints) {
+        *self = *self - rhs;
     }
 }
 

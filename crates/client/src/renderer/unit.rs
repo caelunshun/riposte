@@ -6,7 +6,7 @@ use dume::{
 };
 use glam::{vec2, UVec2};
 use palette::Srgba;
-use protocol::Visibility;
+use riposte_common::Visibility;
 
 use crate::{
     context::Context,

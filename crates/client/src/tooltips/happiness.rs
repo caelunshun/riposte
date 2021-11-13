@@ -1,4 +1,4 @@
-use protocol::HappinessSource;
+use riposte_common::HappinessSource;
 
 use crate::{game::city::City, utils::merge_lines};
 

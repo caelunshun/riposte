@@ -57,7 +57,7 @@ impl UnitStatus {
     pub fn of(unit: &Unit) -> Self {
         if unit.is_fortified() || unit.has_worker_task() {
             UnitStatus::Fortified
-        } else if unit.movement_left() == unit.kind().movement as f64 {
+        } else if unit.movement_left().as_f64() as u32 == unit.kind().movement {
             UnitStatus::Ready
         } else if unit.has_movement_left() {
             UnitStatus::Used

@@ -3,7 +3,7 @@ use std::{fmt::Write, num::NonZeroUsize};
 
 use glam::UVec2;
 use lexical::{format::STANDARD, WriteFloatOptions};
-use protocol::Visibility;
+use riposte_common::Visibility;
 
 use crate::game::unit::Capability;
 use crate::game::{Improvement, Yield};

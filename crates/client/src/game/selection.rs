@@ -5,7 +5,7 @@ use std::iter;
 use duit::{Event, Vec2};
 use float_ord::FloatOrd;
 use glam::UVec2;
-use protocol::ConfirmMoveUnits;
+use riposte_common::ConfirmMoveUnits;
 use riposte_common::{
     utils::{Version, VersionSnapshot},
     UnitId,
@@ -19,7 +19,7 @@ use crate::{
     context::Context,
 };
 
-use super::{path::Path, unit::MOVEMENT_LEFT_EPSILON, Game};
+use super::{path::Path, Game};
 
 /// The time after no units are selected at which we will
 /// attempt to auto-select the next unit group.
@@ -161,7 +161,7 @@ impl UnitGroup {
         self.last_move_turn != Some(game.turn())
             && self.units.iter().any(|&u| {
                 let unit = game.unit(u);
-                unit.has_movement_left() && !unit.is_fortified() && !unit.has_worker_task()
+                !unit.movement_left().is_exhausted() && !unit.is_fortified() && !unit.has_worker_task()
             })
     }
 }
@@ -477,7 +477,7 @@ impl SelectionDriver {
             let should_deselect = deselect_after_move
                 && match path.peek() {
                     Some(next_point) => next_point.turn > 1,
-                    None => point.movement_left <= MOVEMENT_LEFT_EPSILON,
+                    None => point.movement_left.is_exhausted()
                 };
 
             self.movement.move_units(

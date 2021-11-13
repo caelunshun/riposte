@@ -6,8 +6,8 @@ use riposte_common::{
     assets::Handle,
     lobby::{GameLobby, LobbySlot, SlotId, SlotPlayer},
     mapgen::MapgenSettings,
-    protocol::lobby::ClientLobbyPacket,
     registry::{Civilization, Leader, Registry},
+    protocol::lobby::ClientLobbyPacket,
 };
 use slotmap::SecondaryMap;
 use uuid::Uuid;

@@ -1,4 +1,4 @@
-use protocol::HealthSource;
+use riposte_common::HealthSource;
 
 use crate::{game::city::City, utils::merge_lines};
 

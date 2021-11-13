@@ -1,6 +1,6 @@
 use duit::{Align, Vec2};
 use glam::vec2;
-use protocol::PossibleTechs;
+use riposte_common::PossibleTechs;
 
 use crate::{
     assets::Handle,

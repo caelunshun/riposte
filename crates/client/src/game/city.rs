@@ -1,153 +1,105 @@
-use std::convert::TryInto;
+use std::{convert::TryInto, num::NonZeroU32};
 
 use anyhow::{anyhow, bail};
 use glam::UVec2;
-use protocol::{HappinessEntry, HealthEntry, SicknessEntry, UnhappinessEntry};
 use riposte_common::{
     assets::Handle,
-    game::culture::Culture,
+    game::{
+        city::{CityData, CityEconomy},
+        culture::Culture,
+    },
     registry::{Building, RegistryItemNotFound, Resource, UnitKind},
-    CityId, PlayerId,
+    CityId, CultureLevel, PlayerId,
 };
 
 use super::{Game, Yield};
+pub use riposte_common::game::city::{
+    AngerSource, BuildTask, HappinessSource, HealthSource, SicknessSource,
+};
 
 #[derive(Debug)]
 pub struct City {
-    data: protocol::UpdateCity,
-    id: CityId,
-
-    pos: UVec2,
-    owner: PlayerId,
-    city_yield: Yield,
-    build_task: Option<BuildTask>,
-    previous_build_task: Option<PreviousBuildTask>,
-    buildings: Vec<Handle<Building>>,
-    resources: Vec<Handle<Resource>>,
-    culture: Culture,
+    data: CityData,
 }
 
 impl City {
-    pub fn from_data(data: protocol::UpdateCity, id: CityId, game: &Game) -> anyhow::Result<Self> {
-        let mut city = Self {
-            data: protocol::UpdateCity::default(),
-            id,
-
-            pos: Default::default(),
-            owner: Default::default(),
-            city_yield: Default::default(),
-            build_task: None,
-            previous_build_task: None,
-            buildings: Vec::new(),
-            resources: Vec::new(),
-            culture: Culture::new(),
-        };
-
-        city.update_data(data, game)?;
+    pub fn from_data(data: CityData, game: &Game) -> anyhow::Result<Self> {
+        let city = Self { data };
 
         Ok(city)
     }
 
-    pub fn update_data(&mut self, data: protocol::UpdateCity, game: &Game) -> anyhow::Result<()> {
-        self.pos = data
-            .pos
-            .clone()
-            .ok_or_else(|| anyhow!("missing city position"))?
-            .into();
-        self.owner = game.resolve_player_id(data.owner_id as u32)?;
-        self.city_yield = data.r#yield.clone().unwrap_or_default().into();
-        self.build_task = data
-            .build_task
-            .as_ref()
-            .map(|b| BuildTask::from_data(b, game))
-            .transpose()?;
-
-        self.buildings = data
-            .building_names
-            .iter()
-            .map(|name| game.registry().building(name))
-            .collect::<Result<_, RegistryItemNotFound>>()?;
-        self.resources = data
-            .resources
-            .iter()
-            .map(|id| game.registry().resource(id))
-            .collect::<Result<_, RegistryItemNotFound>>()?;
-
-        if let Some(culture_values) = &data.culture_values {
-            // self.culture.set_data(game, culture_values)?;
-        }
-
+    pub fn update_data(&mut self, data: CityData, game: &Game) -> anyhow::Result<()> {
         self.data = data;
-
         Ok(())
     }
 
     pub fn id(&self) -> CityId {
-        self.id
-    }
-
-    pub fn network_id(&self) -> u32 {
-        self.data.id as u32
+        self.data.id
     }
 
     pub fn owner(&self) -> PlayerId {
-        self.owner
+        self.data.owner
     }
 
-    pub fn city_yield(&self) -> Yield {
-        self.city_yield
+    pub fn economy(&self) -> &CityEconomy {
+        &self.data.economy
     }
 
     pub fn build_task(&self) -> Option<&BuildTask> {
-        self.build_task.as_ref()
+        self.data.build_task.as_ref()
+    }
+
+    pub fn build_task_progress(&self, task: &BuildTask) -> u32 {
+        self.data.build_task_progress.get(task).copied().unwrap_or(0)
     }
 
     pub fn pos(&self) -> UVec2 {
-        self.pos.clone()
+        self.data.pos
     }
 
-    pub fn num_culture(&self) -> i32 {
-        self.data.culture
+    pub fn num_culture(&self) -> u32 {
+        self.data.culture.culture_for(self.owner())
     }
 
-    pub fn culture_needed(&self) -> i32 {
-        self.data.culture_needed
+    pub fn culture_needed(&self) -> u32 {
+        todo!()
     }
 
-    pub fn buildings(&self) -> impl DoubleEndedIterator<Item = &Handle<Building>> + '_ {
-        self.buildings.iter()
+    pub fn buildings(&self) -> impl Iterator<Item = &Handle<Building>> + '_ {
+        self.data.buildings.iter()
     }
 
-    pub fn resources(&self) -> impl DoubleEndedIterator<Item = &Handle<Resource>> + '_ {
-        self.resources.iter()
+    pub fn resources(&self) -> impl Iterator<Item = &Handle<Resource>> + '_ {
+        self.data.resources.iter()
     }
 
-    pub fn population(&self) -> i32 {
+    pub fn population(&self) -> NonZeroU32 {
         self.data.population
     }
 
-    pub fn stored_food(&self) -> i32 {
+    pub fn stored_food(&self) -> u32 {
         self.data.stored_food
     }
 
-    pub fn food_needed_for_growth(&self) -> i32 {
-        self.data.food_needed_for_growth
+    pub fn food_needed_for_growth(&self) -> u32 {
+        self.data.food_needed_for_growth()
     }
 
-    pub fn consumed_food(&self) -> i32 {
-        self.data.consumed_food
+    pub fn consumed_food(&self) -> u32 {
+        self.data.food_consumed_per_turn()
     }
 
     pub fn is_growing(&self) -> bool {
-        self.consumed_food() < self.city_yield().food as i32
+        self.consumed_food() < self.economy().food_yield
     }
 
     pub fn is_starving(&self) -> bool {
-        self.consumed_food() > self.city_yield().food as i32
+        self.consumed_food() > self.economy().food_yield
     }
 
     pub fn is_stagnant(&self) -> bool {
-        self.consumed_food() == self.city_yield().food as i32
+        self.consumed_food() == self.economy().food_yield
     }
 
     pub fn is_capital(&self) -> bool {
@@ -160,7 +112,7 @@ impl City {
 
     pub fn manual_worked_tiles(&self) -> impl DoubleEndedIterator<Item = UVec2> + '_ {
         self.data
-            .manual_worked_tiles
+            .manually_worked_tiles
             .iter()
             .map(|p| p.clone().into())
     }
@@ -170,147 +122,86 @@ impl City {
     }
 
     pub fn num_happiness(&self) -> u32 {
-        self.data.happiness_sources.iter().map(|s| s.count).sum()
+        self.data.happiness_sources.len() as u32
     }
 
     pub fn num_health(&self) -> u32 {
-        self.data.health_sources.iter().map(|s| s.count).sum()
+        self.data.health_sources.len() as u32
     }
 
-    pub fn num_unhappiness(&self) -> u32 {
-        self.data.unhappiness_sources.iter().map(|s| s.count).sum()
+    pub fn num_anger(&self) -> u32 {
+        self.data.anger_sources.len() as u32
     }
 
     pub fn num_sickness(&self) -> u32 {
-        self.data.sickness_sources.iter().map(|s| s.count).sum()
+        self.data.sickness_sources.len() as u32
     }
 
-    pub fn happiness(&self) -> impl Iterator<Item = &HappinessEntry> {
+    pub fn happiness(&self) -> impl Iterator<Item = &HappinessSource> {
         self.data.happiness_sources.iter()
     }
 
-    pub fn unhappiness(&self) -> impl Iterator<Item = &UnhappinessEntry> {
-        self.data.unhappiness_sources.iter()
+    pub fn anger(&self) -> impl Iterator<Item = &AngerSource> {
+        self.data.anger_sources.iter()
     }
 
-    pub fn health(&self) -> impl Iterator<Item = &HealthEntry> {
+    pub fn health(&self) -> impl Iterator<Item = &HealthSource> {
         self.data.health_sources.iter()
     }
 
-    pub fn sickness(&self) -> impl Iterator<Item = &SicknessEntry> {
+    pub fn sickness(&self) -> impl Iterator<Item = &SicknessSource> {
         self.data.sickness_sources.iter()
     }
 
     pub fn culture(&self) -> &Culture {
-        &self.culture
+        &self.data.culture
     }
 
-    pub fn culture_per_turn(&self) -> i32 {
-        self.data.culture_per_turn
+    pub fn culture_per_turn(&self) -> u32 {
+        self.economy().culture_per_turn
     }
 
-    pub fn culture_level(&self) -> &str {
-        &self.data.culture_level
+    pub fn culture_level(&self) -> CultureLevel {
+        self.data.culture_level()
     }
 
     pub fn beakers_per_turn(&self, game: &Game) -> u32 {
-        (self.city_yield().commerce as f32 * game.the_player().beaker_percent() as f32 / 100.)
-            .floor() as u32
+        (self.economy().commerce as f32 * game.the_player().beaker_percent() as f32 / 100.).floor()
+            as u32
     }
 
     pub fn gold_per_turn(&self, game: &Game) -> u32 {
-        self.city_yield().commerce - self.beakers_per_turn(game)
+        self.economy().commerce as u32 - self.beakers_per_turn(game)
     }
 
-    pub fn culture_defense_bonus(&self) -> i32 {
+    pub fn culture_defense_bonus(&self) -> u32 {
         self.data.culture_defense_bonus
     }
 
     pub fn estimate_build_time_for_task(&self, task: &BuildTask) -> u32 {
-        (task.cost - task.progress + self.city_yield().hammers - 1) / (self.city_yield().hammers)
+        (task.cost() - self.build_task_progress(task) + self.economy().hammer_yield - 1)
+            / (self.economy().hammer_yield)
     }
 
     pub fn estimate_remaining_build_time(&self) -> u32 {
-        match &self.build_task {
+        match &self.data.build_task {
             Some(task) => self.estimate_build_time_for_task(task),
             None => 0,
         }
     }
 
     pub fn turns_needed_for_growth(&self) -> u32 {
-        (self.food_needed_for_growth() as u32 - self.stored_food() as u32 + self.city_yield().food
-            - self.consumed_food() as u32
+        (self.food_needed_for_growth()  - self.stored_food()  + self.economy().food_yield
+            - self.consumed_food() 
             - 1)
-            / (self.city_yield().food - self.consumed_food() as u32)
+            / (self.economy().food_yield - self.consumed_food() )
     }
 
-    pub fn maintenance_cost(&self) -> i32 {
-        self.data.maintenance_cost
+    pub fn maintenance_cost(&self) -> u32  {
+        self.economy().maintenance_cost as u32
     }
 
     pub fn name(&self) -> &str {
         &self.data.name
     }
-
-    pub fn set_previous_build_task(&mut self, task: PreviousBuildTask) {
-        self.previous_build_task = Some(task);
-    }
-
-    pub fn previous_build_task(&self) -> Option<&PreviousBuildTask> {
-        self.previous_build_task.as_ref()
-    }
-}
-
-/// Something a city is building.
-#[derive(Debug)]
-pub struct BuildTask {
-    pub cost: u32,
-    pub progress: u32,
-    pub kind: BuildTaskKind,
-}
-
-impl BuildTask {
-    pub fn from_data(data: &protocol::BuildTask, game: &Game) -> anyhow::Result<Self> {
-        let kind = match &data.kind {
-            Some(k) => match &k.task {
-                Some(protocol::build_task_kind::Task::Unit(t)) => {
-                    BuildTaskKind::Unit(game.registry().unit_kind(&t.unit_kind_id)?)
-                }
-                Some(protocol::build_task_kind::Task::Building(t)) => {
-                    BuildTaskKind::Building(game.registry().building(&t.building_name)?)
-                }
-                None => bail!("missing build task kind"),
-            },
-            None => bail!("missing build task kind"),
-        };
-
-        Ok(Self {
-            cost: data.cost.try_into()?,
-            progress: data.progress.try_into()?,
-            kind,
-        })
-    }
-
-    pub fn name(&self) -> &str {
-        match &self.kind {
-            BuildTaskKind::Unit(u) => &u.name,
-            BuildTaskKind::Building(b) => &b.name,
-        }
-    }
-}
-
-#[derive(Debug)]
-pub enum BuildTaskKind {
-    Unit(Handle<UnitKind>),
-    Building(Handle<Building>),
-}
-
-/// The previous build task completed by a city.
-#[derive(Debug)]
-pub struct PreviousBuildTask {
-    pub task: BuildTask,
-    /// Whether the task completed successfully.
-    /// If false, then it was canceled, e.g. because
-    /// we lost the necessary resources.
-    pub succeeded: bool,
 }

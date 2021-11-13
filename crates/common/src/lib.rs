@@ -21,8 +21,9 @@ pub mod types;
 pub mod utils;
 
 pub use game::{
+    *,
     culture::CultureLevel,
+    improvement::{Cottage, CottageLevel, Improvement},
     tile::{Grid, Terrain},
-    CityId, PlayerId, UnitId,
 };
 pub use types::{Era, Turn, Visibility, Year, Yield};

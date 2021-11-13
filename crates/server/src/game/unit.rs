@@ -19,6 +19,7 @@ impl Unit {
                 owner,
                 kind: kind.clone(),
                 health: 1.,
+                pos,
                 movement_left: MovementPoints::from_u32(kind.movement),
                 is_fortified_forever: false,
                 is_skipping_turn: false,

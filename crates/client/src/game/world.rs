@@ -9,7 +9,7 @@ use anyhow::Context as _;
 use arrayvec::ArrayVec;
 use duit::Event;
 use glam::{ivec2, UVec2};
-use protocol::{
+use riposte_common::{
     Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit, Visibility,
 };
 use riposte_common::{
@@ -506,7 +506,7 @@ impl Game {
             Some(id) => {
                 let mut unit = self.unit_mut(id);
                 let old_pos = unit.pos();
-                unit.update_data(data, self, cx)?;
+                unit.update_data(data)?;
                 let new_pos = unit.pos();
                 if old_pos != new_pos {
                     drop(unit);
@@ -520,7 +520,7 @@ impl Game {
             None => {
                 let mut units = mem::take(&mut self.units);
                 let res = units
-                    .try_insert_with_key(|k| Unit::from_data(data, k, self, cx).map(RefCell::new));
+                    .try_insert_with_key(|k| Unit::from_data(data, self, cx).map(RefCell::new));
                 self.units = units;
                 if let Ok(id) = &res {
                     self.unit_ids.insert(data_id, *id);
@@ -535,8 +535,6 @@ impl Game {
     }
 
     pub fn delete_unit(&mut self, unit: UnitId) {
-        let network_id = self.unit(unit).network_id() as u32;
-        self.unit_ids.remove(network_id);
         self.on_unit_deleted(unit);
         self.units.remove(unit);
     }
@@ -580,7 +578,7 @@ impl Game {
             None => {
                 let mut cities = mem::take(&mut self.cities);
                 let res = cities
-                    .try_insert_with_key(|k| City::from_data(data, k, self).map(RefCell::new));
+                    .try_insert_with_key(|k| City::from_data(data, self).map(RefCell::new));
                 self.cities = cities;
                 if let Ok(id) = &res {
                     self.city_ids.insert(data_id, *id);
@@ -602,7 +600,7 @@ impl Game {
             None => {
                 let mut players = mem::take(&mut self.players);
                 let res = players
-                    .try_insert_with_key(|k| Player::from_data(data, k, self).map(RefCell::new));
+                    .try_insert_with_key(|k| Player::from_data(data, self).map(RefCell::new));
                 self.players = players;
                 if let Ok(id) = &res {
                     self.player_ids.insert(data_id, *id);
@@ -615,8 +613,6 @@ impl Game {
     }
 
     pub fn delete_city(&mut self, city: CityId) {
-        let network_id = self.city(city).network_id() as u32;
-        self.city_ids.remove(network_id);
         self.cities.remove(city);
     }
 

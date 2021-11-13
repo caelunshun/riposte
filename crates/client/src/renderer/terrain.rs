@@ -1,7 +1,7 @@
 use ahash::AHashMap;
 use dume::TextureId;
 use glam::{UVec2, Vec2};
-use protocol::Terrain;
+use riposte_common::Terrain;
 
 use crate::{
     context::Context,

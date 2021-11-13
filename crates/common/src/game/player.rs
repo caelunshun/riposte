@@ -127,4 +127,12 @@ impl EconomySettings {
         self.beaker_percent = self.beaker_percent.saturating_sub(10);
         self.gold_percent = 100 - self.beaker_percent;
     }
+
+    pub fn beaker_percent(&self) -> u32 {
+        self.beaker_percent
+    }
+
+    pub fn gold_percent(&self) -> u32 {
+        self.gold_percent
+    }
 }

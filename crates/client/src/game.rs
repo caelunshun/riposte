@@ -26,8 +26,8 @@ pub struct Yield {
     pub food: u32,
 }
 
-impl From<protocol::Yield> for Yield {
-    fn from(y: protocol::Yield) -> Self {
+impl From<riposte_common::Yield> for Yield {
+    fn from(y: riposte_common::Yield) -> Self {
         Self {
             hammers: y.hammers as u32,
             commerce: y.commerce as u32,

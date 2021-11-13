@@ -56,6 +56,9 @@ pub struct CityData {
     /// Resources accessible to the city
     pub resources: AHashSet<Handle<Resource>>,
 
+    /// Buildings in this city
+    pub buildings: Vec<Handle<Building>>,
+
     /// Cached economy data for the city.
     pub economy: CityEconomy,
 
@@ -106,6 +109,22 @@ pub enum BuildTask {
     Unit(Handle<UnitKind>),
     /// The city is building a building
     Building(Handle<Building>),
+}
+
+impl BuildTask {
+    pub fn cost(&self) -> u32 {
+        match self {
+            BuildTask::Unit(u) => u.cost,
+            BuildTask::Building(b) => b.cost,
+        }
+    }
+
+    pub fn name(&self) -> &str {
+        match self {
+            BuildTask::Unit(u) => &u.name,
+            BuildTask::Building(b) => &b.name,
+        }
+    }
 }
 
 #[derive(Debug, Clone)]

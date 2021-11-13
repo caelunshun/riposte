@@ -1,4 +1,4 @@
-use protocol::UnhappinessSource;
+use riposte_common::UnhappinessSource;
 
 use crate::{game::city::City, utils::merge_lines};
 

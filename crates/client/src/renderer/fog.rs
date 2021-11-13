@@ -1,7 +1,7 @@
 use duit::Vec2;
 use glam::UVec2;
 use palette::Srgba;
-use protocol::Visibility;
+use riposte_common::Visibility;
 
 use crate::{
     context::Context,

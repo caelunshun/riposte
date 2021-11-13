@@ -1,4 +1,4 @@
-use protocol::SicknessSource::PopulationSickness;
+use riposte_common::SicknessSource::PopulationSickness;
 
 use crate::{game::city::City, utils::merge_lines};
 

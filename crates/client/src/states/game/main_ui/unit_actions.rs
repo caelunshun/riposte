@@ -6,7 +6,7 @@
 
 use duit::{Event, Rect, Vec2, WindowPositioner};
 use glam::vec2;
-use protocol::UnitAction;
+use riposte_common::UnitAction;
 use winit::event::VirtualKeyCode;
 
 use crate::{

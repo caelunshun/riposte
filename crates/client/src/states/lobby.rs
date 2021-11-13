@@ -19,7 +19,7 @@ use duit::{
     widget,
     widgets::{Button, PickList, Text},
 };
-use protocol::InitialGameData;
+use riposte_common::protocol::game::server::InitialGameData;
 use riposte_backend_api::UserInfo;
 use riposte_common::{
     assets::Handle,

@@ -4,7 +4,6 @@ members = [
     "crates/backend/api",
     "crates/bundler",
     "crates/client",
-    "crates/client/protocol",
     "crates/common",
     "crates/launcher",
     "crates/lobby",

@@ -1,7 +1,9 @@
 use std::cell::{Ref, RefCell, RefMut};
 
 use glam::UVec2;
-use protocol::{Improvement, Terrain, Visibility};
+use riposte_common::tile::TileData;
+use riposte_common::unit::MovementPoints;
+use riposte_common::{Improvement, Terrain, Visibility};
 use riposte_common::{
     assets::Handle,
     game::{culture::Culture, tile::OutOfBounds},
@@ -14,96 +16,63 @@ use super::{player::Player, Game, Yield};
 /// A tile on the map.
 #[derive(Debug)]
 pub struct Tile {
-    data: protocol::Tile,
-
-    resource: Option<Handle<Resource>>,
-    culture: Culture,
-    owner: Option<PlayerId>,
-    improvements: Vec<Improvement>,
+    data: TileData,
 }
 
 impl Tile {
-    pub fn from_data(data: protocol::Tile, game: &Game) -> anyhow::Result<Self> {
-        let mut tile = Self {
-            data: Default::default(),
-            resource: None,
-            culture: Culture::new(),
-            owner: None,
-            improvements: Vec::new(),
+    pub fn from_data(data: TileData, game: &Game) -> anyhow::Result<Self> {
+        let  tile = Self {
+            data,
         };
-
-        tile.update_data(data, game)?;
 
         Ok(tile)
     }
 
-    pub fn update_data(&mut self, data: protocol::Tile, game: &Game) -> anyhow::Result<()> {
-        self.resource = if data.resource_id.is_empty() {
-            None
-        } else {
-            Some(game.registry().resource(&data.resource_id)?)
-        };
-
-        if let Some(culture_values) = &data.culture_values {
-            //  self.culture.set_data(game, culture_values)?;
-        }
-
-        self.owner = data
-            .has_owner
-            .then(|| game.resolve_player_id(data.owner_id as u32))
-            .transpose()?;
-
-        self.improvements = data
-            .improvements
-            .iter()
-            .map(|data| todo!())
-            .collect::<anyhow::Result<_>>()?;
-
+    pub fn update_data(&mut self, data: TileData) -> anyhow::Result<()> {
         self.data = data;
-
         Ok(())
     }
 
     pub fn terrain(&self) -> Terrain {
-        self.data.terrain()
+        self.data.terrain
     }
 
     pub fn is_forested(&self) -> bool {
-        self.data.forested
+        self.data.is_forested
     }
 
     pub fn is_hilled(&self) -> bool {
-        self.data.hilled
+        self.data.is_hilled
     }
 
     pub fn tile_yield(&self) -> Yield {
-        self.data.r#yield.clone().unwrap_or_default().into()
+        self.data.tile_yield()
     }
 
     pub fn is_worked(&self) -> bool {
-        self.data.is_worked
+        self.data.worked_by_city.is_some()
     }
 
     pub fn resource(&self) -> Option<&Handle<Resource>> {
-        self.resource.as_ref()
+        self.data.resource.as_ref()
     }
 
     pub fn culture(&self) -> &Culture {
-        &self.culture
+        &self.data.culture
     }
 
     pub fn owner(&self) -> Option<PlayerId> {
-        self.owner
+        self.data.owner()
     }
 
     pub fn improvements(&self) -> impl Iterator<Item = &Improvement> + '_ {
-        self.improvements.iter()
+        self.data.improvements.iter()
     }
 
-    pub fn movement_cost(&self, _game: &Game, player: &Player) -> f64 {
-        let mut cost = 1.;
+    pub fn movement_cost(&self, _game: &Game, player: &Player) -> MovementPoints {
+        let mut cost = MovementPoints::from_u32(1);
         if self.is_forested() || self.is_hilled() {
-            cost += 1.;
+            cost += MovementPoints::from_u32(1);
         }
 
         if self.improvements().any(|i| todo!()) {
@@ -113,7 +82,7 @@ impl Tile {
             };
 
             if can_use_road {
-                cost /= 3.;
+                cost = MovementPoints::from_fixed_u32(cost.as_fixed_u32() / 3);
             }
         }
 

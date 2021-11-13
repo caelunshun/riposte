@@ -3,7 +3,7 @@ use std::f32::consts::{PI, TAU};
 use duit::Vec2;
 use dume::Canvas;
 use glam::{uvec2, vec2, UVec2};
-use protocol::Visibility;
+use riposte_common::Visibility;
 
 use crate::{
     context::Context,

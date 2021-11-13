@@ -6,7 +6,7 @@ use bytes::BytesMut;
 use flume::Receiver;
 use glam::{uvec2, UVec2};
 use prost::Message;
-use protocol::{
+use riposte_common::{
     any_client, any_server, worker_task_kind, AnyClient, AnyServer, BordersExpanded,
     BuildTaskFailed, BuildTaskFinished, ConfigureWorkedTiles, ConfirmMoveUnits, DeclarePeace,
     DeclareWar, DoUnitAction, EndTurn, GameSaved, GameStarted, GetBuildTasks, GetPossibleTechs,
@@ -19,7 +19,7 @@ use riposte_common::{
     bridge::{Bridge, ClientSide},
     lobby::{GameLobby, SlotId},
     mapgen::MapgenSettings,
-    protocol::{
+    riposte_common::{
         lobby::{
             ChangeCivAndLeader, ClientLobbyPacket, CreateSlot, DeleteSlot, Kicked, LobbyInfo,
             ServerLobbyPacket, SetMapgenSettings, StartGame,
@@ -33,7 +33,7 @@ use riposte_common::{
 use crate::{
     context::Context,
     game::{
-        city::{self, PreviousBuildTask},
+        city::{self},
         combat::CombatEvent,
         event::GameEvent,
         unit::WorkerTaskKind,
@@ -229,7 +229,7 @@ impl Client<GameState> {
         self.register_response_future(request_id)
     }
 
-    pub fn do_unit_action(&mut self, game: &Game, unit: UnitId, action: protocol::UnitAction) {
+    pub fn do_unit_action(&mut self, game: &Game, unit: UnitId, action: riposte_common::UnitAction) {
         self.send_message(any_client::Packet::DoUnitAction(DoUnitAction {
             unit_id: game.unit(unit).network_id() as i32,
             action: action.into(),
@@ -252,7 +252,7 @@ impl Client<GameState> {
         &mut self,
         game: &Game,
         city: CityId,
-        build_task: protocol::BuildTask,
+        build_task: riposte_common::BuildTask,
     ) {
         self.send_message(any_client::Packet::SetCityBuildTask(SetCityBuildTask {
             city_id: game.city(city).network_id() as i32,
@@ -302,7 +302,7 @@ impl Client<GameState> {
             worker_id: game.unit(worker_id).network_id() as i32,
             task: Some(WorkerTask {
                 kind: Some(match task {
-                    WorkerTaskKind::BuildImprovement(improvement) => protocol::WorkerTaskKind {
+                    WorkerTaskKind::BuildImprovement(improvement) => riposte_common::WorkerTaskKind {
                         kind: Some(worker_task_kind::Kind::BuildImprovement(
                             WorkerTaskImprovement {
                                 improvement_id: todo!(),
@@ -448,7 +448,7 @@ impl Client<GameState> {
         &mut self,
         cx: &Context,
         game: &mut Game,
-        packet: protocol::CombatEvent,
+        packet: riposte_common::CombatEvent,
     ) -> anyhow::Result<()> {
         game.set_current_combat_event(cx, CombatEvent::from_data(packet, game)?);
         Ok(())
@@ -532,8 +532,8 @@ pub trait State {
 pub struct LobbyState;
 
 impl State for LobbyState {
-    type SendPacket = protocol::ClientLobbyPacket;
-    type RecvPacket = protocol::ServerLobbyPacket;
+    type SendPacket = riposte_common::ClientLobbyPacket;
+    type RecvPacket = riposte_common::ServerLobbyPacket;
 }
 
 pub struct GameState;

@@ -8,7 +8,8 @@ use anyhow::anyhow;
 use duit::Vec2;
 use glam::UVec2;
 use lexical::WriteFloatOptions;
-use protocol::{capability, worker_task_kind, Improvement};
+use riposte_common::game::unit::UnitData;
+use riposte_common::Improvement;
 use riposte_common::{
     assets::Handle,
     registry::{CapabilityType, CombatBonusType, UnitKind},
@@ -16,60 +17,30 @@ use riposte_common::{
 };
 use splines::{Interpolation, Key, Spline};
 
-pub const MOVEMENT_LEFT_EPSILON: f64 = 0.001;
+pub use riposte_common::unit::{Capability, MovementPoints, WorkerCapability};
 
 #[derive(Debug)]
 pub struct Unit {
-    data: protocol::UpdateUnit,
-    id: UnitId,
-
-    kind: Handle<UnitKind>,
-    owner: PlayerId,
-    capabilities: Vec<Capability>,
+    data: UnitData,
 
     /// Used to interpolate unit movement
     movement_spline: Spline<f32, Vec2>,
 }
 
 impl Unit {
-    pub fn from_data(
-        data: protocol::UpdateUnit,
-        id: UnitId,
-        game: &Game,
-        cx: &Context,
-    ) -> anyhow::Result<Self> {
+    pub fn from_data(data: UnitData, game: &Game, cx: &Context) -> anyhow::Result<Self> {
         let mut unit = Self {
-            data: Default::default(),
-            id,
-            kind: game.registry().unit_kind(&data.kind_id)?,
-            owner: Default::default(),
-            capabilities: Vec::new(),
+            data,
             movement_spline: Spline::from_vec(Vec::new()),
         };
-
-        unit.update_data(data, game, cx)?;
 
         unit.on_moved(cx, Default::default(), unit.pos());
 
         Ok(unit)
     }
 
-    pub fn update_data(
-        &mut self,
-        data: protocol::UpdateUnit,
-        game: &Game,
-        _cx: &Context,
-    ) -> anyhow::Result<()> {
-        self.kind = game.registry().unit_kind(&data.kind_id)?;
-        self.owner = game.resolve_player_id(data.owner_id as u32)?;
-        self.capabilities = data
-            .capabilities
-            .iter()
-            .map(|c| Capability::from_data(c, game))
-            .collect::<Result<_, anyhow::Error>>()?;
-
+    pub fn update_data(&mut self, data: UnitData) -> anyhow::Result<()> {
         self.data = data;
-
         Ok(())
     }
 
@@ -105,16 +76,15 @@ impl Unit {
     }
 
     pub fn pos(&self) -> UVec2 {
-        let p = self.data.pos.clone().unwrap_or_default();
-        UVec2::new(p.x, p.y)
+        self.data.pos
     }
 
     /// Manually update the unit's position.
     ///
-    /// Only used for unit movement code when we receive ConfirmMoveUnits.
-    /// Don't attempt to move units with this function.
+    /// Only used for unit movement code when we receive UnitsMoved.
+    /// Don't attempt to move units directly with this function.
     pub fn set_pos_unsafe(&mut self, pos: UVec2) {
-        self.data.pos = Some(pos.into());
+        self.data.pos = pos;
     }
 
     pub fn set_health_unsafe(&mut self, health: f64) {
@@ -125,27 +95,26 @@ impl Unit {
         self.data.health
     }
 
-    pub fn movement_left(&self) -> f64 {
+    pub fn movement_left(&self) -> MovementPoints {
         self.data.movement_left
     }
 
     pub fn has_movement_left(&self) -> bool {
-        self.movement_left() > MOVEMENT_LEFT_EPSILON
+        self.movement_left().as_fixed_u32() > 0
     }
 
     pub fn kind(&self) -> &Handle<UnitKind> {
-        &self.kind
+        &self.data.kind
     }
 
     pub fn capabilities(&self) -> impl Iterator<Item = &Capability> {
-        self.capabilities.iter()
+        self.data.capabilities.iter()
     }
 
     pub fn has_capability(&self, typ: CapabilityType) -> bool {
         self.capabilities().any(|c| match c {
             Capability::FoundCity => typ == CapabilityType::FoundCity,
-            Capability::BombardCity => typ == CapabilityType::BombardCityDefenses,
-            Capability::CarryUnits(_) => typ == CapabilityType::CarryUnits,
+            Capability::BombardCity { .. } => typ == CapabilityType::BombardCityDefenses,
             Capability::Worker(_) => typ == CapabilityType::DoWork,
         })
     }
@@ -158,27 +127,23 @@ impl Unit {
     }
 
     pub fn id(&self) -> UnitId {
-        self.id
-    }
-
-    pub fn network_id(&self) -> u32 {
-        self.data.id as u32
+        self.data.id
     }
 
     pub fn strength(&self) -> f64 {
-        self.data.strength
+        self.health() * self.kind().strength
     }
 
     pub fn is_fortified(&self) -> bool {
-        self.data.is_fortified
+        self.data.is_fortified()
     }
 
-    pub fn used_attack(&self) -> bool {
-        self.data.used_attack
+    pub fn has_used_attack(&self) -> bool {
+        self.data.has_used_attack
     }
 
     pub fn owner(&self) -> PlayerId {
-        self.owner
+        self.data.owner
     }
 
     pub fn movement_spline(&self) -> &Spline<f32, Vec2> {
@@ -281,13 +246,13 @@ impl Unit {
     }
 
     pub fn movement_text(&self) -> String {
-        if self.movement_left().ceil() as u32 == self.kind().movement {
-            lexical::to_string(self.movement_left().ceil() as u32)
+        if self.movement_left().as_f64().ceil() as u32 == self.kind().movement {
+            lexical::to_string(self.movement_left().as_f64().ceil() as u32)
         } else {
             format!(
                 "{} / {}",
-                lexical::to_string(self.movement_left().ceil() as u32),
-                self.kind.movement
+                lexical::to_string(self.movement_left().as_f64().ceil() as u32),
+                self.kind().movement
             )
         }
     }
@@ -299,132 +264,4 @@ fn float_options() -> WriteFloatOptions {
         .max_significant_digits(Some(NonZeroUsize::new(2).unwrap()))
         .build()
         .unwrap()
-}
-
-#[derive(Debug)]
-pub enum Capability {
-    FoundCity,
-    BombardCity,
-    CarryUnits(CarryUnitsCapability),
-    Worker(WorkerCapability),
-}
-
-impl Capability {
-    fn from_data(data: &protocol::Capability, game: &Game) -> anyhow::Result<Self> {
-        match data
-            .cap
-            .as_ref()
-            .ok_or_else(|| anyhow!("unknown capability"))?
-        {
-            capability::Cap::FoundCity(_) => Ok(Capability::FoundCity),
-            capability::Cap::BombardCity(_) => Ok(Capability::BombardCity),
-            capability::Cap::Worker(cap) => {
-                let current_task = cap
-                    .current_task
-                    .as_ref()
-                    .map(|t| WorkerTask::from_data(t))
-                    .transpose()?;
-                let possible_tasks = cap
-                    .possible_tasks
-                    .iter()
-                    .map(|t| WorkerTask::from_data(t))
-                    .collect::<Result<_, anyhow::Error>>()?;
-
-                Ok(Capability::Worker(WorkerCapability {
-                    current_task,
-                    possible_tasks,
-                }))
-            }
-            capability::Cap::CarryUnits(cap) => {
-                let carried_units = cap
-                    .carrying_unit_i_ds
-                    .iter()
-                    .map(|&id| game.resolve_unit_id(id as u32))
-                    .collect::<Result<_, InvalidNetworkId>>()?;
-                Ok(Capability::CarryUnits(CarryUnitsCapability {
-                    carried_units,
-                }))
-            }
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct CarryUnitsCapability {
-    carried_units: Vec<UnitId>,
-}
-
-impl CarryUnitsCapability {
-    pub fn carried_units(&self) -> &[UnitId] {
-        &self.carried_units
-    }
-}
-
-#[derive(Debug)]
-pub struct WorkerCapability {
-    current_task: Option<WorkerTask>,
-    possible_tasks: Vec<WorkerTask>,
-}
-
-impl WorkerCapability {
-    pub fn current_task(&self) -> Option<&WorkerTask> {
-        self.current_task.as_ref()
-    }
-
-    pub fn possible_tasks(&self) -> &[WorkerTask] {
-        &self.possible_tasks
-    }
-}
-
-#[derive(Debug)]
-pub struct WorkerTask {
-    name: String,
-    present_participle: String,
-    turns_left: u32,
-    kind: WorkerTaskKind,
-}
-
-impl WorkerTask {
-    pub fn from_data(data: &protocol::WorkerTask) -> anyhow::Result<Self> {
-        let kind = match data
-            .kind
-            .as_ref()
-            .ok_or_else(|| anyhow!("unknown worker task kind"))?
-            .kind
-            .as_ref()
-            .ok_or_else(|| anyhow!("unknown worker task kind"))?
-        {
-            worker_task_kind::Kind::BuildImprovement(task) => {
-                todo!()
-            }
-        };
-
-        Ok(Self {
-            name: data.name.clone(),
-            present_participle: data.present_participle.clone(),
-            turns_left: data.turns_left.try_into()?,
-            kind,
-        })
-    }
-
-    pub fn name(&self) -> &str {
-        &self.name
-    }
-
-    pub fn present_participle(&self) -> &str {
-        &self.present_participle
-    }
-
-    pub fn turns_left(&self) -> u32 {
-        self.turns_left
-    }
-
-    pub fn kind(&self) -> &WorkerTaskKind {
-        &self.kind
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum WorkerTaskKind {
-    BuildImprovement(Improvement),
 }

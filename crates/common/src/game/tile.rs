@@ -31,7 +31,7 @@ impl TileData {
 }
 
 /// A terrain type.
-#[derive(Copy, Clone, Debug, PartialEq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
 pub enum Terrain {
     Ocean,
     Desert,

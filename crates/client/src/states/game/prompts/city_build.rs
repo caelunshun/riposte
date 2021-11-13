@@ -1,6 +1,6 @@
 use duit::{Align, Vec2};
 use glam::vec2;
-use protocol::PossibleCityBuildTasks;
+use riposte_common::PossibleCityBuildTasks;
 
 use crate::{
     client::{Client, GameState, ServerResponseFuture},
@@ -20,7 +20,7 @@ use super::{Action, Prompt};
 
 pub const SIZE: Vec2 = glam::const_vec2!([300., 500.]);
 
-struct SetTask(protocol::BuildTask);
+struct SetTask(riposte_common::BuildTask);
 
 /// Asks the user what to build in a city.
 pub struct CityBuildPrompt {

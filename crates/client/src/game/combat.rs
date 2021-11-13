@@ -1,4 +1,4 @@
-use protocol::CombatRound;
+use riposte_common::CombatRound;
 use riposte_common::UnitId;
 
 use crate::context::Context;
@@ -7,7 +7,7 @@ use super::Game;
 
 #[derive(Debug)]
 pub struct CombatEvent {
-    data: protocol::CombatEvent,
+    data: riposte_common::CombatEvent,
 
     attacker_id: UnitId,
     defender_id: UnitId,
@@ -19,7 +19,7 @@ pub struct CombatEvent {
 }
 
 impl CombatEvent {
-    pub fn from_data(data: protocol::CombatEvent, game: &Game) -> anyhow::Result<Self> {
+    pub fn from_data(data: riposte_common::CombatEvent, game: &Game) -> anyhow::Result<Self> {
         let attacker_id = game.resolve_unit_id(data.attacker_id as u32)?;
         let defender_id = game.resolve_unit_id(data.defender_id as u32)?;
 

@@ -12,8 +12,8 @@ use riposte_common::{
     bridge::{Bridge, ServerSide},
     lobby::GameLobby,
     mapgen::MapgenSettings,
-    protocol::GenericClientPacket,
     registry::Registry,
+    protocol::GenericClientPacket,
 };
 use tokio::runtime;
 use uuid::Uuid;

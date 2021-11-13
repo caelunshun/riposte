@@ -10,7 +10,7 @@ use palette::{Shade, Srgba};
 use crate::{
     context::Context,
     game::{
-        city::{BuildTaskKind, City},
+        city::{BuildTask, City},
         Game, Tile,
     },
 };
@@ -164,9 +164,9 @@ impl CityRenderer {
 
     fn render_production_progress_bar(&mut self, canvas: &mut Canvas, city: &City) {
         if let Some(task) = city.build_task() {
-            let progress = task.progress as f32 / task.cost as f32;
+            let progress = city.build_task_progress(task) as f32 / task.cost() as f32;
             let projected_progress =
-                (task.progress + city.city_yield().hammers) as f32 / task.cost as f32;
+                (city.build_task_progress(task) + city.economy().hammer_yield) as f32 / task.cost() as f32;
             self.render_progress_bar(
                 canvas,
                 vec2(0., 80.0),
@@ -182,8 +182,8 @@ impl CityRenderer {
 
     fn render_population_progress_bar(&mut self, game: &Game, canvas: &mut Canvas, city: &City) {
         let mut progress = city.stored_food() as f32 / city.food_needed_for_growth() as f32;
-        let mut projected_progress = (city.stored_food() + city.city_yield().food as i32
-            - city.consumed_food() as i32) as f32
+        let mut projected_progress = (city.stored_food() + city.economy().food_yield 
+            - city.consumed_food() ) as f32
             / city.food_needed_for_growth() as f32;
         if city.owner() != game.the_player().id() {
             progress = 0.;
@@ -236,7 +236,7 @@ impl CityRenderer {
             .stroke_width(1.5)
             .stroke();
 
-        let population = lexical::to_string(city.population());
+        let population = lexical::to_string(city.population().get());
         let population_text = self.letter_blob(canvas, population);
         canvas.draw_text(population_text, vec2(-5., 80.), 1.);
     }
@@ -255,11 +255,11 @@ impl CityRenderer {
 
         if let Some(task) = city.build_task() {
             let pos = vec2(-radius * 2. + 5. + BUBBLE_SIZE.x, 70.);
-            match &task.kind {
-                BuildTaskKind::Unit(unit) => {
+            match task {
+                BuildTask::Unit(unit) => {
                     canvas.draw_sprite(self.unit_heads[&unit.id], pos, radius * 2.);
                 }
-                BuildTaskKind::Building(building) => {
+                BuildTask::Building(building) => {
                     // First character of the building name
                     let text = self.letter_blob(
                         canvas,

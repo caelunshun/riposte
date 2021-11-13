@@ -5,9 +5,7 @@ use std::{cell::Ref, collections::BinaryHeap};
 use ahash::{AHashMap, AHashSet};
 use float_ord::FloatOrd;
 use glam::UVec2;
-use protocol::{Terrain, Visibility};
-
-use crate::game::unit::MOVEMENT_LEFT_EPSILON;
+use riposte_common::{Terrain, Visibility, unit::MovementPoints};
 
 use super::{unit::Unit, Game};
 
@@ -19,7 +17,7 @@ pub struct PathPoint {
     /// The number of turns from the start it takes to arrive here
     pub turn: u32,
     /// The movement the unit has left at this point.
-    pub movement_left: f64,
+    pub movement_left: MovementPoints,
 }
 
 /// A path between two points.
@@ -121,13 +119,15 @@ impl Pathfinder {
 
         // Get information about the units being moved
         let mut is_ship = false;
-        let mut movement_left = f64::INFINITY;
-        let mut movement_per_turn = f64::INFINITY;
+        let mut movement_left = MovementPoints::from_fixed_u32(u32::MAX);
+        let mut movement_per_turn = u32::MAX;
         let mut can_fight = false;
         for unit in units.into_iter() {
             is_ship |= unit.kind().ship;
-            movement_left = movement_left.min(unit.movement_left());
-            movement_per_turn = movement_per_turn.min(unit.kind().movement as f64);
+            if unit.movement_left().as_fixed_u32() < movement_left.as_fixed_u32() {
+                movement_left = unit.movement_left();
+            }
+            movement_per_turn = movement_per_turn.min(unit.kind().movement);
             can_fight |= unit.kind().strength > 0.;
         }
 
@@ -169,9 +169,9 @@ impl Pathfinder {
                         movement_left: current_movement_left,
                     });
 
-                    if current_movement_left <= MOVEMENT_LEFT_EPSILON {
+                    if current_movement_left.is_exhausted(){
                         current_turn += 1;
-                        current_movement_left = movement_per_turn;
+                        current_movement_left = MovementPoints::from_u32(movement_per_turn);
                     }
                 }
 
@@ -208,7 +208,7 @@ impl Pathfinder {
                 let movement_cost = tile
                     .movement_cost(game, &game.the_player())
                     .min(movement_per_turn);
-                let tentative_g_score = self.g_score[&entry.pos] + movement_cost;
+                let tentative_g_score = self.g_score[&entry.pos] + movement_cost.as_f64();
                 if !self.g_score.contains_key(&neighbor)
                     || tentative_g_score < self.g_score[&neighbor]
                 {

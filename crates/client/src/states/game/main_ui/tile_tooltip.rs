@@ -1,6 +1,6 @@
 use duit::{Event, Rect, Vec2, WindowPositioner};
 use glam::{vec2, UVec2};
-use protocol::Visibility;
+use riposte_common::Visibility;
 
 use crate::{
     context::Context,
