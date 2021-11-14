@@ -38,9 +38,11 @@ impl TerrainRenderer {
             (Terrain::Grassland, "grassland"),
             (Terrain::Plains, "plains"),
             (Terrain::Ocean, "ocean"),
+            (Terrain::Tundra, "tundra"),
+            (Terrain::Mountains, "mountain"),
         ] {
             for is_hilled in [false, true] {
-                if is_hilled && terrain == Terrain::Ocean {
+                if is_hilled && matches!(terrain, Terrain::Ocean | Terrain::Mountains) {
                     continue;
                 }
 

@@ -20,6 +20,16 @@
     "loader": "image"
   },
   {
+    "path": "texture/tile/tundra_basecolor.png",
+    "id": "texture/tile/tundra",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/mountain.png",
+    "id": "texture/tile/mountain",
+    "loader": "image"
+  },
+  {
     "path": "texture/tile/grassland_basecolor_hill.png",
     "id": "texture/tile/grassland/hill",
     "loader": "image"
@@ -32,6 +42,11 @@
   {
     "path": "texture/tile/desert_basecolor_hill.png",
     "id": "texture/tile/desert/hill",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/tundra_basecolor_hill.png",
+    "id": "texture/tile/tundra/hill",
     "loader": "image"
   },
   {
