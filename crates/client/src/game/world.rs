@@ -134,6 +134,14 @@ impl Game {
         cx: &Context,
         data: InitialGameData,
     ) -> anyhow::Result<Self> {
+        log::info!(
+            "Initializing game with {} units, {} players, {}x{} map size",
+            data.units.len(),
+            data.players.len(),
+            data.map.width,
+            data.map.height
+        );
+
         let mut game = Self::new(registry);
 
         let proto_map = data.map;
@@ -511,6 +519,7 @@ impl Game {
                 let mut units = mem::take(&mut self.units);
                 units.insert(data.id, Unit::from_data(data, self, cx).map(RefCell::new)?);
                 self.units = units;
+                self.on_unit_added(id);
             }
         }
         self.push_event(GameEvent::UnitUpdated { unit: id });

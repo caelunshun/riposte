@@ -19,8 +19,9 @@ use duit::{
     widget,
     widgets::{Button, PickList, Text},
 };
-use riposte_common::protocol::game::server::InitialGameData;
+use palette::Srgba;
 use riposte_backend_api::UserInfo;
+use riposte_common::protocol::game::server::InitialGameData;
 use riposte_common::{
     assets::Handle,
     bridge,
@@ -336,42 +337,42 @@ impl GameLobbyState {
 
         for (id, slot) in self.lobby.slots() {
             let name = match &slot.player {
-                SlotPlayer::Empty => "@color{rgb(180, 180, 180)}{<empty>}".to_owned(),
+                SlotPlayer::Empty => text!("@color[180, 180, 180][<empty>]"),
                 SlotPlayer::Human { player_uuid, .. } => {
                     match self.user_info(cx, player_uuid.clone()) {
-                        Some(info) => info.username.clone(),
+                        Some(info) => text!("{}", info.username),
                         None => {
                             self.missing_user_info
                                 .borrow_mut()
                                 .insert(player_uuid.clone());
-                            "<unknown>".to_owned()
+                            text!("<unknown>")
                         }
                     }
                 }
-                SlotPlayer::Ai { .. } => "<AI>".to_owned(),
+                SlotPlayer::Ai { .. } => text!("<AI>"),
             };
             let status = match &slot.player {
-                SlotPlayer::Empty => "@color{rgb(30, 200, 50)}{Open}",
-                SlotPlayer::Human { is_admin: true, .. } => "@color{rgb(230, 20, 10)}{Admin}",
+                SlotPlayer::Empty => text!("@color[30,200,50][Open]"),
+                SlotPlayer::Human { is_admin: true, .. } => text!("@color[230,20,10][Admin]"),
                 SlotPlayer::Human {
                     is_admin: false, ..
-                } => "@color{rgb(240, 78, 152)}{Human}",
-                SlotPlayer::Ai { .. } => "@color{rgb(30, 120, 200)}{AI}",
+                } => text!("@color[240,78,152][Human]"),
+                SlotPlayer::Ai { .. } => text!("@color[30,120,200][AI]"),
             };
 
             let delete_text = if !matches!(&slot.player, SlotPlayer::Human { .. }) {
-                "Remove"
+                text!("Remove")
             } else {
-                "Kick"
+                text!("Kick")
             };
 
             let (civ, leader) = if let Some(civ) = slot.player.civ() {
                 (
-                    format!("@color{{{}}}{{{}}}", color_to_string(&civ.color), civ.name),
-                    slot.player.leader().unwrap().name.as_str(),
+                    text!("@color[{}][{}]", Srgba::new(civ.color[0], civ.color[1], civ.color[2], 255), civ.name),
+                    text!("{}", slot.player.leader().unwrap().name),
                 )
             } else {
-                ("-".to_owned(), "-")
+                (text!("-"), text!("-"))
             };
 
             let (civ_widget, leader_widget) = if slot.is_occupied()
@@ -387,7 +388,7 @@ impl GameLobbyState {
                 civ_picklist
                     .borrow_mut()
                     .data_mut()
-                    .add_child(widget(Text::new(text!("{}", civ))));
+                    .add_child(widget(Text::new(civ)));
 
                 let mut leader_picklist = PickList::new(Some(150.), Some(200.));
                 let our_civ = self.our_slot().player.civ().unwrap();
@@ -400,13 +401,13 @@ impl GameLobbyState {
                 leader_picklist
                     .borrow_mut()
                     .data_mut()
-                    .add_child(widget(Text::new(text!("{}", leader))));
+                    .add_child(widget(Text::new(leader)));
 
                 (civ_picklist, leader_picklist)
             } else {
                 (
-                    widget(Text::new(text!("{}", civ))),
-                    widget(Text::new(text!("{}", leader))),
+                    widget(Text::new(civ)),
+                    widget(Text::new(leader)),
                 )
             };
 
@@ -416,15 +417,15 @@ impl GameLobbyState {
             delete_button
                 .borrow_mut()
                 .data_mut()
-                .add_child(widget(Text::new(text!("{}", delete_text))));
+                .add_child(widget(Text::new(delete_text)));
 
             if id == self.our_slot {
                 delete_button.borrow_mut().data_mut().set_hidden(true);
             }
 
             table.add_row([
-                ("name", widget(Text::new(text!("{}", name)))),
-                ("status", widget(Text::new(text!("{}", status)))),
+                ("name", widget(Text::new(name))),
+                ("status", widget(Text::new(status))),
                 ("civ", civ_widget),
                 ("leader", leader_widget),
                 ("delete_button", delete_button),

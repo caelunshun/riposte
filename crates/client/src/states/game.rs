@@ -14,7 +14,7 @@ use self::{
     city_screen::CityScreen,
     main_ui::MainUi,
     music::GameMusic,
-    prompts::{city_build::CityBuildPrompt, research::ResearchPrompt, Prompts},
+    prompts::{ Prompts},
     sounds::GameSounds,
 };
 
@@ -145,19 +145,19 @@ impl GameState {
         let city = self.game.city(city);
         if city.build_task().is_none() && city.owner() == self.game.the_player().id() {
             log::info!("Queueing build prompt for {}", city.name());
-            self.prompts.push(CityBuildPrompt::new(
+            /*self.prompts.push(CityBuildPrompt::new(
                 cx,
                 &self.game,
                 &mut self.client,
                 city.id(),
-            ));
+            ));*/
         }
     }
 
     fn handle_player_updated(&mut self, cx: &Context, player: PlayerId) {
         if player == self.game.the_player().id() && self.game.turn().get() > 0 {
             if self.game.the_player().researching_tech().is_none() {
-                self.prompts.push(ResearchPrompt::new(cx, &mut self.client));
+               // self.prompts.push(ResearchPrompt::new(cx, &mut self.client));
             }
         }
     }

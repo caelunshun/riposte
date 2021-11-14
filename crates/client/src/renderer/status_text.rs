@@ -38,7 +38,7 @@ impl OverlayRenderLayer for StatusTextOverlay {
                 font: Default::default(),
             },
         };
-        let text = Text::from_sections(vec![section]);
+        let text = Text::from_sections([section]);
 
         let blob = cx.canvas().context().create_text_blob(
             text,
@@ -49,7 +49,7 @@ impl OverlayRenderLayer for StatusTextOverlay {
                 align_v: Align::Start,
             },
         );
-        cx.canvas_mut()
-            .draw_text(&blob, vec2(0., game.view().window_size().y - 150.), alpha);
+      // cx.canvas_mut()
+          //  .draw_text(&blob, vec2(0., game.view().window_size().y - 150.), alpha);
     }
 }

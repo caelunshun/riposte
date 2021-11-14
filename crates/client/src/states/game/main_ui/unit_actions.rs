@@ -97,8 +97,8 @@ fn get_possible_unit_actions(game: &Game, unit: &Unit) -> Vec<PossibleUnitAction
         .next()
     {
         let tile = game.tile(unit.pos()).unwrap();
-        for task in todo!() {
-            match task.kind() {
+        for task in Vec::<WorkerTaskKind>::new() {
+            match &task {
                 WorkerTaskKind::BuildImprovement(improvement) => {
                     let is_recommended = tile
                         .resource()
@@ -108,7 +108,7 @@ fn get_possible_unit_actions(game: &Game, unit: &Unit) -> Vec<PossibleUnitAction
                     actions.push(PossibleUnitAction {
                         text: format!("Build {}", improvement.name()),
                         tooltip: Some(build_improvement_tooltip(&tile, &improvement)),
-                        message: Message::SetWorkerTask(unit.id(), task.kind().clone()),
+                        message: Message::SetWorkerTask(unit.id(), task.clone()),
                         is_recommended,
                     });
                 }

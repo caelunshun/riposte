@@ -69,6 +69,7 @@ pub fn init_graphics_state() -> anyhow::Result<(
     );
 
     let context = dume::Context::builder(Arc::clone(&device), Arc::clone(&queue)).build();
+    context.set_default_font_family("Merriweather");
 
     let canvas = context.create_canvas(
         logical_size(window.inner_size(), window.scale_factor()),

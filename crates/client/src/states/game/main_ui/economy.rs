@@ -1,4 +1,5 @@
 use duit::{Align, Vec2};
+use dume::Srgba;
 
 use crate::{
     client::{Client, GameState},
@@ -69,10 +70,11 @@ impl EconomyScreen {
     }
 
     pub fn update_info(&mut self, game: &Game) {
+
         let the_player = game.the_player();
 
-        let positive_color = "rgb(68, 194, 113)";
-        let negative_color = "rgb(231, 60, 62)";
+        let positive_color = Srgba::new(68, 194, 113, 255);
+        let negative_color = Srgba::new(231, 60, 62, 255);
 
         // Gold
         let (delta, delta_color) = if the_player.net_gold() < 0 {
@@ -83,19 +85,19 @@ impl EconomyScreen {
             (format!("+{}", the_player.net_gold()), positive_color)
         };
         self.window.gold_text.get_mut().set_text(text!(
-            "@icon{gold}: {} @color{{}}{({} / turn)}",
+            "@icon[gold]: {} @color[{}][({} / turn)]",
             the_player.gold(),
             delta_color,
             delta
         ));
 
         self.window.expenses_text.get_mut().set_text(text!(
-            "@color{%color}{Expenses:} %expenses",
+            "@color[{}][Expenses:] {}",
             negative_color,
             the_player.expenses()
         ));
         self.window.revenue_text.get_mut().set_text(text!(
-            "@color{{}}{Revenue:} {}",
+            "@color[{}][Revenue:] {}",
             positive_color,
             the_player.base_revenue()
         ));
@@ -103,10 +105,10 @@ impl EconomyScreen {
         self.window
             .beaker_output_text
             .get_mut()
-            .set_text(text!("(+%beakers / turn)", the_player.beaker_revenue()));
+            .set_text(text!("(+{} / turn)", the_player.beaker_revenue()));
         self.window
             .beaker_percent_text
             .get_mut()
-            .set_text(text!("@icon{beaker}: {}%", the_player.beaker_percent()));
+            .set_text(text!("@icon[beaker]: {}%", the_player.beaker_percent()));
     }
 }

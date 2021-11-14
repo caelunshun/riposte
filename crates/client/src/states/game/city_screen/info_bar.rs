@@ -58,14 +58,14 @@ impl InfoBarScreen {
 
         self.window.food_text.get_mut().set_text(
             text!(
-                "{} @icon{{bread}} - {} @icon{{eaten_bread}}",
-                city.city_yield().food,
+                "{} @icon[bread] - {} @icon[eaten_bread]",
+                city.economy().food_yield,
                 city.consumed_food()
             ),
              
         );
         self.window.hammers_text.get_mut().set_text(
-            text!("{} @icon{{hammer}}", city.city_yield().hammers),
+            text!("{} @icon[hammer]", city.economy().hammer_yield),
           
         );
 
@@ -97,19 +97,19 @@ impl InfoBarScreen {
         self.window
             .happy_text
             .get_mut()
-            .set_text(text!("{}@icon{{happy}} ", city.num_happiness()));
+            .set_text(text!("{}@icon[happy] ", city.num_happiness()));
         self.window
             .happy_sign_text
             .get_mut()
             .set_text(text!("{}", sign(city.num_happiness(), city.num_anger())));
         self.window.unhappy_text.get_mut().set_text(
-            text!(" {}@icon{{unhappy}}", city.num_unhappiness()),
+            text!(" {}@icon[unhappy]", city.num_anger()),
         );
 
         self.window
             .health_text
             .get_mut()
-            .set_text(text!("{}@icon{{health}} ", city.num_health()));
+            .set_text(text!("{}@icon[health] ", city.num_health()));
         self.window
             .health_sign_text
             .get_mut()
@@ -117,7 +117,7 @@ impl InfoBarScreen {
         self.window
             .sick_text
             .get_mut()
-            .set_text(text!(" {}@icon{{sick}}", city.num_sickness()));
+            .set_text(text!(" {}@icon[sick]", city.num_sickness()));
 
         self.window
             .happy_tooltip_text

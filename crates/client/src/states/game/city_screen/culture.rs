@@ -45,7 +45,7 @@ impl CultureScreen {
 
         self.window.culture_amount_text.get_mut().set_text(
             text!(
-                "@icon{{culture}}: {} / {}",
+                "@icon[culture]: {} / {}",
                 city.num_culture(),
                 city.culture_needed()
             ),

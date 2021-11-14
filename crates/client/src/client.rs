@@ -157,7 +157,7 @@ impl Client<LobbyState> {
                 ServerLobbyPacket::Kicked(packet) => {
                     self.handle_kicked(packet, lobby)?;
                 }
-                ServerLobbyPacket::GameStarted(_) => todo!(),
+                ServerLobbyPacket::GameStarted(data) => return Ok(vec![LobbyEvent::GameStarted(data)])
             }
         }
 
