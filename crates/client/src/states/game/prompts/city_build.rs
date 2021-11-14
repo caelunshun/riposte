@@ -1,26 +1,23 @@
 use duit::{Align, Vec2};
 use glam::vec2;
-use riposte_common::PossibleCityBuildTasks;
 
 use crate::{
     client::{Client, GameState, ServerResponseFuture},
     context::Context,
-    game::{
-        city::{BuildTask, BuildTaskKind, PreviousBuildTask},
-        CityId, Game,
-    },
+    game::{city::BuildTask, Game},
     generated::{CityBuildPromptOption, CityBuildPromptWindow},
     state::StateAttachment,
     tooltips,
     ui::{AlignFixed, Z_POPUP},
-    utils::article,
 };
+
+use riposte_common::{utils::article, CityId};
 
 use super::{Action, Prompt};
 
 pub const SIZE: Vec2 = glam::const_vec2!([300., 500.]);
 
-struct SetTask(riposte_common::BuildTask);
+struct SetTask(BuildTask);
 
 /// Asks the user what to build in a city.
 pub struct CityBuildPrompt {
@@ -51,9 +48,9 @@ impl CityBuildPrompt {
 
         match city.previous_build_task() {
             Some(PreviousBuildTask { succeeded, task }) => {
-                let (verb, verb_participle, name) = match &task.kind {
-                    BuildTaskKind::Unit(unit) => ("trained", "training", &unit.name),
-                    BuildTaskKind::Building(building) => {
+                let (verb, verb_participle, name) = match &task {
+                    BuildTask::Unit(unit) => ("trained", "training", &unit.name),
+                    BuildTask::Building(building) => {
                         ("constructed", "constructing", &building.name)
                     }
                 };
@@ -87,7 +84,7 @@ impl Prompt for CityBuildPrompt {
         window
             .question_text
             .get_mut()
-            .set_text(self.title_text(game), vars! {});
+            .set_text(text!("{}", self.title_text(game)));
 
         game.view_mut().animate_to(cx, city.pos());
 
@@ -130,25 +127,21 @@ impl CityBuildPrompt {
                 Ok(task) => {
                     let (handle, widget) = ui.create_spec_instance::<CityBuildPromptOption>();
 
-                    handle.option_text.get_mut().set_text(
-                        "%name (%turns)",
-                        vars! {
-                            name => task.name(),
-                            turns => city.estimate_build_time_for_task(&task),
-                        },
-                    );
+                    handle.option_text.get_mut().set_text(text!(
+                        "{} ({} turns)",
+                        task.name(),
+                        city.estimate_build_time_for_task(&task)
+                    ));
                     handle
                         .clickable
                         .get_mut()
                         .on_click(move || SetTask(proto_task.clone()));
 
                     let tooltip_text = tooltips::build_task_tooltip(cx.registry(), &task.kind);
-                    handle.tooltip_text.get_mut().set_text(
-                        tooltip_text,
-                        vars! {
-                            percent => "%"
-                        },
-                    );
+                    handle
+                        .tooltip_text
+                        .get_mut()
+                        .set_text(text!("{}", tooltip_text));
 
                     self.window
                         .as_mut()

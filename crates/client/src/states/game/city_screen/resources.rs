@@ -34,11 +34,11 @@ impl ResourcesScreen {
             entry
                 .resource_name
                 .get_mut()
-                .set_text(resource.name.clone(), vars! {});
+                .set_text(text!("{}", resource.name));
             entry
                 .resource_output
                 .get_mut()
-                .set_text(resource_tooltip(&resource), vars! {});
+                .set_text(text!("{}", resource_tooltip(&resource)));
             entries.add_child(widget);
         }
     }

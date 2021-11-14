@@ -4,7 +4,7 @@ use winit::event::{MouseButton, VirtualKeyCode};
 use crate::audio::{SoundCategory, SoundHandle};
 use crate::client::{Client, GameState};
 use crate::game::event::GameEvent;
-use crate::game::{CityId, Game};
+use crate::game::Game;
 use crate::volumes;
 use crate::{context::Context, state::StateAttachment};
 
@@ -12,6 +12,8 @@ use self::{
     buildings::BuildingsScreen, culture::CultureScreen, economy::EconomyScreen,
     info_bar::InfoBarScreen, resources::ResourcesScreen,
 };
+
+use riposte_common::CityId;
 
 mod buildings;
 mod culture;

@@ -4,10 +4,12 @@ use winit::event::{MouseButton, VirtualKeyCode};
 use crate::{
     client::{Client, GameState},
     context::Context,
-    game::{event::GameEvent, CityId, Game},
+    game::{event::GameEvent, Game},
     state::StateAttachment,
-    utils::VersionSnapshot,
 };
+
+use riposte_common::utils::VersionSnapshot;
+use riposte_common::{CityId, UnitId};
 
 use self::{
     economy::EconomyScreen, info_bar::InfoBar, player_scores::PlayerScores, research::ResearchBar,

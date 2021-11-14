@@ -3,6 +3,7 @@ use glam::{ivec2, uvec2, DVec2, IVec2, UVec2};
 
 use crate::assets::Handle;
 use crate::registry::Resource;
+use crate::Yield;
 
 use super::culture::Culture;
 use super::improvement::Improvement;
@@ -27,6 +28,44 @@ pub struct TileData {
 impl TileData {
     pub fn owner(&self) -> Option<PlayerId> {
         self.culture.iter().next().map(|v| v.owner())
+    }
+
+    pub fn tile_yield(&self) -> Yield {
+        let mut y = Yield::default();
+
+        match self.terrain {
+            Terrain::Ocean => {
+                y.commerce += 2;
+                y.food += 1;
+            }
+
+            Terrain::Plains => {
+                y.food += 1;
+                y.hammers += 1;
+            }
+            Terrain::Grassland => {
+                y.food += 2;
+                y.commerce += 1;
+            }
+            Terrain::Tundra => {
+                y.food += 1;
+            }
+            Terrain::Desert | Terrain::Mountains => {}
+        }
+
+        if let Some(resource) = &self.resource {
+            y = y + resource.yield_bonus;
+
+            if self
+                .improvements
+                .iter()
+                .any(|i| i.name() == resource.improvement)
+            {
+                y = y + resource.improved_bonus;
+            }
+        }
+
+        y
     }
 }
 

@@ -30,15 +30,11 @@ impl InfoBarScreen {
 
     pub fn update_info(&mut self, _cx: &Context, _game: &Game, city: &City) {
         self.window.city_name.get_mut().set_text(
-            "%city: %pop",
-            vars! {
-                city => city.name(),
-                pop => city.population(),
-            },
+            text!("{}: {}", city.name(), city.population())
         );
 
         let growth_progress = city.stored_food() as f32 / city.food_needed_for_growth() as f32;
-        let growth_projected_progress = (city.stored_food() + city.city_yield().food as i32
+        let growth_projected_progress = (city.stored_food() + city.economy().food_yield
             - city.consumed_food()) as f32
             / city.food_needed_for_growth() as f32;
         self.window
@@ -48,10 +44,10 @@ impl InfoBarScreen {
             .set_projected_progress(growth_projected_progress);
 
         let (prod_progress, prod_projected_progress) = match city.build_task() {
-            Some(task) => (
-                task.progress as f32 / task.cost as f32,
-                (task.progress + city.city_yield().hammers) as f32 / task.cost as f32,
-            ),
+            Some(task) => {let progress = city.build_task_progress(task); (
+                progress as f32 / task.cost() as f32,
+                (progress + city.economy().hammer_yield) as f32 / task.cost() as f32,
+            ) }
             None => (0., 0.),
         };
         self.window
@@ -61,16 +57,16 @@ impl InfoBarScreen {
             .set_projected_progress(prod_projected_progress);
 
         self.window.food_text.get_mut().set_text(
-            format!(
+            text!(
                 "{} @icon{{bread}} - {} @icon{{eaten_bread}}",
                 city.city_yield().food,
                 city.consumed_food()
             ),
-            vars! {},
+             
         );
         self.window.hammers_text.get_mut().set_text(
-            format!("{} @icon{{hammer}}", city.city_yield().hammers),
-            vars! {},
+            text!("{} @icon{{hammer}}", city.city_yield().hammers),
+          
         );
 
         let growth_text = if city.is_growing() {
@@ -83,7 +79,7 @@ impl InfoBarScreen {
         self.window
             .growth_text
             .get_mut()
-            .set_text(growth_text, vars! {});
+            .set_text(text!("{}", growth_text));
 
         let production_text = match city.build_task() {
             Some(task) => format!(
@@ -96,50 +92,49 @@ impl InfoBarScreen {
         self.window
             .production_text
             .get_mut()
-            .set_text(production_text, vars! {});
+            .set_text(text!("{}", production_text));
 
         self.window
             .happy_text
             .get_mut()
-            .set_text(format!("{}@icon{{happy}} ", city.num_happiness()), vars! {});
+            .set_text(text!("{}@icon{{happy}} ", city.num_happiness()));
         self.window
             .happy_sign_text
             .get_mut()
-            .set_text(sign(city.num_happiness(), city.num_unhappiness()), vars! {});
+            .set_text(text!("{}", sign(city.num_happiness(), city.num_anger())));
         self.window.unhappy_text.get_mut().set_text(
-            format!(" {}@icon{{unhappy}}", city.num_unhappiness()),
-            vars! {},
+            text!(" {}@icon{{unhappy}}", city.num_unhappiness()),
         );
 
         self.window
             .health_text
             .get_mut()
-            .set_text(format!("{}@icon{{health}} ", city.num_health()), vars! {});
+            .set_text(text!("{}@icon{{health}} ", city.num_health()));
         self.window
             .health_sign_text
             .get_mut()
-            .set_text(sign(city.num_health(), city.num_sickness()), vars! {});
+            .set_text(text!("{}", sign(city.num_health(), city.num_sickness())));
         self.window
             .sick_text
             .get_mut()
-            .set_text(format!(" {}@icon{{sick}}", city.num_sickness()), vars! {});
+            .set_text(text!(" {}@icon{{sick}}", city.num_sickness()));
 
         self.window
             .happy_tooltip_text
             .get_mut()
-            .set_text(happiness_tooltip(city), vars! {});
+            .set_text(text!("{}", happiness_tooltip(city)));
         self.window
             .unhappy_tooltip_text
             .get_mut()
-            .set_text(unhappiness_tooltip(city), vars! {});
+            .set_text(text!("{}", unhappiness_tooltip(city)));
         self.window
             .health_tooltip_text
             .get_mut()
-            .set_text(health_tooltip(city), vars! {});
+            .set_text(text!("{}", health_tooltip(city)));
         self.window
             .sick_tooltip_text
             .get_mut()
-            .set_text(sickness_tooltip(city), vars! {});
+            .set_text(text!("{}", sickness_tooltip(city)));
     }
 }
 

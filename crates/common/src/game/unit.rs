@@ -123,13 +123,39 @@ pub struct WorkerCapability {
     pub current_task: Option<WorkerTask>,
 }
 
+impl WorkerCapability {
+    pub fn current_task(&self) -> Option<&WorkerTask> {
+        self.current_task.as_ref()
+    }
+}
+
 #[derive(Debug, Clone)]
 pub struct WorkerTask {
     pub turns_left: u32,
     pub kind: WorkerTaskKind,
 }
 
+impl WorkerTask {
+    pub fn turns_left(&self) -> u32 {
+        self.turns_left
+    }
+}
+
 #[derive(Debug, Clone)]
 pub enum WorkerTaskKind {
     BuildImprovement(Improvement),
+}
+
+impl WorkerTaskKind {
+    pub fn name(&self) -> String {
+        match self {
+            WorkerTaskKind::BuildImprovement(i) => i.name(),
+        }
+    }
+
+    pub fn present_participle(&self) -> String {
+        match self {
+            WorkerTaskKind::BuildImprovement(i) => format!("Building {}", i.name()),
+        }
+    }
 }

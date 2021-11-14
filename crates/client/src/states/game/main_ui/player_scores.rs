@@ -6,12 +6,13 @@ use glam::vec2;
 use crate::{
     client::{Client, GameState},
     context::Context,
-    game::{event::GameEvent, Game, PlayerId},
+    game::{event::GameEvent, Game},
     generated::{PlayerScore, ScoresWindow},
     state::StateAttachment,
     ui::Z_FOREGROUND,
-    utils::color_to_string,
 };
+
+use riposte_common::{PlayerId, utils::color_to_string};
 
 pub const WIDTH: f32 = 300.;
 
@@ -48,7 +49,7 @@ impl PlayerScores {
         while let Some(msg) = cx.ui_mut().pop_message::<Message>() {
             match msg {
                 Message::DeclareWar(player) => client.declare_war_on(game, player),
-                Message::MakePeace(player) => client.make_peace_with(game, player),
+                Message::MakePeace(player) => todo!(),
                 Message::None => {}
             }
         }
@@ -85,7 +86,7 @@ impl PlayerScores {
 
             let text = format!("{}:    {}", player.score(), username);
 
-            entry.text.get_mut().set_text(text, vars! {});
+            entry.text.get_mut().set_text(text!("{}", text));
 
             if player.id() != game.the_player().id() {
                 let was_at_war = game.the_player().is_at_war_with(player.id());

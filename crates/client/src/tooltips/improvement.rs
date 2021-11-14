@@ -1,7 +1,6 @@
-use crate::{
-    game::{Improvement, Tile},
-    utils::merge_lines,
-};
+use riposte_common::{Improvement, utils::merge_lines};
+
+use crate::game::Tile;
 
 pub fn build_improvement_tooltip(tile: &Tile, improvement: &Improvement) -> String {
     let mut lines = Vec::new();

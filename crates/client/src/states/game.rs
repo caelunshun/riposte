@@ -155,7 +155,7 @@ impl GameState {
     }
 
     fn handle_player_updated(&mut self, cx: &Context, player: PlayerId) {
-        if player == self.game.the_player().id() && self.game.turn() > 0 {
+        if player == self.game.the_player().id() && self.game.turn().get() > 0 {
             if self.game.the_player().researching_tech().is_none() {
                 self.prompts.push(ResearchPrompt::new(cx, &mut self.client));
             }

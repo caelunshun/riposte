@@ -46,13 +46,11 @@ impl BuildingsScreen {
             entry
                 .building_name
                 .get_mut()
-                .set_text(building.name.clone(), vars! {});
-            entry.building_output.get_mut().set_text(
-                short_building_tooltip(&building),
-                vars! {
-                    percent => "%",
-                },
-            );
+                .set_text(text!("{}", building.name));
+            entry
+                .building_output
+                .get_mut()
+                .set_text(text!("{}", short_building_tooltip(&building)));
             entries.add_child(widget);
         }
     }

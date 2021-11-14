@@ -10,15 +10,17 @@ use arrayvec::ArrayVec;
 use duit::Event;
 use glam::{ivec2, UVec2};
 use riposte_common::{
-    Era, InitialGameData, UpdateCity, UpdateGlobalData, UpdatePlayer, UpdateUnit, Visibility,
-};
-use riposte_common::{
+    city::CityData,
     game::tile::OutOfBounds,
+    player::PlayerData,
+    protocol::server::{InitialGameData, UpdateCity, UpdateUnit},
     registry::{CapabilityType, Registry},
+    unit::UnitData,
     utils::VersionSnapshot,
-    CityId, PlayerId, UnitId,
+    CityId, PlayerId, Turn, UnitId,
 };
-use slotmap::SlotMap;
+use riposte_common::{Era, Visibility};
+use slotmap::{SecondaryMap, SlotMap};
 
 use crate::{
     client::{Client, GameState},
@@ -52,9 +54,11 @@ pub struct Game {
     city_ids: IdMapper<CityId>,
     unit_ids: IdMapper<UnitId>,
 
-    players: SlotMap<PlayerId, RefCell<Player>>,
-    cities: SlotMap<CityId, RefCell<City>>,
-    units: SlotMap<UnitId, RefCell<Unit>>,
+    // These are `SecondaryMaps` because they reuse the same
+    // IDs used on the server.
+    players: SecondaryMap<PlayerId, RefCell<Player>>,
+    cities: SecondaryMap<CityId, RefCell<City>>,
+    units: SecondaryMap<UnitId, RefCell<Unit>>,
 
     registry: Arc<Registry>,
 
@@ -66,7 +70,7 @@ pub struct Game {
 
     current_combat_event: Option<RefCell<CombatEvent>>,
 
-    turn: u32,
+    turn: Turn,
     era: Era,
     the_player_id: PlayerId,
 
@@ -95,16 +99,16 @@ impl Game {
             player_ids: IdMapper::new(),
             city_ids: IdMapper::new(),
             unit_ids: IdMapper::new(),
-            players: SlotMap::default(),
-            cities: SlotMap::default(),
-            units: SlotMap::default(),
+            players: SecondaryMap::default(),
+            cities: SecondaryMap::default(),
+            units: SecondaryMap::default(),
             registry,
             map: Map::default(),
             view: RefCell::new(View::default()),
             stacks: StackGrid::default(),
             current_combat_event: None,
 
-            turn: 0,
+            turn: Turn::new(0),
             era: Era::Ancient,
             the_player_id: PlayerId::default(),
 
@@ -132,12 +136,8 @@ impl Game {
     ) -> anyhow::Result<Self> {
         let mut game = Self::new(registry);
 
-        let proto_map = data.map.context("missing tile map")?;
-        let visibility: Vec<Visibility> = data
-            .visibility
-            .context("missing visibility grid")?
-            .visibility()
-            .collect();
+        let proto_map = data.map;
+        let visibility: Vec<Visibility> = data.visibility.visibility.to_vec();
 
         let stacks = StackGrid::new(proto_map.width, proto_map.height);
         game.stacks = stacks;
@@ -148,13 +148,14 @@ impl Game {
 
         let tiles = proto_map
             .tiles
-            .into_iter()
-            .map(|tile_data| Tile::from_data(tile_data, &game))
+            .iter()
+            .map(|tile_data| Tile::from_data(tile_data.clone(), &game))
             .collect::<Result<Vec<_>, anyhow::Error>>()?;
         let map = Map::new(proto_map.width, proto_map.height, tiles, visibility)?;
         game.map = map;
 
-        game.update_global_data(data.global_data.as_ref().context("missing global data")?)?;
+        game.turn = data.turn;
+        game.the_player_id = data.the_player_id;
 
         for city in data.cities {
             game.add_or_update_city(city)?;
@@ -422,7 +423,7 @@ impl Game {
     }
 
     /// Gets the current turn number.
-    pub fn turn(&self) -> u32 {
+    pub fn turn(&self) -> Turn {
         self.turn
     }
 
@@ -500,38 +501,20 @@ impl Game {
             .handle_event(self, client, cx, event);
     }
 
-    pub fn add_or_update_unit(&mut self, cx: &Context, data: UpdateUnit) -> anyhow::Result<()> {
-        let data_id = data.id as u32;
-        match self.unit_ids.get(data_id) {
-            Some(id) => {
-                let mut unit = self.unit_mut(id);
-                let old_pos = unit.pos();
-                unit.update_data(data)?;
-                let new_pos = unit.pos();
-                if old_pos != new_pos {
-                    drop(unit);
-                    self.on_units_moved(cx, &[id], old_pos, new_pos);
-                }
-
-                self.push_event(GameEvent::UnitUpdated { unit: id });
-
-                Ok(())
+    pub fn add_or_update_unit(&mut self, cx: &Context, data: UnitData) -> anyhow::Result<()> {
+        let id = data.id;
+        match self.units.get(id) {
+            Some(unit) => {
+                unit.borrow_mut().update_data(data)?;
             }
             None => {
                 let mut units = mem::take(&mut self.units);
-                let res = units
-                    .try_insert_with_key(|k| Unit::from_data(data, self, cx).map(RefCell::new));
+                units.insert(data.id, Unit::from_data(data, self, cx).map(RefCell::new)?);
                 self.units = units;
-                if let Ok(id) = &res {
-                    self.unit_ids.insert(data_id, *id);
-                    self.on_unit_added(*id);
-
-                    self.push_event(GameEvent::UnitUpdated { unit: *id });
-                }
-
-                res.map(|_| ())
             }
         }
+        self.push_event(GameEvent::UnitUpdated { unit: id });
+        Ok(())
     }
 
     pub fn delete_unit(&mut self, unit: UnitId) {
@@ -567,65 +550,49 @@ impl Game {
         self.stacks.on_unit_deleted(self, unit);
     }
 
-    pub fn add_or_update_city(&mut self, data: UpdateCity) -> anyhow::Result<()> {
-        let data_id = data.id as u32;
-        match self.city_ids.get(data_id) {
-            Some(id) => {
-                let res = self.city_mut(id).update_data(data, self);
-                self.push_event(GameEvent::CityUpdated { city: id });
-                res
+    pub fn add_or_update_city(&mut self, data: CityData) -> anyhow::Result<()> {
+        let id = data.id;
+        match self.cities.get(id) {
+            Some(city) => {
+                city.borrow_mut().update_data(data, self)?;
             }
             None => {
                 let mut cities = mem::take(&mut self.cities);
-                let res = cities
-                    .try_insert_with_key(|k| City::from_data(data, self).map(RefCell::new));
+                cities.insert(data.id, City::from_data(data, self).map(RefCell::new)?);
                 self.cities = cities;
-                if let Ok(id) = &res {
-                    self.city_ids.insert(data_id, *id);
-                    self.push_event(GameEvent::CityUpdated { city: *id });
-                }
-                res.map(|_| ())
             }
         }
+        self.push_event(GameEvent::CityUpdated { city: id });
+        Ok(())
     }
 
-    pub fn add_or_update_player(&mut self, data: UpdatePlayer) -> anyhow::Result<()> {
-        let data_id = data.id as u32;
-        match self.player_ids.get(data_id) {
-            Some(id) => {
-                let res = self.player_mut(id).update_data(data, self);
-                self.push_event(GameEvent::PlayerUpdated { player: id });
-                res
+    pub fn add_or_update_player(&mut self, data: PlayerData) -> anyhow::Result<()> {
+        let id = data.id;
+        match self.players.get(id) {
+            Some(player) => {
+                player.borrow_mut().update_data(data, self)?;
             }
             None => {
                 let mut players = mem::take(&mut self.players);
-                let res = players
-                    .try_insert_with_key(|k| Player::from_data(data, self).map(RefCell::new));
+                players.insert(data.id, Player::from_data(data, self).map(RefCell::new)?);
                 self.players = players;
-                if let Ok(id) = &res {
-                    self.player_ids.insert(data_id, *id);
-                    self.push_event(GameEvent::PlayerUpdated { player: *id });
-                }
-
-                res.map(|_| ())
             }
         }
+        self.push_event(GameEvent::PlayerUpdated { player: id });
+        Ok(())
     }
 
     pub fn delete_city(&mut self, city: CityId) {
         self.cities.remove(city);
     }
 
-    pub fn update_global_data(&mut self, data: &UpdateGlobalData) -> anyhow::Result<()> {
+    pub fn update_turn(&mut self, turn: Turn) {
         let old_turn = self.turn;
-        self.turn = data.turn.try_into()?;
-        self.the_player_id = self.resolve_player_id(data.player_id as u32)?;
+        self.turn = turn;
 
         if self.turn != old_turn {
             self.on_turn_ended();
         }
-
-        Ok(())
     }
 
     fn on_turn_ended(&mut self) {

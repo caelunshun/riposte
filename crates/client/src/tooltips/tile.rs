@@ -3,18 +3,14 @@ use std::{fmt::Write, num::NonZeroUsize};
 
 use glam::UVec2;
 use lexical::{format::STANDARD, WriteFloatOptions};
-use riposte_common::Visibility;
+use riposte_common::assets::Handle;
+use riposte_common::registry::{Resource, UnitKind};
+use riposte_common::{Improvement, PlayerId, UnitId, Visibility, Yield};
+use riposte_common::unit::MovementPoints;
+use riposte_common::utils::{color_to_string, delimit_string, merge_lines};
 
-use crate::game::unit::Capability;
-use crate::game::{Improvement, Yield};
-use crate::registry::Resource;
-use crate::utils::{delimit_string, merge_lines};
-use crate::{
-    assets::Handle,
-    game::{unit::Unit, Game, PlayerId, Tile, UnitId},
-    registry::UnitKind,
-    utils::color_to_string,
-};
+use crate::game::{Game, Tile};
+use crate::game::unit::{Capability, Unit};
 
 pub fn tile_tooltip(game: &Game, tile: &Tile, pos: UVec2) -> String {
     let mut lines = Vec::new();
@@ -60,7 +56,7 @@ fn culture_lines(game: &Game, tile: &Tile) -> Vec<String> {
 
 struct UnitLinesEntry {
     kind: Handle<UnitKind>,
-    movement_left: f64,
+    movement_left: MovementPoints,
     strength: f64,
     owner: PlayerId,
     units: Vec<UnitId>,
@@ -143,12 +139,12 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
             write!(line, ", {} @icon{{strength}}", strength).unwrap();
         }
 
-        let movement = if entry.movement_left.ceil() as u32 == entry.kind.movement {
+        let movement = if entry.movement_left.as_f64().ceil() as u32 == entry.kind.movement {
             entry.kind.movement.to_string()
         } else {
             format!(
                 "{}/{}",
-                entry.movement_left.ceil() as u32,
+                entry.movement_left.as_f64().ceil() as u32,
                 entry.kind.movement
             )
         };
@@ -173,7 +169,7 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
                     write!(
                         line,
                         ", {} ({})",
-                        task.present_participle(),
+                        task.kind. present_participle(),
                         task.turns_left()
                     )
                     .unwrap();
@@ -224,7 +220,7 @@ fn yield_description_line(yiel: &Yield) -> String {
 }
 
 fn resource_line(game: &Game, tile: &Tile, resource: &Resource) -> Option<String> {
-    if !game.the_player().has_unlocked_tech(&resource.revealed_by) {
+    if !game.the_player().has_unlocked_tech(&game.registry().tech(&resource.revealed_by).unwrap()) {
         return None;
     }
 

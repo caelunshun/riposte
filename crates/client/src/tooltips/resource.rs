@@ -1,4 +1,4 @@
-use crate::{registry::Resource, utils::delimit_string};
+use riposte_common::{registry::Resource, utils::delimit_string};
 
 pub fn resource_tooltip(resource: &Resource) -> String {
     let mut components = Vec::new();

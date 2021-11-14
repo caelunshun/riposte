@@ -7,8 +7,9 @@ use crate::{
     generated::ResearchBarWindow,
     state::StateAttachment,
     ui::{AlignFixed, Z_FOREGROUND},
-    utils::INFINITY_SYMBOL,
 };
+
+use riposte_common::utils::INFINITY_SYMBOL;
 
 pub const SIZE: Vec2 = glam::const_vec2!([400., 30.]);
 
@@ -39,19 +40,22 @@ impl ResearchBar {
         let research = the_player.researching_tech();
 
         let (text, progress, projected_progress) = match research {
-            Some(research) => (
-                format!(
-                    "Research: {} ({})",
-                    research.tech.name,
-                    the_player
-                        .estimate_current_research_turns()
-                        .map(|t| t.to_string())
-                        .unwrap_or_else(|| INFINITY_SYMBOL.to_owned())
-                ),
-                research.progress as f32 / research.tech.cost as f32,
-                (research.progress + the_player.beaker_revenue() as u32) as f32
-                    / research.tech.cost as f32,
-            ),
+            Some(research) => {
+                let progress = the_player.tech_progress(research);
+                (
+                    format!(
+                        "Research: {} ({})",
+                        research.name,
+                        the_player
+                            .estimate_current_research_turns()
+                            .map(|t| t.to_string())
+                            .unwrap_or_else(|| INFINITY_SYMBOL.to_owned())
+                    ),
+                    progress as f32 / research.cost as f32,
+                    (progress + the_player.beaker_revenue() as u32) as f32
+                        / research.cost as f32,
+                )
+            }
             None => ("Research: None".to_owned(), 0., 0.),
         };
 
@@ -60,6 +64,9 @@ impl ResearchBar {
             .get_mut()
             .set_progress(progress)
             .set_projected_progress(projected_progress);
-        self.window.research_text.get_mut().set_text(text, vars! {});
+        self.window
+            .research_text
+            .get_mut()
+            .set_text(text!("{}", text));
     }
 }

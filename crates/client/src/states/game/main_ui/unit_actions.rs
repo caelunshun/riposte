@@ -6,22 +6,22 @@
 
 use duit::{Event, Rect, Vec2, WindowPositioner};
 use glam::vec2;
-use riposte_common::UnitAction;
 use winit::event::VirtualKeyCode;
 
 use crate::{
     client::{Client, GameState},
     context::Context,
     game::{
-        unit::{Capability, Unit, WorkerTaskKind},
-        Game, Improvement, UnitId,
+        unit::{Capability, Unit},
+        Game,
     },
     generated::{UnitActionBarWindow, UnitActionButton},
-    registry::CapabilityType,
     state::StateAttachment,
     tooltips::improvement::build_improvement_tooltip,
     ui::Z_FOREGROUND,
 };
+
+use riposte_common::{Improvement, UnitId, protocol::client::UnitAction, registry::CapabilityType, unit::WorkerTaskKind};
 
 use super::unit_info;
 
@@ -97,7 +97,7 @@ fn get_possible_unit_actions(game: &Game, unit: &Unit) -> Vec<PossibleUnitAction
         .next()
     {
         let tile = game.tile(unit.pos()).unwrap();
-        for task in worker_cap.possible_tasks() {
+        for task in todo!() {
             match task.kind() {
                 WorkerTaskKind::BuildImprovement(improvement) => {
                     let is_recommended = tile
@@ -107,7 +107,7 @@ fn get_possible_unit_actions(game: &Game, unit: &Unit) -> Vec<PossibleUnitAction
                         || tile.resource().is_some() && matches!(improvement, Improvement::Road);
                     actions.push(PossibleUnitAction {
                         text: format!("Build {}", improvement.name()),
-                        tooltip: Some(build_improvement_tooltip(&tile, improvement)),
+                        tooltip: Some(build_improvement_tooltip(&tile, &improvement)),
                         message: Message::SetWorkerTask(unit.id(), task.kind().clone()),
                         is_recommended,
                     });
@@ -192,7 +192,7 @@ impl UnitActionBar {
                     .the_button
                     .get_mut()
                     .on_click(move || message.clone());
-                handle.the_text.get_mut().set_text(action.text, vars! {});
+                handle.the_text.get_mut().set_text(text!(""));
 
                 if action.is_recommended {
                     handle.the_button.get_mut().set_flashing(true);
@@ -200,7 +200,7 @@ impl UnitActionBar {
 
                 match action.tooltip {
                     Some(tooltip) => {
-                        handle.tooltip_text.get_mut().set_text(tooltip, vars! {});
+                        handle.tooltip_text.get_mut().set_text(text!("{}", tooltip));
                     }
                     None => {
                         handle.tooltip_container.hide();

@@ -32,7 +32,13 @@ impl ResourceRenderer {
 impl TileRenderLayer for ResourceRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, _tile_pos: UVec2, tile: &Tile) {
         if let Some(resource) = tile.resource() {
-            if !game.the_player().has_unlocked_tech(&resource.revealed_by) && !game.cheat_mode {
+            if !game.the_player().has_unlocked_tech(
+                &game
+                    .registry()
+                    .tech(&resource.revealed_by)
+                    .expect("invalid revealed_by tech"),
+            ) && !game.cheat_mode
+            {
                 return;
             }
 

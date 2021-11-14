@@ -1,15 +1,19 @@
-use riposte_common::SicknessSource::PopulationSickness;
 
-use crate::{game::city::City, utils::merge_lines};
+use riposte_common::{city::SicknessSource, utils::merge_lines};
+
+use crate::{game::city::City};
+
+use super::count_entries;
 
 pub fn sickness_tooltip(city: &City) -> String {
     let mut lines = Vec::new();
 
-    for entry in city.sickness() {
-        let reason = match entry.source() {
-            PopulationSickness => "from overpopulation",
+    for (count, source) in count_entries(city.sickness().copied()) {
+        let reason = match source {
+            SicknessSource::Population => "from overpopulation",
+            SicknessSource::Buildings => "from buildings",
         };
-        lines.push(format!("+{}@icon{{sick}} {}", entry.count, reason));
+        lines.push(format!("+{}@icon{{sick}} {}", count, reason));
     }
 
     merge_lines(&lines)

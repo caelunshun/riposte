@@ -5,7 +5,6 @@ use std::iter;
 use duit::{Event, Vec2};
 use float_ord::FloatOrd;
 use glam::UVec2;
-use riposte_common::ConfirmMoveUnits;
 use riposte_common::{
     utils::{Version, VersionSnapshot},
     UnitId,
@@ -158,10 +157,12 @@ impl UnitGroup {
 
     /// Returns whether the group is a candidate for being auto-selected.
     pub fn should_autoselect(&self, game: &Game) -> bool {
-        self.last_move_turn != Some(game.turn())
+        self.last_move_turn != Some(game.turn().get())
             && self.units.iter().any(|&u| {
                 let unit = game.unit(u);
-                !unit.movement_left().is_exhausted() && !unit.is_fortified() && !unit.has_worker_task()
+                !unit.movement_left().is_exhausted()
+                    && !unit.is_fortified()
+                    && !unit.has_worker_task()
             })
     }
 }
@@ -245,9 +246,6 @@ impl SelectionDriver {
     /// this function should not be called until _after_ all
     /// units in the group had their positions updated. Otherwise,
     /// the group will be split in error.
-    ///
-    /// The unit movement code updates unit positions as soon as `ConfirmMoveUnits`
-    /// is received, which happens _before_ all UpdateUnit packets.
     pub fn on_units_moved(
         &mut self,
         game: &Game,
@@ -349,7 +347,7 @@ impl SelectionDriver {
                 ) {
                     self.move_units_along_path(game, client, best_group_id, &mut path, false);
                     should_select = false;
-                    self.groups[best_group_id].last_move_turn = Some(game.turn());
+                    self.groups[best_group_id].last_move_turn = Some(game.turn().get());
                 }
             }
 
@@ -477,7 +475,7 @@ impl SelectionDriver {
             let should_deselect = deselect_after_move
                 && match path.peek() {
                     Some(next_point) => next_point.turn > 1,
-                    None => point.movement_left.is_exhausted()
+                    None => point.movement_left.is_exhausted(),
                 };
 
             self.movement.move_units(
@@ -547,7 +545,7 @@ struct MovementDriver {
 impl MovementDriver {
     pub fn update(&mut self, game: &Game) {
         self.waiting.retain(|waiting| {
-            if let Some(response) = waiting.future.get() {
+            /*  if let Some(response) = waiting.get() {
                 log::info!(
                     "Server responded to move request {:?}. Success: {}",
                     waiting.target_pos,
@@ -575,7 +573,8 @@ impl MovementDriver {
                 false
             } else {
                 true
-            }
+            }*/
+            true
         });
     }
 
@@ -597,7 +596,6 @@ impl MovementDriver {
 
         let future = client.move_units(game, units.iter().copied(), target_pos);
         self.waiting.push(WaitingMovement {
-            future,
             units,
             start_pos,
             target_pos,
@@ -611,7 +609,6 @@ impl MovementDriver {
 }
 
 struct WaitingMovement {
-    future: ServerResponseFuture<ConfirmMoveUnits>,
     units: Vec<UnitId>,
     target_pos: UVec2,
     start_pos: UVec2,

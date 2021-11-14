@@ -1,7 +1,8 @@
+use riposte_common::{registry::{Registry, Tech}, utils::{article, delimit_string, merge_lines}};
+
 use crate::{
     game::Game,
-    registry::{Registry, Tech},
-    utils::{article, delimit_string, merge_lines},
+
 };
 
 pub fn tech_tooltip(registry: &Registry, game: &Game, tech: &Tech) -> String {

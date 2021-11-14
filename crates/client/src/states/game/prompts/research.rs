@@ -1,19 +1,17 @@
 use duit::{Align, Vec2};
 use glam::vec2;
-use riposte_common::PossibleTechs;
 
 use crate::{
-    assets::Handle,
     client::{Client, GameState, ServerResponseFuture},
     context::Context,
     game::Game,
     generated::{ResearchPromptOption, ResearchPromptWindow},
-    registry::Tech,
     state::StateAttachment,
     tooltips::tech::tech_tooltip,
     ui::{AlignFixed, Z_POPUP},
-    utils::INFINITY_SYMBOL,
 };
+
+use riposte_common::{utils::INFINITY_SYMBOL, assets::Handle, registry::Tech};
 
 use super::{Action, Prompt};
 
@@ -55,10 +53,10 @@ impl ResearchPrompt {
             option
                 .option_text
                 .get_mut()
-                .set_text(format!("{} ({})", tech.name, turns), vars! {});
+                .set_text(text!("{} ({})", tech.name, turns));
 
             let tooltip = tech_tooltip(cx.registry(), game, &tech);
-            option.tooltip_text.get_mut().set_text(tooltip, vars! {});
+            option.tooltip_text.get_mut().set_text(text!("{}", tooltip));
 
             option
                 .clickable

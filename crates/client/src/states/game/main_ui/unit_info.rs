@@ -36,16 +36,13 @@ impl UnitInfo {
 
         match selected_units.get_all().len() {
             0 => {
-                header.set_text("", vars! {});
-                info.set_text("", vars! {});
+                header.set_text(text!(""));
+                info.set_text(text!(""));
             }
             1 => {
                 let unit = game.unit(selected_units.get_all()[0]);
                 header.set_text(
-                    "%unit",
-                    vars! {
-                        unit => unit.kind().name,
-                    },
+                   text!("{}", unit.kind().name)
                 );
 
                 let mut text = match unit.strength_text() {
@@ -61,16 +58,16 @@ impl UnitInfo {
                     if let Some(task) = worker_cap.current_task() {
                         text.push_str(&format!(
                             "\n{} ({})",
-                            task.present_participle(),
+                            task.kind.present_participle(),
                             task.turns_left()
                         ));
                     }
                 }
-                info.set_text(text, vars! {});
+                info.set_text(text!("{}", text));
             }
             n => {
-                header.set_text(format!("Unit Stack ({})", n), vars! {});
-                info.set_text("", vars! {});
+                header.set_text(text!("Unit Stack ({})", n));
+                info.set_text(text!(""));
             }
         }
     }

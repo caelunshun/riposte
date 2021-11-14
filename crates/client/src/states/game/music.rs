@@ -46,7 +46,7 @@ impl GameMusic {
 
         Self {
             current_song: None,
-            current_song_era: Default::default(),
+            current_song_era: Era::Ancient,
             song_picker: None,
             era_songs,
         }

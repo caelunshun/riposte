@@ -82,42 +82,31 @@ impl EconomyScreen {
             // Prefix a '+' sign
             (format!("+{}", the_player.net_gold()), positive_color)
         };
-        self.window.gold_text.get_mut().set_text(
-            "@icon{gold}: %gold @color{%delta_color}{(%delta / turn)}",
-            vars! {
-                gold => the_player.gold(),
-                delta_color => delta_color,
-                delta => delta,
-            },
-        );
+        self.window.gold_text.get_mut().set_text(text!(
+            "@icon{gold}: {} @color{{}}{({} / turn)}",
+            the_player.gold(),
+            delta_color,
+            delta
+        ));
 
-        self.window.expenses_text.get_mut().set_text(
+        self.window.expenses_text.get_mut().set_text(text!(
             "@color{%color}{Expenses:} %expenses",
-            vars! {
-                color => negative_color,
-                expenses => the_player.expenses(),
-            },
-        );
-        self.window.revenue_text.get_mut().set_text(
-            "@color{%color}{Revenue:} %revenue",
-            vars! {
-                color => positive_color,
-                revenue => the_player.base_revenue(),
-            },
-        );
+            negative_color,
+            the_player.expenses()
+        ));
+        self.window.revenue_text.get_mut().set_text(text!(
+            "@color{{}}{Revenue:} {}",
+            positive_color,
+            the_player.base_revenue()
+        ));
 
-        self.window.beaker_output_text.get_mut().set_text(
-            "(+%beakers / turn)",
-            vars! {
-                beakers => the_player.beaker_revenue(),
-            },
-        );
-        self.window.beaker_percent_text.get_mut().set_text(
-            "@icon{beaker}: %beakerPercent%percent",
-            vars! {
-                beakerPercent => the_player.beaker_percent(),
-                percent => "%",
-            },
-        );
+        self.window
+            .beaker_output_text
+            .get_mut()
+            .set_text(text!("(+%beakers / turn)", the_player.beaker_revenue()));
+        self.window
+            .beaker_percent_text
+            .get_mut()
+            .set_text(text!("@icon{beaker}: {}%", the_player.beaker_percent()));
     }
 }

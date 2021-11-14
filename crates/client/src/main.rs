@@ -36,11 +36,11 @@ mod saveload;
 mod server_bridge;
 mod state;
 mod states;
-// mod tooltips;
+ mod tooltips;
 mod ui;
 mod volumes;
 
-use states::{lobby::GameLobbyState, menu::MenuState};
+use states::{game::GameState, lobby::GameLobbyState, menu::MenuState};
 
 extern crate fs_err as fs;
 
@@ -52,7 +52,7 @@ pub enum Action {
 pub enum RootState {
     MainMenu(MenuState),
     Lobby(GameLobbyState),
-    //  Game(GameState),
+      Game(GameState),
 }
 
 impl RootState {
@@ -88,7 +88,7 @@ impl RootState {
                             }
                         };
                     let client = lobby.client().to_game_state();
-                    // *self = RootState::Game(GameState::new(cx, client, game));
+                    *self = RootState::Game(GameState::new(cx, client, game));
                 }
                 Ok(None) => {}
                 Err(e) => {
@@ -96,18 +96,18 @@ impl RootState {
                     *self = RootState::MainMenu(MenuState::new(cx));
                 }
             },
-            /*  RootState::Game(game) => {
+            RootState::Game(game) => {
                 if let Err(e) = game.update(cx) {
                     cx.show_error_popup(&format!("disconnected from the game: {}", e));
                     *self = RootState::MainMenu(MenuState::new(cx));
                 }
-            }*/
+            }
         }
     }
 
     pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
         match self {
-            // RootState::Game(g) => g.handle_event(cx, event),
+             RootState::Game(g) => g.handle_event(cx, event),
             _ => {}
         }
     }

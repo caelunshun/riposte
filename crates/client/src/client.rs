@@ -7,26 +7,27 @@ use flume::Receiver;
 use glam::{uvec2, UVec2};
 use prost::Message;
 use riposte_common::{
-    any_client, any_server, worker_task_kind, AnyClient, AnyServer, BordersExpanded,
-    BuildTaskFailed, BuildTaskFinished, ConfigureWorkedTiles, ConfirmMoveUnits, DeclarePeace,
-    DeclareWar, DoUnitAction, EndTurn, GameSaved, GameStarted, GetBuildTasks, GetPossibleTechs,
-    InitialGameData, MoveUnits, PeaceDeclared, Pos, PossibleCityBuildTasks, PossibleTechs,
-    SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask, WarDeclared,
-    WorkerTask, WorkerTaskImprovement,
-};
-use riposte_common::{
     assets::Handle,
     bridge::{Bridge, ClientSide},
+    city::BuildTask,
     lobby::{GameLobby, SlotId},
     mapgen::MapgenSettings,
-    riposte_common::{
+    player::EconomySettings,
+    protocol::{
+        client::{
+            ClientGamePacket, ConfigureWorkedTiles, DeclareWar, DoUnitAction, EndTurn, MoveUnits,
+            SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask,
+        },
+        game::client::{ClientPacket, UnitAction},
         lobby::{
             ChangeCivAndLeader, ClientLobbyPacket, CreateSlot, DeleteSlot, Kicked, LobbyInfo,
             ServerLobbyPacket, SetMapgenSettings, StartGame,
         },
+        server::{InitialGameData, ServerGamePacket},
         GenericClientPacket, GenericServerPacket,
     },
     registry::{Civilization, Leader, Registry, Tech},
+    unit::WorkerTaskKind,
     CityId, PlayerId, UnitId,
 };
 
@@ -36,7 +37,6 @@ use crate::{
         city::{self},
         combat::CombatEvent,
         event::GameEvent,
-        unit::WorkerTaskKind,
         Game,
     },
 };
@@ -184,11 +184,11 @@ impl Client<LobbyState> {
 
     fn handle_game_started(
         &mut self,
-        packet: GameStarted,
+        packet: InitialGameData,
         _lobby: &mut GameLobby,
     ) -> Result<InitialGameData> {
         log::info!("Game starting");
-        packet.game_data.ok_or(ClientError::MissingPacket)
+        Ok(packet)
     }
 
     fn send_message(&self, packet: ClientLobbyPacket) {
@@ -216,124 +216,66 @@ impl Client<GameState> {
         game: &Game,
         unit_ids: impl Iterator<Item = UnitId>,
         target_pos: UVec2,
-    ) -> ServerResponseFuture<ConfirmMoveUnits> {
-        let request_id = self.send_message(any_client::Packet::MoveUnits(MoveUnits {
-            unit_i_ds: unit_ids
-                .map(|id| game.unit(id).network_id() as i32)
-                .collect(),
-            target_pos: Some(Pos {
-                x: target_pos.x,
-                y: target_pos.y,
-            }),
+    ) {
+        self.send_message(ClientPacket::MoveUnits(MoveUnits {
+            unit_ids: unit_ids.collect(),
+            target_pos,
         }));
-        self.register_response_future(request_id)
     }
 
-    pub fn do_unit_action(&mut self, game: &Game, unit: UnitId, action: riposte_common::UnitAction) {
-        self.send_message(any_client::Packet::DoUnitAction(DoUnitAction {
-            unit_id: game.unit(unit).network_id() as i32,
-            action: action.into(),
-        }));
+    pub fn do_unit_action(&mut self, game: &Game, unit_id: UnitId, action: UnitAction) {
+        self.send_message(ClientPacket::DoUnitAction(DoUnitAction { unit_id, action }));
         log::info!("Performing unit action {:?}", action);
     }
 
-    pub fn get_possible_city_build_tasks(
-        &mut self,
-        game: &Game,
-        city: CityId,
-    ) -> ServerResponseFuture<PossibleCityBuildTasks> {
-        let request_id = self.send_message(any_client::Packet::GetBuildTasks(GetBuildTasks {
-            city_id: game.city(city).network_id() as i32,
-        }));
-        self.register_response_future(request_id)
-    }
-
-    pub fn set_city_build_task(
-        &mut self,
-        game: &Game,
-        city: CityId,
-        build_task: riposte_common::BuildTask,
-    ) {
-        self.send_message(any_client::Packet::SetCityBuildTask(SetCityBuildTask {
-            city_id: game.city(city).network_id() as i32,
-            task: build_task.kind,
+    pub fn set_city_build_task(&mut self, game: &Game, city_id: CityId, build_task: BuildTask) {
+        self.send_message(ClientPacket::SetCityBuildTask(SetCityBuildTask {
+            city_id,
+            build_task,
         }));
     }
 
-    pub fn get_possible_techs(&mut self) -> ServerResponseFuture<PossibleTechs> {
-        let request_id =
-            self.send_message(any_client::Packet::GetPossibleTechs(GetPossibleTechs {}));
-        self.register_response_future(request_id)
-    }
-
-    pub fn set_research(&mut self, tech: &Tech) {
-        self.send_message(any_client::Packet::SetResearch(SetResearch {
-            tech_id: tech.name.clone(),
+    pub fn set_research(&mut self, tech: &Handle<Tech>) {
+        self.send_message(ClientPacket::SetResearch(SetResearch {
+            tech: tech.clone(),
         }));
     }
 
     pub fn set_economy_settings(&mut self, beaker_percent: u32) {
-        self.send_message(any_client::Packet::SetEconomySettings(SetEconomySettings {
-            beaker_percent: beaker_percent as i32,
-        }));
+        todo!()
     }
 
     pub fn set_tile_manually_worked(
         &mut self,
         game: &Game,
-        city: CityId,
-        tile: UVec2,
+        city_id: CityId,
+        tile_pos: UVec2,
         manually_worked: bool,
     ) {
-        self.send_message(any_client::Packet::ConfigureWorkedTiles(
-            ConfigureWorkedTiles {
-                city_id: game.city(city).network_id() as i32,
-                tile_pos: Some(Pos {
-                    x: tile.x,
-                    y: tile.y,
-                }),
-                should_manually_work: manually_worked,
-            },
-        ));
+        self.send_message(ClientPacket::ConfigureWorkedTiles(ConfigureWorkedTiles {
+            city_id,
+            tile_pos,
+            should_manually_work: manually_worked,
+        }));
     }
 
     pub fn set_worker_task(&mut self, game: &Game, worker_id: UnitId, task: &WorkerTaskKind) {
-        self.send_message(any_client::Packet::SetWorkerTask(SetWorkerTask {
-            worker_id: game.unit(worker_id).network_id() as i32,
-            task: Some(WorkerTask {
-                kind: Some(match task {
-                    WorkerTaskKind::BuildImprovement(improvement) => riposte_common::WorkerTaskKind {
-                        kind: Some(worker_task_kind::Kind::BuildImprovement(
-                            WorkerTaskImprovement {
-                                improvement_id: todo!(),
-                            },
-                        )),
-                    },
-                }),
-                ..Default::default()
-            }),
+        self.send_message(ClientPacket::SetWorkerTask(SetWorkerTask {
+            worker_id,
+            task: task.clone(),
         }));
     }
 
-    pub fn declare_war_on(&mut self, game: &Game, player: PlayerId) {
-        self.send_message(any_client::Packet::DeclareWar(DeclareWar {
-            on_player_id: game.player(player).network_id() as i32,
-        }));
+    pub fn declare_war_on(&mut self, game: &Game, on_player: PlayerId) {
+        self.send_message(ClientPacket::DeclareWar(DeclareWar { on_player }));
     }
 
-    pub fn make_peace_with(&mut self, game: &Game, player: PlayerId) {
-        self.send_message(any_client::Packet::DeclarePeace(DeclarePeace {
-            on_player_id: game.player(player).network_id() as i32,
-        }));
-    }
-
-    pub fn save_game(&mut self) -> ServerResponseFuture<GameSaved> {
-        let request_id = self.send_message(any_client::Packet::SaveGame(SaveGame {}));
-        self.register_response_future(request_id)
+    pub fn save_game(&mut self){
+        let request_id = self.send_message(ClientPacket::SaveGame(SaveGame));
     }
 
     pub fn end_turn(&mut self, game: &mut Game) {
-        self.send_message(any_client::Packet::EndTurn(EndTurn {}));
+        self.send_message(ClientPacket::EndTurn(EndTurn));
         game.waiting_on_turn_end = true;
     }
 
@@ -341,7 +283,7 @@ impl Client<GameState> {
         if game.has_combat_event() {
             return Ok(());
         }
-        todo!()
+        Ok(())
         /*while let Some(msg) = self.poll_for_message()? {
             let request_id = msg.request_id as u32;
             match msg.packet.ok_or(ClientError::MissingPacket)? {
@@ -398,7 +340,7 @@ impl Client<GameState> {
         Ok(())*/
     }
 
-    fn handle_confirm_move_units(&mut self, packet: ConfirmMoveUnits, request_id: u32) {
+    /*fn handle_confirm_move_units(&mut self, packet: ConfirmMoveUnits, request_id: u32) {
         self.handle_server_response(request_id, packet);
     }
 
@@ -493,6 +435,16 @@ impl Client<GameState> {
         Ok(())
     }
 
+
+
+    fn handle_server_response<T: 'static>(&mut self, request_id: u32, value: T) {
+        if let Some(sender) = self.server_response_senders.remove(&request_id) {
+            if let Ok(sender) = sender.downcast::<flume::Sender<T>>() {
+                sender.send(value).ok();
+            }
+        }
+    }*/
+
     fn register_response_future<T: 'static>(&mut self, request_id: u32) -> ServerResponseFuture<T> {
         let (sender, receiver) = flume::bounded(1);
 
@@ -502,43 +454,34 @@ impl Client<GameState> {
         ServerResponseFuture { receiver }
     }
 
-    fn handle_server_response<T: 'static>(&mut self, request_id: u32, value: T) {
-        if let Some(sender) = self.server_response_senders.remove(&request_id) {
-            if let Ok(sender) = sender.downcast::<flume::Sender<T>>() {
-                sender.send(value).ok();
-            }
-        }
-    }
-
-    fn send_message(&self, packet: any_client::Packet) -> u32 {
+    fn send_message(&self, packet: ClientPacket) -> u32 {
         let request_id = self.next_request_id.get();
         self.next_request_id
             .set(self.next_request_id.get().wrapping_add(1));
-        let mut bytes = BytesMut::new();
-        let packet = AnyClient {
-            request_id: request_id as i32,
-            packet: Some(packet),
-        };
-        packet.encode(&mut bytes).expect("failed to encode message");
-        todo!()
+        self.bridge
+            .send(GenericClientPacket::Game(ClientGamePacket {
+                request_id,
+                packet,
+            }));
+        request_id
     }
 }
 
 pub trait State {
-    type SendPacket: Message + Default;
-    type RecvPacket: Message + Default;
+    type SendPacket;
+    type RecvPacket;
 }
 
 pub struct LobbyState;
 
 impl State for LobbyState {
-    type SendPacket = riposte_common::ClientLobbyPacket;
-    type RecvPacket = riposte_common::ServerLobbyPacket;
+    type SendPacket = ClientLobbyPacket;
+    type RecvPacket =ServerLobbyPacket;
 }
 
 pub struct GameState;
 
 impl State for GameState {
-    type SendPacket = AnyClient;
-    type RecvPacket = AnyServer;
+    type SendPacket = ClientGamePacket;
+    type RecvPacket = ServerGamePacket;
 }

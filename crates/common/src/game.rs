@@ -4,6 +4,7 @@ pub mod improvement;
 pub mod player;
 pub mod tile;
 pub mod unit;
+pub mod combat;
 
 slotmap::new_key_type! {
     pub struct PlayerId;

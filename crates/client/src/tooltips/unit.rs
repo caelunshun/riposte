@@ -1,9 +1,6 @@
 use std::fmt::Write;
 
-use crate::{
-    registry::{CapabilityType, CombatBonusType, Registry, UnitKind},
-    utils::merge_lines,
-};
+use riposte_common::{registry::{CapabilityType, CombatBonusType, Registry, UnitKind}, utils::merge_lines};
 
 /// Generates a tooltip for the given unit kind.
 pub fn unit_tooltip(registry: &Registry, unit: &UnitKind) -> String {
