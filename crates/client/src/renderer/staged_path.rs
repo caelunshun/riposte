@@ -35,7 +35,7 @@ impl StagedPathOverlay {
 
     fn digit_blob(&mut self, canvas: &mut Canvas, digit: u32) -> &TextBlob {
         self.digit_blobs.entry(digit).or_insert_with(|| {
-            let text = Text::from_sections(vec![TextSection::Text {
+            let text = Text::from_sections([TextSection::Text {
                 text: digit.to_string().into(),
                 style: TextStyle {
                     color: Some(Srgba::new(u8::MAX, u8::MAX, u8::MAX, u8::MAX)),
@@ -46,7 +46,7 @@ impl StagedPathOverlay {
                     },
                 },
             }]);
-            canvas.context().create_text_blob(
+           let mut blob =  canvas.context().create_text_blob(
                 text,
                 TextOptions {
                     wrap_lines: false,
@@ -54,7 +54,9 @@ impl StagedPathOverlay {
                     align_h: Align::Center,
                     align_v: Align::Center,
                 },
-            )
+            );
+            canvas.context().resize_text_blob(&mut blob, Vec2::splat(PIXELS_PER_TILE));
+            blob
         })
     }
 

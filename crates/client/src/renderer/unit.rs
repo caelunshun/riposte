@@ -35,7 +35,7 @@ impl UnitRenderer {
                 .unwrap_or_else(|_| panic!("missing texture for unit '{}'", unit_kind.id));
             textures.insert(unit_kind.id.clone(), texture);
 
-            let name_text = Text::from_sections(vec![TextSection::Text {
+            let name_text = Text::from_sections([TextSection::Text {
                 text: unit_kind.name.clone().into(),
                 style: TextStyle {
                     font: Query {
@@ -47,7 +47,7 @@ impl UnitRenderer {
                     ..Default::default()
                 },
             }]);
-            let name_blob = cx.canvas().context().create_text_blob(
+            let mut name_blob = cx.canvas().context().create_text_blob(
                 name_text,
                 TextOptions {
                     wrap_lines: false,
@@ -56,6 +56,9 @@ impl UnitRenderer {
                     align_v: Align::Start,
                 },
             );
+            cx.canvas()
+                .context()
+                .resize_text_blob(&mut name_blob, vec2(100., f32::INFINITY));
             name_blobs.insert(unit_kind.id.clone(), name_blob);
         }
 

@@ -3,7 +3,7 @@ use std::sync::Arc;
 use anyhow::Context;
 use duit::Vec2;
 use dume::Canvas;
-use glam::vec2;
+use glam::{uvec2, vec2};
 use pollster::block_on;
 use winit::{
     dpi::{LogicalSize, PhysicalSize},
@@ -68,7 +68,8 @@ pub fn init_graphics_state() -> anyhow::Result<(
         },
     );
 
-    let context = dume::Context::builder(Arc::clone(&device), Arc::clone(&queue)).build();
+    let context = dume::Context::builder(Arc::clone(&device), Arc::clone(&queue))
+        .glyph_subpixel_steps(uvec2(2, 4)).build();
     context.set_default_font_family("Merriweather");
 
     let canvas = context.create_canvas(

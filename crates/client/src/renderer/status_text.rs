@@ -40,7 +40,7 @@ impl OverlayRenderLayer for StatusTextOverlay {
         };
         let text = Text::from_sections([section]);
 
-        let blob = cx.canvas().context().create_text_blob(
+        let mut blob = cx.canvas().context().create_text_blob(
             text,
             TextOptions {
                 wrap_lines: false,
@@ -49,7 +49,9 @@ impl OverlayRenderLayer for StatusTextOverlay {
                 align_v: Align::Start,
             },
         );
-      // cx.canvas_mut()
-          //  .draw_text(&blob, vec2(0., game.view().window_size().y - 150.), alpha);
+        cx.canvas().context()
+            .resize_text_blob(&mut blob, vec2(100., f32::INFINITY));
+        cx.canvas_mut()
+            .draw_text(&blob, vec2(0., game.view().window_size().y - 150.), alpha);
     }
 }
