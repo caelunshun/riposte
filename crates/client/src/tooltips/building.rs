@@ -1,6 +1,7 @@
-use riposte_common::{registry::{Building, BuildingEffect, BuildingEffectType, Registry}, utils::{delimit_string, merge_lines}};
-
-
+use riposte_common::{
+    registry::{Building, BuildingEffect, BuildingEffectType, Registry},
+    utils::{delimit_string, merge_lines},
+};
 
 /// Gets a tooltip for a building.
 pub fn building_tooltip(registry: &Registry, building: &Building) -> String {

@@ -1,11 +1,9 @@
 use std::{
     cell::{Ref, RefCell, RefMut},
-    convert::TryInto,
     mem,
     sync::Arc,
 };
 
-use anyhow::Context as _;
 use arrayvec::ArrayVec;
 use duit::Event;
 use glam::{ivec2, UVec2};
@@ -13,14 +11,14 @@ use riposte_common::{
     city::CityData,
     game::tile::OutOfBounds,
     player::PlayerData,
-    protocol::server::{InitialGameData, UpdateCity, UpdateUnit},
+    protocol::server::InitialGameData,
     registry::{CapabilityType, Registry},
     unit::UnitData,
     utils::VersionSnapshot,
     CityId, PlayerId, Turn, UnitId,
 };
 use riposte_common::{Era, Visibility};
-use slotmap::{SecondaryMap, SlotMap};
+use slotmap::SecondaryMap;
 
 use crate::{
     client::{Client, GameState},

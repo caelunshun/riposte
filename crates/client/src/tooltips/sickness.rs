@@ -1,7 +1,6 @@
-
 use riposte_common::{city::SicknessSource, utils::merge_lines};
 
-use crate::{game::city::City};
+use crate::game::city::City;
 
 use super::count_entries;
 

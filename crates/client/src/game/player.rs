@@ -1,6 +1,3 @@
-use std::convert::TryInto;
-
-use ahash::AHashSet;
 use riposte_common::player::PlayerData;
 use riposte_common::Era;
 use riposte_common::{
@@ -9,7 +6,7 @@ use riposte_common::{
     PlayerId,
 };
 
-use super::{Game, InvalidNetworkId};
+use super::Game;
 
 /// A player / civilization in the game.
 #[derive(Debug)]
@@ -18,12 +15,12 @@ pub struct Player {
 }
 
 impl Player {
-    pub fn from_data(data: PlayerData, game: &Game) -> anyhow::Result<Self> {
-        let mut player = Self { data };
+    pub fn from_data(data: PlayerData, _game: &Game) -> anyhow::Result<Self> {
+        let player = Self { data };
         Ok(player)
     }
 
-    pub fn update_data(&mut self, data: PlayerData, game: &Game) -> anyhow::Result<()> {
+    pub fn update_data(&mut self, data: PlayerData, _game: &Game) -> anyhow::Result<()> {
         self.data = data;
         Ok(())
     }

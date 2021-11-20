@@ -32,7 +32,6 @@ use riposte_common::{
     },
     protocol::lobby::{CreateSlot, DeleteSlot},
     registry::{Civilization, Leader},
-    utils::color_to_string,
 };
 use riposte_server::{Server, ServerConfig};
 use slotmap::Key;
@@ -368,7 +367,11 @@ impl GameLobbyState {
 
             let (civ, leader) = if let Some(civ) = slot.player.civ() {
                 (
-                    text!("@color[{}][{}]", Srgba::new(civ.color[0], civ.color[1], civ.color[2], 255), civ.name),
+                    text!(
+                        "@color[{}][{}]",
+                        Srgba::new(civ.color[0], civ.color[1], civ.color[2], 255),
+                        civ.name
+                    ),
                     text!("{}", slot.player.leader().unwrap().name),
                 )
             } else {
@@ -405,10 +408,7 @@ impl GameLobbyState {
 
                 (civ_picklist, leader_picklist)
             } else {
-                (
-                    widget(Text::new(civ)),
-                    widget(Text::new(leader)),
-                )
+                (widget(Text::new(civ)), widget(Text::new(leader)))
             };
 
             let mut delete_button = Button::new();

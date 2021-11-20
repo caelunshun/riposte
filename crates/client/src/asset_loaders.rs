@@ -26,7 +26,11 @@ impl Loader for ImageLoader {
         id: &str,
         bytes: &[u8],
     ) -> anyhow::Result<Option<Arc<dyn Any + Send + Sync>>> {
-        self.builder.borrow_mut().as_mut().unwrap().add_texture(bytes, id)?;
+        self.builder
+            .borrow_mut()
+            .as_mut()
+            .unwrap()
+            .add_texture(bytes, id)?;
         Ok(None)
     }
 }

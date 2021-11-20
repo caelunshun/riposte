@@ -9,7 +9,6 @@ use duit::Event;
 use game::Game;
 use mimalloc::MiMalloc;
 use riposte_common::bridge::{Bridge, ClientSide};
-use server_bridge::ServerBridge;
 use simple_logger::SimpleLogger;
 
 #[global_allocator]
@@ -36,7 +35,7 @@ mod saveload;
 mod server_bridge;
 mod state;
 mod states;
- mod tooltips;
+mod tooltips;
 mod ui;
 mod volumes;
 
@@ -52,7 +51,7 @@ pub enum Action {
 pub enum RootState {
     MainMenu(MenuState),
     Lobby(GameLobbyState),
-      Game(GameState),
+    Game(GameState),
 }
 
 impl RootState {
@@ -107,7 +106,7 @@ impl RootState {
 
     pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
         match self {
-             RootState::Game(g) => g.handle_event(cx, event),
+            RootState::Game(g) => g.handle_event(cx, event),
             _ => {}
         }
     }

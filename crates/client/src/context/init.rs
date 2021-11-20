@@ -69,7 +69,9 @@ pub fn init_graphics_state() -> anyhow::Result<(
     );
 
     let context = dume::Context::builder(Arc::clone(&device), Arc::clone(&queue))
-        .glyph_subpixel_steps(uvec2(2, 4)).build();
+        .glyph_subpixel_steps(uvec2(2, 4))
+        .max_mipmap_levels(8)
+        .build();
     context.set_default_font_family("Merriweather");
 
     let canvas = context.create_canvas(

@@ -41,9 +41,7 @@ impl UnitInfo {
             }
             1 => {
                 let unit = game.unit(selected_units.get_all()[0]);
-                header.set_text(
-                   text!("{}", unit.kind().name)
-                );
+                header.set_text(text!("{}", unit.kind().name));
 
                 let mut text = match unit.strength_text() {
                     Some(t) => formatdoc! {

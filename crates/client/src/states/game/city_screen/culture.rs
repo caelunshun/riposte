@@ -34,22 +34,16 @@ impl CultureScreen {
             .set_progress(progress)
             .set_projected_progress(projected_progress);
 
-        self.window.culture_text.get_mut().set_text(
-            text!(
-                "{} (+{} / turn)",
-                city.culture_level(),
-                city.culture_per_turn()
-            ),
-           
-        );
+        self.window.culture_text.get_mut().set_text(text!(
+            "{} (+{} / turn)",
+            city.culture_level(),
+            city.culture_per_turn()
+        ));
 
-        self.window.culture_amount_text.get_mut().set_text(
-            text!(
-                "@icon[culture]: {} / {}",
-                city.num_culture(),
-                city.culture_needed()
-            ),
-         
-        );
+        self.window.culture_amount_text.get_mut().set_text(text!(
+            "@icon[culture]: {} / {}",
+            city.num_culture(),
+            city.culture_needed()
+        ));
     }
 }

@@ -1,6 +1,5 @@
-use std::{convert::TryInto, num::NonZeroU32};
+use std::num::NonZeroU32;
 
-use anyhow::{anyhow, bail};
 use glam::UVec2;
 use riposte_common::{
     assets::Handle,
@@ -8,11 +7,11 @@ use riposte_common::{
         city::{CityData, CityEconomy},
         culture::Culture,
     },
-    registry::{Building, RegistryItemNotFound, Resource, UnitKind},
+    registry::{Building, Resource},
     CityId, CultureLevel, PlayerId,
 };
 
-use super::{Game, Yield};
+use super::Game;
 pub use riposte_common::game::city::{
     AngerSource, BuildTask, HappinessSource, HealthSource, SicknessSource,
 };
@@ -23,13 +22,13 @@ pub struct City {
 }
 
 impl City {
-    pub fn from_data(data: CityData, game: &Game) -> anyhow::Result<Self> {
+    pub fn from_data(data: CityData, _game: &Game) -> anyhow::Result<Self> {
         let city = Self { data };
 
         Ok(city)
     }
 
-    pub fn update_data(&mut self, data: CityData, game: &Game) -> anyhow::Result<()> {
+    pub fn update_data(&mut self, data: CityData, _game: &Game) -> anyhow::Result<()> {
         self.data = data;
         Ok(())
     }
@@ -51,7 +50,11 @@ impl City {
     }
 
     pub fn build_task_progress(&self, task: &BuildTask) -> u32 {
-        self.data.build_task_progress.get(task).copied().unwrap_or(0)
+        self.data
+            .build_task_progress
+            .get(task)
+            .copied()
+            .unwrap_or(0)
     }
 
     pub fn pos(&self) -> UVec2 {
@@ -191,13 +194,13 @@ impl City {
     }
 
     pub fn turns_needed_for_growth(&self) -> u32 {
-        (self.food_needed_for_growth()  - self.stored_food()  + self.economy().food_yield
-            - self.consumed_food() 
+        (self.food_needed_for_growth() - self.stored_food() + self.economy().food_yield
+            - self.consumed_food()
             - 1)
-            / (self.economy().food_yield - self.consumed_food() )
+            / (self.economy().food_yield - self.consumed_food())
     }
 
-    pub fn maintenance_cost(&self) -> u32  {
+    pub fn maintenance_cost(&self) -> u32 {
         self.economy().maintenance_cost as u32
     }
 

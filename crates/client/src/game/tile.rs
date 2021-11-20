@@ -3,13 +3,13 @@ use std::cell::{Ref, RefCell, RefMut};
 use glam::UVec2;
 use riposte_common::tile::TileData;
 use riposte_common::unit::MovementPoints;
-use riposte_common::{Improvement, Terrain, Visibility};
 use riposte_common::{
     assets::Handle,
     game::{culture::Culture, tile::OutOfBounds},
     registry::Resource,
     PlayerId,
 };
+use riposte_common::{Improvement, Terrain, Visibility};
 
 use super::{player::Player, Game, Yield};
 
@@ -20,10 +20,8 @@ pub struct Tile {
 }
 
 impl Tile {
-    pub fn from_data(data: TileData, game: &Game) -> anyhow::Result<Self> {
-        let  tile = Self {
-            data,
-        };
+    pub fn from_data(data: TileData, _game: &Game) -> anyhow::Result<Self> {
+        let tile = Self { data };
 
         Ok(tile)
     }
@@ -75,7 +73,7 @@ impl Tile {
             cost += MovementPoints::from_u32(1);
         }
 
-        if self.improvements().any(|i| todo!()) {
+        if self.improvements().any(|i| matches!(i, Improvement::Road)) {
             let can_use_road = match self.owner() {
                 Some(owner) => !player.is_at_war_with(owner),
                 None => true,

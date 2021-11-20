@@ -1,15 +1,13 @@
-use std::{convert::TryInto, num::NonZeroUsize, str::FromStr};
+use std::num::NonZeroUsize;
 
-use crate::{context::Context, game::InvalidNetworkId};
+use crate::context::Context;
 
 use super::Game;
 
-use anyhow::anyhow;
 use duit::Vec2;
 use glam::UVec2;
 use lexical::WriteFloatOptions;
 use riposte_common::game::unit::UnitData;
-use riposte_common::Improvement;
 use riposte_common::{
     assets::Handle,
     registry::{CapabilityType, CombatBonusType, UnitKind},
@@ -28,7 +26,7 @@ pub struct Unit {
 }
 
 impl Unit {
-    pub fn from_data(data: UnitData, game: &Game, cx: &Context) -> anyhow::Result<Self> {
+    pub fn from_data(data: UnitData, _game: &Game, cx: &Context) -> anyhow::Result<Self> {
         let mut unit = Self {
             data,
             movement_spline: Spline::from_vec(Vec::new()),

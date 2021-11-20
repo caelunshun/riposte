@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
-use strum::EnumIter;
 use glam::{uvec2, UVec2};
+use strum::EnumIter;
 
 /// Settings provided to the map generator.
 #[derive(Debug, Clone)]

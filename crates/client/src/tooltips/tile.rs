@@ -5,12 +5,12 @@ use glam::UVec2;
 use lexical::{format::STANDARD, WriteFloatOptions};
 use riposte_common::assets::Handle;
 use riposte_common::registry::{Resource, UnitKind};
-use riposte_common::{Improvement, PlayerId, UnitId, Visibility, Yield};
 use riposte_common::unit::MovementPoints;
 use riposte_common::utils::{color_to_string, delimit_string, merge_lines};
+use riposte_common::{Improvement, PlayerId, UnitId, Visibility, Yield};
 
-use crate::game::{Game, Tile};
 use crate::game::unit::{Capability, Unit};
+use crate::game::{Game, Tile};
 
 pub fn tile_tooltip(game: &Game, tile: &Tile, pos: UVec2) -> String {
     let mut lines = Vec::new();
@@ -169,7 +169,7 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
                     write!(
                         line,
                         ", {} ({})",
-                        task.kind. present_participle(),
+                        task.kind.present_participle(),
                         task.turns_left()
                     )
                     .unwrap();
@@ -220,7 +220,10 @@ fn yield_description_line(yiel: &Yield) -> String {
 }
 
 fn resource_line(game: &Game, tile: &Tile, resource: &Resource) -> Option<String> {
-    if !game.the_player().has_unlocked_tech(&game.registry().tech(&resource.revealed_by).unwrap()) {
+    if !game
+        .the_player()
+        .has_unlocked_tech(&game.registry().tech(&resource.revealed_by).unwrap())
+    {
         return None;
     }
 

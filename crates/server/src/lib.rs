@@ -1,5 +1,7 @@
 //! The Riposte server. Runs all the game logic.
 
+#![allow(dead_code)]
+
 use std::sync::Arc;
 
 use anyhow::bail;
@@ -12,8 +14,8 @@ use riposte_common::{
     bridge::{Bridge, ServerSide},
     lobby::GameLobby,
     mapgen::MapgenSettings,
-    registry::Registry,
     protocol::GenericClientPacket,
+    registry::Registry,
 };
 use tokio::runtime;
 use uuid::Uuid;
@@ -76,7 +78,7 @@ impl Server {
     fn update(&mut self) {
         match &mut self.state {
             State::Lobby(l) => l.update(&self.connections),
-            State::Game(g) => {}
+            State::Game(_g) => {}
         }
     }
 
@@ -97,7 +99,7 @@ impl Server {
                     bail!("expected a lobby packet")
                 }
             }
-            State::Game(g) => todo!(),
+            State::Game(_g) => todo!(),
         }
     }
 
@@ -123,7 +125,7 @@ impl Server {
                     self.kick(id, e.to_string());
                 }
             }
-            State::Game(g) => todo!("add connections while in Game state"),
+            State::Game(_g) => todo!("add connections while in Game state"),
         }
 
         id

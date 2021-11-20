@@ -6,8 +6,8 @@ use riposte_common::{
     assets::Handle,
     lobby::{GameLobby, LobbySlot, SlotId, SlotPlayer},
     mapgen::MapgenSettings,
-    registry::{Civilization, Leader, Registry},
     protocol::lobby::ClientLobbyPacket,
+    registry::{Civilization, Leader, Registry},
 };
 use slotmap::SecondaryMap;
 use uuid::Uuid;
@@ -55,6 +55,7 @@ impl LobbyServer {
         self.connection_slots.get(connection).copied()
     }
 
+    #[allow(unused)]
     fn connection_for_slot(&self, slot: SlotId) -> Option<ConnectionId> {
         self.slot_connections.get(slot).copied()
     }

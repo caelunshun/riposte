@@ -37,17 +37,14 @@ impl SavesListState {
         let mut table = window.saves_table.get_mut();
         table.add_row([
             ("created_at", widget(Text::new(text!("Created")))),
-            ("turn", widget(Text::new(text!("Turn" )))),
-            (
-                "load_button",
-                widget(Text::new(text!("Actions"))),
-            ),
+            ("turn", widget(Text::new(text!("Turn")))),
+            ("load_button", widget(Text::new(text!("Actions")))),
         ]);
         for (i, save) in cx.saves().list_saves().enumerate() {
-            let created_at = widget(Text::new(
-                text!("{}", humantime::format_rfc3339(save.created_at)),
-            
-            ));
+            let created_at = widget(Text::new(text!(
+                "{}",
+                humantime::format_rfc3339(save.created_at)
+            )));
             let turn = widget(Text::new(text!("{}", save.turn)));
 
             let load_button = widget(Button::new());

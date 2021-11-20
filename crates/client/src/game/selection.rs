@@ -14,7 +14,7 @@ use smallvec::SmallVec;
 use winit::event::MouseButton;
 
 use crate::{
-    client::{Client, GameState, ServerResponseFuture},
+    client::{Client, GameState},
     context::Context,
 };
 
@@ -543,8 +543,8 @@ struct MovementDriver {
 }
 
 impl MovementDriver {
-    pub fn update(&mut self, game: &Game) {
-        self.waiting.retain(|waiting| {
+    pub fn update(&mut self, _game: &Game) {
+        self.waiting.retain(|_waiting| {
             /*  if let Some(response) = waiting.get() {
                 log::info!(
                     "Server responded to move request {:?}. Success: {}",
@@ -594,7 +594,7 @@ impl MovementDriver {
             target_pos
         );
 
-        let future = client.move_units(game, units.iter().copied(), target_pos);
+        let _future = client.move_units(game, units.iter().copied(), target_pos);
         self.waiting.push(WaitingMovement {
             units,
             start_pos,

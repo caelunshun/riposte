@@ -17,7 +17,7 @@ pub struct CombatEvent {
 impl CombatEvent {
     pub fn from_data(
         data: riposte_common::combat::CombatEvent,
-        game: &Game,
+        _game: &Game,
     ) -> anyhow::Result<Self> {
         let time_per_round = 4. / data.rounds().len() as f32;
 

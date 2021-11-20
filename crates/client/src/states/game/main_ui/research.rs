@@ -52,8 +52,7 @@ impl ResearchBar {
                             .unwrap_or_else(|| INFINITY_SYMBOL.to_owned())
                     ),
                     progress as f32 / research.cost as f32,
-                    (progress + the_player.beaker_revenue() as u32) as f32
-                        / research.cost as f32,
+                    (progress + the_player.beaker_revenue() as u32) as f32 / research.cost as f32,
                 )
             }
             None => ("Research: None".to_owned(), 0., 0.),

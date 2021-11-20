@@ -3,11 +3,7 @@
 use glam::UVec2;
 
 use crate::{
-    assets::Handle,
-    city::BuildTask,
-    player::EconomySettings,
-    registry::Tech,
-    unit::{WorkerTask, WorkerTaskKind},
+    assets::Handle, city::BuildTask, player::EconomySettings, registry::Tech, unit::WorkerTaskKind,
     CityId, PlayerId, UnitId,
 };
 

@@ -1,22 +1,18 @@
 use std::{any::Any, cell::Cell, marker::PhantomData};
 
 use ahash::AHashMap;
-use anyhow::Context as _;
-use bytes::BytesMut;
 use flume::Receiver;
-use glam::{uvec2, UVec2};
-use prost::Message;
+use glam::UVec2;
 use riposte_common::{
     assets::Handle,
     bridge::{Bridge, ClientSide},
     city::BuildTask,
     lobby::{GameLobby, SlotId},
     mapgen::MapgenSettings,
-    player::EconomySettings,
     protocol::{
         client::{
             ClientGamePacket, ConfigureWorkedTiles, DeclareWar, DoUnitAction, EndTurn, MoveUnits,
-            SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask,
+            SaveGame, SetCityBuildTask, SetResearch, SetWorkerTask,
         },
         game::client::{ClientPacket, UnitAction},
         lobby::{
@@ -31,15 +27,7 @@ use riposte_common::{
     CityId, PlayerId, UnitId,
 };
 
-use crate::{
-    context::Context,
-    game::{
-        city::{self},
-        combat::CombatEvent,
-        event::GameEvent,
-        Game,
-    },
-};
+use crate::{context::Context, game::Game};
 
 #[derive(Debug, thiserror::Error)]
 pub enum ClientError {
@@ -126,7 +114,7 @@ impl Client<LobbyState> {
         self.send_message(ClientLobbyPacket::StartGame(StartGame));
     }
 
-    pub fn set_save_file(&mut self, file: Vec<u8>) {
+    pub fn set_save_file(&mut self, _file: Vec<u8>) {
         todo!()
     }
 
@@ -157,7 +145,9 @@ impl Client<LobbyState> {
                 ServerLobbyPacket::Kicked(packet) => {
                     self.handle_kicked(packet, lobby)?;
                 }
-                ServerLobbyPacket::GameStarted(data) => return Ok(vec![LobbyEvent::GameStarted(data)])
+                ServerLobbyPacket::GameStarted(data) => {
+                    return Ok(vec![LobbyEvent::GameStarted(data)])
+                }
             }
         }
 
@@ -169,7 +159,7 @@ impl Client<LobbyState> {
         packet: LobbyInfo,
         lobby: &mut GameLobby,
         settings: &mut MapgenSettings,
-        registry: &Registry,
+        _registry: &Registry,
     ) -> Result<()> {
         log::info!("Received new lobby info: {:?}", packet);
         *lobby = packet.lobby;
@@ -213,7 +203,7 @@ impl<T> ServerResponseFuture<T> {
 impl Client<GameState> {
     pub fn move_units(
         &mut self,
-        game: &Game,
+        _game: &Game,
         unit_ids: impl Iterator<Item = UnitId>,
         target_pos: UVec2,
     ) {
@@ -223,12 +213,12 @@ impl Client<GameState> {
         }));
     }
 
-    pub fn do_unit_action(&mut self, game: &Game, unit_id: UnitId, action: UnitAction) {
+    pub fn do_unit_action(&mut self, _game: &Game, unit_id: UnitId, action: UnitAction) {
         self.send_message(ClientPacket::DoUnitAction(DoUnitAction { unit_id, action }));
         log::info!("Performing unit action {:?}", action);
     }
 
-    pub fn set_city_build_task(&mut self, game: &Game, city_id: CityId, build_task: BuildTask) {
+    pub fn set_city_build_task(&mut self, _game: &Game, city_id: CityId, build_task: BuildTask) {
         self.send_message(ClientPacket::SetCityBuildTask(SetCityBuildTask {
             city_id,
             build_task,
@@ -241,13 +231,13 @@ impl Client<GameState> {
         }));
     }
 
-    pub fn set_economy_settings(&mut self, beaker_percent: u32) {
+    pub fn set_economy_settings(&mut self, _beaker_percent: u32) {
         todo!()
     }
 
     pub fn set_tile_manually_worked(
         &mut self,
-        game: &Game,
+        _game: &Game,
         city_id: CityId,
         tile_pos: UVec2,
         manually_worked: bool,
@@ -259,19 +249,19 @@ impl Client<GameState> {
         }));
     }
 
-    pub fn set_worker_task(&mut self, game: &Game, worker_id: UnitId, task: &WorkerTaskKind) {
+    pub fn set_worker_task(&mut self, _game: &Game, worker_id: UnitId, task: &WorkerTaskKind) {
         self.send_message(ClientPacket::SetWorkerTask(SetWorkerTask {
             worker_id,
             task: task.clone(),
         }));
     }
 
-    pub fn declare_war_on(&mut self, game: &Game, on_player: PlayerId) {
+    pub fn declare_war_on(&mut self, _game: &Game, on_player: PlayerId) {
         self.send_message(ClientPacket::DeclareWar(DeclareWar { on_player }));
     }
 
-    pub fn save_game(&mut self){
-        let request_id = self.send_message(ClientPacket::SaveGame(SaveGame));
+    pub fn save_game(&mut self) {
+        self.send_message(ClientPacket::SaveGame(SaveGame));
     }
 
     pub fn end_turn(&mut self, game: &mut Game) {
@@ -279,7 +269,7 @@ impl Client<GameState> {
         game.waiting_on_turn_end = true;
     }
 
-    pub fn handle_messages(&mut self, cx: &Context, game: &mut Game) -> anyhow::Result<()> {
+    pub fn handle_messages(&mut self, _cx: &Context, game: &mut Game) -> anyhow::Result<()> {
         if game.has_combat_event() {
             return Ok(());
         }
@@ -476,7 +466,7 @@ pub struct LobbyState;
 
 impl State for LobbyState {
     type SendPacket = ClientLobbyPacket;
-    type RecvPacket =ServerLobbyPacket;
+    type RecvPacket = ServerLobbyPacket;
 }
 
 pub struct GameState;

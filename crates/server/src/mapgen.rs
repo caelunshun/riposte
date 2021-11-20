@@ -9,7 +9,7 @@ use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
 use riposte_common::{
     game::player::PlayerKind,
-    lobby::{GameLobby, LobbySlot, SlotPlayer},
+    lobby::{GameLobby, SlotPlayer},
     mapgen::{LandGeneratorSettings, MapgenSettings},
     registry::Registry,
     Grid,

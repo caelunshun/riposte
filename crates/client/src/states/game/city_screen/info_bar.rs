@@ -29,9 +29,10 @@ impl InfoBarScreen {
     }
 
     pub fn update_info(&mut self, _cx: &Context, _game: &Game, city: &City) {
-        self.window.city_name.get_mut().set_text(
-            text!("{}: {}", city.name(), city.population())
-        );
+        self.window
+            .city_name
+            .get_mut()
+            .set_text(text!("{}: {}", city.name(), city.population()));
 
         let growth_progress = city.stored_food() as f32 / city.food_needed_for_growth() as f32;
         let growth_projected_progress = (city.stored_food() + city.economy().food_yield
@@ -44,10 +45,13 @@ impl InfoBarScreen {
             .set_projected_progress(growth_projected_progress);
 
         let (prod_progress, prod_projected_progress) = match city.build_task() {
-            Some(task) => {let progress = city.build_task_progress(task); (
-                progress as f32 / task.cost() as f32,
-                (progress + city.economy().hammer_yield) as f32 / task.cost() as f32,
-            ) }
+            Some(task) => {
+                let progress = city.build_task_progress(task);
+                (
+                    progress as f32 / task.cost() as f32,
+                    (progress + city.economy().hammer_yield) as f32 / task.cost() as f32,
+                )
+            }
             None => (0., 0.),
         };
         self.window
@@ -56,18 +60,15 @@ impl InfoBarScreen {
             .set_progress(prod_progress)
             .set_projected_progress(prod_projected_progress);
 
-        self.window.food_text.get_mut().set_text(
-            text!(
-                "{} @icon[bread] - {} @icon[eaten_bread]",
-                city.economy().food_yield,
-                city.consumed_food()
-            ),
-             
-        );
-        self.window.hammers_text.get_mut().set_text(
-            text!("{} @icon[hammer]", city.economy().hammer_yield),
-          
-        );
+        self.window.food_text.get_mut().set_text(text!(
+            "{} @icon[bread] - {} @icon[eaten_bread]",
+            city.economy().food_yield,
+            city.consumed_food()
+        ));
+        self.window
+            .hammers_text
+            .get_mut()
+            .set_text(text!("{} @icon[hammer]", city.economy().hammer_yield));
 
         let growth_text = if city.is_growing() {
             format!("Growing ({} turns)", city.turns_needed_for_growth())
@@ -102,9 +103,10 @@ impl InfoBarScreen {
             .happy_sign_text
             .get_mut()
             .set_text(text!("{}", sign(city.num_happiness(), city.num_anger())));
-        self.window.unhappy_text.get_mut().set_text(
-            text!(" {}@icon[unhappy]", city.num_anger()),
-        );
+        self.window
+            .unhappy_text
+            .get_mut()
+            .set_text(text!(" {}@icon[unhappy]", city.num_anger()));
 
         self.window
             .health_text

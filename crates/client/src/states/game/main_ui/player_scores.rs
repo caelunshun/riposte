@@ -12,7 +12,7 @@ use crate::{
     ui::Z_FOREGROUND,
 };
 
-use riposte_common::{PlayerId, utils::color_to_string};
+use riposte_common::{utils::color_to_string, PlayerId};
 
 pub const WIDTH: f32 = 300.;
 
@@ -49,7 +49,7 @@ impl PlayerScores {
         while let Some(msg) = cx.ui_mut().pop_message::<Message>() {
             match msg {
                 Message::DeclareWar(player) => client.declare_war_on(game, player),
-                Message::MakePeace(player) => todo!(),
+                Message::MakePeace(_) => todo!(),
                 Message::None => {}
             }
         }

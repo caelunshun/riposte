@@ -70,7 +70,6 @@ impl EconomyScreen {
     }
 
     pub fn update_info(&mut self, game: &Game) {
-
         let the_player = game.the_player();
 
         let positive_color = Srgba::new(68, 194, 113, 255);

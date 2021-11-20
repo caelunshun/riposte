@@ -10,7 +10,7 @@ use crate::{
     ui::{unit_indicator::UnitStatus, Z_FOREGROUND},
 };
 
-use riposte_common::{PlayerId, UnitId, assets::Handle, registry::UnitKind};
+use riposte_common::{assets::Handle, registry::UnitKind, UnitId};
 
 pub const HEIGHT: f32 = 100.;
 

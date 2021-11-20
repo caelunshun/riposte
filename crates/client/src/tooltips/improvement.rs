@@ -1,4 +1,4 @@
-use riposte_common::{Improvement, utils::merge_lines};
+use riposte_common::{utils::merge_lines, Improvement};
 
 use crate::game::Tile;
 

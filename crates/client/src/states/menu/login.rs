@@ -76,11 +76,10 @@ impl LogInPage {
                 }
                 Err(e) => {
                     log::error!("Login error: {}", e);
-                    self.handle.error_text.get_mut().set_text(
-                        text!("Error: {}", e.message())
-                      
-                       
-                    );
+                    self.handle
+                        .error_text
+                        .get_mut()
+                        .set_text(text!("Error: {}", e.message()));
                     self.response_handle = None;
                 }
             }
@@ -159,10 +158,10 @@ impl RegisterPage {
                 }
                 Err(e) => {
                     log::error!("Register error: {}", e);
-                    self.handle.error_text.get_mut().set_text(
-                        text!("Error: {}", e.message())
-                        
-                    );
+                    self.handle
+                        .error_text
+                        .get_mut()
+                        .set_text(text!("Error: {}", e.message()));
                     self.response_handle = None;
                 }
             }

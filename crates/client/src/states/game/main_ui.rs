@@ -9,7 +9,7 @@ use crate::{
 };
 
 use riposte_common::utils::VersionSnapshot;
-use riposte_common::{CityId, UnitId};
+use riposte_common::CityId;
 
 use self::{
     economy::EconomyScreen, info_bar::InfoBar, player_scores::PlayerScores, research::ResearchBar,

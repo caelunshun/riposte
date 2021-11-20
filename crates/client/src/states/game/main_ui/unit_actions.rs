@@ -21,7 +21,10 @@ use crate::{
     ui::Z_FOREGROUND,
 };
 
-use riposte_common::{Improvement, UnitId, protocol::client::UnitAction, registry::CapabilityType, unit::WorkerTaskKind};
+use riposte_common::{
+    protocol::client::UnitAction, registry::CapabilityType, unit::WorkerTaskKind, Improvement,
+    UnitId,
+};
 
 use super::unit_info;
 
@@ -88,7 +91,7 @@ fn get_possible_unit_actions(game: &Game, unit: &Unit) -> Vec<PossibleUnitAction
     }
 
     // Workers can build improvements.
-    if let Some(worker_cap) = unit
+    if let Some(_worker_cap) = unit
         .capabilities()
         .filter_map(|cap| match cap {
             Capability::Worker(cap) => Some(cap),

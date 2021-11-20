@@ -5,7 +5,7 @@ use std::{cell::Ref, collections::BinaryHeap};
 use ahash::{AHashMap, AHashSet};
 use float_ord::FloatOrd;
 use glam::UVec2;
-use riposte_common::{Terrain, Visibility, unit::MovementPoints};
+use riposte_common::{unit::MovementPoints, Terrain, Visibility};
 
 use super::{unit::Unit, Game};
 
@@ -169,7 +169,7 @@ impl Pathfinder {
                         movement_left: current_movement_left,
                     });
 
-                    if current_movement_left.is_exhausted(){
+                    if current_movement_left.is_exhausted() {
                         current_turn += 1;
                         current_movement_left = MovementPoints::from_u32(movement_per_turn);
                     }

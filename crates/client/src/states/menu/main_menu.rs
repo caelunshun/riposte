@@ -4,7 +4,6 @@ use crate::{
     state::StateAttachment,
     ui::{FillScreen, Z_BACKGROUND, Z_FOREGROUND},
 };
-use ahash::AHashMap;
 
 pub enum Action {
     PushOptions,

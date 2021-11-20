@@ -99,7 +99,7 @@ impl MenuState {
                 Some(server_list::Action::Close) => {
                     self.state = State::MainMenu(MainMenuState::new(cx));
                 }
-                Some(server_list::Action::JoinGame(bridge)) => {
+                Some(server_list::Action::JoinGame(_bridge)) => {
                     todo!()
                     // action = Some(crate::Action::EnterLobby(bridge));
                 }

@@ -46,7 +46,7 @@ impl StagedPathOverlay {
                     },
                 },
             }]);
-           let mut blob =  canvas.context().create_text_blob(
+            let mut blob = canvas.context().create_text_blob(
                 text,
                 TextOptions {
                     wrap_lines: false,
@@ -55,7 +55,9 @@ impl StagedPathOverlay {
                     align_v: Align::Center,
                 },
             );
-            canvas.context().resize_text_blob(&mut blob, Vec2::splat(PIXELS_PER_TILE));
+            canvas
+                .context()
+                .resize_text_blob(&mut blob, Vec2::splat(PIXELS_PER_TILE));
             blob
         })
     }
