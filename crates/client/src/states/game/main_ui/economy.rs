@@ -76,12 +76,12 @@ impl EconomyScreen {
         let negative_color = Srgba::new(231, 60, 62, 255);
 
         // Gold
-        let (delta, delta_color) = if the_player.net_gold() < 0 {
+        let (delta, delta_color) = if the_player.net_gold_per_turn() < 0 {
             // The '-' sign is part of negative number
-            (format!("{}", the_player.net_gold()), negative_color)
+            (format!("{}", the_player.net_gold_per_turn()), negative_color)
         } else {
             // Prefix a '+' sign
-            (format!("+{}", the_player.net_gold()), positive_color)
+            (format!("+{}", the_player.net_gold_per_turn()), positive_color)
         };
         self.window.gold_text.get_mut().set_text(text!(
             "@icon[gold]: {} @color[{}][({} / turn)]",

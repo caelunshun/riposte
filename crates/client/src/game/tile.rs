@@ -1,17 +1,12 @@
 use std::cell::{Ref, RefCell, RefMut};
+use std::ops::Deref;
 
 use glam::UVec2;
+use riposte_common::game::tile::OutOfBounds;
 use riposte_common::tile::TileData;
-use riposte_common::unit::MovementPoints;
-use riposte_common::{
-    assets::Handle,
-    game::{culture::Culture, tile::OutOfBounds},
-    registry::Resource,
-    PlayerId,
-};
-use riposte_common::{Improvement, Terrain, Visibility};
+use riposte_common::Visibility;
 
-use super::{player::Player, Game, Yield};
+use super::Game;
 
 /// A tile on the map.
 #[derive(Debug)]
@@ -30,72 +25,13 @@ impl Tile {
         self.data = data;
         Ok(())
     }
+}
 
-    pub fn terrain(&self) -> Terrain {
-        self.data.terrain
-    }
+impl Deref for Tile {
+    type Target = TileData;
 
-    pub fn is_forested(&self) -> bool {
-        self.data.is_forested
-    }
-
-    pub fn is_hilled(&self) -> bool {
-        self.data.is_hilled
-    }
-
-    pub fn tile_yield(&self) -> Yield {
-        self.data.tile_yield()
-    }
-
-    pub fn is_worked(&self) -> bool {
-        self.data.worked_by_city.is_some()
-    }
-
-    pub fn resource(&self) -> Option<&Handle<Resource>> {
-        self.data.resource.as_ref()
-    }
-
-    pub fn culture(&self) -> &Culture {
-        &self.data.culture
-    }
-
-    pub fn owner(&self) -> Option<PlayerId> {
-        self.data.owner()
-    }
-
-    pub fn improvements(&self) -> impl Iterator<Item = &Improvement> + '_ {
-        self.data.improvements.iter()
-    }
-
-    pub fn movement_cost(&self, _game: &Game, player: &Player) -> MovementPoints {
-        let mut cost = MovementPoints::from_u32(1);
-        if self.is_forested() || self.is_hilled() {
-            cost += MovementPoints::from_u32(1);
-        }
-
-        if self.improvements().any(|i| matches!(i, Improvement::Road)) {
-            let can_use_road = match self.owner() {
-                Some(owner) => !player.is_at_war_with(owner),
-                None => true,
-            };
-
-            if can_use_road {
-                cost = MovementPoints::from_fixed_u32(cost.as_fixed_u32() / 3);
-            }
-        }
-
-        cost
-    }
-
-    pub fn defense_bonus(&self) -> u32 {
-        let mut bonus = 0;
-        if self.is_forested() {
-            bonus += 50;
-        }
-        if self.is_hilled() {
-            bonus += 25;
-        }
-        bonus
+    fn deref(&self) -> &Self::Target {
+        &self.data
     }
 }
 

@@ -15,7 +15,7 @@ use riposte_common::{
     registry::{CapabilityType, Registry},
     unit::UnitData,
     utils::VersionSnapshot,
-    CityId, PlayerId, Turn, UnitId,
+    CityId, GameBase, PlayerId, Turn, UnitId,
 };
 use riposte_common::{Era, Visibility};
 use slotmap::SecondaryMap;
@@ -604,5 +604,31 @@ impl Game {
 
     fn on_turn_ended(&mut self) {
         self.waiting_on_turn_end = false;
+    }
+}
+
+impl GameBase for Game {
+    fn unit(&self, id: UnitId) -> Ref<UnitData> {
+        Ref::map(self.units.get(id).expect("bad unit id").borrow(), |u| &**u)
+    }
+
+    fn units_at_pos(&self, pos: UVec2) -> Ref<[UnitId]> {
+        Ref::map(self.unit_stack(pos).expect("pos out of bounds"), |stack| {
+            stack.units()
+        })
+    }
+
+    fn city(&self, id: CityId) -> Ref<CityData> {
+        Ref::map(self.cities.get(id).expect("bad city id").borrow(), |u| &**u)
+    }
+
+    fn city_at_pos(&self, pos: UVec2) -> Option<Ref<CityData>> {
+        Self::city_at_pos(self, pos).map(|r| Ref::map(r, |c| &**c))
+    }
+
+    fn player(&self, id: PlayerId) -> Ref<PlayerData> {
+        Ref::map(self.players.get(id).expect("bad player id").borrow(), |u| {
+            &**u
+        })
     }
 }

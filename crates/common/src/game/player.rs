@@ -3,6 +3,7 @@ use uuid::Uuid;
 
 use super::{CityId, PlayerId, UnitId};
 use crate::lobby::SlotId;
+use crate::registry::Leader;
 use crate::{
     assets::Handle,
     registry::{Civilization, Tech},
@@ -71,6 +72,90 @@ pub struct PlayerData {
 impl PlayerData {
     pub fn net_gold_per_turn(&self) -> i32 {
         self.economy.gold_revenue as i32 - self.economy.expenses as i32
+    }
+
+    pub fn id(&self) -> PlayerId {
+        self.id
+    }
+
+    pub fn researching_tech(&self) -> Option<&Handle<Tech>> {
+        self.research.as_ref()
+    }
+
+    pub fn tech_progress(&self, tech: &Handle<Tech>) -> u32 {
+        self.tech_progress.get(tech).copied().unwrap_or(0)
+    }
+
+    pub fn is_at_war_with(&self, player: PlayerId) -> bool {
+        self.at_war_with.contains(&player)
+    }
+
+    pub fn era(&self) -> Era {
+        self.era
+    }
+
+    pub fn civ(&self) -> &Handle<Civilization> {
+        &self.civ
+    }
+
+    pub fn leader(&self) -> &Leader {
+        self.civ()
+            .leaders
+            .iter()
+            .find(|l| &l.name == &self.leader_name)
+            .unwrap_or_else(|| &self.civ().leaders[0])
+    }
+
+    pub fn username(&self) -> &str {
+        &self.leader().name
+    }
+
+    pub fn base_revenue(&self) -> u32 {
+        self.economy.base_revenue
+    }
+
+    pub fn beaker_revenue(&self) -> u32 {
+        self.economy.beaker_revenue
+    }
+
+    pub fn gold_revenue(&self) -> u32 {
+        self.economy.gold_revenue
+    }
+
+    pub fn expenses(&self) -> u32 {
+        self.economy.expenses
+    }
+
+    pub fn gold(&self) -> u32 {
+        self.gold
+    }
+
+    pub fn has_unlocked_tech(&self, tech: &Handle<Tech>) -> bool {
+        self.unlocked_techs.contains(tech)
+    }
+
+    pub fn beaker_percent(&self) -> u32 {
+        self.economy_settings.beaker_percent()
+    }
+
+    pub fn score(&self) -> u32 {
+        self.score
+    }
+
+    /// Estimate the number of turns it takes to complete the given research.
+    pub fn estimate_research_turns(&self, tech: &Tech, progress: u32) -> Option<u32> {
+        if self.beaker_revenue() == 0 {
+            None
+        } else {
+            Some((tech.cost - progress + self.beaker_revenue() - 1) / self.beaker_revenue())
+        }
+    }
+
+    /// Estimate remaining turns for the currently researching tech.
+    pub fn estimate_current_research_turns(&self) -> Option<u32> {
+        self.researching_tech()
+            .map(|tech| self.estimate_research_turns(tech, self.tech_progress(tech)))
+            .unwrap_or_default()
     }
 }
 

@@ -7,6 +7,7 @@ use indexmap::IndexSet;
 use crate::{
     assets::Handle,
     registry::{Building, Resource, UnitKind},
+    GameBase,
 };
 
 use super::{
@@ -97,6 +98,165 @@ impl CityData {
 
     pub fn culture_level(&self) -> CultureLevel {
         CultureLevel::for_culture_amount(self.culture())
+    }
+
+    pub fn id(&self) -> CityId {
+        self.id
+    }
+
+    pub fn owner(&self) -> PlayerId {
+        self.owner
+    }
+
+    pub fn economy(&self) -> &CityEconomy {
+        &self.economy
+    }
+
+    pub fn build_task(&self) -> Option<&BuildTask> {
+        self.build_task.as_ref()
+    }
+
+    pub fn build_task_progress(&self, task: &BuildTask) -> u32 {
+        self
+            .build_task_progress
+            .get(task)
+            .copied()
+            .unwrap_or(0)
+    }
+
+    pub fn pos(&self) -> UVec2 {
+        self.pos
+    }
+
+    pub fn num_culture(&self) -> u32 {
+        self.culture.culture_for(self.owner())
+    }
+
+    pub fn culture_needed(&self) -> u32 {
+        todo!()
+    }
+
+    pub fn buildings(&self) -> impl Iterator<Item = &Handle<Building>> + '_ {
+        self.buildings.iter()
+    }
+
+    pub fn resources(&self) -> impl Iterator<Item = &Handle<Resource>> + '_ {
+        self.resources.iter()
+    }
+
+    pub fn population(&self) -> NonZeroU32 {
+        self.population
+    }
+
+    pub fn stored_food(&self) -> u32 {
+        self.stored_food
+    }
+
+    pub fn is_growing(&self) -> bool {
+        self.food_consumed_per_turn() < self.economy().food_yield
+    }
+
+    pub fn is_starving(&self) -> bool {
+        self.food_consumed_per_turn() > self.economy().food_yield
+    }
+
+    pub fn is_stagnant(&self) -> bool {
+        self.food_consumed_per_turn() == self.economy().food_yield
+    }
+
+    pub fn is_capital(&self) -> bool {
+        self.is_capital
+    }
+
+    pub fn worked_tiles(&self) -> impl DoubleEndedIterator<Item = UVec2> + '_ {
+        self.worked_tiles.iter().map(|p| p.clone().into())
+    }
+
+    pub fn manual_worked_tiles(&self) -> impl DoubleEndedIterator<Item = UVec2> + '_ {
+        self
+            .manually_worked_tiles
+            .iter()
+            .map(|p| p.clone().into())
+    }
+
+    pub fn is_tile_manually_worked(&self, tile: UVec2) -> bool {
+        self.manual_worked_tiles().any(|t| t == tile)
+    }
+
+    pub fn num_happiness(&self) -> u32 {
+        self.happiness_sources.len() as u32
+    }
+
+    pub fn num_health(&self) -> u32 {
+        self.health_sources.len() as u32
+    }
+
+    pub fn num_anger(&self) -> u32 {
+        self.anger_sources.len() as u32
+    }
+
+    pub fn num_sickness(&self) -> u32 {
+        self.sickness_sources.len() as u32
+    }
+
+    pub fn happiness(&self) -> impl Iterator<Item = &HappinessSource> {
+        self.happiness_sources.iter()
+    }
+
+    pub fn anger(&self) -> impl Iterator<Item = &AngerSource> {
+        self.anger_sources.iter()
+    }
+
+    pub fn health(&self) -> impl Iterator<Item = &HealthSource> {
+        self.health_sources.iter()
+    }
+
+    pub fn sickness(&self) -> impl Iterator<Item = &SicknessSource> {
+        self.sickness_sources.iter()
+    }
+
+    pub fn culture_per_turn(&self) -> u32 {
+        self.economy().culture_per_turn
+    }
+
+    pub fn beakers_per_turn(&self, game: &impl GameBase) -> u32 {
+        (self.economy().commerce as f32 * game.player(self.owner()).beaker_percent() as f32 / 100.)
+            .floor() as u32
+    }
+
+    pub fn gold_per_turn(&self, game: &impl GameBase) -> u32 {
+        self.economy().commerce as u32 - self.beakers_per_turn(game)
+    }
+
+    pub fn culture_defense_bonus(&self) -> u32 {
+        self.culture_defense_bonus
+    }
+
+    pub fn estimate_build_time_for_task(&self, task: &BuildTask) -> u32 {
+        (task.cost() - self.build_task_progress(task) + self.economy().hammer_yield - 1)
+            / (self.economy().hammer_yield)
+    }
+
+    pub fn estimate_remaining_build_time(&self) -> u32 {
+        match &self.build_task {
+            Some(task) => self.estimate_build_time_for_task(task),
+            None => 0,
+        }
+    }
+
+    pub fn turns_needed_for_growth(&self) -> u32 {
+        (self.food_needed_for_growth() - self.stored_food() + self.economy().food_yield
+            - self.food_consumed_per_turn()
+            - 1)
+            / (self.economy().food_yield - self.food_consumed_per_turn())
+    }
+
+    pub fn maintenance_cost(&self) -> u32 {
+        self.economy().maintenance_cost as u32
+    }
+
+    pub fn name(&self) -> &str {
+        &self.name
     }
 }
 

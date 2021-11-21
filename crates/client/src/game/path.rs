@@ -158,7 +158,7 @@ impl Pathfinder {
                         let movement_cost = game
                             .tile(pos)
                             .unwrap()
-                            .movement_cost(game, &game.the_player())
+                            .movement_cost(game, &*game.the_player())
                             .min(movement_per_turn);
                         current_movement_left -= movement_cost;
                     }
@@ -206,7 +206,7 @@ impl Pathfinder {
                 }
 
                 let movement_cost = tile
-                    .movement_cost(game, &game.the_player())
+                    .movement_cost(game, &*game.the_player())
                     .min(movement_per_turn);
                 let tentative_g_score = self.g_score[&entry.pos] + movement_cost.as_f64();
                 if !self.g_score.contains_key(&neighbor)

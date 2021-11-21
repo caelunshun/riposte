@@ -36,7 +36,7 @@ impl InfoBarScreen {
 
         let growth_progress = city.stored_food() as f32 / city.food_needed_for_growth() as f32;
         let growth_projected_progress = (city.stored_food() + city.economy().food_yield
-            - city.consumed_food()) as f32
+            - city.food_consumed_per_turn()) as f32
             / city.food_needed_for_growth() as f32;
         self.window
             .growth_progress_bar
@@ -63,7 +63,7 @@ impl InfoBarScreen {
         self.window.food_text.get_mut().set_text(text!(
             "{} @icon[bread] - {} @icon[eaten_bread]",
             city.economy().food_yield,
-            city.consumed_food()
+            city.food_consumed_per_turn()
         ));
         self.window
             .hammers_text

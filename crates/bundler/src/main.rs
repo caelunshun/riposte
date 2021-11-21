@@ -92,6 +92,7 @@ fn find_bundle() -> anyhow::Result<Bundle> {
 
 #[derive(Debug, Deserialize)]
 struct AssetEntry {
+    #[allow(unused)]
     id: String,
     path: String,
 }

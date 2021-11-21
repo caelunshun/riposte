@@ -1,9 +1,13 @@
+use std::ops::Deref;
+
 use arrayvec::ArrayVec;
 use glam::{ivec2, uvec2, DVec2, IVec2, UVec2};
 
 use crate::assets::Handle;
+use crate::player::PlayerData;
 use crate::registry::Resource;
-use crate::Yield;
+use crate::unit::MovementPoints;
+use crate::{GameBase, Yield};
 
 use super::culture::Culture;
 use super::improvement::Improvement;
@@ -66,6 +70,69 @@ impl TileData {
         }
 
         y
+    }
+
+    pub fn terrain(&self) -> Terrain {
+        self.terrain
+    }
+
+    pub fn is_forested(&self) -> bool {
+        self.is_forested
+    }
+
+    pub fn is_hilled(&self) -> bool {
+        self.is_hilled
+    }
+
+    pub fn is_worked(&self) -> bool {
+        self.worked_by_city.is_some()
+    }
+
+    pub fn resource(&self) -> Option<&Handle<Resource>> {
+        self.resource.as_ref()
+    }
+
+    pub fn culture(&self) -> &Culture {
+        &self.culture
+    }
+
+    pub fn improvements(&self) -> impl Iterator<Item = &Improvement> + '_ {
+        self.improvements.iter()
+    }
+
+    pub fn movement_cost(
+        &self,
+        _game: &impl GameBase,
+        player: &impl Deref<Target = PlayerData>,
+    ) -> MovementPoints {
+        let mut cost = MovementPoints::from_u32(1);
+        if self.is_forested() || self.is_hilled() {
+            cost += MovementPoints::from_u32(1);
+        }
+
+        if self.improvements().any(|i| matches!(i, Improvement::Road)) {
+            let can_use_road = match self.owner() {
+                Some(owner) => !player.is_at_war_with(owner),
+                None => true,
+            };
+
+            if can_use_road {
+                cost = MovementPoints::from_fixed_u32(cost.as_fixed_u32() / 3);
+            }
+        }
+
+        cost
+    }
+
+    pub fn defense_bonus(&self) -> u32 {
+        let mut bonus = 0;
+        if self.is_forested() {
+            bonus += 50;
+        }
+        if self.is_hilled() {
+            bonus += 25;
+        }
+        bonus
     }
 }
 
