@@ -90,33 +90,31 @@ impl MapGenerator {
         let map_width = game.map().width();
         let map_height = game.map().height();
         for ((lobby_id, player_desc), &starting_location) in lobby.slots().zip(starting_locations) {
-            let player = game.add_player(|id| {
-                let kind = match &player_desc.player {
-                    SlotPlayer::Empty => panic!("empty player added to game"),
-                    SlotPlayer::Human { player_uuid, .. } => PlayerKind::Human {
-                        account_uuid: *player_uuid,
-                    },
-                    SlotPlayer::Ai { .. } => PlayerKind::Ai,
-                };
-                Player::new(
-                    kind,
-                    player_desc.player.civ().unwrap().clone(),
-                    player_desc.player.leader().unwrap(),
-                    id,
-                    lobby_id,
-                    map_width,
-                    map_height,
-                )
-            });
+            let player = game.new_player_id();
+            let player_kind = match &player_desc.player {
+                SlotPlayer::Empty => panic!("empty player added to game"),
+                SlotPlayer::Human { player_uuid, .. } => PlayerKind::Human {
+                    account_uuid: *player_uuid,
+                },
+                SlotPlayer::Ai { .. } => PlayerKind::Ai,
+            };
+            game.add_player(Player::new(
+                player,
+                lobby_id,
+                player_kind,
+                player_desc.player.civ().unwrap().clone(),
+                player_desc.player.leader().unwrap().name.clone(),
+                map_width,
+                map_height,
+            ));
 
-            let _settler = game.add_unit(|id| {
-                Unit::new(
-                    id,
-                    player,
-                    &registry.unit_kind("settler").unwrap(),
-                    starting_location,
-                )
-            });
+            let settler = game.new_unit_id();
+            game.add_unit(Unit::new(
+                settler,
+                player,
+                registry.unit_kind("settler").unwrap(),
+                starting_location,
+            ));
 
             let unit_kind = if player_desc
                 .player
@@ -135,7 +133,8 @@ impl MapGenerator {
             let unit_pos = possible_unit_positions
                 [self.context.rng.gen_range(0..possible_unit_positions.len())];
 
-            let _warrior_or_scout = game.add_unit(|id| Unit::new(id, player, &unit_kind, unit_pos));
+            let warrior_or_scout = game.new_unit_id();
+            game.add_unit(Unit::new(warrior_or_scout, player, unit_kind, unit_pos));
         }
     }
 }

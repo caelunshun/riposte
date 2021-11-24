@@ -1,15 +1,13 @@
 use riposte_common::{
     protocol::{
-        game::server::{
-            InitialGameData, ServerGamePacket, ServerPacket, UpdateMap, UpdateVisibility,
-        },
+        game::server::{InitialGameData, ServerGamePacket, ServerPacket},
         GenericServerPacket,
     },
     PlayerId,
 };
 
 use crate::connection::{ConnectionId, Connections};
-use crate::game::{Game, Player};
+use crate::game::Game;
 
 pub struct GameServer {
     game: Game,
@@ -42,37 +40,16 @@ impl GameServer {
         }
     }
 
-    fn make_update_map_packet(&self) -> UpdateMap {
-        UpdateMap {
-            tiles: self
-                .game
-                .map()
-                .as_slice()
-                .iter()
-                .map(|t| t.borrow().data().clone())
-                .collect(),
-            width: self.game.map().width(),
-            height: self.game.map().height(),
-        }
-    }
-
-    fn make_update_visibility_packet(&self, player: &Player) -> UpdateVisibility {
-        UpdateVisibility {
-            visibility: player.data().visibility.as_slice().into(),
-        }
-    }
-
     pub fn make_initial_game_data(&self, for_player: PlayerId) -> InitialGameData {
         let player = self.game.player(for_player);
 
         InitialGameData {
             the_player_id: player.id(),
-            map: self.make_update_map_packet(),
+            map: self.game.map().clone(),
             turn: self.game.turn(),
-            visibility: self.make_update_visibility_packet(&*player),
-            players: self.game.players().map(|p| p.data().clone()).collect(),
-            units: self.game.units().map(|u| u.data().clone()).collect(),
-            cities: self.game.cities().map(|c| c.data().clone()).collect(),
+            players: self.game.players().map(|p| p.clone()).collect(),
+            units: self.game.units().map(|u| u.clone()).collect(),
+            cities: self.game.cities().map(|c| c.clone()).collect(),
         }
     }
 

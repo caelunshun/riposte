@@ -52,11 +52,11 @@ impl CombatEvent {
 
         let elapsed =
             ((cx.time() - self.previous_round_time) / self.time_per_round).clamp(0., 1.) as f64;
-        game.unit_mut(self.defender_id()).set_health_unsafe(
+        game.unit_mut(self.defender_id()).set_health(
             previous_round.defender_health() * (1. - elapsed)
                 + current_round.defender_health() * elapsed,
         );
-        game.unit_mut(self.attacker_id()).set_health_unsafe(
+        game.unit_mut(self.attacker_id()).set_health(
             previous_round.attacker_health() * (1. - elapsed)
                 + current_round.attacker_health() * elapsed,
         );

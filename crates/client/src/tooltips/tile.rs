@@ -82,7 +82,7 @@ impl UnitLinesEntry {
 }
 
 fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
-    if game.map().visibility(pos) != Visibility::Visible && !game.cheat_mode {
+    if game.the_player().visibility_at(pos) != Visibility::Visible && !game.cheat_mode {
         return Vec::new();
     }
 

@@ -1,75 +1,111 @@
 use ahash::{AHashMap, AHashSet};
+use glam::UVec2;
 use uuid::Uuid;
 
 use super::{CityId, PlayerId, UnitId};
 use crate::lobby::SlotId;
 use crate::registry::Leader;
+use crate::world::Game;
 use crate::{
     assets::Handle,
     registry::{Civilization, Tech},
     Era, Grid, Visibility,
 };
 
-/// Base data for a player.
+/// A player in the game.
 ///
-/// Fields are exposed because this struct
-/// is always wrapped in a `client::Player` or `server::Player`,
-/// each of which does its own encapsulation of these fields.
+/// All fields are private and encapsulated. Modifying player
+/// data has to happen through high-level methods like [`declare_war_on`].
 #[derive(Debug, Clone)]
-pub struct PlayerData {
+pub struct Player {
+    on_server: bool,
+
     /// The player's ID.
-    pub id: PlayerId,
+    id: PlayerId,
     /// The player's ID when in the game lobby.
-    pub lobby_id: SlotId,
+    lobby_id: SlotId,
 
     /// Cities owned by this player.
-    pub cities: Vec<CityId>,
+    cities: Vec<CityId>,
     /// Units owned by this player.
-    pub units: Vec<UnitId>,
+    units: Vec<UnitId>,
 
     /// The player's capital city.
     ///
     /// Can be `None` at the start of the game or
     /// if the player is dead.
-    pub capital: Option<CityId>,
+    capital: Option<CityId>,
 
     /// Whether the player is still alive.
-    pub is_alive: bool,
+    is_alive: bool,
 
     /// Human or AI.
-    pub kind: PlayerKind,
+    kind: PlayerKind,
 
     /// The set of players we're at war with.
-    pub at_war_with: AHashSet<PlayerId>,
+    at_war_with: AHashSet<PlayerId>,
 
-    pub civ: Handle<Civilization>,
-    pub leader_name: String,
+    civ: Handle<Civilization>,
+    leader_name: String,
 
     /// Amount of gold in the player's treasury.
-    pub gold: u32,
+    gold: u32,
     /// Cached economy data / revenues
-    pub economy: PlayerEconomy,
+    economy: PlayerEconomy,
     /// Economy settings.
-    pub economy_settings: EconomySettings,
+    economy_settings: EconomySettings,
 
-    pub score: u32,
+    score: u32,
 
     /// The era the player is currently in.
-    pub era: Era,
+    era: Era,
 
     /// Stored progress, in beakers, made on each tech.
-    pub tech_progress: AHashMap<Handle<Tech>, u32>,
+    tech_progress: AHashMap<Handle<Tech>, u32>,
     /// The current tech being researched.
     ///
     /// Progress made is stored in the `tech_progress` map.
-    pub research: Option<Handle<Tech>>,
+    research: Option<Handle<Tech>>,
 
-    pub unlocked_techs: AHashSet<Handle<Tech>>,
+    unlocked_techs: AHashSet<Handle<Tech>>,
 
-    pub visibility: Grid<Visibility>,
+    visibility: Grid<Visibility>,
 }
 
-impl PlayerData {
+impl Player {
+    pub fn new(
+        id: PlayerId,
+        lobby_id: SlotId,
+        kind: PlayerKind,
+        civ: Handle<Civilization>,
+        leader_name: String,
+        map_width: u32,
+        map_height: u32,
+    ) -> Self {
+        Self {
+            on_server: true,
+            id,
+            lobby_id,
+            cities: Vec::new(),
+            units: Vec::new(),
+            capital: None,
+            is_alive: true,
+            kind,
+            at_war_with: AHashSet::new(),
+            civ,
+            leader_name,
+            gold: 0,
+            economy: PlayerEconomy::default(),
+            economy_settings: EconomySettings::default(),
+            score: 0,
+            era: Era::Ancient,
+            tech_progress: AHashMap::new(),
+            research: None,
+            unlocked_techs: AHashSet::new(),
+            visibility: Grid::new(Visibility::Hidden, map_width, map_height),
+        }
+    }
+
     pub fn net_gold_per_turn(&self) -> i32 {
         self.economy.gold_revenue as i32 - self.economy.expenses as i32
     }
@@ -138,8 +174,44 @@ impl PlayerData {
         self.economy_settings.beaker_percent()
     }
 
+    pub fn lobby_id(&self) -> SlotId {
+        self.lobby_id
+    }
+
+    pub fn capital(&self) -> Option<CityId> {
+        self.capital
+    }
+
+    pub fn is_alive(&self) -> bool {
+        self.is_alive
+    }
+
+    pub fn kind(&self) -> &PlayerKind {
+        &self.kind
+    }
+
     pub fn score(&self) -> u32 {
         self.score
+    }
+
+    pub fn cities(&self) -> &[CityId] {
+        &self.cities
+    }
+
+    pub fn units(&self) -> &[UnitId] {
+        &self.units
+    }
+
+    pub fn visibility(&self) -> &Grid<Visibility> {
+        &self.visibility
+    }
+
+    pub fn visibility_at(&self, pos: UVec2) -> Visibility {
+        self.visibility
+            .get(pos)
+            .ok()
+            .copied()
+            .unwrap_or(Visibility::Hidden)
     }
 
     /// Estimate the number of turns it takes to complete the given research.
@@ -157,10 +229,75 @@ impl PlayerData {
             .map(|tech| self.estimate_research_turns(tech, self.tech_progress(tech)))
             .unwrap_or_default()
     }
+
+    pub fn downgrade_to_client(&mut self) {
+        self.on_server = false;
+    }
+
+    /// Should be called when a new city is founded that belongs to this player.
+    pub fn register_city(&mut self, id: CityId) {
+        if self.on_server && self.capital.is_none() {
+            self.capital = Some(id);
+        }
+        if !self.cities.contains(&id) {
+            self.cities.push(id);
+        }
+    }
+
+    /// Should be called when this player loses a city.
+    pub fn deregister_city(&mut self, game: &Game, id: CityId) {
+        // If this city was our capital, we need a new one.
+        if self.on_server && self.capital == Some(id) {
+            self.capital = self.find_new_capital(game);
+            if self.capital.is_none() {
+                // We've run out of cities - we're dead.
+                self.die(game);
+            }
+        }
+
+        if let Some(p) = self.cities().iter().position(|p| *p == id) {
+            self.cities.swap_remove(p);
+        }
+    }
+
+    fn find_new_capital(&self, game: &Game) -> Option<CityId> {
+        // Find the city with the highest population.
+        let mut best: Option<CityId> = None;
+        for city in self.cities() {
+            let city = game.city(*city);
+            if let Some(b) = best {
+                if game.city(b).population() < city.population() {
+                    best = Some(city.id());
+                }
+            } else {
+                best = Some(city.id());
+            }
+        }
+        best
+    }
+
+    /// Should be called when a unit comes into this player's possession.
+    pub fn register_unit(&mut self, id: UnitId) {
+        if !self.units.contains(&id) {
+            self.units.push(id);
+        }
+    }
+
+    /// Should be called when a unit dies or goes to another player.
+    pub fn deregister_unit(&mut self, id: UnitId) {
+        if let Some(p) = self.units().iter().position(|p| *p == id) {
+            self.units.swap_remove(p);
+        }
+    }
+
+    fn die(&mut self, _game: &Game) {
+        self.is_alive = false;
+        log::info!("{} has died", self.username());
+    }
 }
 
 /// Cached economy data for a player.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct PlayerEconomy {
     /// Total gold revenue before conversion to gold / beakers based on slider percents.
     pub base_revenue: u32,

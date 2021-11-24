@@ -155,7 +155,7 @@ impl Server {
             // Initialize connections and send GameData
             for (slot_id, conn_id) in l.slots_and_connections() {
                 let player_id = server.game().players().find_map(|p| {
-                    if p.data().lobby_id == slot_id {
+                    if p.lobby_id() == slot_id {
                         Some(p.id())
                     } else {
                         None

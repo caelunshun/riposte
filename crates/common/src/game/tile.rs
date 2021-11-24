@@ -1,35 +1,49 @@
-use std::ops::Deref;
-
 use arrayvec::ArrayVec;
 use glam::{ivec2, uvec2, DVec2, IVec2, UVec2};
 
 use crate::assets::Handle;
-use crate::player::PlayerData;
+use crate::player::Player;
 use crate::registry::Resource;
 use crate::unit::MovementPoints;
-use crate::{GameBase, Yield};
+use crate::world::Game;
+use crate::Yield;
 
 use super::culture::Culture;
 use super::improvement::Improvement;
 use super::{CityId, PlayerId};
 
-/// Base data for a map tile.
+/// A map tile.
+///
+/// All fields are private and encapsulated. Modifying tile
+/// data has to happen through high-level methods.
 #[derive(Debug, Clone)]
-pub struct TileData {
-    pub terrain: Terrain,
-    pub is_forested: bool,
-    pub is_hilled: bool,
+pub struct Tile {
+    terrain: Terrain,
+    is_forested: bool,
+    is_hilled: bool,
 
-    pub culture: Culture,
+    culture: Culture,
 
-    pub worked_by_city: Option<CityId>,
+    worked_by_city: Option<CityId>,
 
-    pub resource: Option<Handle<Resource>>,
+    resource: Option<Handle<Resource>>,
 
-    pub improvements: Vec<Improvement>,
+    improvements: Vec<Improvement>,
 }
 
-impl TileData {
+impl Tile {
+    pub fn new(terrain: Terrain) -> Self {
+        Self {
+            terrain,
+            is_forested: false,
+            is_hilled: false,
+            culture: Culture::new(),
+            worked_by_city: None,
+            resource: None,
+            improvements: Vec::new(),
+        }
+    }
+
     pub fn owner(&self) -> Option<PlayerId> {
         self.culture.iter().next().map(|v| v.owner())
     }
@@ -100,11 +114,7 @@ impl TileData {
         self.improvements.iter()
     }
 
-    pub fn movement_cost(
-        &self,
-        _game: &impl GameBase,
-        player: &impl Deref<Target = PlayerData>,
-    ) -> MovementPoints {
+    pub fn movement_cost(&self, _game: &Game, player: &Player) -> MovementPoints {
         let mut cost = MovementPoints::from_u32(1);
         if self.is_forested() || self.is_hilled() {
             cost += MovementPoints::from_u32(1);
@@ -133,6 +143,26 @@ impl TileData {
             bonus += 25;
         }
         bonus
+    }
+
+    pub fn set_forested(&mut self, f: bool) {
+        self.is_forested = f;
+    }
+
+    pub fn set_hilled(&mut self, h: bool) {
+        self.is_hilled = h;
+    }
+
+    pub fn set_terrain(&mut self, t: Terrain) {
+        self.terrain = t;
+    }
+
+    pub fn set_worked_by_city(&mut self, by_city: Option<CityId>) {
+        self.worked_by_city = by_city;
+    }
+
+    pub fn set_resource(&mut self, resource: Handle<Resource>) {
+        self.resource = Some(resource);
     }
 }
 

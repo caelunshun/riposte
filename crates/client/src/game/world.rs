@@ -6,19 +6,15 @@ use std::{
 
 use arrayvec::ArrayVec;
 use duit::Event;
-use glam::{ivec2, UVec2};
+use glam::UVec2;
+use riposte_common::Era;
 use riposte_common::{
-    city::CityData,
     game::tile::OutOfBounds,
-    player::PlayerData,
     protocol::server::InitialGameData,
     registry::{CapabilityType, Registry},
-    unit::UnitData,
     utils::VersionSnapshot,
-    CityId, GameBase, PlayerId, Turn, UnitId,
+    CityId, Grid, PlayerId, Turn, UnitId,
 };
-use riposte_common::{Era, Visibility};
-use slotmap::SecondaryMap;
 
 use crate::{
     client::{Client, GameState},
@@ -29,38 +25,22 @@ use super::{
     city::City,
     combat::CombatEvent,
     event::{EventBus, GameEvent},
-    id_mapper::IdMapper,
     path::Pathfinder,
     player::Player,
     selection::{SelectedUnits, SelectionDriver},
     stack::{StackGrid, UnitStack},
-    tile::Map,
-    unit::Unit,
+    unit::{Unit, UnitMoveSplines},
     Tile, View,
 };
 
-#[derive(Debug, thiserror::Error)]
-#[error("invalid {typ} network ID: {id}")]
-pub struct InvalidNetworkId {
-    typ: &'static str,
-    id: u32,
-}
-
 /// Contains all game state received from the server.
+///
+/// Internally, this consists of a [`riposte_common::Game`] along
+/// with a bunch of client-specific state.
 pub struct Game {
-    player_ids: IdMapper<PlayerId>,
-    city_ids: IdMapper<CityId>,
-    unit_ids: IdMapper<UnitId>,
-
-    // These are `SecondaryMaps` because they reuse the same
-    // IDs used on the server.
-    players: SecondaryMap<PlayerId, RefCell<Player>>,
-    cities: SecondaryMap<CityId, RefCell<City>>,
-    units: SecondaryMap<UnitId, RefCell<Unit>>,
+    base: riposte_common::Game,
 
     registry: Arc<Registry>,
-
-    map: Map,
 
     stacks: StackGrid,
 
@@ -68,8 +48,6 @@ pub struct Game {
 
     current_combat_event: Option<RefCell<CombatEvent>>,
 
-    turn: Turn,
-    era: Era,
     the_player_id: PlayerId,
 
     selected_units: RefCell<SelectedUnits>,
@@ -86,28 +64,22 @@ pub struct Game {
     pub current_city_screen: Option<CityId>,
     pub cheat_mode: bool,
 
+    unit_splines: RefCell<UnitMoveSplines>,
+
     queued_operations: RefCell<Vec<Box<dyn FnOnce(&mut Self, &Context)>>>,
 }
 
 impl Game {
-    pub fn new(registry: Arc<Registry>) -> Self {
+    pub fn new(registry: Arc<Registry>, map: Grid<RefCell<Tile>>) -> Self {
         let selected_units = SelectedUnits::new();
         let selection_units_version = selected_units.version();
         Self {
-            player_ids: IdMapper::new(),
-            city_ids: IdMapper::new(),
-            unit_ids: IdMapper::new(),
-            players: SecondaryMap::default(),
-            cities: SecondaryMap::default(),
-            units: SecondaryMap::default(),
+            base: riposte_common::Game::new(map),
+
             registry,
-            map: Map::default(),
             view: RefCell::new(View::default()),
             stacks: StackGrid::default(),
             current_combat_event: None,
-
-            turn: Turn::new(0),
-            era: Era::Ancient,
             the_player_id: PlayerId::default(),
 
             selected_units: RefCell::new(selected_units),
@@ -123,6 +95,8 @@ impl Game {
             current_city_screen: None,
             cheat_mode: false,
 
+            unit_splines: RefCell::new(UnitMoveSplines::default()),
+
             queued_operations: RefCell::new(Vec::new()),
         }
     }
@@ -133,34 +107,21 @@ impl Game {
         data: InitialGameData,
     ) -> anyhow::Result<Self> {
         log::info!(
-            "Initializing game with {} units, {} players, {}x{} map size",
+            "Initializing game with {} units, {} players",
             data.units.len(),
             data.players.len(),
-            data.map.width,
-            data.map.height
         );
 
-        let mut game = Self::new(registry);
+        let (width, height) = (data.map.width(), data.map.height());
+        let mut game = Self::new(registry, data.map);
 
-        let proto_map = data.map;
-        let visibility: Vec<Visibility> = data.visibility.visibility.to_vec();
-
-        let stacks = StackGrid::new(proto_map.width, proto_map.height);
+        let stacks = StackGrid::new(width, height);
         game.stacks = stacks;
 
         for player in data.players {
             game.add_or_update_player(player)?;
         }
 
-        let tiles = proto_map
-            .tiles
-            .iter()
-            .map(|tile_data| Tile::from_data(tile_data.clone(), &game))
-            .collect::<Result<Vec<_>, anyhow::Error>>()?;
-        let map = Map::new(proto_map.width, proto_map.height, tiles, visibility)?;
-        game.map = map;
-
-        game.turn = data.turn;
         game.the_player_id = data.the_player_id;
 
         for city in data.cities {
@@ -211,51 +172,19 @@ impl Game {
         self.view_mut().set_center_tile(center);
     }
 
-    /// Gets a player ID from its network ID.
-    pub fn resolve_player_id(&self, network_id: u32) -> Result<PlayerId, InvalidNetworkId> {
-        Ok(self
-            .player_ids
-            .get(network_id)
-            .ok_or_else(|| InvalidNetworkId {
-                typ: "player",
-                id: network_id,
-            })
-            .unwrap())
-    }
-
-    /// Gets a city ID from its network ID.
-    pub fn resolve_city_id(&self, network_id: u32) -> Result<CityId, InvalidNetworkId> {
-        self.city_ids
-            .get(network_id)
-            .ok_or_else(|| InvalidNetworkId {
-                typ: "city",
-                id: network_id,
-            })
-    }
-
-    /// Gets a unit ID from its network ID.
-    pub fn resolve_unit_id(&self, network_id: u32) -> Result<UnitId, InvalidNetworkId> {
-        self.unit_ids
-            .get(network_id)
-            .ok_or_else(|| InvalidNetworkId {
-                typ: "unit",
-                id: network_id,
-            })
-    }
-
     /// Gets the player with the given ID.
     pub fn player(&self, id: PlayerId) -> Ref<Player> {
-        self.players[id].borrow()
+        self.base.player(id)
     }
 
     /// Mutably gets the player with the given ID.
     pub fn player_mut(&self, id: PlayerId) -> RefMut<Player> {
-        self.players[id].borrow_mut()
+        self.base.player_mut(id)
     }
 
     /// Gets all players in the game.
     pub fn players(&self) -> impl Iterator<Item = Ref<Player>> {
-        self.players.values().map(|cell| cell.borrow())
+        self.base.players()
     }
 
     /// Gets the player on this client.
@@ -270,22 +199,22 @@ impl Game {
 
     /// Returns whether the given player ID is still valid.
     pub fn is_player_valid(&self, id: PlayerId) -> bool {
-        self.players.contains_key(id)
+        self.base.is_player_valid(id)
     }
 
     /// Gets the city with the given ID.
     pub fn city(&self, id: CityId) -> Ref<City> {
-        self.cities[id].borrow()
+        self.base.city(id)
     }
 
     /// Mutably gets the city with the given ID.
     pub fn city_mut(&self, id: CityId) -> RefMut<City> {
-        self.cities[id].borrow_mut()
+        self.base.city_mut(id)
     }
 
     /// Gets all cities in the game.
     pub fn cities(&self) -> impl Iterator<Item = Ref<City>> {
-        self.cities.values().map(|cell| cell.borrow())
+        self.base.cities()
     }
 
     /// Gets all cities owned by the given player.
@@ -295,36 +224,33 @@ impl Game {
 
     /// Returns whether the given city ID is still valid.
     pub fn is_city_valid(&self, id: CityId) -> bool {
-        self.cities.contains_key(id)
+        self.base.is_city_valid(id)
     }
 
     /// Gets the city at the given position.
     pub fn city_at_pos(&self, pos: UVec2) -> Option<Ref<City>> {
         // PERF: consider using hashmap instead of linear search
-        self.cities
-            .iter()
-            .find(|(_, city)| city.borrow().pos() == pos)
-            .map(|(_, city)| city.borrow())
+        self.cities().find(|city| city.pos() == pos)
     }
 
     /// Gets the unit with the given ID.
     pub fn unit(&self, id: UnitId) -> Ref<Unit> {
-        self.units[id].borrow()
+        self.base.unit(id)
     }
 
     /// Mutably gets the unit with the given ID.
     pub fn unit_mut(&self, id: UnitId) -> RefMut<Unit> {
-        self.units[id].borrow_mut()
+        self.base.unit_mut(id)
     }
 
     /// Gets all units in the game.
     pub fn units(&self) -> impl Iterator<Item = Ref<Unit>> {
-        self.units.values().map(|cell| cell.borrow())
+        self.base.units()
     }
 
     /// Returns whether the given unit ID is still valid.
     pub fn is_unit_valid(&self, id: UnitId) -> bool {
-        self.units.contains_key(id)
+        self.base.is_unit_valid(id)
     }
 
     /// Gets the stack of units at `pos`.
@@ -386,56 +312,32 @@ impl Game {
 
     /// Gets the tile at the given position.
     pub fn tile(&self, pos: UVec2) -> Result<Ref<Tile>, OutOfBounds> {
-        self.map.tile(pos)
+        self.base.tile(pos)
     }
 
     /// Mutably gets the tile at the given position.
     pub fn tile_mut(&self, pos: UVec2) -> Result<RefMut<Tile>, OutOfBounds> {
-        self.map.tile_mut(pos)
+        self.base.tile_mut(pos)
     }
 
     /// Gets the tile map.
-    pub fn map(&self) -> &Map {
-        &self.map
-    }
-
-    /// Mutably gets the tile map.
-    pub fn map_mut(&mut self) -> &mut Map {
-        &mut self.map
+    pub fn map(&self) -> &Grid<RefCell<Tile>> {
+        self.base.map()
     }
 
     /// Gets the neighbors of the given tile (sideways and diagonally)
     pub fn tile_neighbors(&self, pos: UVec2) -> ArrayVec<UVec2, 8> {
-        let pos = pos.as_i32();
-        let mut res = ArrayVec::from([
-            pos + ivec2(1, 0),
-            pos + ivec2(1, 1),
-            pos + ivec2(0, 1),
-            pos + ivec2(-1, 1),
-            pos + ivec2(-1, 0),
-            pos + ivec2(-1, -1),
-            pos + ivec2(0, -1),
-            pos + ivec2(1, -1),
-        ]);
-
-        res.retain(|pos| {
-            pos.x >= 0
-                && pos.y >= 0
-                && (pos.x as u32) < self.map.width()
-                && (pos.y as u32) < self.map.height()
-        });
-
-        res.into_iter().map(|p| p.as_u32()).collect()
+        self.map().adjacent(pos)
     }
 
     /// Gets the current turn number.
     pub fn turn(&self) -> Turn {
-        self.turn
+        self.base.turn()
     }
 
     /// Gets the current era.
     pub fn era(&self) -> Era {
-        self.era
+        self.the_player().era()
     }
 
     /// Gets the pathfinding engine.
@@ -507,31 +409,38 @@ impl Game {
             .handle_event(self, client, cx, event);
     }
 
-    pub fn add_or_update_unit(&mut self, cx: &Context, data: UnitData) -> anyhow::Result<()> {
-        let id = data.id;
-        match self.units.get(id) {
-            Some(unit) => {
-                unit.borrow_mut().update_data(data)?;
+    pub fn add_or_update_unit(&mut self, cx: &Context, mut data: Unit) -> anyhow::Result<()> {
+        let id = data.id();
+
+        data.downgrade_to_client();
+
+        if self.is_unit_valid(id) {
+            let mut unit = self.unit_mut(id);
+            let old_pos = unit.pos();
+            *unit = data;
+            let new_pos = unit.pos();
+            if old_pos != new_pos {
+                self.on_units_moved(cx, &[unit.id()], old_pos, new_pos);
             }
-            None => {
-                let mut units = mem::take(&mut self.units);
-                units.insert(data.id, Unit::from_data(data, self, cx).map(RefCell::new)?);
-                self.units = units;
-                self.on_unit_added(id);
-            }
+        } else {
+            self.base.add_unit(data);
+            self.on_unit_added(cx, id);
         }
+
         self.push_event(GameEvent::UnitUpdated { unit: id });
         Ok(())
     }
 
     pub fn delete_unit(&mut self, unit: UnitId) {
         self.on_unit_deleted(unit);
-        self.units.remove(unit);
+        self.base.remove_unit(unit);
     }
 
-    fn on_unit_added(&mut self, unit: UnitId) {
+    fn on_unit_added(&mut self,cx: &Context, unit: UnitId) {
         self.stacks.on_unit_added(self, unit);
         self.selection_driver_mut().on_unit_added(self, unit);
+        let pos = self.unit(unit).pos();
+        self.unit_splines.borrow_mut().on_unit_moved(cx, unit, pos, pos);
     }
 
     pub fn on_units_moved(&self, cx: &Context, units: &[UnitId], old_pos: UVec2, new_pos: UVec2) {
@@ -541,7 +450,7 @@ impl Game {
         self.selection_driver_mut()
             .on_units_moved(self, units, old_pos, new_pos);
         for &unit in units {
-            self.unit_mut(unit).on_moved(cx, old_pos, new_pos);
+            self.unit_splines.borrow_mut().on_unit_moved(cx, unit, old_pos, new_pos);
 
             self.push_event(GameEvent::UnitMoved {
                 unit,
@@ -557,47 +466,45 @@ impl Game {
         self.stacks.on_unit_deleted(self, unit);
     }
 
-    pub fn add_or_update_city(&mut self, data: CityData) -> anyhow::Result<()> {
-        let id = data.id;
-        match self.cities.get(id) {
-            Some(city) => {
-                city.borrow_mut().update_data(data, self)?;
-            }
-            None => {
-                let mut cities = mem::take(&mut self.cities);
-                cities.insert(data.id, City::from_data(data, self).map(RefCell::new)?);
-                self.cities = cities;
-            }
+    pub fn add_or_update_city(&mut self, mut data: City) -> anyhow::Result<()> {
+        let id = data.id();
+        data.downgrade_to_client();
+
+        if self.is_city_valid(id) {
+            let mut city = self.city_mut(id);
+            *city = data;
+        } else {
+            self.base.add_city(data);
         }
+
         self.push_event(GameEvent::CityUpdated { city: id });
         Ok(())
     }
 
-    pub fn add_or_update_player(&mut self, data: PlayerData) -> anyhow::Result<()> {
-        let id = data.id;
-        match self.players.get(id) {
-            Some(player) => {
-                player.borrow_mut().update_data(data, self)?;
-            }
-            None => {
-                let mut players = mem::take(&mut self.players);
-                players.insert(data.id, Player::from_data(data, self).map(RefCell::new)?);
-                self.players = players;
-            }
+    pub fn add_or_update_player(&mut self, mut data: Player) -> anyhow::Result<()> {
+        let id = data.id();
+        data.downgrade_to_client();
+
+        if self.is_player_valid(id) {
+            let mut player = self.player_mut(id);
+            *player = data;
+        } else {
+            self.base.add_player(data);
         }
+
         self.push_event(GameEvent::PlayerUpdated { player: id });
         Ok(())
     }
 
     pub fn delete_city(&mut self, city: CityId) {
-        self.cities.remove(city);
+        self.base.remove_city(city);
     }
 
     pub fn update_turn(&mut self, turn: Turn) {
-        let old_turn = self.turn;
-        self.turn = turn;
+        let old_turn = self.turn();
+        self.base.set_turn(turn);
 
-        if self.turn != old_turn {
+        if self.turn() != old_turn {
             self.on_turn_ended();
         }
     }
@@ -605,30 +512,12 @@ impl Game {
     fn on_turn_ended(&mut self) {
         self.waiting_on_turn_end = false;
     }
-}
 
-impl GameBase for Game {
-    fn unit(&self, id: UnitId) -> Ref<UnitData> {
-        Ref::map(self.units.get(id).expect("bad unit id").borrow(), |u| &**u)
+    pub fn base(&self) -> &riposte_common::Game {
+        &self.base
     }
 
-    fn units_at_pos(&self, pos: UVec2) -> Ref<[UnitId]> {
-        Ref::map(self.unit_stack(pos).expect("pos out of bounds"), |stack| {
-            stack.units()
-        })
-    }
-
-    fn city(&self, id: CityId) -> Ref<CityData> {
-        Ref::map(self.cities.get(id).expect("bad city id").borrow(), |u| &**u)
-    }
-
-    fn city_at_pos(&self, pos: UVec2) -> Option<Ref<CityData>> {
-        Self::city_at_pos(self, pos).map(|r| Ref::map(r, |c| &**c))
-    }
-
-    fn player(&self, id: PlayerId) -> Ref<PlayerData> {
-        Ref::map(self.players.get(id).expect("bad player id").borrow(), |u| {
-            &**u
-        })
+    pub fn unit_splines(&self) -> Ref<UnitMoveSplines> {
+        self.unit_splines.borrow()
     }
 }

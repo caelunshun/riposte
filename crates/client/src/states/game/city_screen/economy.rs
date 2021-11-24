@@ -27,12 +27,12 @@ impl EconomyScreen {
     pub fn update_info(&mut self, _cx: &Context, game: &Game, city: &City) {
         self.window.beaker_output_text.get_mut().set_text(text!(
             "+{} @icon[beaker] / turn",
-            city.beakers_per_turn(game)
+            city.beakers_per_turn(game.base())
         ));
         self.window
             .gold_output_text
             .get_mut()
-            .set_text(text!("+{} @icon[gold] / turn", city.gold_per_turn(game)));
+            .set_text(text!("+{} @icon[gold] / turn", city.gold_per_turn(game.base())));
         self.window.maintenance_text.get_mut().set_text(text!(
             "Maintenance: -{} @icon[coin] / turn",
             city.maintenance_cost()

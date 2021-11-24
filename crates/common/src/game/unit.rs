@@ -1,40 +1,80 @@
 use std::{
     fmt::Display,
-    ops::{Add, AddAssign, Sub, SubAssign},
+    ops::{Add, AddAssign, Sub, SubAssign}, num::NonZeroUsize,
 };
 
 use glam::UVec2;
+use lexical::WriteFloatOptions;
 
-use crate::{GameBase, assets::Handle, registry::{CapabilityType, CombatBonusType, UnitKind}};
+use crate::{
+    assets::Handle,
+    registry::{CapabilityType, CombatBonusType, UnitKind},
+    world::Game,
+};
 
 use super::{improvement::Improvement, PlayerId, UnitId};
 
-/// Base data for a unit.
+/// Represents a unit in the game.
+///
+/// All fields are private and encapsulated. Modifying unit
+/// data has to happen through high-level methods like [`move_to`].
 #[derive(Debug, Clone)]
-pub struct UnitData {
-    pub id: UnitId,
-    pub owner: PlayerId,
-    pub kind: Handle<UnitKind>,
+pub struct Unit {
+    on_server: bool,
 
-    pub pos: UVec2,
+    id: UnitId,
+    owner: PlayerId,
+    kind: Handle<UnitKind>,
+
+    pos: UVec2,
 
     /// On [0, 1]
-    pub health: f64,
+    health: f64,
 
-    pub movement_left: MovementPoints,
+    movement_left: MovementPoints,
 
-    pub is_fortified_forever: bool,
-    pub is_skipping_turn: bool,
-    pub is_fortified_until_heal: bool,
+    is_fortified_forever: bool,
+    is_skipping_turn: bool,
+    is_fortified_until_heal: bool,
 
     /// Whether the unit has used its one attack for this
     /// turn and therefore cannot attack again until the next turn.
-    pub has_used_attack: bool,
+    has_used_attack: bool,
 
-    pub capabilities: Vec<Capability>,
+    capabilities: Vec<Capability>,
 }
 
-impl UnitData {
+impl Unit {
+    pub fn new(id: UnitId, owner: PlayerId, kind: Handle<UnitKind>, pos: UVec2) -> Self {
+        Self {
+            id,
+            on_server: true,
+            owner,
+            kind: kind.clone(),
+            pos,
+            health: 1.,
+            movement_left: MovementPoints::from_u32(kind.movement),
+            is_fortified_forever: false,
+            is_skipping_turn: false,
+            is_fortified_until_heal: false,
+            has_used_attack: false,
+            capabilities: kind
+                .capabilities
+                .iter()
+                .map(|ty| match ty {
+                    CapabilityType::FoundCity => Capability::FoundCity,
+                    CapabilityType::DoWork => {
+                        Capability::Worker(WorkerCapability { current_task: None })
+                    }
+                    CapabilityType::CarryUnits => todo!(),
+                    CapabilityType::BombardCityDefenses => Capability::BombardCity {
+                        max_per_turn: kind.max_bombard_per_turn,
+                    },
+                })
+                .collect(),
+        }
+    }
+
     pub fn is_fortified(&self) -> bool {
         self.is_fortified_forever || self.is_skipping_turn || self.is_fortified_until_heal
     }
@@ -103,7 +143,7 @@ impl UnitData {
     /// This method ignores tile defense and city defense bonuses,
     /// as its only use on the Rust client is to sort unit stacks - and all units in the same
     /// stack have the same tile defense bonuses.
-    pub fn modified_defending_strength(&self, game: &impl GameBase, attacker: &UnitData) -> f64 {
+    pub fn modified_defending_strength(&self, game: &Game, attacker: &Unit) -> f64 {
         let mut percent_bonus = 0i32;
 
         // Subtract opponent bonuses
@@ -165,6 +205,62 @@ impl UnitData {
 
         result
     }
+
+    pub fn strength_text(&self) -> Option<String> {
+        if self.kind().strength == 0. {
+            None
+        } else if self.health() == 1. {
+            Some(lexical::to_string_with_options::<
+                _,
+                { lexical::format::STANDARD },
+            >(self.strength(), &float_options()))
+        } else {
+            Some(format!(
+                "{} / {}",
+                lexical::to_string_with_options::<_, { lexical::format::STANDARD }>(
+                    self.strength(),
+                    &float_options()
+                ),
+                lexical::to_string_with_options::<_, { lexical::format::STANDARD }>(
+                    self.kind().strength,
+                    &float_options()
+                )
+            ))
+        }
+    }
+
+    pub fn movement_text(&self) -> String {
+        if self.movement_left().as_f64().ceil() as u32 == self.kind().movement {
+            lexical::to_string(self.movement_left().as_f64().ceil() as u32)
+        } else {
+            format!(
+                "{} / {}",
+                lexical::to_string(self.movement_left().as_f64().ceil() as u32),
+                self.kind().movement
+            )
+        }
+    }
+
+    pub fn downgrade_to_client(&mut self) {
+        self.on_server = false;
+    }
+
+    /// Returns whether the unit can found a city on the tile it's currently on.
+    pub fn can_found_city(&self, _game: &Game) -> bool {
+        todo!()
+    }
+
+    pub fn set_health(&mut self, health: f64) {
+        self.health = health.clamp(0., 1.);
+    }
+}
+
+fn float_options() -> WriteFloatOptions {
+    WriteFloatOptions::builder()
+        .trim_floats(true)
+        .max_significant_digits(Some(NonZeroUsize::new(2).unwrap()))
+        .build()
+        .unwrap()
 }
 
 /// Stores how much farther a unit can move on this turn.

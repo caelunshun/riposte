@@ -24,7 +24,7 @@ impl TileRenderLayer for FogRenderer {
             return;
         }
 
-        if game.map().visibility(tile_pos) == Visibility::Fogged {
+        if game.the_player().visibility_at(tile_pos) == Visibility::Fogged {
             cx.canvas_mut()
                 .begin_path()
                 .rect(Vec2::splat(0.), Vec2::splat(PIXELS_PER_TILE))

@@ -158,7 +158,7 @@ impl Pathfinder {
                         let movement_cost = game
                             .tile(pos)
                             .unwrap()
-                            .movement_cost(game, &*game.the_player())
+                            .movement_cost(game.base(), &*game.the_player())
                             .min(movement_per_turn);
                         current_movement_left -= movement_cost;
                     }
@@ -180,7 +180,7 @@ impl Pathfinder {
             }
 
             'neighbors: for neighbor in game.tile_neighbors(entry.pos) {
-                if !game.cheat_mode && game.map().visibility(neighbor) == Visibility::Hidden {
+                if !game.cheat_mode && game.the_player().visibility_at(neighbor) == Visibility::Hidden {
                     continue;
                 }
 
@@ -206,7 +206,7 @@ impl Pathfinder {
                 }
 
                 let movement_cost = tile
-                    .movement_cost(game, &*game.the_player())
+                    .movement_cost(game.base(), &*game.the_player())
                     .min(movement_per_turn);
                 let tentative_g_score = self.g_score[&entry.pos] + movement_cost.as_f64();
                 if !self.g_score.contains_key(&neighbor)

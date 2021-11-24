@@ -9,11 +9,10 @@ pub mod tile;
 pub mod unit;
 pub mod view;
 
-mod id_mapper;
 mod world;
 
 pub use tile::Tile;
 pub use view::View;
-pub use world::{Game, InvalidNetworkId};
+pub use world::Game;
 
 pub use riposte_common::Yield;

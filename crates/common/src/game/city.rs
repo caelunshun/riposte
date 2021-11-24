@@ -7,7 +7,8 @@ use indexmap::IndexSet;
 use crate::{
     assets::Handle,
     registry::{Building, Resource, UnitKind},
-    GameBase,
+    world::Game,
+    Player,
 };
 
 use super::{
@@ -15,53 +16,54 @@ use super::{
     CityId, PlayerId,
 };
 
-/// Base data for a city.
+/// A city in the game.
 ///
-/// Fields are exposed because this struct
-/// is always wrapped in a `client::City` or `server::City`,
-/// each of which does its own encapsulation of these fields.
+/// All fields are private and encapsulated. Modifying city
+/// data has to happen through high-level methods like [`set_build_task`].
 #[derive(Debug, Clone)]
-pub struct CityData {
-    pub id: CityId,
-    pub owner: PlayerId,
-    pub pos: UVec2,
-    pub name: String,
-    pub population: NonZeroU32,
-    pub is_capital: bool,
+pub struct City {
+    on_server: bool,
+
+    id: CityId,
+    owner: PlayerId,
+    pos: UVec2,
+    name: String,
+    population: NonZeroU32,
+    is_capital: bool,
 
     /// Culture values for each player that
     /// has owned the city
-    pub culture: Culture,
+    culture: Culture,
 
     /// Tiles that the city is working and gains
     /// yield from (hammers / commerce / food).
     ///
     /// Length is equal to `population + 1`.
-    pub worked_tiles: IndexSet<UVec2, ahash::RandomState>,
+    worked_tiles: IndexSet<UVec2, ahash::RandomState>,
     /// The subset of `worked_tiles` that were manually
     /// overriden by the player and thus should not be
     /// modified by the city governor.
-    pub manually_worked_tiles: IndexSet<UVec2, ahash::RandomState>,
+    manually_worked_tiles: IndexSet<UVec2, ahash::RandomState>,
 
     /// Food stored to reach the next population level.
-    pub stored_food: u32,
+    stored_food: u32,
 
     /// Stored progress on each possible build task.
-    pub build_task_progress: AHashMap<BuildTask, u32>,
+    build_task_progress: AHashMap<BuildTask, u32>,
     /// What the city is currently building.
-    pub build_task: Option<BuildTask>,
+    build_task: Option<BuildTask>,
 
     /// Bonus defense from culture
-    pub culture_defense_bonus: u32,
+    culture_defense_bonus: u32,
 
     /// Resources accessible to the city
-    pub resources: AHashSet<Handle<Resource>>,
+    resources: AHashSet<Handle<Resource>>,
 
     /// Buildings in this city
-    pub buildings: Vec<Handle<Building>>,
+    buildings: Vec<Handle<Building>>,
 
     /// Cached economy data for the city.
-    pub economy: CityEconomy,
+    economy: CityEconomy,
 
     /// Sources of happiness in the city.
     ///
@@ -69,13 +71,39 @@ pub struct CityData {
     /// for example, if three happiness come from `Buildings`,
     /// then there will be three `HappinessSource::Buildings` elements
     /// in this vector.
-    pub happiness_sources: Vec<HappinessSource>,
-    pub anger_sources: Vec<AngerSource>,
-    pub health_sources: Vec<HealthSource>,
-    pub sickness_sources: Vec<SicknessSource>,
+    happiness_sources: Vec<HappinessSource>,
+    anger_sources: Vec<AngerSource>,
+    health_sources: Vec<HealthSource>,
+    sickness_sources: Vec<SicknessSource>,
 }
 
-impl CityData {
+impl City {
+    pub fn new(id: CityId, owner: &Player, pos: UVec2, name: String) -> Self {
+        Self {
+            on_server: true,
+            id,
+            owner: owner.id(),
+            pos,
+            name,
+            population: NonZeroU32::new(1).unwrap(),
+            is_capital: owner.cities().is_empty(),
+            culture: Culture::new(),
+            worked_tiles: IndexSet::default(),
+            manually_worked_tiles: IndexSet::default(),
+            stored_food: 0,
+            build_task_progress: AHashMap::new(),
+            build_task: None,
+            culture_defense_bonus: 0,
+            resources: AHashSet::new(),
+            buildings: Vec::new(),
+            economy: CityEconomy::default(),
+            happiness_sources: Vec::new(),
+            anger_sources: Vec::new(),
+            health_sources: Vec::new(),
+            sickness_sources: Vec::new(),
+        }
+    }
+
     pub fn food_needed_for_growth(&self) -> u32 {
         30 + 3 * self.population.get()
     }
@@ -117,11 +145,7 @@ impl CityData {
     }
 
     pub fn build_task_progress(&self, task: &BuildTask) -> u32 {
-        self
-            .build_task_progress
-            .get(task)
-            .copied()
-            .unwrap_or(0)
+        self.build_task_progress.get(task).copied().unwrap_or(0)
     }
 
     pub fn pos(&self) -> UVec2 {
@@ -173,10 +197,7 @@ impl CityData {
     }
 
     pub fn manual_worked_tiles(&self) -> impl DoubleEndedIterator<Item = UVec2> + '_ {
-        self
-            .manually_worked_tiles
-            .iter()
-            .map(|p| p.clone().into())
+        self.manually_worked_tiles.iter().map(|p| p.clone().into())
     }
 
     pub fn is_tile_manually_worked(&self, tile: UVec2) -> bool {
@@ -219,12 +240,12 @@ impl CityData {
         self.economy().culture_per_turn
     }
 
-    pub fn beakers_per_turn(&self, game: &impl GameBase) -> u32 {
+    pub fn beakers_per_turn(&self, game: &Game) -> u32 {
         (self.economy().commerce as f32 * game.player(self.owner()).beaker_percent() as f32 / 100.)
             .floor() as u32
     }
 
-    pub fn gold_per_turn(&self, game: &impl GameBase) -> u32 {
+    pub fn gold_per_turn(&self, game: &Game) -> u32 {
         self.economy().commerce as u32 - self.beakers_per_turn(game)
     }
 
@@ -258,6 +279,10 @@ impl CityData {
     pub fn name(&self) -> &str {
         &self.name
     }
+
+    pub fn downgrade_to_client(&mut self) {
+        self.on_server = false;
+    }
 }
 
 /// Something a city is building.
@@ -287,7 +312,7 @@ impl BuildTask {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct CityEconomy {
     // gold + beakers = commerce
     pub commerce: f64,

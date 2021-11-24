@@ -1,11 +1,10 @@
 //! The server-sent packets.
 
+use std::cell::RefCell;
+
 use glam::UVec2;
 
-use crate::{
-    game::{city::CityData, player::PlayerData, tile::TileData, unit::UnitData},
-    PlayerId, Turn, UnitId, Visibility,
-};
+use crate::{City, Grid, Player, PlayerId, Tile, Turn, Unit, UnitId};
 
 #[derive(Debug, Clone)]
 pub struct ServerGamePacket {
@@ -22,8 +21,6 @@ pub struct ServerGamePacket {
 #[derive(Debug, Clone)]
 pub enum ServerPacket {
     UpdateTurn(UpdateTurn),
-    UpdateMap(UpdateMap),
-    UpdateVisibility(UpdateVisibility),
     UpdateTile(UpdateTile),
     UpdatePlayer(UpdatePlayer),
     UpdateUnit(UpdateUnit),
@@ -40,17 +37,15 @@ pub struct InitialGameData {
     /// ID of the client's associated player.
     pub the_player_id: PlayerId,
     /// The initial map.
-    pub map: UpdateMap,
+    pub map: Grid<RefCell<Tile>>,
     /// The current turn.
     pub turn: Turn,
-    /// The initial visibility data.
-    pub visibility: UpdateVisibility,
     /// Every player in the game.
-    pub players: Vec<PlayerData>,
+    pub players: Vec<Player>,
     /// Every unit in the game.
-    pub units: Vec<UnitData>,
+    pub units: Vec<Unit>,
     /// Every city in the game.
-    pub cities: Vec<CityData>,
+    pub cities: Vec<City>,
 }
 
 /// Updates the current turn number.
@@ -59,37 +54,23 @@ pub struct UpdateTurn {
     pub turn: Turn,
 }
 
-/// Updates all tiles on the map.
-#[derive(Debug, Clone)]
-pub struct UpdateMap {
-    pub width: u32,
-    pub height: u32,
-    pub tiles: Box<[TileData]>,
-}
-
-/// Updates the player's visibility.
-#[derive(Debug, Clone)]
-pub struct UpdateVisibility {
-    pub visibility: Box<[Visibility]>,
-}
-
 /// Updates a single tile on the map.
 #[derive(Debug, Clone)]
 pub struct UpdateTile {
     pub pos: UVec2,
-    pub tile: TileData,
+    pub tile: Tile,
 }
 
 /// Updates a player in the game.
 #[derive(Debug, Clone)]
 pub struct UpdatePlayer {
-    pub player: PlayerData,
+    pub player: Player,
 }
 
 /// Updates or creates a unit.
 #[derive(Debug, Clone)]
 pub struct UpdateUnit {
-    pub unit: UnitData,
+    pub unit: Unit,
 }
 
 /// Indicates that a list of units has moved to a new position.
@@ -111,5 +92,5 @@ pub struct DeleteUnit {
 /// Updates or creates a city.
 #[derive(Debug, Clone)]
 pub struct UpdateCity {
-    pub city: CityData,
+    pub city: City,
 }

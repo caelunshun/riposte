@@ -95,7 +95,7 @@ impl GameRenderer {
                 for y in first_tile.y..=last_tile.y {
                     let pos = uvec2(x, y);
                     if let Ok(tile) = game.tile(pos) {
-                        if game.map().visibility(pos) == Visibility::Hidden && !game.cheat_mode {
+                        if game.the_player().visibility_at(pos) == Visibility::Hidden && !game.cheat_mode {
                             continue;
                         }
 

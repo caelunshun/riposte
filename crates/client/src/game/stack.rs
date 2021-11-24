@@ -70,7 +70,7 @@ impl UnitStack {
             let mut score = match &selected_unit {
                 Some(selected_unit) => game
                     .unit(u)
-                    .modified_defending_strength(game, &*selected_unit),
+                    .modified_defending_strength(game.base(), &*selected_unit),
                 None => game.unit(u).strength(),
             };
 

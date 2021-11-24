@@ -122,7 +122,7 @@ impl UnitRenderer {
 
 impl TileRenderLayer for UnitRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, _tile: &Tile) {
-        if game.map().visibility(tile_pos) == Visibility::Fogged {
+        if game.the_player().visibility_at(tile_pos) == Visibility::Fogged {
             return;
         }
 
@@ -141,8 +141,9 @@ impl TileRenderLayer for UnitRenderer {
             }
 
             // Translation based on spline interpolation for unit movement
-            let interpolated_pos = (unit
-                .movement_spline()
+            let interpolated_pos = (game
+                .unit_splines()
+                .get(unit.id())
                 .clamped_sample(cx.time())
                 .unwrap_or_else(|| tile_pos.as_f32())
                 - tile_pos.as_f32())
