@@ -1,5 +1,6 @@
 use std::{any::Any, cell::RefCell, marker::PhantomData, rc::Rc, sync::Arc};
 
+use bytes::Bytes;
 use dume::{Canvas, TextureSetBuilder};
 use riposte_common::assets::Loader;
 use serde::de::DeserializeOwned;
@@ -100,5 +101,31 @@ impl Loader for SoundLoader {
     ) -> anyhow::Result<Option<Arc<dyn Any + Send + Sync>>> {
         self.audio.borrow_mut().add_sound(id, bytes);
         Ok(None)
+    }
+}
+
+pub struct VideoData(Bytes);
+
+impl VideoData {
+    pub fn data(&self) -> Bytes {
+        self.0.clone()
+    }
+}
+
+pub struct VideoLoader;
+
+impl VideoLoader {
+    pub fn new() -> Self {
+        VideoLoader
+    }
+}
+
+impl Loader for VideoLoader {
+    fn load_from_bytes(
+        &self,
+        _id: &str,
+        bytes: &[u8],
+    ) -> anyhow::Result<Option<Arc<dyn Any + Send + Sync>>> {
+        Ok(Some(Arc::new(VideoData(bytes.to_vec().into()))))
     }
 }

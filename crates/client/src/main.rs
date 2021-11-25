@@ -104,6 +104,13 @@ impl RootState {
         }
     }
 
+    pub fn render_overlay(&mut self, cx: &mut Context) {
+        match self {
+            RootState::MainMenu(m) => m.render_overlay(cx),
+            _ => {}
+        }
+    }
+
     pub fn handle_event(&mut self, cx: &mut Context, event: &Event) {
         match self {
             RootState::Game(g) => g.handle_event(cx, event),

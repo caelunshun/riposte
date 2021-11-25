@@ -1,6 +1,7 @@
 use std::{
     fmt::Display,
-    ops::{Add, AddAssign, Sub, SubAssign}, num::NonZeroUsize,
+    num::NonZeroUsize,
+    ops::{Add, AddAssign, Sub, SubAssign},
 };
 
 use glam::UVec2;
@@ -246,13 +247,47 @@ impl Unit {
     }
 
     /// Returns whether the unit can found a city on the tile it's currently on.
-    pub fn can_found_city(&self, _game: &Game) -> bool {
-        todo!()
+    pub fn can_found_city(&self, game: &Game) -> Result<(), CannotFoundCity> {
+        // This unit must be able to found a city.
+        if !self.has_capability(CapabilityType::FoundCity) {
+            return Err(CannotFoundCity::MissingCapability);
+        }
+
+        // Minimum distance to other cities: we don't
+        // allow two cities to lie within each others' BFCs.
+        for pos in game.map().big_fat_cross(self.pos()) {
+            if game.city_at_pos(pos).is_some() {
+                return Err(CannotFoundCity::NearbyCities);
+            }
+        }
+
+        // Must not be in the land of a different player.
+        if game
+            .tile(self.pos())
+            .unwrap()
+            .owner()
+            .map(|o| o != self.owner)
+            .unwrap_or(false)
+        {
+            return Err(CannotFoundCity::InOpponentLand);
+        }
+
+        Ok(())
     }
 
     pub fn set_health(&mut self, health: f64) {
         self.health = health.clamp(0., 1.);
     }
+}
+
+#[derive(Debug, thiserror::Error)]
+pub enum CannotFoundCity {
+    #[error("this unit is not a settler")]
+    MissingCapability,
+    #[error("there are nearby cities")]
+    NearbyCities,
+    #[error("cities cannot be founded in opponents' land")]
+    InOpponentLand,
 }
 
 fn float_options() -> WriteFloatOptions {

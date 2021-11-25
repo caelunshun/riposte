@@ -40,8 +40,6 @@ use super::{
 pub struct Game {
     base: riposte_common::Game,
 
-    registry: Arc<Registry>,
-
     stacks: StackGrid,
 
     view: RefCell<View>,
@@ -74,9 +72,8 @@ impl Game {
         let selected_units = SelectedUnits::new();
         let selection_units_version = selected_units.version();
         Self {
-            base: riposte_common::Game::new(map),
+            base: riposte_common::Game::new(registry, map),
 
-            registry,
             view: RefCell::new(View::default()),
             stacks: StackGrid::default(),
             current_combat_event: None,
@@ -297,7 +294,7 @@ impl Game {
 
     /// Gets the game data registry.
     pub fn registry(&self) -> &Registry {
-        &self.registry
+        self.base.registry()
     }
 
     /// Gets the game view.

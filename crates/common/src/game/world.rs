@@ -1,4 +1,7 @@
-use std::cell::{Ref, RefCell, RefMut};
+use std::{
+    cell::{Ref, RefCell, RefMut},
+    sync::Arc,
+};
 
 use ahash::AHashMap;
 use glam::UVec2;
@@ -7,11 +10,13 @@ use rand_pcg::Pcg64Mcg;
 use slotmap::{SecondaryMap, SlotMap};
 
 use super::{CityId, PlayerId, UnitId};
-use crate::{tile::OutOfBounds, City, Grid, Player, Tile, Turn, Unit};
+use crate::{registry::Registry, tile::OutOfBounds, City, Grid, Player, Tile, Turn, Unit};
 
 /// Stores the entire game state.
 #[derive(Debug)]
 pub struct Game {
+    registry: Arc<Registry>,
+
     map: Grid<RefCell<Tile>>,
 
     // Allocators for IDs (only used on the server)
@@ -34,8 +39,10 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(map: Grid<RefCell<Tile>>) -> Self {
+    pub fn new(registry: Arc<Registry>, map: Grid<RefCell<Tile>>) -> Self {
         Self {
+            registry,
+
             map,
 
             player_ids: SlotMap::default(),
@@ -52,6 +59,10 @@ impl Game {
 
             turn: Turn::new(0),
         }
+    }
+
+    pub fn registry(&self) -> &Arc<Registry> {
+        &self.registry
     }
 
     /// Gets the player with the given ID.

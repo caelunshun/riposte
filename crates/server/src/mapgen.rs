@@ -2,7 +2,7 @@
 //!
 //! Generates random maps given a `MapgenSettings`.
 
-use std::cell::RefCell;
+use std::{cell::RefCell, sync::Arc};
 
 use glam::UVec2;
 use rand::{Rng, SeedableRng};
@@ -55,7 +55,7 @@ impl MapGenerator {
         }
     }
 
-    pub fn generate(mut self, lobby: &GameLobby, registry: &Registry) -> Game {
+    pub fn generate(mut self, lobby: &GameLobby, registry: &Arc<Registry>) -> Game {
         let mut land = Grid::new(
             land::TileType::Ocean,
             self.settings.size.dimensions().x,
@@ -75,7 +75,7 @@ impl MapGenerator {
         let starting_locations = generate_starting_locations(&tiles, lobby.slots().count());
         let tiles = tiles.map(RefCell::new);
 
-        let mut game = Game::new(tiles);
+        let mut game = Game::new(Arc::clone(registry), tiles);
         self.add_players_and_starting_units(&mut game, registry, lobby, &starting_locations);
         game
     }

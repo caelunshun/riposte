@@ -19,7 +19,7 @@ use indexmap::IndexMap;
 
 /// A registry of data-driven game files - unit kinds, civilizations,
 /// buildings, etc.
-#[derive(Default)]
+#[derive(Default, Debug)]
 pub struct Registry {
     unit_kinds: IndexMap<String, Handle<UnitKind>, ahash::RandomState>,
     civs: IndexMap<String, Handle<Civilization>, ahash::RandomState>,

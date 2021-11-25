@@ -24,7 +24,7 @@ use walkdir::WalkDir;
 use winit::{dpi::PhysicalSize, event::WindowEvent, event_loop::EventLoop, window::Window};
 
 use crate::{
-    asset_loaders::{FontLoader, ImageLoader, JsonLoader, SoundLoader},
+    asset_loaders::{FontLoader, ImageLoader, JsonLoader, SoundLoader, VideoLoader},
     audio::Audio,
     backend::BackendService,
     options::Options,
@@ -133,6 +133,7 @@ impl Context {
             )
             .add_loader("font", FontLoader::new(Rc::clone(&canvas)))
             .add_loader("sound", SoundLoader::new(Rc::clone(&audio)))
+            .add_loader("video", VideoLoader::new())
             .add_loader("civ", JsonLoader::<Civilization>::new())
             .add_loader("unit", JsonLoader::<UnitKind>::new())
             .add_loader("tech", JsonLoader::<Tech>::new())
@@ -370,7 +371,7 @@ impl Context {
         }
     }
 
-    pub fn render(&mut self) {
+    pub fn render(&mut self, render_overlay: impl FnOnce(&mut Self)) {
         let window_logical_size = self
             .window
             .inner_size()
@@ -379,10 +380,26 @@ impl Context {
         self.ui_mut()
             .render(&mut *self.canvas.borrow_mut(), window_logical_size);
 
-        let frame = self
-            .surface
-            .get_current_texture()
-            .expect("failed to get next swapchain frame");
+        render_overlay(self);
+
+        let frame = match self.surface.get_current_texture() {
+            Ok(f) => f,
+            Err(_) => {
+                self.surface.configure(
+                    &self.device,
+                    &wgpu::SurfaceConfiguration {
+                        usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
+                        format: dume::TARGET_FORMAT,
+                        width: self.window.inner_size().width,
+                        height: self.window.inner_size().height,
+                        present_mode: init::PRESENT_MODE,
+                    },
+                );
+                self.surface
+                    .get_current_texture()
+                    .expect("failed to get next swapchain frame")
+            }
+        };
         self.canvas_mut().render(
             &frame.texture.create_view(&Default::default()),
             &self.sample_texture.create_view(&Default::default()),

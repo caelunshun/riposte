@@ -1143,5 +1143,10 @@
     "path": "icon/flag/babylonia.png",
     "id": "icon/flag/babylonia",
     "loader": "image"
+  },
+  {
+    "path": "film/logo.ivf",
+    "id": "film/logo",
+    "loader": "video"
   }
 ]

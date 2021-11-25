@@ -16,7 +16,7 @@ pub fn run(event_loop: EventLoop<()>, mut context: Context, mut state: RootState
             Event::RedrawRequested(_) => {
                 context.update();
                 state.update(&mut context);
-                context.render();
+                context.render(|cx| state.render_overlay(cx));
             }
 
             Event::WindowEvent { event, .. } => {
