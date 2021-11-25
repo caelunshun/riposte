@@ -99,7 +99,13 @@ impl Server {
                     bail!("expected a lobby packet")
                 }
             }
-            State::Game(_g) => todo!(),
+            State::Game(g) => {
+                if let GenericClientPacket::Game(packet) = packet {
+                    g.handle_packet(packet, sender, &self.connections)
+                } else {
+                    bail!("expected a game packet")
+                }
+            }
         }
     }
 

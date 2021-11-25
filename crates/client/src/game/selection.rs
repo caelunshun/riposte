@@ -7,14 +7,14 @@ use float_ord::FloatOrd;
 use glam::UVec2;
 use riposte_common::{
     utils::{Version, VersionSnapshot},
-    UnitId,
+    UnitId, protocol::server::ConfirmMoveUnits,
 };
 use slotmap::{SecondaryMap, SlotMap};
 use smallvec::SmallVec;
 use winit::event::MouseButton;
 
 use crate::{
-    client::{Client, GameState},
+    client::{Client, GameState, ServerResponseFuture},
     context::Context,
 };
 
@@ -543,38 +543,19 @@ struct MovementDriver {
 }
 
 impl MovementDriver {
-    pub fn update(&mut self, _game: &Game) {
-        self.waiting.retain(|_waiting| {
-            /*  if let Some(response) = waiting.get() {
+    pub fn update(&mut self, game: &Game) {
+        self.waiting.retain(|waiting| {
+            if let Some(response) = waiting.future.get() {
                 log::info!(
                     "Server responded to move request {:?}. Success: {}",
                     waiting.target_pos,
                     response.success
                 );
-                let units = waiting.units.clone();
-                let old_pos = waiting.start_pos;
-                let new_pos = waiting.target_pos;
-                game.enqueue_operation(move |game, cx| {
-                    let mut updated = false;
-                    for &unit in &units {
-                        if !game.is_unit_valid(unit) {
-                            return;
-                        }
-                        if game.unit(unit).pos() == old_pos {
-                            updated = true;
-                        }
-                        game.unit_mut(unit).set_pos_unsafe(new_pos);
-                    }
-                    if updated {
-                        game.on_units_moved(cx, &units, old_pos, new_pos);
-                    }
-                });
                 (waiting.callback)(game, response.success);
                 false
             } else {
                 true
-            }*/
-            true
+            }
         });
     }
 
@@ -594,12 +575,13 @@ impl MovementDriver {
             target_pos
         );
 
-        let _future = client.move_units(game, units.iter().copied(), target_pos);
+        let future = client.move_units(game, units.iter().copied(), target_pos);
         self.waiting.push(WaitingMovement {
             units,
             start_pos,
             target_pos,
             callback: Box::new(callback),
+            future,
         });
     }
 
@@ -613,4 +595,5 @@ struct WaitingMovement {
     target_pos: UVec2,
     start_pos: UVec2,
     callback: Box<dyn Fn(&Game, bool)>,
+    future: ServerResponseFuture<ConfirmMoveUnits>
 }

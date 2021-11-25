@@ -275,6 +275,53 @@ impl Unit {
         Ok(())
     }
 
+    /// Returns whether the unit can move to the given adjacent
+    /// tile.
+    ///
+    /// `target` must be adjacent to this unit's current position.
+    pub fn can_move_to(&self, game: &Game, target: UVec2) -> bool {
+        if target.as_f32().distance_squared(self.pos().as_f32()) > 2. {
+            return false;
+        }
+
+        let target_tile = game.tile(target).unwrap();
+        if !target_tile.terrain().is_passable() {
+            return false;
+        }
+
+        if !self.has_movement_left() {
+            return false;
+        }
+
+        true
+    }
+
+    /// Moves the unit to the given position.
+    pub fn move_to(&mut self, game: &Game, target: UVec2) -> bool {
+        if !self.can_move_to(game, target) {
+            return false;
+        }
+
+        self.pos = target;
+
+        // Spend the movement points
+        let target_tile = game.tile(target).unwrap();
+        self.movement_left = self
+            .movement_left
+            .saturating_sub(target_tile.movement_cost(game, &*game.player(self.owner())));
+
+        true
+    }
+
+    /// Sets the unit's position directly.
+    pub fn set_pos_unsafe(&mut self, pos: UVec2) {
+        self.pos = pos;
+    }
+
+    pub fn set_movement_left_unsafe(&mut self, movement_left: MovementPoints) {
+        self.movement_left = movement_left;
+    }
+
     pub fn set_health(&mut self, health: f64) {
         self.health = health.clamp(0., 1.);
     }
@@ -330,6 +377,10 @@ impl MovementPoints {
 
     pub fn is_exhausted(&self) -> bool {
         self.0 == 0
+    }
+
+    pub fn saturating_sub(&self, rhs: Self) -> Self {
+        MovementPoints(self.0.saturating_sub(rhs.0))
     }
 }
 

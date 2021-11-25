@@ -4,7 +4,7 @@ use std::cell::RefCell;
 
 use glam::UVec2;
 
-use crate::{City, Grid, Player, PlayerId, Tile, Turn, Unit, UnitId};
+use crate::{unit::MovementPoints, City, Grid, Player, PlayerId, Tile, Turn, Unit, UnitId};
 
 #[derive(Debug, Clone)]
 pub struct ServerGamePacket {
@@ -25,6 +25,7 @@ pub enum ServerPacket {
     UpdatePlayer(UpdatePlayer),
     UpdateUnit(UpdateUnit),
     UnitsMoved(UnitsMoved),
+    ConfirmMoveUnits(ConfirmMoveUnits),
     DeleteUnit(DeleteUnit),
     UpdateCity(UpdateCity),
 }
@@ -80,7 +81,16 @@ pub struct UpdateUnit {
 #[derive(Debug, Clone)]
 pub struct UnitsMoved {
     pub units: Vec<UnitId>,
+    pub new_movement_left: Vec<MovementPoints>,
     pub new_pos: UVec2,
+}
+
+/// Response to `MoveUnits` indicating whether the movement was successful.
+///
+/// Sent directly after `UnitsMoved` if successful.
+#[derive(Debug, Clone)]
+pub struct ConfirmMoveUnits {
+    pub success: bool,
 }
 
 /// Deletes a unit.

@@ -6,6 +6,7 @@ use riposte_common::{
     protocol::{
         game::server::InitialGameData,
         lobby::{Kicked, LobbyInfo, ServerLobbyPacket},
+        server::{ServerGamePacket, ServerPacket},
         GenericClientPacket, GenericServerPacket,
     },
 };
@@ -40,6 +41,12 @@ impl Connections {
         self.connections.iter()
     }
 
+    pub fn broadcast_game_packet(&self, packet: ServerPacket) {
+        for conn in self.connections.values() {
+            conn.send_game_packet(packet.clone(), None);
+        }
+    }
+
     pub async fn recv_packet(
         &self,
     ) -> (
@@ -68,6 +75,13 @@ impl Connection {
 
     pub fn send_packet(&self, packet: GenericServerPacket) {
         self.bridge.send(packet);
+    }
+
+    pub fn send_game_packet(&self, packet: ServerPacket, request_id: Option<u32>) {
+        self.send_packet(GenericServerPacket::Game(ServerGamePacket {
+            request_id,
+            packet,
+        }));
     }
 
     fn send_lobby_packet(&self, packet: ServerLobbyPacket) {

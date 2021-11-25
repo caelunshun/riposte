@@ -1,6 +1,7 @@
 use std::{any::Any, cell::Cell, marker::PhantomData};
 
 use ahash::AHashMap;
+use anyhow::Context as _;
 use flume::Receiver;
 use glam::UVec2;
 use riposte_common::{
@@ -19,7 +20,7 @@ use riposte_common::{
             ChangeCivAndLeader, ClientLobbyPacket, CreateSlot, DeleteSlot, Kicked, LobbyInfo,
             ServerLobbyPacket, SetMapgenSettings, StartGame,
         },
-        server::{InitialGameData, ServerGamePacket},
+        server::{ConfirmMoveUnits, InitialGameData, ServerGamePacket, ServerPacket, UnitsMoved},
         GenericClientPacket, GenericServerPacket,
     },
     registry::{Civilization, Leader, Registry, Tech},
@@ -206,11 +207,12 @@ impl Client<GameState> {
         _game: &Game,
         unit_ids: impl Iterator<Item = UnitId>,
         target_pos: UVec2,
-    ) {
-        self.send_message(ClientPacket::MoveUnits(MoveUnits {
+    ) -> ServerResponseFuture<ConfirmMoveUnits> {
+        let request_id = self.send_message(ClientPacket::MoveUnits(MoveUnits {
             unit_ids: unit_ids.collect(),
             target_pos,
         }));
+        self.register_response_future(request_id)
     }
 
     pub fn do_unit_action(&mut self, _game: &Game, unit_id: UnitId, action: UnitAction) {
@@ -269,113 +271,53 @@ impl Client<GameState> {
         game.waiting_on_turn_end = true;
     }
 
-    pub fn handle_messages(&mut self, _cx: &Context, game: &mut Game) -> anyhow::Result<()> {
+    pub fn handle_messages(&mut self, cx: &Context, game: &mut Game) -> anyhow::Result<()> {
         if game.has_combat_event() {
             return Ok(());
         }
-        Ok(())
-        /*while let Some(msg) = self.poll_for_message()? {
-            let request_id = msg.request_id as u32;
-            match msg.packet.ok_or(ClientError::MissingPacket)? {
-                any_server::Packet::ConfirmMoveUnits(packet) => {
-                    self.handle_confirm_move_units(packet, request_id)
+        while let Some(packet) = self.bridge.try_recv() {
+            if let GenericServerPacket::Game(packet) = packet {
+                match packet.packet {
+                    ServerPacket::UpdateTurn(p) => game.update_turn(p.turn),
+                    ServerPacket::UpdateTile(p) => *game.tile_mut(p.pos)? = p.tile,
+                    ServerPacket::UpdatePlayer(p) => game.add_or_update_player(p.player)?,
+                    ServerPacket::UpdateUnit(p) => game.add_or_update_unit(cx, p.unit)?,
+                    ServerPacket::UnitsMoved(p) => self.handle_units_moved(cx, game, p),
+                    ServerPacket::ConfirmMoveUnits(p) => self.handle_confirm_move_units(
+                        p,
+                        packet
+                            .request_id
+                            .context("ConfirmMoveUnits requires a request ID")?,
+                    ),
+                    ServerPacket::DeleteUnit(p) => game.delete_unit(p.unit),
+                    ServerPacket::UpdateCity(p) => game.add_or_update_city(p.city)?,
                 }
-                any_server::Packet::UpdateUnit(packet) => game.add_or_update_unit(cx, packet)?,
-                any_server::Packet::UpdateCity(packet) => game.add_or_update_city(packet)?,
-                any_server::Packet::UpdatePlayer(packet) => game.add_or_update_player(packet)?,
-                any_server::Packet::UpdateVisibility(packet) => game
-                    .map_mut()
-                    .set_visibility(packet.visibility().collect())?,
-                any_server::Packet::UpdateGlobalData(packet) => game.update_global_data(&packet)?,
-                any_server::Packet::DeleteUnit(packet) => {
-                    game.delete_unit(game.resolve_unit_id(packet.unit_id as u32)?)
-                }
-                any_server::Packet::UpdateTile(packet) => game
-                    .tile_mut(uvec2(packet.x, packet.y))?
-                    .update_data(packet.tile.context("missing tile")?, game)?,
-                any_server::Packet::PossibleCityBuildTasks(packet) => {
-                    self.handle_possible_city_build_tasks(packet, request_id)
-                }
-                any_server::Packet::BuildTaskFinished(packet) => {
-                    self.handle_build_task_finished(game, packet)?
-                }
-                any_server::Packet::BuildTaskFailed(packet) => {
-                    self.handle_build_task_failed(game, packet)?
-                }
-                any_server::Packet::PossibleTechs(packet) => {
-                    self.handle_possible_techs(packet, request_id)
-                }
-                any_server::Packet::CombatEvent(packet) => {
-                    self.handle_combat_event(cx, game, packet)?
-                }
-                any_server::Packet::GameSaved(packet) => {
-                    self.handle_game_saved(cx, game, packet, request_id)
-                }
-                any_server::Packet::WarDeclared(packet) => {
-                    self.handle_war_declared(game, packet)?
-                }
-                any_server::Packet::PeaceDeclared(packet) => {
-                    self.handle_peace_declared(game, packet)?
-                }
-                any_server::Packet::BordersExpanded(packet) => {
-                    self.handle_borders_expanded(game, packet)?
-                }
-                p => log::warn!("unhandled packet: {:?}", p),
             }
 
             if game.has_combat_event() {
                 return Ok(());
             }
         }
-        Ok(())*/
-    }
-
-    /*fn handle_confirm_move_units(&mut self, packet: ConfirmMoveUnits, request_id: u32) {
-        self.handle_server_response(request_id, packet);
-    }
-
-    fn handle_possible_city_build_tasks(
-        &mut self,
-        packet: PossibleCityBuildTasks,
-        request_id: u32,
-    ) {
-        self.handle_server_response(request_id, packet);
-    }
-
-    fn handle_build_task_finished(
-        &mut self,
-        game: &Game,
-        packet: BuildTaskFinished,
-    ) -> anyhow::Result<()> {
-        let mut city = game.city_mut(game.resolve_city_id(packet.city_id)?);
-        if let Some(task) = packet.task {
-            city.set_previous_build_task(PreviousBuildTask {
-                succeeded: true,
-                task: city::BuildTask::from_data(&task, game)?,
-            });
-        }
         Ok(())
     }
 
-    fn handle_build_task_failed(
-        &mut self,
-        game: &Game,
-        packet: BuildTaskFailed,
-    ) -> anyhow::Result<()> {
-        let mut city = game.city_mut(game.resolve_city_id(packet.city_id)?);
-        if let Some(task) = packet.task {
-            city.set_previous_build_task(PreviousBuildTask {
-                succeeded: false,
-                task: city::BuildTask::from_data(&task, game)?,
-            });
-        }
-        Ok(())
-    }
-
-    fn handle_possible_techs(&mut self, packet: PossibleTechs, request_id: u32) {
+    fn handle_confirm_move_units(&mut self, packet: ConfirmMoveUnits, request_id: u32) {
         self.handle_server_response(request_id, packet);
     }
 
+    fn handle_units_moved(&mut self, cx: &Context, game: &mut Game, packet: UnitsMoved) {
+        let mut old_pos = UVec2::default();
+        for (unit, movement_left) in packet.units.iter().zip(packet.new_movement_left) {
+            let mut unit = game.unit_mut(*unit);
+            old_pos = unit.pos();
+            unit.set_pos_unsafe(packet.new_pos);
+            unit.set_movement_left_unsafe(movement_left);
+        }
+
+        game.on_units_moved(cx, &packet.units, old_pos, packet.new_pos);
+    }
+
+    /*
     fn handle_combat_event(
         &mut self,
         cx: &Context,
@@ -423,9 +365,7 @@ impl Client<GameState> {
             city: game.resolve_city_id(packet.city_id)?,
         });
         Ok(())
-    }
-
-
+    }*/
 
     fn handle_server_response<T: 'static>(&mut self, request_id: u32, value: T) {
         if let Some(sender) = self.server_response_senders.remove(&request_id) {
@@ -433,7 +373,7 @@ impl Client<GameState> {
                 sender.send(value).ok();
             }
         }
-    }*/
+    }
 
     fn register_response_future<T: 'static>(&mut self, request_id: u32) -> ServerResponseFuture<T> {
         let (sender, receiver) = flume::bounded(1);

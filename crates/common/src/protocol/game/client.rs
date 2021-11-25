@@ -39,6 +39,8 @@ pub enum ClientPacket {
 /// the server will not attempt to pathfind through multiple tiles to the target.
 ///
 /// On success, the server broadcasts `UnitsMoved`.
+/// 
+/// The server will always respond with `ConfirmMoveUnits` containing a success flag.
 #[derive(Debug, Clone)]
 pub struct MoveUnits {
     pub unit_ids: Vec<UnitId>,

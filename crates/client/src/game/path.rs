@@ -160,7 +160,7 @@ impl Pathfinder {
                             .unwrap()
                             .movement_cost(game.base(), &*game.the_player())
                             .min(movement_per_turn);
-                        current_movement_left -= movement_cost;
+                        current_movement_left = current_movement_left.saturating_sub(movement_cost);
                     }
 
                     path_points.push(PathPoint {
