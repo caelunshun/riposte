@@ -25,16 +25,9 @@ pub fn init_graphics_state() -> anyhow::Result<(
     Arc<wgpu::Queue>,
 )> {
     let event_loop = EventLoop::new();
-    let monitor = event_loop.primary_monitor().expect("no monitor available");
-    let video_mode = monitor
-        .video_modes()
-        .max_by_key(|v| v.size().width)
-        .expect("no video modes available");
-    log::info!("Video mode: {}", video_mode);
     let window = WindowBuilder::new()
         .with_title(WINDOW_TITLE)
-        .with_inner_size(video_mode.size())
-        .with_fullscreen(Some(Fullscreen::Exclusive(video_mode)))
+        .with_fullscreen(Some(Fullscreen::Borderless(None)))
         .build(&event_loop)
         .context("failed to create window")?;
 
