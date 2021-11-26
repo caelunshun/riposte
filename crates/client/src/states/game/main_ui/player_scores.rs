@@ -10,9 +10,10 @@ use crate::{
     generated::{PlayerScore, ScoresWindow},
     state::StateAttachment,
     ui::Z_FOREGROUND,
+    utils::convert_color,
 };
 
-use riposte_common::{utils::color_to_string, PlayerId};
+use riposte_common::PlayerId;
 
 pub const WIDTH: f32 = 300.;
 
@@ -71,22 +72,26 @@ impl PlayerScores {
         for player in players {
             let (entry, widget) = cx.ui_mut().create_spec_instance::<PlayerScore>();
 
-            let mut username = format!(
-                "@color{{{}}}{{{}}}",
-                color_to_string(&player.civ().color),
+            let mut username = text!(
+                "@color[{}][{}]",
+                convert_color(&player.civ().color),
                 player.username()
             );
             if player.id() == game.the_player().id() {
-                username = format!("[{}]", username);
+                let mut name = text!("{}", "[");
+                name.extend(username);
+                name.extend(text!("{}", "]"));
+                username = name;
             }
 
             if game.the_player().is_at_war_with(player.id()) {
-                username = format!("{} @color{{rgb(207,69,32)}}{{(WAR)}}", username);
+                username.extend(text!("@color[207,69,32][(WAR)]"));
             }
 
-            let text = format!("{}:    {}", player.score(), username);
+            let mut text = text!("{}:    ", player.score());
+            text.extend(username);
 
-            entry.text.get_mut().set_text(text!("{}", text));
+            entry.text.get_mut().set_text(text);
 
             if player.id() != game.the_player().id() {
                 let was_at_war = game.the_player().is_at_war_with(player.id());

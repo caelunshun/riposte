@@ -29,6 +29,7 @@ mod game;
 mod generated;
 mod options;
 mod paths;
+mod utils;
 mod popups;
 mod renderer;
 mod saveload;

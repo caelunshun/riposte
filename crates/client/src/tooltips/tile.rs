@@ -1,18 +1,19 @@
 use std::mem;
-use std::{fmt::Write, num::NonZeroUsize};
+use std::{ num::NonZeroUsize};
 
+use dume::Text;
 use glam::UVec2;
 use lexical::{format::STANDARD, WriteFloatOptions};
 use riposte_common::assets::Handle;
 use riposte_common::registry::{Resource, UnitKind};
 use riposte_common::unit::MovementPoints;
-use riposte_common::utils::{color_to_string, delimit_string, merge_lines};
 use riposte_common::{Improvement, PlayerId, UnitId, Visibility, Yield};
 
 use crate::game::unit::{Capability, Unit};
 use crate::game::{Game, Tile};
+use crate::utils::{convert_color, delimit_text, merge_text_lines};
 
-pub fn tile_tooltip(game: &Game, tile: &Tile, pos: UVec2) -> String {
+pub fn tile_tooltip(game: &Game, tile: &Tile, pos: UVec2) -> Text {
     let mut lines = Vec::new();
 
     lines.extend(culture_lines(game, tile));
@@ -25,10 +26,10 @@ pub fn tile_tooltip(game: &Game, tile: &Tile, pos: UVec2) -> String {
         lines.extend(resource_line(game, tile, &resource));
     }
 
-    merge_lines(&lines)
+    merge_text_lines(lines)
 }
 
-fn culture_lines(game: &Game, tile: &Tile) -> Vec<String> {
+fn culture_lines(game: &Game, tile: &Tile) -> Vec<Text> {
     let mut lines = Vec::new();
 
     let total_culture = tile.culture().iter().map(|c| c.amount()).sum::<u32>();
@@ -42,10 +43,10 @@ fn culture_lines(game: &Game, tile: &Tile) -> Vec<String> {
         let percent = (culture_value.amount() as f64 / total_culture as f64 * 100.).floor() as u32;
 
         if percent != 0 {
-            lines.push(format!(
-                "{}%percent @color{{{}}}{{{}}}",
+            lines.push(text!(
+                "{}% @color[{}][{}]",
                 percent,
-                color_to_string(&player.civ().color),
+                convert_color(&player.civ().color),
                 player.civ().adjective
             ));
         }
@@ -81,7 +82,7 @@ impl UnitLinesEntry {
     }
 }
 
-fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
+fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<Text> {
     if game.the_player().visibility_at(pos) != Visibility::Visible && !game.cheat_mode {
         return Vec::new();
     }
@@ -117,10 +118,10 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
         .unwrap();
 
     for entry in entries {
-        let mut line = format!("@color{{rgb(255,205,0)}}{{{}}}", entry.kind.name);
+        let mut line = text!("@color[255,205,0][{}]", entry.kind.name);
 
         if entry.units.len() > 1 {
-            write!(line, " ({})", entry.units.len()).unwrap();
+            line.extend(text!(" ({})", entry.units.len()));
         }
 
         if entry.kind.strength > 0. {
@@ -136,7 +137,7 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
                     )
                 )
             };
-            write!(line, ", {} @icon{{strength}}", strength).unwrap();
+            line.extend(text!(", {} @icon[strength]", strength));
         }
 
         let movement = if entry.movement_left.as_f64().ceil() as u32 == entry.kind.movement {
@@ -148,17 +149,16 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
                 entry.kind.movement
             )
         };
-        write!(line, ", {} @icon{{movement}}", movement).unwrap();
+        line.extend(text!(", {} @icon[movement]", movement));
 
         if entry.owner != game.the_player().id() {
             let owner = game.player(entry.owner);
-            write!(
-                line,
-                ", @color{{{}}}{{{}}}",
-                color_to_string(&owner.civ().color),
+
+            line.extend(text!(
+                ", @color[{}][{}]",
+                convert_color(&owner.civ().color),
                 owner.username()
-            )
-            .unwrap();
+            ));
         } else {
             let unit = game.unit(entry.units.first().copied().unwrap());
             if let Some(worker_cap) = unit.capabilities().find_map(|c| match c {
@@ -166,13 +166,11 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
                 _ => None,
             }) {
                 if let Some(task) = worker_cap.current_task() {
-                    write!(
-                        line,
+                    line.extend(text!(
                         ", {} ({})",
                         task.kind.present_participle(),
                         task.turns_left()
-                    )
-                    .unwrap();
+                    ));
                 }
             };
         }
@@ -183,43 +181,43 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<String> {
     lines
 }
 
-fn header(tile: &Tile) -> String {
-    let mut header = format!("{:?}", tile.terrain());
+fn header(tile: &Tile) -> Text {
+    let mut header = text!("{:?}", tile.terrain());
     if tile.is_hilled() {
-        header += ", Hills";
+        header.extend(text!(", Hills"));
     }
     if tile.is_forested() {
-        header += ", Forest";
+        header.extend(text!(", Forest"));
     }
     header
 }
 
-fn defense_bonus_line(tile: &Tile) -> Option<String> {
+fn defense_bonus_line(tile: &Tile) -> Option<Text> {
     let bonus = tile.defense_bonus();
     if bonus > 0 {
-        Some(format!("Defense bonus: +{}%percent", bonus))
+        Some(text!("Defense bonus: +{}%", bonus))
     } else {
         None
     }
 }
 
-fn yield_description_line(yiel: &Yield) -> String {
+fn yield_description_line(yiel: &Yield) -> Text {
     let mut parts = Vec::new();
 
     if yiel.food > 0 {
-        parts.push(format!("{}@icon{{bread}}", yiel.food));
+        parts.push(text!("{}@icon[bread]", yiel.food));
     }
     if yiel.hammers > 0 {
-        parts.push(format!("{}@icon{{hammer}}", yiel.hammers));
+        parts.push(text!("{}@icon[hammer]", yiel.hammers));
     }
     if yiel.commerce > 0 {
-        parts.push(format!("{}@icon{{coin}}", yiel.commerce));
+        parts.push(text!("{}@icon[coin]", yiel.commerce));
     }
 
-    delimit_string(&parts, ", ")
+    delimit_text(parts, text!(", "))
 }
 
-fn resource_line(game: &Game, tile: &Tile, resource: &Resource) -> Option<String> {
+fn resource_line(game: &Game, tile: &Tile, resource: &Resource) -> Option<Text> {
     if !game
         .the_player()
         .has_unlocked_tech(&game.registry().tech(&resource.revealed_by).unwrap())
@@ -227,41 +225,38 @@ fn resource_line(game: &Game, tile: &Tile, resource: &Resource) -> Option<String
         return None;
     }
 
-    let mut line = resource.name.to_owned();
+    let mut line = text!("{}, ", resource.name);
 
-    line += ", ";
-    line += &yield_description_line(&resource.improved_bonus);
+    line.extend(yield_description_line(&resource.improved_bonus));
 
     if !tile
         .improvements()
         .any(|i| resource.improvement == i.name())
     {
-        write!(
-            line,
-            " (@color{{rgb(200,30,60)}}{{Requires {})}}",
+        line.extend(text!(
+            " (@color[200,30,60][Requires {})]",
             resource.improvement
-        )
-        .unwrap();
+        ));
     }
 
     Some(line)
 }
 
-fn improvement_lines(tile: &Tile) -> Vec<String> {
+fn improvement_lines(tile: &Tile) -> Vec<Text> {
     let mut lines = Vec::new();
 
     for improvement in tile.improvements() {
         match improvement {
             Improvement::Cottage(cottage) => {
-                lines.push(format!("{:?}", cottage.level()));
+                lines.push(text!("{:?}", cottage.level()));
                 if !tile.is_worked() {
                     lines
                         .last_mut()
                         .unwrap()
-                        .push_str(" (City must work to grow)");
+                        .extend(text!(" (City must work to grow)"));
                 }
             }
-            _ => lines.push(improvement.name().clone()),
+            _ => lines.push(text!("{}", improvement.name())),
         }
     }
 

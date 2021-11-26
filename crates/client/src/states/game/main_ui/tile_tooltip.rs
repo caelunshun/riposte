@@ -74,7 +74,7 @@ impl TileTooltip {
         self.window
             .tooltip_text
             .get_mut()
-            .set_text(text!("{}", tile_tooltip(game, &tile, tile_pos)));
+            .set_text(tile_tooltip(game, &tile, tile_pos));
         self.window.root.unhide();
         self.hovered_tile = Some(tile_pos);
     }
