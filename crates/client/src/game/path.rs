@@ -188,6 +188,9 @@ impl Pathfinder {
                 if !is_ship && tile.terrain() == Terrain::Ocean {
                     continue;
                 }
+                if tile.terrain() == Terrain::Mountains {
+                    continue;
+                }
                 if is_ship
                     && tile.terrain() != Terrain::Ocean
                     && game.city_at_pos(neighbor).is_none()

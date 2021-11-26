@@ -3,6 +3,7 @@ use glam::UVec2;
 use uuid::Uuid;
 
 use super::{CityId, PlayerId, UnitId};
+use crate::event::Event;
 use crate::lobby::SlotId;
 use crate::registry::Leader;
 use crate::world::Game;
@@ -293,6 +294,11 @@ impl Player {
     fn die(&mut self, _game: &Game) {
         self.is_alive = false;
         log::info!("{} has died", self.username());
+    }
+
+    /// Should be called on the end of each turn.
+    pub fn on_turn_end(&mut self, game: &Game) {
+        game.push_event(Event::PlayerChanged(self.id()));
     }
 }
 

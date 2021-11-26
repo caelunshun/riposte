@@ -78,7 +78,7 @@ impl Server {
     fn update(&mut self) {
         match &mut self.state {
             State::Lobby(l) => l.update(&self.connections),
-            State::Game(_g) => {}
+            State::Game(g) => g.update(&self.connections),
         }
     }
 

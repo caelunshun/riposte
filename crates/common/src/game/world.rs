@@ -10,7 +10,9 @@ use rand_pcg::Pcg64Mcg;
 use slotmap::{SecondaryMap, SlotMap};
 
 use super::{CityId, PlayerId, UnitId};
-use crate::{registry::Registry, tile::OutOfBounds, City, Grid, Player, Tile, Turn, Unit};
+use crate::{
+    event::Event, registry::Registry, tile::OutOfBounds, City, Grid, Player, Tile, Turn, Unit,
+};
 
 /// Stores the entire game state.
 #[derive(Debug)]
@@ -36,6 +38,8 @@ pub struct Game {
     rng: RefCell<Pcg64Mcg>,
 
     turn: Turn,
+
+    events: RefCell<Vec<Event>>,
 }
 
 impl Game {
@@ -58,6 +62,8 @@ impl Game {
             rng: RefCell::new(Pcg64Mcg::from_entropy()),
 
             turn: Turn::new(0),
+
+            events: RefCell::new(Vec::new()),
         }
     }
 
@@ -216,5 +222,28 @@ impl Game {
 
     pub fn set_turn(&mut self, turn: Turn) {
         self.turn = turn;
+    }
+
+    /// Ends the turn, running all inter-turn simulation. (Server only.)
+    pub fn end_turn(&mut self) {
+        for unit in self.units.values() {
+            unit.borrow_mut().on_turn_end(self);
+        }
+
+        for player in self.players.values() {
+            player.borrow_mut().on_turn_end(self);
+        }
+
+        self.turn.increment();
+    }
+
+    pub fn push_event(&self, event: Event) {
+        self.events.borrow_mut().push(event);
+    }
+
+    pub fn drain_events(&self, mut f: impl FnMut(Event)) {
+        for event in self.events.borrow_mut().drain(..) {
+            f(event);
+        }
     }
 }

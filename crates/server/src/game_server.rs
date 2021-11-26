@@ -1,13 +1,18 @@
 use anyhow::Context;
 use riposte_common::{
+    event::Event,
     protocol::{
         client::{ClientGamePacket, ClientPacket, MoveUnits},
         game::server::{InitialGameData, ServerGamePacket, ServerPacket},
-        server::{ConfirmMoveUnits, UnitsMoved},
+        server::{
+            ConfirmMoveUnits, UnitsMoved, UpdateCity, UpdatePlayer, UpdateTile, UpdateTurn,
+            UpdateUnit,
+        },
         GenericServerPacket,
     },
     PlayerId,
 };
+use slotmap::SecondaryMap;
 
 use crate::connection::{ConnectionId, Connections};
 use crate::game::Game;
@@ -15,6 +20,7 @@ use crate::game::Game;
 pub struct GameServer {
     game: Game,
     player_connections: Vec<(PlayerId, ConnectionId)>,
+    ended_turns: SecondaryMap<PlayerId, bool>,
 }
 
 impl GameServer {
@@ -22,16 +28,19 @@ impl GameServer {
         Self {
             game,
             player_connections: Vec::new(),
+            ended_turns: SecondaryMap::default(),
         }
     }
 
     pub fn add_connection(&mut self, _conns: &Connections, id: ConnectionId, player: PlayerId) {
         self.remove_connection_for_player(player);
         self.player_connections.push((player, id));
+        self.ended_turns.insert(player, false);
     }
 
     fn remove_connection_for_player(&mut self, player: PlayerId) {
         self.player_connections.retain(|(p, _)| *p != player);
+        self.ended_turns.remove(player);
     }
 
     fn conn_for_player(&self, player: PlayerId) -> ConnectionId {
@@ -42,7 +51,7 @@ impl GameServer {
             .1
     }
 
-    fn broadcast(&mut self, conns: &Connections, packet: ServerPacket) {
+    fn broadcast(&self, conns: &Connections, packet: ServerPacket) {
         for (_, conn) in conns.iter() {
             conn.send_packet(GenericServerPacket::Game(ServerGamePacket {
                 request_id: None,
@@ -90,7 +99,7 @@ impl GameServer {
             ClientPacket::ConfigureWorkedTiles(_) => todo!(),
             ClientPacket::BombardCity(_) => todo!(),
             ClientPacket::SaveGame(_) => todo!(),
-            ClientPacket::EndTurn(_) => todo!(),
+            ClientPacket::EndTurn(_) => self.handle_end_turn(player, conns),
         }
 
         Ok(())
@@ -134,6 +143,54 @@ impl GameServer {
             ServerPacket::ConfirmMoveUnits(ConfirmMoveUnits { success }),
             Some(request_id),
         );
+    }
+
+    fn handle_end_turn(&mut self, player: PlayerId, conns: &Connections) {
+        self.ended_turns[player] = true;
+        if self.ended_turns.values().all(|&b| b) {
+            self.end_turn(conns);
+        }
+    }
+
+    fn end_turn(&mut self, conns: &Connections) {
+        self.game.end_turn();
+
+        self.broadcast(
+            conns,
+            ServerPacket::UpdateTurn(UpdateTurn {
+                turn: self.game.turn(),
+            }),
+        );
+    }
+
+    pub fn update(&mut self, conns: &Connections) {
+        self.game.drain_events(|event| match event {
+            Event::UnitChanged(id) => self.broadcast(
+                conns,
+                ServerPacket::UpdateUnit(UpdateUnit {
+                    unit: (*self.game.unit(id)).clone(),
+                }),
+            ),
+            Event::CityChanged(id) => self.broadcast(
+                conns,
+                ServerPacket::UpdateCity(UpdateCity {
+                    city: (*self.game.city(id)).clone(),
+                }),
+            ),
+            Event::PlayerChanged(id) => self.broadcast(
+                conns,
+                ServerPacket::UpdatePlayer(UpdatePlayer {
+                    player: (*self.game.player(id)).clone(),
+                }),
+            ),
+            Event::TileChanged(pos) => self.broadcast(
+                conns,
+                ServerPacket::UpdateTile(UpdateTile {
+                    pos,
+                    tile: (*self.game.tile(pos).unwrap()).clone(),
+                }),
+            ),
+        });
     }
 
     pub fn game(&self) -> &Game {

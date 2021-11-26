@@ -45,7 +45,8 @@ impl InfoBar {
 
     pub fn update_info(&mut self, _cx: &Context, game: &Game) {
         self.window.turn_text.get_mut().set_text(text!(
-            "Turn {}    •    {:?} Era",
+            "{}    •    Turn {}    •    {:?} Era",
+            game.turn().year(),
             game.turn(),
             game.era()
         ));

@@ -9,6 +9,7 @@ use lexical::WriteFloatOptions;
 
 use crate::{
     assets::Handle,
+    event::Event,
     registry::{CapabilityType, CombatBonusType, UnitKind},
     world::Game,
 };
@@ -275,6 +276,12 @@ impl Unit {
         Ok(())
     }
 
+    /// Returns whether the unit has moved on the current turn.
+    pub fn has_moved(&self) -> bool {
+        self.movement_left.as_fixed_u32()
+            < MovementPoints::from_u32(self.kind.movement).as_fixed_u32()
+    }
+
     /// Returns whether the unit can move to the given adjacent
     /// tile.
     ///
@@ -311,6 +318,63 @@ impl Unit {
             .saturating_sub(target_tile.movement_cost(game, &*game.player(self.owner())));
 
         true
+    }
+
+    /// Should be called at the end of each turn.
+    pub fn on_turn_end(&mut self, game: &Game) {
+        self.heal(game);
+
+        self.reset_fortify();
+
+        self.reset_movement();
+
+        game.push_event(Event::UnitChanged(self.id()));
+    }
+
+    fn reset_fortify(&mut self) {
+        self.is_skipping_turn = false;
+        if self.health == 1. {
+            self.is_fortified_until_heal = false;
+        }
+    }
+
+    fn reset_movement(&mut self) {
+        self.movement_left = MovementPoints::from_u32(self.kind.movement);
+    }
+
+    fn heal(&mut self, game: &Game) {
+        // Can only heal when we didn't do anything on the previous turn.
+        if self.has_moved() {
+            return;
+        }
+
+        // Healing per turn depends on the tile we're on:
+        // * 20% when in a city
+        // * 5% in enemy territory
+        // * 10% in neutral territory
+        // * 15% in our territory
+
+        let tile = game.tile(self.pos()).unwrap();
+        let tile_owner = tile.owner().map(|t| game.player(t));
+        let rate = if game.city_at_pos(self.pos()).is_some() {
+            0.2
+        } else {
+            match tile_owner {
+                Some(t) => {
+                    if t.is_at_war_with(self.owner) {
+                        0.05
+                    } else if t.id() == self.owner {
+                        0.15
+                    } else {
+                        0.1
+                    }
+                }
+                None => 0.1,
+            }
+        };
+
+        self.set_health(self.health + rate);
+        assert!(self.health <= 1.);
     }
 
     /// Sets the unit's position directly.
