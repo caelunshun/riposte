@@ -10,4 +10,5 @@ pub enum Event {
     CityChanged(CityId),
     PlayerChanged(PlayerId),
     TileChanged(UVec2),
+    UnitDeleted(UnitId)
 }

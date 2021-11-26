@@ -1,5 +1,6 @@
 use std::{
     cell::{Ref, RefCell, RefMut},
+    mem,
     sync::Arc,
 };
 
@@ -15,7 +16,6 @@ use crate::{
 };
 
 /// Stores the entire game state.
-#[derive(Debug)]
 pub struct Game {
     registry: Arc<Registry>,
 
@@ -40,6 +40,8 @@ pub struct Game {
     turn: Turn,
 
     events: RefCell<Vec<Event>>,
+
+    deferred: RefCell<Vec<Box<dyn FnOnce(&mut Game) + Send>>>,
 }
 
 impl Game {
@@ -64,6 +66,8 @@ impl Game {
             turn: Turn::new(0),
 
             events: RefCell::new(Vec::new()),
+
+            deferred: RefCell::new(Vec::new()),
         }
     }
 
@@ -100,6 +104,7 @@ impl Game {
 
     /// Adds a new player with an existing ID.
     pub fn add_player(&mut self, player: Player) {
+        self.push_event(Event::PlayerChanged(player.id()));
         self.players.insert(player.id(), RefCell::new(player));
     }
 
@@ -143,6 +148,7 @@ impl Game {
         let owner = city.owner();
         self.cities.insert(id, RefCell::new(city));
         self.player_mut(owner).register_city(id);
+        self.push_event(Event::CityChanged(id));
     }
 
     /// Gets the city at the given tile.
@@ -181,6 +187,7 @@ impl Game {
         if let Some(u) = self.units.remove(id) {
             self.player_mut(u.into_inner().owner()).deregister_unit(id);
         }
+        self.push_event(Event::UnitDeleted(id));
     }
 
     /// Adds a new unit with an existing ID.
@@ -189,6 +196,7 @@ impl Game {
         let owner = unit.owner();
         self.units.insert(id, RefCell::new(unit));
         self.player_mut(owner).register_unit(id);
+        self.push_event(Event::UnitChanged(id));
     }
 
     /// Gets the tile map.
@@ -245,5 +253,17 @@ impl Game {
         for event in self.events.borrow_mut().drain(..) {
             f(event);
         }
+    }
+
+    pub fn defer(&self, f: impl FnOnce(&mut Self) + 'static + Send) {
+        self.deferred.borrow_mut().push(Box::new(f));
+    }
+
+    pub fn run_deferred_functions(&mut self) {
+        let mut functions = mem::take(&mut self.deferred);
+        for f in functions.get_mut().drain(..) {
+            f(self);
+        }
+        self.deferred = functions;
     }
 }

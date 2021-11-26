@@ -2,11 +2,11 @@ use anyhow::Context;
 use riposte_common::{
     event::Event,
     protocol::{
-        client::{ClientGamePacket, ClientPacket, MoveUnits},
+        client::{ClientGamePacket, ClientPacket, DoUnitAction, MoveUnits, UnitAction},
         game::server::{InitialGameData, ServerGamePacket, ServerPacket},
         server::{
-            ConfirmMoveUnits, UnitsMoved, UpdateCity, UpdatePlayer, UpdateTile, UpdateTurn,
-            UpdateUnit,
+            ConfirmMoveUnits, DeleteUnit, UnitsMoved, UpdateCity, UpdatePlayer, UpdateTile,
+            UpdateTurn, UpdateUnit,
         },
         GenericServerPacket,
     },
@@ -94,7 +94,7 @@ impl GameServer {
             ClientPacket::SetWorkerTask(_) => todo!(),
             ClientPacket::SetEconomySettings(_) => todo!(),
             ClientPacket::SetResearch(_) => todo!(),
-            ClientPacket::DoUnitAction(_) => todo!(),
+            ClientPacket::DoUnitAction(p) => self.handle_do_unit_action(p),
             ClientPacket::DeclareWar(_) => todo!(),
             ClientPacket::ConfigureWorkedTiles(_) => todo!(),
             ClientPacket::BombardCity(_) => todo!(),
@@ -145,6 +145,22 @@ impl GameServer {
         );
     }
 
+    fn handle_do_unit_action(&mut self, packet: DoUnitAction) {
+        match packet.action {
+            UnitAction::Kill => self.game.remove_unit(packet.unit_id),
+            UnitAction::Fortify => self.game.unit_mut(packet.unit_id).fortify_forever(),
+            UnitAction::SkipTurn => self.game.unit_mut(packet.unit_id).skip_turn(),
+            UnitAction::FortifyUntilHealed => {
+                self.game.unit_mut(packet.unit_id).fortify_until_healed()
+            }
+            UnitAction::FoundCity => {
+                if let Err(e) = self.game.unit_mut(packet.unit_id).found_city(&self.game) {
+                    log::info!("Failed to found city: {}", e);
+                }
+            }
+        }
+    }
+
     fn handle_end_turn(&mut self, player: PlayerId, conns: &Connections) {
         self.ended_turns[player] = true;
         if self.ended_turns.values().all(|&b| b) {
@@ -164,6 +180,7 @@ impl GameServer {
     }
 
     pub fn update(&mut self, conns: &Connections) {
+        self.game.run_deferred_functions();
         self.game.drain_events(|event| match event {
             Event::UnitChanged(id) => self.broadcast(
                 conns,
@@ -190,6 +207,9 @@ impl GameServer {
                     tile: (*self.game.tile(pos).unwrap()).clone(),
                 }),
             ),
+            Event::UnitDeleted(unit) => {
+                self.broadcast(conns, ServerPacket::DeleteUnit(DeleteUnit { unit }))
+            }
         });
     }
 

@@ -12,6 +12,7 @@ use crate::{
     event::Event,
     registry::{CapabilityType, CombatBonusType, UnitKind},
     world::Game,
+    City,
 };
 
 use super::{improvement::Improvement, PlayerId, UnitId};
@@ -276,6 +277,28 @@ impl Unit {
         Ok(())
     }
 
+    /// Founds a city on the current tile.
+    pub fn found_city(&mut self, game: &Game) -> Result<(), CannotFoundCity> {
+        assert!(self.on_server);
+        self.can_found_city(game)?;
+
+        let this = self.id();
+        game.defer(move |game| {
+            let id = game.new_city_id();
+            let city = {
+                let this = game.unit(this);
+                let owner = game.player(this.owner());
+
+                City::new(id, &*owner, this.pos(), owner.next_city_name(game))
+            };
+
+            game.add_city(city);
+            game.remove_unit(this);
+        });
+
+        Ok(())
+    }
+
     /// Returns whether the unit has moved on the current turn.
     pub fn has_moved(&self) -> bool {
         self.movement_left.as_fixed_u32()
@@ -388,6 +411,18 @@ impl Unit {
 
     pub fn set_health(&mut self, health: f64) {
         self.health = health.clamp(0., 1.);
+    }
+
+    pub fn fortify_forever(&mut self) {
+        self.is_fortified_forever = true;
+    }
+
+    pub fn fortify_until_healed(&mut self) {
+        self.is_fortified_until_heal = true;
+    }
+
+    pub fn skip_turn(&mut self) {
+        self.is_skipping_turn = true;
     }
 }
 

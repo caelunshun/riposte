@@ -183,8 +183,8 @@ impl CityRenderer {
 
     fn render_population_progress_bar(&mut self, game: &Game, canvas: &mut Canvas, city: &City) {
         let mut progress = city.stored_food() as f32 / city.food_needed_for_growth() as f32;
-        let mut projected_progress = (city.stored_food() + city.economy().food_yield
-            - city.food_consumed_per_turn()) as f32
+        let mut projected_progress = (city.stored_food() as i32 + city.economy().food_yield as i32
+            - city.food_consumed_per_turn() as i32) as f32
             / city.food_needed_for_growth() as f32;
         if city.owner() != game.the_player().id() {
             progress = 0.;

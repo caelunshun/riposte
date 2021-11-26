@@ -21,10 +21,7 @@ use crate::{
     ui::Z_FOREGROUND,
 };
 
-use riposte_common::{
-    protocol::client::UnitAction, registry::CapabilityType, unit::WorkerTaskKind, Improvement,
-    UnitId,
-};
+use riposte_common::{protocol::client::UnitAction, unit::WorkerTaskKind, Improvement, UnitId};
 
 use super::unit_info;
 
@@ -79,7 +76,7 @@ fn get_possible_unit_actions(game: &Game, unit: &Unit) -> Vec<PossibleUnitAction
     }
 
     // Settlers can found cities.
-    if unit.has_capability(CapabilityType::FoundCity) {
+    if unit.can_found_city(game.base()).is_ok() {
         // Recommend founding a city  if the player has no cities
         let is_recommended = game.player_cities(game.the_player().id()).count() == 0;
         actions.push(PossibleUnitAction {
@@ -195,7 +192,7 @@ impl UnitActionBar {
                     .the_button
                     .get_mut()
                     .on_click(move || message.clone());
-                handle.the_text.get_mut().set_text(text!(""));
+                handle.the_text.get_mut().set_text(text!("{}", action.text));
 
                 if action.is_recommended {
                     handle.the_button.get_mut().set_flashing(true);

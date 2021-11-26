@@ -300,6 +300,27 @@ impl Player {
     pub fn on_turn_end(&mut self, game: &Game) {
         game.push_event(Event::PlayerChanged(self.id()));
     }
+
+    /// Gets the name of the next city to create for this player.
+    pub fn next_city_name(&self, game: &Game) -> String {
+        let current_city_names: AHashSet<String> = self
+            .cities()
+            .iter()
+            .map(|c| game.city(*c).name().to_owned())
+            .collect();
+
+        let mut num_news = 0;
+        loop {
+            for city in &self.civ.cities {
+                let mut name = "New ".repeat(num_news);
+                name.push_str(&city);
+                if !current_city_names.contains(name.as_str()) {
+                    return name;
+                }
+            }
+            num_news += 1;
+        }
+    }
 }
 
 /// Cached economy data for a player.
