@@ -8,6 +8,7 @@ use crate::{
     game::{event::GameEvent, Game},
     renderer::GameRenderer,
     state::StateAttachment,
+    states::game::prompts::city_build::CityBuildPrompt,
 };
 
 use self::{
@@ -138,16 +139,12 @@ impl GameState {
         }
     }
 
-    fn handle_city_updated(&mut self, _cx: &Context, city: CityId) {
+    fn handle_city_updated(&mut self, cx: &Context, city: CityId) {
         let city = self.game.city(city);
         if city.build_task().is_none() && city.owner() == self.game.the_player().id() {
             log::info!("Queueing build prompt for {}", city.name());
-            /*self.prompts.push(CityBuildPrompt::new(
-                cx,
-                &self.game,
-                &mut self.client,
-                city.id(),
-            ));*/
+            self.prompts
+                .push(CityBuildPrompt::new(&self.game, cx, city.id()));
         }
     }
 

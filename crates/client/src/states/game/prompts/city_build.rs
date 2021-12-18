@@ -1,8 +1,9 @@
 use duit::{Align, Vec2};
+use dume::Text;
 use glam::vec2;
 
 use crate::{
-    client::{Client, GameState, ServerResponseFuture},
+    client::{Client, GameState},
     context::Context,
     game::{city::BuildTask, Game},
     generated::{CityBuildPromptOption, CityBuildPromptWindow},
@@ -11,7 +12,7 @@ use crate::{
     ui::{AlignFixed, Z_POPUP},
 };
 
-use riposte_common::{utils::article, CityId};
+use riposte_common::{city::PreviousBuildTask, utils::article, CityId};
 
 use super::{Action, Prompt};
 
@@ -25,29 +26,23 @@ pub struct CityBuildPrompt {
 
     city: CityId,
 
-    possible_tasks: ServerResponseFuture<PossibleCityBuildTasks>,
-
     window: Option<CityBuildPromptWindow>,
-
-    received_tasks: bool,
 }
 
 impl CityBuildPrompt {
-    pub fn new(cx: &Context, game: &Game, client: &mut Client<GameState>, city: CityId) -> Self {
+    pub fn new(_game: &Game, cx: &Context, city: CityId) -> Self {
         Self {
             attachment: cx.state_manager().create_state(),
             city,
-            possible_tasks: client.get_possible_city_build_tasks(game, city),
-            received_tasks: false,
             window: None,
         }
     }
 
-    fn title_text(&self, game: &Game) -> String {
+    fn title_text(&self, game: &Game) -> Text {
         let city = game.city(self.city);
 
         match city.previous_build_task() {
-            Some(PreviousBuildTask { succeeded, task }) => {
+            Some(PreviousBuildTask { success, task }) => {
                 let (verb, verb_participle, name) = match &task {
                     BuildTask::Unit(unit) => ("trained", "training", &unit.name),
                     BuildTask::Building(building) => {
@@ -55,15 +50,15 @@ impl CityBuildPrompt {
                     }
                 };
 
-                if *succeeded {
-                    format!("You have {} {} @color{{rgb(255, 191, 63)}}{{{}}} in {}. What would you like to work on next?", 
+                if *success {
+                    text!("You have {} {} @color[255, 191, 63][{}] in {}. What would you like to work on next?", 
                         verb, article(name), name, city.name())
                 } else {
-                    format!("You can no longer continue {} {} @color{{rgb(255, 191, 63)}}{{{}}} in {}. What would you like to work on instead?", 
+                    text!("You can no longer continue {} {} @color[255, 191, 63][{}] in {}. What would you like to work on instead?", 
                         verb_participle, article(name), name, city.name())
                 }
             }
-            None => format!("What would you like to build in {}?", city.name()),
+            None => text!("What would you like to build in {}?", city.name()),
         }
     }
 }
@@ -84,11 +79,13 @@ impl Prompt for CityBuildPrompt {
         window
             .question_text
             .get_mut()
-            .set_text(text!("{}", self.title_text(game)));
+            .set_text(self.title_text(game));
 
         game.view_mut().animate_to(cx, city.pos());
 
         self.window = Some(window);
+
+        self.initialize_tasks(cx, game);
     }
 
     fn update(
@@ -102,13 +99,6 @@ impl Prompt for CityBuildPrompt {
             return Some(Action::Close);
         }
 
-        if !self.received_tasks {
-            if let Some(tasks) = self.possible_tasks.get() {
-                self.initialize_tasks(cx, game, tasks);
-                self.received_tasks = true;
-            }
-        }
-
         if let Some(msg) = cx.ui_mut().pop_message::<SetTask>() {
             client.set_city_build_task(game, self.city, msg.0);
             Some(Action::Close)
@@ -119,39 +109,39 @@ impl Prompt for CityBuildPrompt {
 }
 
 impl CityBuildPrompt {
-    fn initialize_tasks(&mut self, cx: &mut Context, game: &Game, tasks: PossibleCityBuildTasks) {
+    fn initialize_tasks(&mut self, cx: &Context, game: &Game) {
+        let tasks = game.city(self.city).possible_build_tasks(game.base());
         let mut ui = cx.ui_mut();
         let city = game.city(self.city);
-        for proto_task in tasks.tasks {
-            match BuildTask::from_data(&proto_task, game) {
-                Ok(task) => {
-                    let (handle, widget) = ui.create_spec_instance::<CityBuildPromptOption>();
+        for task in &tasks {
+            let (handle, widget) = ui.create_spec_instance::<CityBuildPromptOption>();
 
-                    handle.option_text.get_mut().set_text(text!(
-                        "{} ({} turns)",
-                        task.name(),
-                        city.estimate_build_time_for_task(&task)
-                    ));
-                    handle
-                        .clickable
-                        .get_mut()
-                        .on_click(move || SetTask(proto_task.clone()));
+            handle.option_text.get_mut().set_text(text!(
+                "{} ({})",
+                task.name(),
+                city.estimate_build_time_for_task(&task)
+            ));
 
-                    let tooltip_text = tooltips::build_task_tooltip(cx.registry(), &task.kind);
-                    handle
-                        .tooltip_text
-                        .get_mut()
-                        .set_text(text!("{}", tooltip_text));
-
-                    self.window
-                        .as_mut()
-                        .unwrap()
-                        .options_column
-                        .get_mut()
-                        .add_child(widget);
-                }
-                Err(e) => log::error!("Received bad build task from server: {}", e),
+            {
+                let task = task.clone();
+                handle
+                    .clickable
+                    .get_mut()
+                    .on_click(move || SetTask(task.clone()));
             }
+
+            let tooltip_text = tooltips::build_task_tooltip(cx.registry(), &task);
+            handle
+                .tooltip_text
+                .get_mut()
+                .set_text(tooltip_text);
+
+            self.window
+                .as_mut()
+                .unwrap()
+                .options_column
+                .get_mut()
+                .add_child(widget);
         }
     }
 }

@@ -6,6 +6,7 @@ use super::{CityId, PlayerId, UnitId};
 use crate::event::Event;
 use crate::lobby::SlotId;
 use crate::registry::Leader;
+use crate::utils::MaybeInfinityU32;
 use crate::world::Game;
 use crate::{
     assets::Handle,
@@ -216,19 +217,16 @@ impl Player {
     }
 
     /// Estimate the number of turns it takes to complete the given research.
-    pub fn estimate_research_turns(&self, tech: &Tech, progress: u32) -> Option<u32> {
-        if self.beaker_revenue() == 0 {
-            None
-        } else {
-            Some((tech.cost - progress + self.beaker_revenue() - 1) / self.beaker_revenue())
-        }
+    pub fn estimate_research_turns(&self, tech: &Tech, progress: u32) -> MaybeInfinityU32 {
+        MaybeInfinityU32::new(tech.cost - progress + self.beaker_revenue() - 1)
+            / self.beaker_revenue()
     }
 
     /// Estimate remaining turns for the currently researching tech.
-    pub fn estimate_current_research_turns(&self) -> Option<u32> {
+    pub fn estimate_current_research_turns(&self) -> MaybeInfinityU32 {
         self.researching_tech()
             .map(|tech| self.estimate_research_turns(tech, self.tech_progress(tech)))
-            .unwrap_or_default()
+            .unwrap_or_else(|| MaybeInfinityU32::new(0))
     }
 
     pub fn downgrade_to_client(&mut self) {

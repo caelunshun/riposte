@@ -1,4 +1,4 @@
-use std::{cell::Cell, rc::Rc};
+use std::{cell::Cell, fmt::Display, ops::Div, rc::Rc};
 
 use arrayvec::ArrayVec;
 
@@ -86,5 +86,42 @@ impl VersionSnapshot {
     /// `false` again.
     pub fn update(&self) {
         self.snapshot.set(self.state.version.get());
+    }
+}
+
+/// A wrapper over a `u32` that can be either finite or infinite.
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+pub enum MaybeInfinityU32 {
+    Finite(u32),
+    Infinite,
+}
+
+impl MaybeInfinityU32 {
+    pub fn new(x: u32) -> Self {
+        Self::Finite(x)
+    }
+}
+
+impl Div<u32> for MaybeInfinityU32 {
+    type Output = Self;
+
+    fn div(self, rhs: u32) -> Self::Output {
+        if rhs == 0 {
+            Self::Infinite
+        } else {
+            match self {
+                Self::Finite(x) => Self::Finite(x / rhs),
+                Self::Infinite => Self::Infinite,
+            }
+        }
+    }
+}
+
+impl Display for MaybeInfinityU32 {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            MaybeInfinityU32::Finite(x) => x.fmt(f),
+            MaybeInfinityU32::Infinite => write!(f, "∞"),
+        }
     }
 }

@@ -77,7 +77,7 @@ impl CityRenderer {
                 &text,
                 TextOptions {
                     wrap_lines: false,
-                    baseline: Baseline::Middle,
+                    baseline: Baseline::Bottom,
                     align_h: Align::Center,
                     align_v: Align::Start,
                 },

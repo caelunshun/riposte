@@ -44,7 +44,7 @@ rodio = { version = "0.14", default-features = false, features = [ "vorbis", "wa
 rustls = { version = "0.19", features = [ "dangerous_configuration", "quic" ] }
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"
-simple_logger = "1"
+simple_logger = { version = "1", default-features = false, features = [ "colors" ] }
 slotmap = "1"
 smallvec = "1"
 splines = { version = "4", features = [ "glam" ] }

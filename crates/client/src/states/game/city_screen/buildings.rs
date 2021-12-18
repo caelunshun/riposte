@@ -50,7 +50,7 @@ impl BuildingsScreen {
             entry
                 .building_output
                 .get_mut()
-                .set_text(text!("{}", short_building_tooltip(&building)));
+                .set_text(short_building_tooltip(&building));
             entries.add_child(widget);
         }
     }

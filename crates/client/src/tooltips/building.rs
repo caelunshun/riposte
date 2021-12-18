@@ -1,24 +1,25 @@
-use riposte_common::{
-    registry::{Building, BuildingEffect, BuildingEffectType, Registry},
-    utils::{delimit_string, merge_lines},
-};
+use dume::{Text, TextSection};
+use riposte_common::registry::{Building, BuildingEffect, BuildingEffectType, Registry};
+
+use crate::utils::{delimit_text, merge_text_lines};
 
 /// Gets a tooltip for a building.
-pub fn building_tooltip(registry: &Registry, building: &Building) -> String {
+pub fn building_tooltip(registry: &Registry, building: &Building) -> Text {
     let mut lines = Vec::new();
 
     // Basic info
-    lines.push(building.name.clone());
-    lines.push(format!("{} @icon{{hammer}}", building.cost));
+    lines.push(text!("{}", building.name));
+    lines.push(text!("{} @icon[hammer]", building.cost));
 
     if let Some(civ) = building.only_for_civs.first() {
         let civ = registry.civ(civ).unwrap();
         let replaces = registry
             .building(building.replaces.as_ref().unwrap())
             .unwrap();
-        lines.push(format!(
+        lines.push(text!(
             "Unique Building for {} (Replaces {})",
-            civ.name, replaces.name
+            civ.name,
+            replaces.name
         ));
     }
 
@@ -28,18 +29,28 @@ pub fn building_tooltip(registry: &Registry, building: &Building) -> String {
         lines.push(line);
     }
 
-    merge_lines(&lines)
+    merge_text_lines(lines)
 }
 
-fn bonus_line(amount: i32, icon: &str) -> String {
-    format!("+{} @icon{{{}}}", amount, icon)
+fn bonus_line(amount: i32, icon: &str) -> Text {
+    let mut text = text!("+{} ", amount);
+    text.extend(Text::from_sections([TextSection::Icon {
+        name: icon.into(),
+        size: 12.,
+    }]));
+    text
 }
 
-fn bonus_percent_line(amount: i32, icon: &str) -> String {
-    format!("+{}%percent @icon{{{}}}", amount, icon)
+fn bonus_percent_line(amount: i32, icon: &str) -> Text {
+    let mut text = text!("+{}% ", amount);
+    text.extend(Text::from_sections([TextSection::Icon {
+        name: icon.into(),
+        size: 12.,
+    }]));
+    text
 }
 
-pub fn short_building_tooltip(building: &Building) -> String {
+pub fn short_building_tooltip(building: &Building) -> Text {
     let mut components = Vec::new();
 
     for effect in &building.effects {
@@ -53,10 +64,10 @@ pub fn short_building_tooltip(building: &Building) -> String {
         }
     }
 
-    delimit_string(&components, ", ")
+    delimit_text(components, text!(", "))
 }
 
-fn building_effect_line(effect: &BuildingEffect) -> String {
+fn building_effect_line(effect: &BuildingEffect) -> Text {
     match &effect.typ {
         BuildingEffectType::BonusHammers => bonus_line(effect.amount, "hammer"),
         BuildingEffectType::BonusHammerPercent => bonus_percent_line(effect.amount, "hammer"),
@@ -69,15 +80,15 @@ fn building_effect_line(effect: &BuildingEffect) -> String {
         BuildingEffectType::BonusCulture => bonus_line(effect.amount, "culture"),
         BuildingEffectType::BonusCulturePercent => bonus_percent_line(effect.amount, "culture"),
         BuildingEffectType::DefenseBonusPercent => {
-            format!("+{}%percent city defense", effect.amount)
+            text!("+{}% city defense", effect.amount)
         }
-        BuildingEffectType::OceanFoodBonus => format!("+1@icon{{bread}} on ocean tiles"),
+        BuildingEffectType::OceanFoodBonus => text!("+1@icon[bread] on ocean tiles"),
         BuildingEffectType::MinusMaintenancePercent => {
-            format!("-{}%percent city maintenance", effect.amount)
+            text!("-{}% city maintenance", effect.amount)
         }
         BuildingEffectType::Happiness => bonus_line(effect.amount, "happy"),
         BuildingEffectType::GranaryFoodStore => {
-            "City keeps 50%percent of stored food after growth".to_owned()
+            text!("City keeps 50% of stored food after growth")
         }
     }
 }

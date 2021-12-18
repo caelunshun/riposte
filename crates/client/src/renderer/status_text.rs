@@ -51,7 +51,7 @@ impl OverlayRenderLayer for StatusTextOverlay {
         );
         cx.canvas()
             .context()
-            .resize_text_blob(&mut blob, vec2(100., f32::INFINITY));
+            .resize_text_blob(&mut blob, vec2(cx.canvas().size().x, f32::INFINITY));
         cx.canvas_mut()
             .draw_text(&blob, vec2(0., game.view().window_size().y - 150.), alpha);
     }

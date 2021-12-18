@@ -2,7 +2,9 @@ use anyhow::Context;
 use riposte_common::{
     event::Event,
     protocol::{
-        client::{ClientGamePacket, ClientPacket, DoUnitAction, MoveUnits, UnitAction},
+        client::{
+            ClientGamePacket, ClientPacket, DoUnitAction, MoveUnits, SetCityBuildTask, UnitAction,
+        },
         game::server::{InitialGameData, ServerGamePacket, ServerPacket},
         server::{
             ConfirmMoveUnits, DeleteUnit, UnitsMoved, UpdateCity, UpdatePlayer, UpdateTile,
@@ -90,7 +92,7 @@ impl GameServer {
             ClientPacket::MoveUnits(p) => {
                 self.handle_move_units(player, p, packet.request_id, conns)
             }
-            ClientPacket::SetCityBuildTask(_) => todo!(),
+            ClientPacket::SetCityBuildTask(p) => self.handle_set_city_build_task(p),
             ClientPacket::SetWorkerTask(_) => todo!(),
             ClientPacket::SetEconomySettings(_) => todo!(),
             ClientPacket::SetResearch(_) => todo!(),
@@ -159,6 +161,11 @@ impl GameServer {
                 }
             }
         }
+    }
+
+    fn handle_set_city_build_task(&mut self, p: SetCityBuildTask) {
+        self.game.city_mut(p.city_id).set_build_task(p.build_task);
+        self.game.push_event(Event::CityChanged(p.city_id));
     }
 
     fn handle_end_turn(&mut self, player: PlayerId, conns: &Connections) {

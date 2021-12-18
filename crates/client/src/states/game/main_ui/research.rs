@@ -9,8 +9,6 @@ use crate::{
     ui::{AlignFixed, Z_FOREGROUND},
 };
 
-use riposte_common::utils::INFINITY_SYMBOL;
-
 pub const SIZE: Vec2 = glam::const_vec2!([400., 30.]);
 
 pub struct ResearchBar {
@@ -46,10 +44,7 @@ impl ResearchBar {
                     format!(
                         "Research: {} ({})",
                         research.name,
-                        the_player
-                            .estimate_current_research_turns()
-                            .map(|t| t.to_string())
-                            .unwrap_or_else(|| INFINITY_SYMBOL.to_owned())
+                        the_player.estimate_current_research_turns()
                     ),
                     progress as f32 / research.cost as f32,
                     (progress + the_player.beaker_revenue() as u32) as f32 / research.cost as f32,

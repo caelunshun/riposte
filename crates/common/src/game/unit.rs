@@ -289,7 +289,7 @@ impl Unit {
                 let this = game.unit(this);
                 let owner = game.player(this.owner());
 
-                City::new(id, &*owner, this.pos(), owner.next_city_name(game))
+                City::new(id, &*owner, this.pos(), owner.next_city_name(game), game)
             };
 
             game.add_city(city);

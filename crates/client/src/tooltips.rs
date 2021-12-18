@@ -1,6 +1,7 @@
 //! Generates tooltip text for various objects: unit kinds,
 //! buildings, tiles.
 
+use dume::Text;
 use riposte_common::{city::BuildTask, registry::Registry};
 
 pub mod building;
@@ -14,7 +15,7 @@ pub mod tile;
 pub mod unhappiness;
 pub mod unit;
 
-pub fn build_task_tooltip(registry: &Registry, task: &BuildTask) -> String {
+pub fn build_task_tooltip(registry: &Registry, task: &BuildTask) -> Text {
     match task {
         BuildTask::Unit(u) => unit::unit_tooltip(registry, &u),
         BuildTask::Building(b) => building::building_tooltip(registry, &b),

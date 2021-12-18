@@ -1,20 +1,20 @@
 use std::fmt::Write;
 
-use riposte_common::{
-    registry::{CapabilityType, CombatBonusType, Registry, UnitKind},
-    utils::merge_lines,
-};
+use dume::Text;
+use riposte_common::registry::{CapabilityType, CombatBonusType, Registry, UnitKind};
+
+use crate::utils::merge_text_lines;
 
 /// Generates a tooltip for the given unit kind.
-pub fn unit_tooltip(registry: &Registry, unit: &UnitKind) -> String {
+pub fn unit_tooltip(registry: &Registry, unit: &UnitKind) -> Text {
     let mut lines = Vec::new();
 
     // Basic info
-    lines.push(format!("{} ({:?} units)", unit.name, unit.category));
+    lines.push(text!("{} ({:?} units)", unit.name, unit.category));
 
     if let Some(civ) = unit.only_for_civs.first() {
         let civ = registry.civ(civ).unwrap();
-        lines.push(format!(
+        lines.push(text!(
             "Unique Unit for {} (Replaces {})",
             civ.name,
             registry
@@ -24,9 +24,9 @@ pub fn unit_tooltip(registry: &Registry, unit: &UnitKind) -> String {
         ));
     }
 
-    lines.push(format!("{} @icon{{hammer}}", unit.cost));
-    lines.push(format!(
-        "{} @icon{{movement}}, {} @icon{{strength}}",
+    lines.push(text!("{} @icon[hammer]", unit.cost));
+    lines.push(text!(
+        "{} @icon[movement], {} @icon[strength]",
         unit.movement,
         unit.strength.round() as u32
     ));
@@ -44,12 +44,12 @@ pub fn unit_tooltip(registry: &Registry, unit: &UnitKind) -> String {
                 unit.max_bombard_per_turn
             ),
         };
-        lines.push(line);
+        lines.push(text!("{}", line));
     }
 
     // Combat bonuses
     for bonus in &unit.combat_bonuses {
-        let mut line = format!("+{} %percent ", bonus.bonus_percent);
+        let mut line = format!("+{} % ", bonus.bonus_percent);
 
         if bonus.only_on_attack {
             line += "attack ";
@@ -71,8 +71,8 @@ pub fn unit_tooltip(registry: &Registry, unit: &UnitKind) -> String {
                 write!(line, "against {:?} units", bonus.unit_category).ok();
             }
         }
-        lines.push(line);
+        lines.push(text!("{}", line));
     }
 
-    merge_lines(&lines)
+    merge_text_lines(lines)
 }

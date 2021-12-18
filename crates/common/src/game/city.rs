@@ -6,9 +6,11 @@ use indexmap::IndexSet;
 
 use crate::{
     assets::Handle,
+    event::Event,
     registry::{Building, Resource, UnitKind},
+    utils::MaybeInfinityU32,
     world::Game,
-    Player,
+    Player, Terrain, Unit,
 };
 
 use super::{
@@ -30,6 +32,7 @@ pub struct City {
     name: String,
     population: NonZeroU32,
     is_capital: bool,
+    is_coastal: bool,
 
     /// Culture values for each player that
     /// has owned the city
@@ -65,6 +68,9 @@ pub struct City {
     /// Cached economy data for the city.
     economy: CityEconomy,
 
+    /// The previous build task we completed.
+    previous_build_task: Option<PreviousBuildTask>,
+
     /// Sources of happiness in the city.
     ///
     /// May have multiple entries of the same type;
@@ -78,13 +84,21 @@ pub struct City {
 }
 
 impl City {
-    pub fn new(id: CityId, owner: &Player, pos: UVec2, name: String) -> Self {
+    pub fn new(id: CityId, owner: &Player, pos: UVec2, name: String, game: &Game) -> Self {
+        let mut is_coastal = false;
+        for tile in game.map().adjacent(pos) {
+            if game.tile(tile).unwrap().terrain() == Terrain::Ocean {
+                is_coastal = true;
+                break;
+            }
+        }
         Self {
             on_server: true,
             id,
             owner: owner.id(),
             pos,
             name,
+            is_coastal,
             population: NonZeroU32::new(1).unwrap(),
             is_capital: owner.cities().is_empty(),
             culture: Culture::new(),
@@ -92,6 +106,7 @@ impl City {
             manually_worked_tiles: IndexSet::default(),
             stored_food: 0,
             build_task_progress: AHashMap::new(),
+            previous_build_task: None,
             build_task: None,
             culture_defense_bonus: 0,
             resources: AHashSet::new(),
@@ -253,15 +268,16 @@ impl City {
         self.culture_defense_bonus
     }
 
-    pub fn estimate_build_time_for_task(&self, task: &BuildTask) -> u32 {
-        (task.cost() - self.build_task_progress(task) + self.economy().hammer_yield - 1)
-            / (self.economy().hammer_yield)
+    pub fn estimate_build_time_for_task(&self, task: &BuildTask) -> MaybeInfinityU32 {
+        MaybeInfinityU32::new(
+            task.cost() - self.build_task_progress(task) + self.economy().hammer_yield - 1,
+        ) / (self.economy().hammer_yield)
     }
 
-    pub fn estimate_remaining_build_time(&self) -> u32 {
+    pub fn estimate_remaining_build_time(&self) -> MaybeInfinityU32 {
         match &self.build_task {
             Some(task) => self.estimate_build_time_for_task(task),
-            None => 0,
+            None => MaybeInfinityU32::new(0),
         }
     }
 
@@ -280,9 +296,163 @@ impl City {
         &self.name
     }
 
+    pub fn previous_build_task(&self) -> Option<&PreviousBuildTask> {
+        self.previous_build_task.as_ref()
+    }
+
     pub fn downgrade_to_client(&mut self) {
         self.on_server = false;
     }
+
+    /// Returns all the possible build tasks for this city.
+    pub fn possible_build_tasks(&self, game: &Game) -> Vec<BuildTask> {
+        let mut tasks = Vec::new();
+
+        for unit in game.registry().unit_kinds() {
+            if self.can_build_unit(game, unit) {
+                tasks.push(BuildTask::Unit(unit.clone()));
+            }
+        }
+        for building in game.registry().buildings() {
+            if self.can_build_building(game, building) {
+                tasks.push(BuildTask::Building(building.clone()));
+            }
+        }
+
+        tasks
+    }
+
+    pub fn can_build_unit(&self, game: &Game, kind: &UnitKind) -> bool {
+        let player = game.player(self.owner);
+
+        for tech in &kind.techs {
+            if !player.has_unlocked_tech(&game.registry().tech(tech).unwrap()) {
+                return false;
+            }
+        }
+
+        if kind.ship && !self.is_coastal {
+            return false;
+        }
+
+        for resource in &kind.resources {
+            if !self.resources().any(|r| &r.id == resource) {
+                return false;
+            }
+        }
+
+        if game.registry().is_unit_replaced_for_civ(kind, player.civ()) {
+            return false;
+        }
+
+        true
+    }
+
+    pub fn can_build_building(&self, game: &Game, building: &Handle<Building>) -> bool {
+        if self.buildings.contains(building) {
+            return false;
+        }
+
+        let player = game.player(self.owner);
+
+        for tech in &building.techs {
+            if !player.has_unlocked_tech(&game.registry().tech(tech).unwrap()) {
+                return false;
+            }
+        }
+
+        if building.only_coastal && !self.is_coastal {
+            return false;
+        }
+
+        for prerequisite in &building.prerequisites {
+            if !self.buildings().any(|b| &b.name == prerequisite) {
+                return false;
+            }
+        }
+
+        true
+    }
+
+    pub fn set_build_task(&mut self, task: BuildTask) {
+        self.build_task = Some(task);
+    }
+
+    /// Should be called at the end of each turn.
+    pub fn on_turn_end(&mut self, game: &Game) {
+        self.check_build_task_prerequisites(game);
+        self.make_build_task_progress(game);
+
+        game.push_event(Event::CityChanged(self.id));
+    }
+
+    fn check_build_task_prerequisites(&mut self, game: &Game) {
+        // If we can no longer build the current task, then it has to fail.
+        if let Some(task) = &self.build_task {
+            let failure = match task {
+                BuildTask::Unit(u) => !self.can_build_unit(game, u),
+                BuildTask::Building(b) => !self.can_build_building(game, b),
+            };
+            if failure {
+                log::info!("{} has failed to build {:?}", self.name(), task);
+                self.previous_build_task = Some(PreviousBuildTask {
+                    success: false,
+                    task: task.clone(),
+                });
+                self.build_task = None;
+            }
+        }
+    }
+
+    fn make_build_task_progress(&mut self, game: &Game) {
+        if let Some(task) = &self.build_task {
+            let progress = self.build_task_progress.entry(task.clone()).or_insert(0);
+            *progress += self.economy.hammer_yield;
+            *progress += self.economy.overflow_hammers;
+            self.economy.overflow_hammers = 0;
+            let progress = *progress;
+
+            if progress >= task.cost() {
+                // Done. Set the current task to None, the previous task to Some, and add overflow hammers.
+                log::info!("{} finished building {:?}", self.name, task);
+                self.complete_build_task(task, game);
+
+                self.economy.overflow_hammers = progress - task.cost();
+                self.build_task_progress.remove(task);
+
+                self.previous_build_task = Some(PreviousBuildTask {
+                    success: true,
+                    task: task.clone(),
+                });
+                self.build_task = None;
+            }
+        }
+    }
+
+    fn complete_build_task(&self, task: &BuildTask, game: &Game) {
+        let id = self.id;
+        match task.clone() {
+            BuildTask::Unit(kind) => game.defer(move |game| {
+                let unit_id = game.new_unit_id();
+                let this = game.city(id);
+                let unit = Unit::new(unit_id, this.owner(), kind, this.pos());
+                drop(this);
+                game.add_unit(unit);
+            }),
+            BuildTask::Building(b) => game.defer(move |game| {
+                game.city_mut(id).buildings.push(b);
+            }),
+        }
+    }
+}
+
+/// The most recent build task completed in a city.
+#[derive(Debug, Clone)]
+pub struct PreviousBuildTask {
+    /// Whether the task completed succesfully, which is not the case if
+    /// e.g. we lost the resource needed to build a unit.
+    pub success: bool,
+    pub task: BuildTask,
 }
 
 /// Something a city is building.
@@ -321,6 +491,8 @@ pub struct CityEconomy {
 
     pub hammer_yield: u32,
     pub food_yield: u32,
+
+    pub overflow_hammers: u32,
 
     pub culture_per_turn: u32,
 
