@@ -12,7 +12,10 @@ use crate::{
 };
 
 use self::{
-    city_screen::CityScreen, main_ui::MainUi, music::GameMusic, prompts::Prompts,
+    city_screen::CityScreen,
+    main_ui::MainUi,
+    music::GameMusic,
+    prompts::{research::ResearchPrompt, Prompts},
     sounds::GameSounds,
 };
 
@@ -148,10 +151,10 @@ impl GameState {
         }
     }
 
-    fn handle_player_updated(&mut self, _cx: &Context, player: PlayerId) {
+    fn handle_player_updated(&mut self, cx: &Context, player: PlayerId) {
         if player == self.game.the_player().id() && self.game.turn().get() > 0 {
             if self.game.the_player().researching_tech().is_none() {
-                // self.prompts.push(ResearchPrompt::new(cx, &mut self.client));
+                self.prompts.push(ResearchPrompt::new(cx, &mut self.client));
             }
         }
     }

@@ -1,15 +1,16 @@
+use dume::Text;
 use riposte_common::{
     registry::{Registry, Tech},
-    utils::{article, delimit_string, merge_lines},
+    utils::{article, delimit_string},
 };
 
-use crate::game::Game;
+use crate::{game::Game, utils::merge_text_lines};
 
-pub fn tech_tooltip(registry: &Registry, game: &Game, tech: &Tech) -> String {
+pub fn tech_tooltip(registry: &Registry, game: &Game, tech: &Tech) -> Text {
     let mut lines = Vec::new();
 
     // Basic info
-    lines.push(format!("{}, {} @icon{{beaker}}", tech.name, tech.cost));
+    lines.push(text!("{}, {} @icon[beaker]", tech.name, tech.cost));
 
     let civ = game.the_player().civ().clone();
 
@@ -25,7 +26,7 @@ pub fn tech_tooltip(registry: &Registry, game: &Game, tech: &Tech) -> String {
         }
 
         if unit_kind.techs.contains(&tech.name) {
-            lines.push(format!(
+            lines.push(text!(
                 "Can train {} {}",
                 article(&unit_kind.name),
                 unit_kind.name
@@ -42,7 +43,7 @@ pub fn tech_tooltip(registry: &Registry, game: &Game, tech: &Tech) -> String {
         }
 
         if building.techs.contains(&tech.name) {
-            lines.push(format!(
+            lines.push(text!(
                 "Can build {} {}",
                 article(&building.name),
                 building.name
@@ -52,11 +53,7 @@ pub fn tech_tooltip(registry: &Registry, game: &Game, tech: &Tech) -> String {
 
     // Unlocks improvement...
     for improvement in &tech.unlocks_improvements {
-        lines.push(format!(
-            "Can build {} {}",
-            article(improvement),
-            improvement
-        ));
+        lines.push(text!("Can build {} {}", article(improvement), improvement));
     }
 
     // Tech leads to...
@@ -68,8 +65,8 @@ pub fn tech_tooltip(registry: &Registry, game: &Game, tech: &Tech) -> String {
     }
 
     if !leads_to.is_empty() {
-        lines.push(format!("Leads to {}", delimit_string(&leads_to, ", ")));
+        lines.push(text!("Leads to {}", delimit_string(&leads_to, ", ")));
     }
 
-    merge_lines(&lines)
+    merge_text_lines(lines)
 }

@@ -218,8 +218,13 @@ impl Player {
 
     /// Estimate the number of turns it takes to complete the given research.
     pub fn estimate_research_turns(&self, tech: &Tech, progress: u32) -> MaybeInfinityU32 {
-        MaybeInfinityU32::new(tech.cost - progress + self.beaker_revenue() - 1)
-            / self.beaker_revenue()
+        MaybeInfinityU32::new(
+            tech.cost
+                .saturating_sub(self.economy.beaker_overflow)
+                .saturating_sub(progress)
+                + self.beaker_revenue()
+                - 1,
+        ) / self.beaker_revenue()
     }
 
     /// Estimate remaining turns for the currently researching tech.
@@ -227,6 +232,28 @@ impl Player {
         self.researching_tech()
             .map(|tech| self.estimate_research_turns(tech, self.tech_progress(tech)))
             .unwrap_or_else(|| MaybeInfinityU32::new(0))
+    }
+
+    pub fn researchable_techs(&self, game: &Game) -> Vec<Handle<Tech>> {
+        game.registry()
+            .techs()
+            .filter(|t| self.can_research(game, t))
+            .cloned()
+            .collect()
+    }
+
+    pub fn can_research(&self, game: &Game, tech: &Handle<Tech>) -> bool {
+        if self.has_unlocked_tech(tech) {
+            return false;
+        }
+
+        for prerequisite in &tech.prerequisites {
+            if !self.has_unlocked_tech(&game.registry().tech(prerequisite).unwrap()) {
+                return false;
+            }
+        }
+
+        true
     }
 
     pub fn downgrade_to_client(&mut self) {
@@ -294,11 +321,6 @@ impl Player {
         log::info!("{} has died", self.username());
     }
 
-    /// Should be called on the end of each turn.
-    pub fn on_turn_end(&mut self, game: &Game) {
-        game.push_event(Event::PlayerChanged(self.id()));
-    }
-
     /// Gets the name of the next city to create for this player.
     pub fn next_city_name(&self, game: &Game) -> String {
         let current_city_names: AHashSet<String> = self
@@ -319,6 +341,53 @@ impl Player {
             num_news += 1;
         }
     }
+    pub fn set_research(&mut self, tech: Handle<Tech>) {
+        self.research = Some(tech);
+    }
+
+    /// Should be called on the end of each turn.
+    pub fn on_turn_end(&mut self, game: &Game) {
+        self.update_economy(game);
+        self.update_research(game);
+        game.push_event(Event::PlayerChanged(self.id()));
+    }
+
+    fn update_economy(&mut self, game: &Game) {
+        let mut base = 0.;
+        let mut gold = 0.;
+        let mut beakers = 0.;
+        let mut expenses = 0.;
+        for &city_id in &self.cities {
+            let city = game.city(city_id);
+            base += city.economy().commerce_yield;
+            gold += city.economy().gold;
+            beakers += city.economy().beakers;
+            expenses += city.economy().maintenance_cost;
+        }
+
+        self.economy.base_revenue = base.floor() as u32;
+        self.economy.gold_revenue = gold.floor() as u32;
+        self.economy.beaker_revenue = beakers.floor() as u32;
+        self.economy.expenses = expenses.floor() as u32;
+    }
+
+    fn update_research(&mut self, _game: &Game) {
+        if let Some(tech) = &self.research {
+            let progress = self.tech_progress.entry(tech.clone()).or_insert(0);
+            *progress += self.economy.beaker_revenue;
+            if self.economy.beaker_overflow > 0 {
+                log::info!("Using beaker overflow of {}", self.economy.beaker_overflow);
+            }
+            *progress += self.economy.beaker_overflow;
+            self.economy.beaker_overflow = 0;
+
+            if *progress >= tech.cost {
+                self.economy.beaker_overflow = *progress - tech.cost;
+                self.unlocked_techs.insert(tech.clone());
+                self.research = None;
+            }
+        }
+    }
 }
 
 /// Cached economy data for a player.
@@ -332,6 +401,9 @@ pub struct PlayerEconomy {
     pub beaker_revenue: u32,
     /// Total expenses from inflation, city maintenance, etc.
     pub expenses: u32,
+
+    /// Beakers overflowing from previous research.
+    pub beaker_overflow: u32,
 }
 
 #[derive(Debug, Clone)]

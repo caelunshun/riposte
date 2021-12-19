@@ -7,7 +7,7 @@ use crate::{
 };
 
 pub mod city_build;
-//pub mod research;
+pub mod research;
 
 pub enum Action {
     Close,

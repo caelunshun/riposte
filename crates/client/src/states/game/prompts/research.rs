@@ -2,7 +2,7 @@ use duit::{Align, Vec2};
 use glam::vec2;
 
 use crate::{
-    client::{Client, GameState, ServerResponseFuture},
+    client::{Client, GameState},
     context::Context,
     game::Game,
     generated::{ResearchPromptOption, ResearchPromptWindow},
@@ -11,7 +11,7 @@ use crate::{
     ui::{AlignFixed, Z_POPUP},
 };
 
-use riposte_common::{utils::INFINITY_SYMBOL, assets::Handle, registry::Tech};
+use riposte_common::{assets::Handle, registry::Tech};
 
 use super::{Action, Prompt};
 
@@ -22,41 +22,31 @@ struct SetResearch(Handle<Tech>);
 pub struct ResearchPrompt {
     attachment: StateAttachment,
 
-    possible_techs: ServerResponseFuture<PossibleTechs>,
-    received_techs: bool,
-
     window: Option<ResearchPromptWindow>,
 }
 
 impl ResearchPrompt {
-    pub fn new(cx: &Context, client: &mut Client<GameState>) -> Self {
+    pub fn new(cx: &Context, _client: &mut Client<GameState>) -> Self {
         Self {
             attachment: cx.state_manager().create_state(),
-            possible_techs: client.get_possible_techs(),
-            received_techs: false,
             window: None,
         }
     }
 
-    fn init_with_techs(&mut self, cx: &Context, game: &Game, techs: PossibleTechs) {
+    fn init_with_techs(&mut self, cx: &Context, game: &Game, techs: Vec<Handle<Tech>>) {
         let window = self.window.as_mut().unwrap();
 
-        for tech in techs.techs {
+        for tech in techs {
             let (option, widget) = cx.ui_mut().create_spec_instance::<ResearchPromptOption>();
 
-            let tech = cx.registry().tech(&tech).unwrap();
-            let turns = game
-                .the_player()
-                .estimate_research_turns(&tech, 0)
-                .map(|t| t.to_string())
-                .unwrap_or_else(|| INFINITY_SYMBOL.to_owned());
+            let turns = game.the_player().estimate_research_turns(&tech, 0);
             option
                 .option_text
                 .get_mut()
                 .set_text(text!("{} ({})", tech.name, turns));
 
             let tooltip = tech_tooltip(cx.registry(), game, &tech);
-            option.tooltip_text.get_mut().set_text(text!("{}", tooltip));
+            option.tooltip_text.get_mut().set_text(tooltip);
 
             option
                 .clickable
@@ -69,7 +59,7 @@ impl ResearchPrompt {
 }
 
 impl Prompt for ResearchPrompt {
-    fn open(&mut self, _cx: &mut Context, game: &Game, _client: &mut Client<GameState>) {
+    fn open(&mut self, cx: &mut Context, game: &Game, _client: &mut Client<GameState>) {
         if game.the_player().researching_tech().is_some() {
             return;
         }
@@ -79,6 +69,8 @@ impl Prompt for ResearchPrompt {
             Z_POPUP,
         );
         self.window = Some(window);
+
+        self.init_with_techs(cx, game, game.the_player().researchable_techs(game.base()));
     }
 
     fn update(
@@ -89,13 +81,6 @@ impl Prompt for ResearchPrompt {
     ) -> Option<Action> {
         if game.the_player().researching_tech().is_some() {
             return Some(Action::Close);
-        }
-
-        if !self.received_techs {
-            if let Some(techs) = self.possible_techs.get() {
-                self.init_with_techs(cx, game, techs);
-                self.received_techs = true;
-            }
         }
 
         if let Some(msg) = cx.ui_mut().pop_message::<SetResearch>() {

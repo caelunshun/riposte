@@ -589,6 +589,10 @@ impl City {
             self.economy.commerce_yield += tile_yield.commerce as f64;
         }
 
+        if self.is_capital {
+            self.economy.commerce_yield += 8.;
+        }
+
         let owner = game.player(self.owner);
         let beaker_percent = owner.beaker_percent() as f64 / 100.;
         self.economy.beakers = self.economy.commerce_yield as f64 * beaker_percent;

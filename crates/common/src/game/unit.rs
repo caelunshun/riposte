@@ -1,5 +1,6 @@
 use std::{
     fmt::Display,
+    iter::once,
     num::NonZeroUsize,
     ops::{Add, AddAssign, Sub, SubAssign},
 };
@@ -257,7 +258,7 @@ impl Unit {
 
         // Minimum distance to other cities: we don't
         // allow two cities to lie within each others' BFCs.
-        for pos in game.map().big_fat_cross(self.pos()) {
+        for pos in game.map().big_fat_cross(self.pos()).into_iter().chain(once(self.pos())) {
             if game.city_at_pos(pos).is_some() {
                 return Err(CannotFoundCity::NearbyCities);
             }
