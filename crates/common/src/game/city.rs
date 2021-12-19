@@ -120,6 +120,7 @@ impl City {
             sickness_sources: Vec::new(),
         };
         city.update_worked_tiles(game);
+        city.update_economy(game);
         city
     }
 
@@ -262,13 +263,12 @@ impl City {
         self.economy().culture_per_turn
     }
 
-    pub fn beakers_per_turn(&self, game: &Game) -> u32 {
-        (self.economy().commerce as f32 * game.player(self.owner()).beaker_percent() as f32 / 100.)
-            .floor() as u32
+    pub fn beakers_per_turn(&self) -> u32 {
+        self.economy.beakers.floor() as u32
     }
 
-    pub fn gold_per_turn(&self, game: &Game) -> u32 {
-        self.economy().commerce as u32 - self.beakers_per_turn(game)
+    pub fn gold_per_turn(&self) -> u32 {
+        self.economy().commerce_yield as u32 - self.beakers_per_turn()
     }
 
     pub fn culture_defense_bonus(&self) -> u32 {
@@ -404,6 +404,7 @@ impl City {
         self.check_build_task_prerequisites(game);
         self.make_build_task_progress(game);
         self.update_worked_tiles(game);
+        self.update_economy(game);
 
         game.push_event(Event::CityChanged(self.id));
     }
@@ -543,6 +544,26 @@ impl City {
 
         true
     }
+
+    /// Updates the CityEconomy based on current worked tiles.
+    fn update_economy(&mut self, game: &Game) {
+        // Base values of 1 for free.
+        self.economy.hammer_yield = 1;
+        self.economy.food_yield = 1;
+        self.economy.commerce_yield = 1.;
+
+        for &tile in &self.worked_tiles {
+            let tile_yield = game.tile(tile).unwrap().tile_yield();
+            self.economy.hammer_yield += tile_yield.hammers;
+            self.economy.food_yield += tile_yield.food;
+            self.economy.commerce_yield += tile_yield.commerce as f64;
+        }
+
+        let owner = game.player(self.owner);
+        let beaker_percent = owner.beaker_percent() as f64 / 100.;
+        self.economy.beakers = self.economy.commerce_yield as f64 * beaker_percent;
+        self.economy.gold = self.economy.commerce_yield as f64 * (1. - beaker_percent);
+    }
 }
 
 /// The most recent build task completed in a city.
@@ -584,10 +605,10 @@ impl BuildTask {
 #[derive(Debug, Clone, Default)]
 pub struct CityEconomy {
     // gold + beakers = commerce
-    pub commerce: f64,
     pub gold: f64,
     pub beakers: f64,
 
+    pub commerce_yield: f64,
     pub hammer_yield: u32,
     pub food_yield: u32,
 

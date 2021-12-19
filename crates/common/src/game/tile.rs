@@ -71,6 +71,14 @@ impl Tile {
             Terrain::Desert | Terrain::Mountains => {}
         }
 
+        if self.is_forested {
+            y.hammers += 1;
+        }
+        if self.is_hilled {
+            y.hammers += 1;
+            y.food = y.food.saturating_sub(1);
+        }
+
         if let Some(resource) = &self.resource {
             y = y + resource.yield_bonus;
 
