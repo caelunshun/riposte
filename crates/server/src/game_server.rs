@@ -3,7 +3,8 @@ use riposte_common::{
     event::Event,
     protocol::{
         client::{
-            ClientGamePacket, ClientPacket, DoUnitAction, MoveUnits, SetCityBuildTask, UnitAction,
+            ClientGamePacket, ClientPacket, ConfigureWorkedTiles, DoUnitAction, MoveUnits,
+            SetCityBuildTask, UnitAction,
         },
         game::server::{InitialGameData, ServerGamePacket, ServerPacket},
         server::{
@@ -98,7 +99,7 @@ impl GameServer {
             ClientPacket::SetResearch(_) => todo!(),
             ClientPacket::DoUnitAction(p) => self.handle_do_unit_action(p),
             ClientPacket::DeclareWar(_) => todo!(),
-            ClientPacket::ConfigureWorkedTiles(_) => todo!(),
+            ClientPacket::ConfigureWorkedTiles(p) => self.handle_configure_worked_tiles(p),
             ClientPacket::BombardCity(_) => todo!(),
             ClientPacket::SaveGame(_) => todo!(),
             ClientPacket::EndTurn(_) => self.handle_end_turn(player, conns),
@@ -166,6 +167,11 @@ impl GameServer {
     fn handle_set_city_build_task(&mut self, p: SetCityBuildTask) {
         self.game.city_mut(p.city_id).set_build_task(p.build_task);
         self.game.push_event(Event::CityChanged(p.city_id));
+    }
+
+    fn handle_configure_worked_tiles(&mut self, p: ConfigureWorkedTiles) {
+        let mut city = self.game.city_mut(p.city_id);
+        city.set_tile_manually_worked(&self.game, p.tile_pos, p.should_manually_work);
     }
 
     fn handle_end_turn(&mut self, player: PlayerId, conns: &Connections) {

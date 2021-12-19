@@ -18,6 +18,8 @@ use super::{
     CityId, PlayerId,
 };
 
+pub const BFC_RADIUS_SQUARED: f64 = 5.;
+
 /// A city in the game.
 ///
 /// All fields are private and encapsulated. Modifying city
@@ -92,7 +94,7 @@ impl City {
                 break;
             }
         }
-        Self {
+        let mut city = Self {
             on_server: true,
             id,
             owner: owner.id(),
@@ -116,7 +118,9 @@ impl City {
             anger_sources: Vec::new(),
             health_sources: Vec::new(),
             sickness_sources: Vec::new(),
-        }
+        };
+        city.update_worked_tiles(game);
+        city
     }
 
     pub fn food_needed_for_growth(&self) -> u32 {
@@ -381,10 +385,25 @@ impl City {
         self.build_task = Some(task);
     }
 
+    pub fn set_tile_manually_worked(&mut self, game: &Game, pos: UVec2, worked: bool) {
+        if !worked {
+            self.manually_worked_tiles.remove(&pos);
+        } else if self.can_work_tile(game, pos) {
+            self.manually_worked_tiles.insert(pos);
+            if self.manually_worked_tiles.len() > self.num_workable_tiles() as usize {
+                self.manually_worked_tiles.shift_remove_index(0);
+            }
+        }
+
+        self.update_worked_tiles(game);
+        game.push_event(Event::CityChanged(self.id));
+    }
+
     /// Should be called at the end of each turn.
     pub fn on_turn_end(&mut self, game: &Game) {
         self.check_build_task_prerequisites(game);
         self.make_build_task_progress(game);
+        self.update_worked_tiles(game);
 
         game.push_event(Event::CityChanged(self.id));
     }
@@ -446,6 +465,83 @@ impl City {
                 game.city_mut(id).buildings.push(b);
             }),
         }
+    }
+
+    /// Updates the current worked tiles.
+    ///
+    /// * recalculates a score for each tile, and works the top-scoring tiles
+    /// * prioritizes manually worked tiles over automatic scoring
+    /// * if there are too many manually worked tiles, then excess ones are removed
+    fn update_worked_tiles(&mut self, game: &Game) {
+        // Reset the set of worked tiles.
+        for tile in self.worked_tiles.drain(..) {
+            game.clear_tile_worker(tile);
+        }
+
+        let mut entries = Vec::new();
+
+        for &tile in &self.manually_worked_tiles {
+            entries.push((tile, true));
+        }
+
+        for tile in game.map().big_fat_cross(self.pos) {
+            if !entries.contains(&(tile, true)) {
+                entries.push((tile, false));
+            }
+        }
+
+        #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
+        struct Score {
+            forced: bool,
+            food: u32,
+            hammers_and_commerce: u32,
+        }
+        entries.sort_by_key(|(pos, forced)| {
+            let tile = game.tile(*pos).unwrap();
+            let tile_yield = tile.tile_yield();
+            Score {
+                forced: *forced,
+                food: tile_yield.food,
+                hammers_and_commerce: tile_yield.hammers + tile_yield.commerce,
+            }
+        });
+
+        // The city's own position is always worked.
+        self.worked_tiles.insert(self.pos);
+        game.set_tile_worker(self.pos, self.id);
+
+        // The top entries get worked.
+        for (pos, _) in entries
+            .into_iter()
+            .rev()
+            .take(self.num_workable_tiles() as usize - 1)
+        {
+            self.worked_tiles.insert(pos);
+            game.set_tile_worker(pos, self.id);
+        }
+    }
+
+    pub fn num_workable_tiles(&self) -> u32 {
+        self.population.get() + 1
+    }
+
+    pub fn can_work_tile(&self, game: &Game, pos: UVec2) -> bool {
+        if !game.map().is_in_bounds(pos.as_i32()) {
+            return false;
+        }
+
+        let worker = game.tile_worker(pos);
+        if let Some(c) = worker {
+            if c != self.id {
+                return false;
+            }
+        }
+
+        if pos.as_f64().distance_squared(self.pos.as_f64()) > BFC_RADIUS_SQUARED {
+            return false;
+        }
+
+        true
     }
 }
 

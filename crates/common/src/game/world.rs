@@ -35,6 +35,9 @@ pub struct Game {
     // Various indexes for fast lookups.
     cities_by_pos: AHashMap<UVec2, CityId>,
 
+    /// Stores which city is working each tile.
+    tile_workers: Grid<RefCell<Option<CityId>>>,
+
     rng: RefCell<Pcg64Mcg>,
 
     turn: Turn,
@@ -49,6 +52,7 @@ impl Game {
         Self {
             registry,
 
+            tile_workers: Grid::new(RefCell::new(None), map.width(), map.height()),
             map,
 
             player_ids: SlotMap::default(),
@@ -230,6 +234,21 @@ impl Game {
 
     pub fn set_turn(&mut self, turn: Turn) {
         self.turn = turn;
+    }
+
+    pub fn tile_worker(&self, pos: UVec2) -> Option<CityId> {
+        self.tile_workers
+            .get(pos)
+            .map(|r| *r.borrow())
+            .unwrap_or(None)
+    }
+
+    pub fn set_tile_worker(&self, pos: UVec2, worker: CityId) {
+        *self.tile_workers.get(pos).unwrap().borrow_mut() = Some(worker);
+    }
+
+    pub fn clear_tile_worker(&self, pos: UVec2) {
+        *self.tile_workers.get(pos).unwrap().borrow_mut() = None;
     }
 
     /// Ends the turn, running all inter-turn simulation. (Server only.)

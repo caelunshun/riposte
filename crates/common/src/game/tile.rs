@@ -276,13 +276,13 @@ impl<T> Grid<T> {
     /// at `pos`.
     ///
     /// Does not return positions that are out of bounds.
-    pub fn big_fat_cross(&self, pos: UVec2) -> ArrayVec<UVec2, 21> {
+    pub fn big_fat_cross(&self, pos: UVec2) -> ArrayVec<UVec2, 20> {
         let mut bfc = ArrayVec::new();
 
         for dx in -2i32..=2 {
             for dy in -2i32..=2 {
-                // Skip the four corners
-                if dx.abs() == 2 && dy.abs() == 2 {
+                // Skip the four corners and the center
+                if dx.abs() == 2 && dy.abs() == 2 || (dx == 0 && dy == 0) {
                     continue;
                 }
 
@@ -307,7 +307,7 @@ impl<T> Grid<T> {
         }
     }
 
-    fn is_in_bounds(&self, pos: IVec2) -> bool {
+    pub fn is_in_bounds(&self, pos: IVec2) -> bool {
         let (x, y) = (pos.x, pos.y);
         x >= 0 && y >= 0 && x < self.width as i32 && y < self.height as i32
     }
