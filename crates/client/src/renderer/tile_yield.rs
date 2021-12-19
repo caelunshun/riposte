@@ -44,7 +44,7 @@ impl TileYieldRenderer {
 
 impl TileRenderLayer for TileYieldRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, _tile_pos: UVec2, tile: &Tile) {
-        let (scale, offset_y) = if tile.is_worked() && tile.owner() == Some(game.the_player().id())
+        let (scale, offset_y) = if tile.is_worked() && tile.owner(game.base()) == Some(game.the_player().id())
         {
             (25., -10.)
         } else {

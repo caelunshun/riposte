@@ -1,3 +1,4 @@
+use ahash::AHashSet;
 use arrayvec::ArrayVec;
 use glam::{ivec2, uvec2, DVec2, IVec2, UVec2};
 
@@ -5,6 +6,7 @@ use crate::assets::Handle;
 use crate::player::Player;
 use crate::registry::Resource;
 use crate::unit::MovementPoints;
+use crate::utils::UVecExt;
 use crate::world::Game;
 use crate::Yield;
 
@@ -23,6 +25,10 @@ pub struct Tile {
     is_hilled: bool,
 
     culture: Culture,
+    /// The set of cities for whom this tile is in the city's border radius.
+    ///
+    /// A tile can only be owned by a city in this set.
+    influencers: Vec<CityId>,
 
     worked_by_city: Option<CityId>,
 
@@ -38,14 +44,35 @@ impl Tile {
             is_forested: false,
             is_hilled: false,
             culture: Culture::new(),
+            influencers: Vec::new(),
             worked_by_city: None,
             resource: None,
             improvements: Vec::new(),
         }
     }
 
-    pub fn owner(&self) -> Option<PlayerId> {
-        self.culture.iter().next().map(|v| v.owner())
+    pub fn owner(&self, game: &Game) -> Option<PlayerId> {
+        self.culture
+            .iter()
+            .find(|val| {
+                // A tile can only be owned by a city that influences it.
+                self.influencers
+                    .iter()
+                    .any(|c| game.city(*c).owner() == val.owner())
+            })
+            .map(|v| v.owner())
+    }
+
+    pub(crate) fn add_influencer(&mut self, influencer: CityId) {
+        if !self.influencers.contains(&influencer) {
+            self.influencers.push(influencer);
+        }
+    }
+
+    pub(crate) fn remove_influencer(&mut self, influencer: CityId) {
+        if let Some(pos) = self.influencers.iter().position(|c| *c == influencer) {
+            self.influencers.swap_remove(pos);
+        }
     }
 
     pub fn tile_yield(&self) -> Yield {
@@ -118,18 +145,22 @@ impl Tile {
         &self.culture
     }
 
+    pub fn culture_mut(&mut self) -> &mut Culture {
+        &mut self.culture
+    }
+
     pub fn improvements(&self) -> impl Iterator<Item = &Improvement> + '_ {
         self.improvements.iter()
     }
 
-    pub fn movement_cost(&self, _game: &Game, player: &Player) -> MovementPoints {
+    pub fn movement_cost(&self, game: &Game, player: &Player) -> MovementPoints {
         let mut cost = MovementPoints::from_u32(1);
         if self.is_forested() || self.is_hilled() {
             cost += MovementPoints::from_u32(1);
         }
 
         if self.improvements().any(|i| matches!(i, Improvement::Road)) {
-            let can_use_road = match self.owner() {
+            let can_use_road = match self.owner(game) {
                 Some(owner) => !player.is_at_war_with(owner),
                 None => true,
             };
@@ -302,6 +333,29 @@ impl<T> Grid<T> {
         }
 
         bfc
+    }
+
+    /// Gets the tiles within the given radius squared of `pos`.
+    ///
+    /// Only yields tiles that are in bounds.
+    pub fn in_radius_squared(&self, pos: UVec2, radius_squared: u32) -> Vec<UVec2> {
+        // Depth-first search.
+        let mut tiles = Vec::new();
+        let mut stack = vec![pos];
+        let mut visited = AHashSet::new();
+
+        while let Some(next) = stack.pop() {
+            tiles.push(next);
+
+            for neighbor in self.straight_adjacent(next) {
+                if visited.insert(neighbor) && neighbor.distance_squared(pos) <= radius_squared
+                {
+                    stack.push(neighbor);
+                }
+            }
+        }
+
+        tiles
     }
 
     pub fn map<G>(&self, mapper: impl Fn(T) -> G) -> Grid<G>

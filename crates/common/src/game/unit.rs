@@ -267,7 +267,7 @@ impl Unit {
         if game
             .tile(self.pos())
             .unwrap()
-            .owner()
+            .owner(game)
             .map(|o| o != self.owner)
             .unwrap_or(false)
         {
@@ -378,7 +378,7 @@ impl Unit {
         // * 15% in our territory
 
         let tile = game.tile(self.pos()).unwrap();
-        let tile_owner = tile.owner().map(|t| game.player(t));
+        let tile_owner = tile.owner(game).map(|t| game.player(t));
         let rate = if game.city_at_pos(self.pos()).is_some() {
             0.2
         } else {

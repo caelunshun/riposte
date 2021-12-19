@@ -30,7 +30,7 @@ struct Adjacent {
 
 impl TileRenderLayer for CulturalBorderRenderer {
     fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
-        let owner = match tile.owner() {
+        let owner = match tile.owner(game.base()) {
             Some(o) => game.player(o),
             None => return,
         };
@@ -75,7 +75,7 @@ impl TileRenderLayer for CulturalBorderRenderer {
                 Err(_) => continue,
             };
 
-            if adjacent_tile.owner() != Some(owner.id()) {
+            if adjacent_tile.owner(game.base()) != Some(owner.id()) {
                 // Owners differ; paint the border.
                 cx.canvas_mut()
                     .begin_path()

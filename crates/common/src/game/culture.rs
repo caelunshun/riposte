@@ -100,8 +100,12 @@ impl CultureLevel {
         }
     }
 
-    pub fn border_radius(self) -> u32 {
-        self as u32
+    pub fn border_radius_squared(self) -> u32 {
+        if self == Self::Poor {
+            2 // special case for first ring
+        } else {
+            (self as u32 + 1).pow(2) + (self as u32 + 1 - 1).pow(2)
+        }
     }
 
     pub fn max_cultural_defense_bonus(self) -> u32 {

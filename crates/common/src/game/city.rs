@@ -1,4 +1,4 @@
-use std::num::NonZeroU32;
+use std::{iter::once, num::NonZeroU32};
 
 use ahash::{AHashMap, AHashSet};
 use glam::UVec2;
@@ -8,7 +8,7 @@ use crate::{
     assets::Handle,
     event::Event,
     registry::{Building, Resource, UnitKind},
-    utils::MaybeInfinityU32,
+    utils::{MaybeInfinityU32, UVecExt},
     world::Game,
     Player, Terrain, Unit,
 };
@@ -18,7 +18,7 @@ use super::{
     CityId, PlayerId,
 };
 
-pub const BFC_RADIUS_SQUARED: f64 = 5.;
+pub const BFC_RADIUS_SQUARED: u32 = 5;
 
 /// A city in the game.
 ///
@@ -119,8 +119,17 @@ impl City {
             health_sources: Vec::new(),
             sickness_sources: Vec::new(),
         };
+
+        // When a city is built, we give 1 free culture to surrounding tiles.
+        for pos in game.map().adjacent(pos).into_iter().chain(once(pos)) {
+            let mut tile = game.tile_mut(pos).unwrap();
+            tile.add_influencer(id);
+            tile.culture_mut().add_culture_to(owner.id(), 1);
+        }
+
         city.update_worked_tiles(game);
         city.update_economy(game);
+        city.update_culture_per_turn();
         city
     }
 
@@ -420,6 +429,8 @@ impl City {
         self.make_build_task_progress(game);
         self.update_worked_tiles(game);
         self.update_economy(game);
+        self.update_culture_per_turn();
+        self.update_culture_borders(game);
 
         game.push_event(Event::CityChanged(self.id));
     }
@@ -553,7 +564,7 @@ impl City {
             }
         }
 
-        if pos.as_f64().distance_squared(self.pos.as_f64()) > BFC_RADIUS_SQUARED {
+        if pos.distance_squared(self.pos) > BFC_RADIUS_SQUARED {
             return false;
         }
 
@@ -578,6 +589,44 @@ impl City {
         let beaker_percent = owner.beaker_percent() as f64 / 100.;
         self.economy.beakers = self.economy.commerce_yield as f64 * beaker_percent;
         self.economy.gold = self.economy.commerce_yield as f64 * (1. - beaker_percent);
+    }
+
+    fn update_culture_per_turn(&mut self) {
+        self.economy.culture_per_turn = 0;
+
+        if self.is_capital {
+            self.economy.culture_per_turn += 2;
+        }
+    }
+
+    fn update_culture_borders(&mut self, game: &Game) {
+        self.culture
+            .add_culture_to(self.owner, self.economy.culture_per_turn);
+
+        // Add culture to surrounding tiles.
+        let border_radius_squared = self.culture_level().border_radius_squared();
+        let border_radius = (border_radius_squared as f64).sqrt().floor() as u32;
+
+        for pos in game
+            .map()
+            .in_radius_squared(self.pos, border_radius_squared)
+        {
+            // We add our culture per turn to each tile, plus 20 times the difference between the distance
+            // and the border radius.
+            // This implements a Civ4 mechanic.
+            // See: https://www.civfanatics.com/civ4/strategy/game-mechanics/culture-mechanics-disassembled/
+            let mut culture_added = self.economy.culture_per_turn;
+            let distance = pos.as_f64().distance(self.pos.as_f64()).floor() as u32;
+            if distance < border_radius {
+                culture_added += (border_radius - distance) * 20;
+            }
+
+            let mut tile = game.tile_mut(pos).unwrap();
+            tile.add_influencer(self.id);
+            tile.culture_mut().add_culture_to(self.owner, culture_added);
+
+            game.push_event(Event::TileChanged(pos));
+        }
     }
 }
 

@@ -1,6 +1,7 @@
 use std::{cell::Cell, fmt::Display, ops::Div, rc::Rc};
 
 use arrayvec::ArrayVec;
+use glam::UVec2;
 
 pub const INFINITY_SYMBOL: &str = "∞";
 
@@ -123,5 +124,24 @@ impl Display for MaybeInfinityU32 {
             MaybeInfinityU32::Finite(x) => x.fmt(f),
             MaybeInfinityU32::Infinite => write!(f, "∞"),
         }
+    }
+}
+
+pub trait UVecExt {
+    fn distance_squared(self, other: Self) -> u32;
+}
+
+impl UVecExt for UVec2 {
+    fn distance_squared(self, other: Self) -> u32 {
+        abs_diff(self.x, other.x).pow(2) + abs_diff(self.y, other.y).pow(2)
+    }
+}
+
+fn abs_diff(a: u32, b: u32) -> u32 {
+    if a < b {
+        b - a
+    } else {
+        // a >= b
+        a - b
     }
 }
