@@ -172,7 +172,10 @@ impl City {
     }
 
     pub fn culture_needed(&self) -> u32 {
-        todo!()
+        let current = self.culture_level() as usize;
+        *super::culture::CULTURE_THRESHOLDS
+            .get(current + 1)
+            .unwrap_or(super::culture::CULTURE_THRESHOLDS.last().unwrap())
     }
 
     pub fn buildings(&self) -> impl Iterator<Item = &Handle<Building>> + '_ {

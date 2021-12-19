@@ -35,8 +35,9 @@ impl InfoBarScreen {
             .set_text(text!("{}: {}", city.name(), city.population()));
 
         let growth_progress = city.stored_food() as f32 / city.food_needed_for_growth() as f32;
-        let growth_projected_progress = (city.stored_food() + city.economy().food_yield
-            - city.food_consumed_per_turn()) as f32
+        let growth_projected_progress = (city.stored_food() as i32
+            + city.economy().food_yield as i32
+            - city.food_consumed_per_turn() as i32) as f32
             / city.food_needed_for_growth() as f32;
         self.window
             .growth_progress_bar
@@ -71,16 +72,16 @@ impl InfoBarScreen {
             .set_text(text!("{} @icon[hammer]", city.economy().hammer_yield));
 
         let growth_text = if city.is_growing() {
-            format!("Growing ({} turns)", city.turns_needed_for_growth())
+            text!("Growing ({} turns)", city.turns_needed_for_growth())
         } else if city.is_stagnant() {
-            "Stagnant".to_owned()
+           text!("Stagnant")
         } else {
-            "@color{rgb(180, 20, 30)}{STARVATION!}".to_owned()
+            text!("@color[180, 20, 30][STARVATION!]")
         };
         self.window
             .growth_text
             .get_mut()
-            .set_text(text!("{}", growth_text));
+            .set_text(growth_text);
 
         let production_text = match city.build_task() {
             Some(task) => format!(

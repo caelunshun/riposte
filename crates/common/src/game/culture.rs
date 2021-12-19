@@ -70,26 +70,33 @@ impl CultureValue {
     }
 }
 
+pub static CULTURE_THRESHOLDS: &[u32] = &[0, 10, 100, 500, 5_000, 50_000];
+
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum CultureLevel {
-    None = 0,
-    Poor = 1,
-    Fledgling = 2,
-    Developing = 3,
-    Refined = 4,
-    Influential = 5,
-    Legendary = 6,
+    Poor = 0,
+    Fledgling = 1,
+    Developing = 2,
+    Refined = 3,
+    Influential = 4,
+    Legendary = 5,
 }
 
 impl CultureLevel {
     pub fn for_culture_amount(amount: u32) -> Self {
-        match amount {
-            0..=9 => CultureLevel::Poor,
-            10..=99 => CultureLevel::Fledgling,
-            100..=499 => CultureLevel::Developing,
-            500..=4999 => CultureLevel::Refined,
-            5000..=49_999 => CultureLevel::Influential,
-            _ => CultureLevel::Legendary,
+        let ord = CULTURE_THRESHOLDS
+            .iter()
+            .rev()
+            .position(|threshold| amount >= *threshold)
+            .unwrap();
+        match ord {
+            0 => Self::Legendary,
+            1 => Self::Influential,
+            2 => Self::Refined,
+            3 => Self::Developing,
+            4 => Self::Fledgling,
+            5 => Self::Poor,
+            _ => unreachable!(),
         }
     }
 
@@ -99,7 +106,7 @@ impl CultureLevel {
 
     pub fn max_cultural_defense_bonus(self) -> u32 {
         match self {
-            CultureLevel::None | CultureLevel::Poor => 0,
+            CultureLevel::Poor => 0,
             CultureLevel::Fledgling => 20,
             CultureLevel::Developing => 40,
             CultureLevel::Refined => 60,
