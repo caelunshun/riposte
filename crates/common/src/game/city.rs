@@ -125,6 +125,7 @@ impl City {
             let mut tile = game.tile_mut(pos).unwrap();
             tile.add_influencer(id);
             tile.culture_mut().add_culture_to(owner.id(), 1);
+            game.push_event(Event::TileChanged(pos));
         }
 
         city.update_worked_tiles(game);
@@ -425,10 +426,13 @@ impl City {
 
     /// Should be called at the end of each turn.
     pub fn on_turn_end(&mut self, game: &Game) {
-        self.check_build_task_prerequisites(game);
-        self.make_build_task_progress(game);
+        // Order matters. We first want to update the economy by checking
+        // worked tiles, and only then should we compute build task progress.
+        self.do_growth(game);
         self.update_worked_tiles(game);
         self.update_economy(game);
+        self.check_build_task_prerequisites(game);
+        self.make_build_task_progress(game);
         self.update_culture_per_turn();
         self.update_culture_borders(game);
 
@@ -626,6 +630,32 @@ impl City {
             tile.culture_mut().add_culture_to(self.owner, culture_added);
 
             game.push_event(Event::TileChanged(pos));
+        }
+    }
+
+    fn do_growth(&mut self, _game: &Game) {
+        let new_stored_food = self.stored_food as i32
+            + (self.economy.food_yield as i32 - self.food_consumed_per_turn() as i32);
+
+        if new_stored_food < 0 {
+            // City shrinks.
+            if let Some(nonzero_pop) = NonZeroU32::new(self.population.get() - 1) {
+                log::info!("{} is shrinking to starvation", self.name());
+                self.population = nonzero_pop;
+            }
+            self.stored_food = 0;
+        } else if new_stored_food >= self.food_needed_for_growth() as i32 {
+            let leftover = new_stored_food as u32 - self.food_needed_for_growth();
+            self.stored_food = leftover;
+            self.population = NonZeroU32::new(
+                self.population
+                    .get()
+                    .checked_add(1)
+                    .expect("that's a lot of citizens"),
+            )
+            .unwrap();
+        } else {
+            self.stored_food = new_stored_food as u32; // cast is safe because new_stored_food >= 0
         }
     }
 }
