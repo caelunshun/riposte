@@ -330,10 +330,10 @@ impl City {
     }
 
     pub fn can_build_unit(&self, game: &Game, kind: &UnitKind) -> bool {
-        let player = game.player(self.owner);
+        let owner = game.player(self.owner);
 
         for tech in &kind.techs {
-            if !player.has_unlocked_tech(&game.registry().tech(tech).unwrap()) {
+            if !owner.has_unlocked_tech(&game.registry().tech(tech).unwrap()) {
                 return false;
             }
         }
@@ -348,7 +348,11 @@ impl City {
             }
         }
 
-        if game.registry().is_unit_replaced_for_civ(kind, player.civ()) {
+        if game.registry().is_unit_replaced_for_civ(kind, owner.civ()) {
+            return false;
+        }
+
+        if !kind.only_for_civs.is_empty() && !kind.only_for_civs.contains(&owner.civ().id) {
             return false;
         }
 
@@ -360,10 +364,10 @@ impl City {
             return false;
         }
 
-        let player = game.player(self.owner);
+        let owner = game.player(self.owner);
 
         for tech in &building.techs {
-            if !player.has_unlocked_tech(&game.registry().tech(tech).unwrap()) {
+            if !owner.has_unlocked_tech(&game.registry().tech(tech).unwrap()) {
                 return false;
             }
         }
@@ -376,6 +380,17 @@ impl City {
             if !self.buildings().any(|b| &b.name == prerequisite) {
                 return false;
             }
+        }
+
+        if game
+            .registry()
+            .is_building_replaced_for_civ(building, owner.civ())
+        {
+            return false;
+        }
+
+        if !building.only_for_civs.is_empty() && !building.only_for_civs.contains(&owner.civ().id) {
+            return false;
         }
 
         true
