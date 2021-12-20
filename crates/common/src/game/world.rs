@@ -257,12 +257,12 @@ impl Game {
             unit.borrow_mut().on_turn_end(self);
         }
 
-        for player in self.players.values() {
-            player.borrow_mut().on_turn_end(self);
-        }
-
         for city in self.cities.values() {
             city.borrow_mut().on_turn_end(self);
+        }
+
+        for player in self.players.values() {
+            player.borrow_mut().on_turn_end(self);
         }
 
         self.turn.increment();

@@ -341,8 +341,15 @@ impl Player {
             num_news += 1;
         }
     }
+
     pub fn set_research(&mut self, tech: Handle<Tech>) {
         self.research = Some(tech);
+    }
+
+    pub fn set_economy_settings(&mut self, mut settings: EconomySettings) {
+        settings.beaker_percent = settings.beaker_percent.min(100);
+        settings.gold_percent = 100 - settings.beaker_percent;
+        self.economy_settings = settings;
     }
 
     /// Should be called on the end of each turn.
@@ -352,7 +359,7 @@ impl Player {
         game.push_event(Event::PlayerChanged(self.id()));
     }
 
-    fn update_economy(&mut self, game: &Game) {
+   pub fn update_economy(&mut self, game: &Game) {
         let mut base = 0.;
         let mut gold = 0.;
         let mut beakers = 0.;
@@ -369,6 +376,8 @@ impl Player {
         self.economy.gold_revenue = gold.floor() as u32;
         self.economy.beaker_revenue = beakers.floor() as u32;
         self.economy.expenses = expenses.floor() as u32;
+
+        log::info!("Updated economy for {} - {} beakers from {} cities", self.username(), self.economy.beaker_revenue, self.cities.len());
     }
 
     fn update_research(&mut self, _game: &Game) {
@@ -444,6 +453,11 @@ impl EconomySettings {
 
     pub fn decrement_beaker_percent(&mut self) {
         self.beaker_percent = self.beaker_percent.saturating_sub(10);
+        self.gold_percent = 100 - self.beaker_percent;
+    }
+
+    pub fn set_beaker_percent(&mut self, percent: u32 ) {
+        self.beaker_percent = percent.min(100);
         self.gold_percent = 100 - self.beaker_percent;
     }
 

@@ -422,6 +422,8 @@ impl City {
 
         self.update_worked_tiles(game);
         game.push_event(Event::CityChanged(self.id));
+        game.player_mut(self.owner).update_economy(game);
+        game.push_event(Event::PlayerChanged(self.owner));
     }
 
     /// Should be called at the end of each turn.
@@ -576,7 +578,7 @@ impl City {
     }
 
     /// Updates the CityEconomy based on current worked tiles.
-    fn update_economy(&mut self, game: &Game) {
+    pub fn update_economy(&mut self, game: &Game) {
         // Base values of 1 for free.
         self.economy.hammer_yield = 1;
         self.economy.food_yield = 1;

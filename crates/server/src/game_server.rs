@@ -4,7 +4,7 @@ use riposte_common::{
     protocol::{
         client::{
             ClientGamePacket, ClientPacket, ConfigureWorkedTiles, DoUnitAction, MoveUnits,
-            SetCityBuildTask, SetResearch, UnitAction,
+            SetCityBuildTask, SetEconomySettings, SetResearch, UnitAction,
         },
         game::server::{InitialGameData, ServerGamePacket, ServerPacket},
         server::{
@@ -95,7 +95,7 @@ impl GameServer {
             }
             ClientPacket::SetCityBuildTask(p) => self.handle_set_city_build_task(p),
             ClientPacket::SetWorkerTask(_) => todo!(),
-            ClientPacket::SetEconomySettings(_) => todo!(),
+            ClientPacket::SetEconomySettings(p) => self.handle_set_economy_settings(player, p),
             ClientPacket::SetResearch(p) => self.handle_set_research(player, p),
             ClientPacket::DoUnitAction(p) => self.handle_do_unit_action(p),
             ClientPacket::DeclareWar(_) => todo!(),
@@ -176,6 +176,19 @@ impl GameServer {
 
     fn handle_set_research(&mut self, player: PlayerId, p: SetResearch) {
         self.game.player_mut(player).set_research(p.tech);
+        self.game.push_event(Event::PlayerChanged(player));
+    }
+
+    fn handle_set_economy_settings(&mut self, player: PlayerId, p: SetEconomySettings) {
+        {
+            let mut player = self.game.player_mut(player);
+            player.set_economy_settings(p.settings);
+            player.update_economy(&self.game);
+        }
+        for city in self.game.player(player).cities() {
+            self.game.city_mut(*city).update_economy(&self.game);
+            self.game.push_event(Event::CityChanged(*city));
+        }
         self.game.push_event(Event::PlayerChanged(player));
     }
 

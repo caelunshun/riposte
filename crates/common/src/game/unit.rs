@@ -258,7 +258,12 @@ impl Unit {
 
         // Minimum distance to other cities: we don't
         // allow two cities to lie within each others' BFCs.
-        for pos in game.map().big_fat_cross(self.pos()).into_iter().chain(once(self.pos())) {
+        for pos in game
+            .map()
+            .big_fat_cross(self.pos())
+            .into_iter()
+            .chain(once(self.pos()))
+        {
             if game.city_at_pos(pos).is_some() {
                 return Err(CannotFoundCity::NearbyCities);
             }
@@ -290,10 +295,13 @@ impl Unit {
                 let this = game.unit(this);
                 let owner = game.player(this.owner());
 
+                game.push_event(Event::PlayerChanged(this.owner()));
+
                 City::new(id, &*owner, this.pos(), owner.next_city_name(game), game)
             };
 
             game.add_city(city);
+            game.player_mut(game.unit(this).owner()).update_economy(game);
             game.remove_unit(this);
         });
 

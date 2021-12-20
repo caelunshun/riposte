@@ -10,10 +10,11 @@ use riposte_common::{
     city::BuildTask,
     lobby::{GameLobby, SlotId},
     mapgen::MapgenSettings,
+    player::EconomySettings,
     protocol::{
         client::{
             ClientGamePacket, ConfigureWorkedTiles, DeclareWar, DoUnitAction, EndTurn, MoveUnits,
-            SaveGame, SetCityBuildTask, SetResearch, SetWorkerTask,
+            SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask,
         },
         game::client::{ClientPacket, UnitAction},
         lobby::{
@@ -233,8 +234,12 @@ impl Client<GameState> {
         }));
     }
 
-    pub fn set_economy_settings(&mut self, _beaker_percent: u32) {
-        todo!()
+    pub fn set_economy_settings(&mut self, beaker_percent: u32) {
+        let mut settings = EconomySettings::default();
+        settings.set_beaker_percent(beaker_percent);
+        self.send_message(ClientPacket::SetEconomySettings(SetEconomySettings {
+            settings,
+        }));
     }
 
     pub fn set_tile_manually_worked(
