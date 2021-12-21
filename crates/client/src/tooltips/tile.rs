@@ -1,5 +1,5 @@
 use std::mem;
-use std::{ num::NonZeroUsize};
+use std::num::NonZeroUsize;
 
 use dume::Text;
 use glam::UVec2;
@@ -168,8 +168,10 @@ fn units_lines(game: &Game, _tile: &Tile, pos: UVec2) -> Vec<Text> {
                 if let Some(task) = worker_cap.current_task() {
                     line.extend(text!(
                         ", {} ({})",
-                        task.kind.present_participle(),
-                        task.turns_left()
+                        task.present_participle(),
+                        game.base()
+                            .worker_progress_grid()
+                            .predict_remaining_turns_for(game.base(), pos, task),
                     ));
                 }
             };

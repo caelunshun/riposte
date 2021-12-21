@@ -56,8 +56,10 @@ impl UnitInfo {
                     if let Some(task) = worker_cap.current_task() {
                         text.push_str(&format!(
                             "\n{} ({})",
-                            task.kind.present_participle(),
-                            task.turns_left()
+                            task.present_participle(),
+                            game.base()
+                                .worker_progress_grid()
+                                .predict_remaining_turns_for(game.base(), unit.pos(), task),
                         ));
                     }
                 }

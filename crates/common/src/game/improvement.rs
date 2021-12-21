@@ -1,4 +1,10 @@
-use std::str::FromStr;
+use std::{mem, str::FromStr};
+
+use crate::{
+    assets::Handle,
+    registry::{Registry, Tech},
+    Game, Player, Terrain, Tile,
+};
 
 #[derive(Debug, thiserror::Error)]
 #[error("unknown cottage level '{0}'")]
@@ -9,7 +15,7 @@ pub struct InvalidCottageLevel(String);
 pub struct InvalidImprovementType(String);
 
 /// A tile improvement.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum Improvement {
     Farm,
     Mine,
@@ -28,6 +34,86 @@ impl Improvement {
             Improvement::Cottage(cottage) => format!("{:?}", cottage.level),
         }
     }
+
+    pub fn is_compatible_with(&self, other: &Improvement) -> bool {
+        if mem::discriminant(self) == mem::discriminant(other) {
+            return false;
+        }
+
+        if self == &Self::Road {
+            return true;
+        }
+
+        false
+    }
+
+    pub fn worker_turns_to_build(&self) -> u32 {
+        match self {
+            Improvement::Farm => 5,
+            Improvement::Mine => 4,
+            Improvement::Road => 2,
+            Improvement::Pasture => 5,
+            Improvement::Cottage(_) => 4,
+        }
+    }
+
+    pub fn required_tech(&self, registry: &Registry) -> Handle<Tech> {
+        let id = match self {
+            Improvement::Farm => "Agriculture",
+            Improvement::Mine => "Mining",
+            Improvement::Road => "The Wheel",
+            Improvement::Pasture => "Animal Husbandry",
+            Improvement::Cottage(_) => "Pottery",
+        };
+        registry.tech(id).unwrap()
+    }
+
+    pub fn possible_for_tile(game: &Game, tile: &Tile, builder: &Player) -> Vec<Self> {
+        let mut possible = Vec::new();
+
+        let owner = tile.owner(game);
+        if owner.is_none() || owner == Some(builder.id()) {
+            possible.push(Improvement::Road);
+        }
+
+        if owner == Some(builder.id()) {
+            if !tile.is_hilled() && tile.terrain() != Terrain::Desert {
+                possible.push(Improvement::Farm);
+                if tile.terrain() != Terrain::Tundra {
+                    possible.push(Improvement::Cottage(Cottage::default()));
+                }
+            }
+
+            if tile.is_hilled()
+                || tile
+                    .resource()
+                    .map(|r| {
+                        r.improvement == "Mine"
+                            && builder
+                                .has_unlocked_tech(&game.registry().tech(&r.revealed_by).unwrap())
+                    })
+                    .unwrap_or(false)
+            {
+                possible.push(Improvement::Mine);
+            }
+
+            if tile
+                .resource()
+                .map(|r| {
+                    r.improvement == "Pasture"
+                        && builder.has_unlocked_tech(&game.registry().tech(&r.revealed_by).unwrap())
+                })
+                .unwrap_or(false)
+            {
+                possible.push(Improvement::Pasture);
+            }
+        }
+
+        possible.retain(|i| tile.improvements().all(|i2| i.is_compatible_with(i2)));
+        possible.retain(|i| builder.has_unlocked_tech(&i.required_tech(game.registry())));
+
+        possible
+    }
 }
 
 impl FromStr for Improvement {
@@ -45,7 +131,7 @@ impl FromStr for Improvement {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Cottage {
     level: CottageLevel,
 }
@@ -64,7 +150,7 @@ impl Default for Cottage {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
 pub enum CottageLevel {
     Cottage,
     Hamlet,

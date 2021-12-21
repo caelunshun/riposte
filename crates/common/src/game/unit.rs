@@ -16,7 +16,9 @@ use crate::{
     City,
 };
 
-use super::{improvement::Improvement, PlayerId, UnitId};
+use super::{PlayerId, UnitId};
+
+pub use crate::worker::WorkerTask;
 
 /// Represents a unit in the game.
 ///
@@ -112,10 +114,26 @@ impl Unit {
     }
 
     pub fn has_worker_task(&self) -> bool {
-        self.capabilities().any(|c| match c {
-            Capability::Worker(w) => w.current_task.is_some(),
-            _ => false,
+        self.worker_task().is_some()
+    }
+
+    pub fn worker_task(&self) -> Option<&WorkerTask> {
+        self.capabilities().find_map(|c| match c {
+            Capability::Worker(w) => w.current_task.as_ref(),
+            _ => None,
         })
+    }
+
+    pub fn set_worker_task(&mut self, task: Option<WorkerTask>) {
+        if let Some(cap) = self
+            .capabilities
+            .iter_mut()
+            .find(|c| matches!(c, Capability::Worker(_)))
+        {
+            if let Capability::Worker(w) = cap {
+                w.current_task = task;
+            }
+        }
     }
 
     pub fn id(&self) -> UnitId {
@@ -301,7 +319,8 @@ impl Unit {
             };
 
             game.add_city(city);
-            game.player_mut(game.unit(this).owner()).update_economy(game);
+            game.player_mut(game.unit(this).owner())
+                .update_economy(game);
             game.remove_unit(this);
         });
 
@@ -349,11 +368,19 @@ impl Unit {
             .movement_left
             .saturating_sub(target_tile.movement_cost(game, &*game.player(self.owner())));
 
+        // Worker task is canceled
+        if self.has_worker_task() {
+            self.set_worker_task(None);
+            game.push_event(Event::UnitChanged(self.id));
+        }
+
         true
     }
 
     /// Should be called at the end of each turn.
     pub fn on_turn_end(&mut self, game: &Game) {
+        self.do_work(game);
+
         self.heal(game);
 
         self.reset_fortify();
@@ -361,6 +388,22 @@ impl Unit {
         self.reset_movement();
 
         game.push_event(Event::UnitChanged(self.id()));
+    }
+
+    fn do_work(&mut self, game: &Game) {
+        // Can only do work if there is movement left.
+        if !self.has_movement_left() {
+            return;
+        }
+
+        if let Some(task) = self.worker_task() {
+            let mut progress_grid = game.worker_progress_grid_mut();
+            progress_grid.add_progress_to(self.pos, task);
+            if progress_grid.is_task_completed(self.pos, task) {
+                task.complete(game, self.pos);
+                self.set_worker_task(None);
+            }
+        }
     }
 
     fn reset_fortify(&mut self) {
@@ -543,36 +586,5 @@ pub struct WorkerCapability {
 impl WorkerCapability {
     pub fn current_task(&self) -> Option<&WorkerTask> {
         self.current_task.as_ref()
-    }
-}
-
-#[derive(Debug, Clone)]
-pub struct WorkerTask {
-    pub turns_left: u32,
-    pub kind: WorkerTaskKind,
-}
-
-impl WorkerTask {
-    pub fn turns_left(&self) -> u32 {
-        self.turns_left
-    }
-}
-
-#[derive(Debug, Clone)]
-pub enum WorkerTaskKind {
-    BuildImprovement(Improvement),
-}
-
-impl WorkerTaskKind {
-    pub fn name(&self) -> String {
-        match self {
-            WorkerTaskKind::BuildImprovement(i) => i.name(),
-        }
-    }
-
-    pub fn present_participle(&self) -> String {
-        match self {
-            WorkerTaskKind::BuildImprovement(i) => format!("Building {}", i.name()),
-        }
     }
 }

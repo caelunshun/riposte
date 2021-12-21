@@ -12,7 +12,8 @@ use slotmap::{SecondaryMap, SlotMap};
 
 use super::{CityId, PlayerId, UnitId};
 use crate::{
-    event::Event, registry::Registry, tile::OutOfBounds, City, Grid, Player, Tile, Turn, Unit,
+    event::Event, registry::Registry, tile::OutOfBounds, worker::WorkerProgressGrid, City, Grid,
+    Player, Tile, Turn, Unit,
 };
 
 /// Stores the entire game state.
@@ -38,6 +39,8 @@ pub struct Game {
     /// Stores which city is working each tile.
     tile_workers: Grid<RefCell<Option<CityId>>>,
 
+    worker_progress: RefCell<WorkerProgressGrid>,
+
     rng: RefCell<Pcg64Mcg>,
 
     turn: Turn,
@@ -53,6 +56,7 @@ impl Game {
             registry,
 
             tile_workers: Grid::new(RefCell::new(None), map.width(), map.height()),
+            worker_progress: RefCell::new(WorkerProgressGrid::new(map.width(), map.height())),
             map,
 
             player_ids: SlotMap::default(),
@@ -218,6 +222,14 @@ impl Game {
     /// Mutably gets the tile at `pos`.
     pub fn tile_mut(&self, pos: UVec2) -> Result<RefMut<Tile>, OutOfBounds> {
         self.map.get(pos).map(RefCell::borrow_mut)
+    }
+
+    pub fn worker_progress_grid(&self) -> Ref<WorkerProgressGrid> {
+        self.worker_progress.borrow()
+    }
+
+    pub fn worker_progress_grid_mut(&self) -> RefMut<WorkerProgressGrid> {
+        self.worker_progress.borrow_mut()
     }
 
     /// Gets the RNG used for all random game events, such as combat.

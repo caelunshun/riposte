@@ -8,6 +8,7 @@ pub mod player;
 pub mod tile;
 pub mod world;
 pub mod unit;
+pub mod worker;
 pub mod event;
 
 pub use city::City;

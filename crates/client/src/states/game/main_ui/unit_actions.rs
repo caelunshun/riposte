@@ -21,7 +21,7 @@ use crate::{
     ui::Z_FOREGROUND,
 };
 
-use riposte_common::{protocol::client::UnitAction, unit::WorkerTaskKind, Improvement, UnitId};
+use riposte_common::{protocol::client::UnitAction, worker::WorkerTask, Improvement, UnitId};
 
 use super::unit_info;
 
@@ -42,7 +42,7 @@ impl WindowPositioner for Positioner {
 enum Message {
     Kill(UnitId),
     FoundCity(UnitId),
-    SetWorkerTask(UnitId, WorkerTaskKind),
+    SetWorkerTask(UnitId, WorkerTask),
     Heal(UnitId),
 }
 
@@ -97,9 +97,9 @@ fn get_possible_unit_actions(game: &Game, unit: &Unit) -> Vec<PossibleUnitAction
         .next()
     {
         let tile = game.tile(unit.pos()).unwrap();
-        for task in Vec::<WorkerTaskKind>::new() {
+        for task in WorkerTask::possible_for_tile(game.base(), &*tile, unit.pos(), &*game.the_player()) {
             match &task {
-                WorkerTaskKind::BuildImprovement(improvement) => {
+                WorkerTask::BuildImprovement(improvement) => {
                     let is_recommended = tile
                         .resource()
                         .map(|r| r.improvement == improvement.name())

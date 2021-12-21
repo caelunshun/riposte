@@ -153,6 +153,10 @@ impl Tile {
         self.improvements.iter()
     }
 
+    pub fn clear_improvements(&mut self) {
+        self.improvements.clear();
+    }
+
     pub fn movement_cost(&self, game: &Game, player: &Player) -> MovementPoints {
         let mut cost = MovementPoints::from_u32(1);
         if self.is_forested() || self.is_hilled() {
@@ -202,6 +206,16 @@ impl Tile {
 
     pub fn set_resource(&mut self, resource: Handle<Resource>) {
         self.resource = Some(resource);
+    }
+
+    pub fn add_improvement(&mut self, improvement: Improvement) {
+        if !self.improvements.contains(&improvement) {
+            if improvement != Improvement::Road {
+                self.is_forested = false;
+            }
+
+            self.improvements.push(improvement);
+        }
     }
 }
 
@@ -348,8 +362,7 @@ impl<T> Grid<T> {
             tiles.push(next);
 
             for neighbor in self.straight_adjacent(next) {
-                if visited.insert(neighbor) && neighbor.distance_squared(pos) <= radius_squared
-                {
+                if visited.insert(neighbor) && neighbor.distance_squared(pos) <= radius_squared {
                     stack.push(neighbor);
                 }
             }

@@ -128,6 +128,8 @@ impl City {
             game.push_event(Event::TileChanged(pos));
         }
 
+        game.tile_mut(pos).unwrap().clear_improvements();
+
         city.update_worked_tiles(game);
         city.update_economy(game);
         city.update_culture_per_turn();

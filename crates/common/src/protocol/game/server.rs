@@ -4,7 +4,10 @@ use std::cell::RefCell;
 
 use glam::UVec2;
 
-use crate::{unit::MovementPoints, City, Grid, Player, PlayerId, Tile, Turn, Unit, UnitId};
+use crate::{
+    unit::MovementPoints, worker::WorkerProgressGrid, City, Grid, Player, PlayerId, Tile, Turn,
+    Unit, UnitId,
+};
 
 #[derive(Debug, Clone)]
 pub struct ServerGamePacket {
@@ -28,6 +31,7 @@ pub enum ServerPacket {
     ConfirmMoveUnits(ConfirmMoveUnits),
     DeleteUnit(DeleteUnit),
     UpdateCity(UpdateCity),
+    UpdateWorkerProgressGrid(UpdateWorkerProgressGrid),
 }
 
 /// Sent in the `GameStarted` lobby packet.
@@ -103,4 +107,10 @@ pub struct DeleteUnit {
 #[derive(Debug, Clone)]
 pub struct UpdateCity {
     pub city: City,
+}
+
+/// Updates the worker progress grid.
+#[derive(Debug, Clone)]
+pub struct UpdateWorkerProgressGrid {
+    pub grid: WorkerProgressGrid,
 }

@@ -25,7 +25,7 @@ use riposte_common::{
         GenericClientPacket, GenericServerPacket,
     },
     registry::{Civilization, Leader, Registry, Tech},
-    unit::WorkerTaskKind,
+    worker::WorkerTask,
     CityId, PlayerId, UnitId,
 };
 
@@ -256,7 +256,7 @@ impl Client<GameState> {
         }));
     }
 
-    pub fn set_worker_task(&mut self, _game: &Game, worker_id: UnitId, task: &WorkerTaskKind) {
+    pub fn set_worker_task(&mut self, _game: &Game, worker_id: UnitId, task: &WorkerTask) {
         self.send_message(ClientPacket::SetWorkerTask(SetWorkerTask {
             worker_id,
             task: task.clone(),
@@ -296,6 +296,9 @@ impl Client<GameState> {
                     ),
                     ServerPacket::DeleteUnit(p) => game.delete_unit(p.unit),
                     ServerPacket::UpdateCity(p) => game.add_or_update_city(p.city)?,
+                    ServerPacket::UpdateWorkerProgressGrid(p) => {
+                        *game.base().worker_progress_grid_mut() = p.grid
+                    }
                 }
             }
 

@@ -4,12 +4,12 @@ use riposte_common::{
     protocol::{
         client::{
             ClientGamePacket, ClientPacket, ConfigureWorkedTiles, DoUnitAction, MoveUnits,
-            SetCityBuildTask, SetEconomySettings, SetResearch, UnitAction,
+            SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask, UnitAction,
         },
         game::server::{InitialGameData, ServerGamePacket, ServerPacket},
         server::{
             ConfirmMoveUnits, DeleteUnit, UnitsMoved, UpdateCity, UpdatePlayer, UpdateTile,
-            UpdateTurn, UpdateUnit,
+            UpdateTurn, UpdateUnit, UpdateWorkerProgressGrid,
         },
         GenericServerPacket,
     },
@@ -94,7 +94,7 @@ impl GameServer {
                 self.handle_move_units(player, p, packet.request_id, conns)
             }
             ClientPacket::SetCityBuildTask(p) => self.handle_set_city_build_task(p),
-            ClientPacket::SetWorkerTask(_) => todo!(),
+            ClientPacket::SetWorkerTask(p) => self.handle_set_worker_task(p),
             ClientPacket::SetEconomySettings(p) => self.handle_set_economy_settings(player, p),
             ClientPacket::SetResearch(p) => self.handle_set_research(player, p),
             ClientPacket::DoUnitAction(p) => self.handle_do_unit_action(p),
@@ -162,6 +162,8 @@ impl GameServer {
                 }
             }
         }
+
+        self.game.push_event(Event::UnitChanged(packet.unit_id));
     }
 
     fn handle_set_city_build_task(&mut self, p: SetCityBuildTask) {
@@ -192,6 +194,13 @@ impl GameServer {
         self.game.push_event(Event::PlayerChanged(player));
     }
 
+    fn handle_set_worker_task(&mut self, p: SetWorkerTask) {
+        self.game
+            .unit_mut(p.worker_id)
+            .set_worker_task(Some(p.task));
+        self.game.push_event(Event::UnitChanged(p.worker_id));
+    }
+
     fn handle_end_turn(&mut self, player: PlayerId, conns: &Connections) {
         self.ended_turns[player] = true;
         if self.ended_turns.values().all(|&b| b) {
@@ -204,6 +213,12 @@ impl GameServer {
 
         self.broadcast(
             conns,
+            ServerPacket::UpdateWorkerProgressGrid(UpdateWorkerProgressGrid {
+                grid: (*self.game.worker_progress_grid()).clone(),
+            }),
+        );
+        self.broadcast(
+            conns,
             ServerPacket::UpdateTurn(UpdateTurn {
                 turn: self.game.turn(),
             }),
@@ -213,12 +228,16 @@ impl GameServer {
     pub fn update(&mut self, conns: &Connections) {
         self.game.run_deferred_functions();
         self.game.drain_events(|event| match event {
-            Event::UnitChanged(id) => self.broadcast(
-                conns,
-                ServerPacket::UpdateUnit(UpdateUnit {
-                    unit: (*self.game.unit(id)).clone(),
-                }),
-            ),
+            Event::UnitChanged(id) => {
+                if self.game.is_unit_valid(id) {
+                    self.broadcast(
+                        conns,
+                        ServerPacket::UpdateUnit(UpdateUnit {
+                            unit: (*self.game.unit(id)).clone(),
+                        }),
+                    )
+                }
+            }
             Event::CityChanged(id) => self.broadcast(
                 conns,
                 ServerPacket::UpdateCity(UpdateCity {

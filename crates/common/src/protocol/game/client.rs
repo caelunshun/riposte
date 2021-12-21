@@ -3,7 +3,7 @@
 use glam::UVec2;
 
 use crate::{
-    assets::Handle, city::BuildTask, player::EconomySettings, registry::Tech, unit::WorkerTaskKind,
+    assets::Handle, city::BuildTask, player::EconomySettings, registry::Tech, worker::WorkerTask,
     CityId, PlayerId, UnitId,
 };
 
@@ -39,7 +39,7 @@ pub enum ClientPacket {
 /// the server will not attempt to pathfind through multiple tiles to the target.
 ///
 /// On success, the server broadcasts `UnitsMoved`.
-/// 
+///
 /// The server will always respond with `ConfirmMoveUnits` containing a success flag.
 #[derive(Debug, Clone)]
 pub struct MoveUnits {
@@ -58,7 +58,7 @@ pub struct SetCityBuildTask {
 #[derive(Debug, Clone)]
 pub struct SetWorkerTask {
     pub worker_id: UnitId,
-    pub task: WorkerTaskKind,
+    pub task: WorkerTask,
 }
 
 /// Configures the player's economy settings.
