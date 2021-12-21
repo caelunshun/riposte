@@ -141,6 +141,7 @@ impl Game {
     pub fn remove_city(&mut self, id: CityId) {
         self.city_ids.remove(id);
         if let Some(city) = self.cities.remove(id) {
+            self.cities_by_pos.remove(&city.borrow().pos());
             self.player_mut(city.into_inner().owner())
                 .deregister_city(self, id);
         }
@@ -150,6 +151,7 @@ impl Game {
     pub fn add_city(&mut self, city: City) {
         let id = city.id();
         let owner = city.owner();
+        self.cities_by_pos.insert(city.pos(), id);
         self.cities.insert(id, RefCell::new(city));
         self.player_mut(owner).register_city(id);
         self.push_event(Event::CityChanged(id));
