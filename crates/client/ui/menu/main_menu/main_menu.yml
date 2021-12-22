@@ -1,6 +1,8 @@
 name: MainMenu
 child:
   Container:
+    classes:
+      - menu_container
     mode:
       Pad: 50
     child:

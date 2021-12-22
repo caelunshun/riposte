@@ -2,7 +2,7 @@ variables:
   window: rgb(40, 40, 40)
   background: rgb(65, 65, 65)
   lighter: rgb(80, 80, 80)
-  border: rgb(100, 100, 100)
+  border: rgb(200, 200, 200)
   active: rgb(100, 105, 100)
   foreground: rgb(120, 120, 120)
   text_color: rgb(255, 255, 255)
@@ -83,13 +83,18 @@ styles:
 
   unit_action_button:
     padding: 10
-    border_radius: 0.2
+    border_radius: 3
 
   container:
     border_radius: 0
     border_width: 1
     background_color: rgba(50, 50, 50, 240)
     border_color: $background
+
+  container & menu_container:
+    border_radius: 5
+    border_width: 1
+    border_color: $border
 
   container & window_container:
     background_color: rgba(45, 45, 45, 254)
@@ -159,18 +164,22 @@ styles:
 
   table:
     background_color_a: rgb(70, 70, 70)
-    background_color_b: rgb(80, 80, 80)
+    background_color_b: rgb(90, 90, 90)
 
   scrollable:
     bar_width: 10
     bar_border_radius: 1
-    bar_color: rgb(120, 120, 120)
-    hovered_bar_color: rgb(140, 140, 140)
-    grabbed_bar_color: rgb(160, 160, 160)
+    bar_color: rgb(160, 160, 160)
+    hovered_bar_color: rgb(180, 180, 180)
+    grabbed_bar_color: rgb(190, 190, 190)
 
   pick_list:
     arrow_font_family: $icon_font_family
 
   pick_list_option & hovered:
     background_color: $border_active
+
+  divider:
+    line_color: $border
+    line_width: 1
   
