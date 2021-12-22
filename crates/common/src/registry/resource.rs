@@ -13,4 +13,5 @@ pub struct Resource {
     pub health_bonus: u32,
     #[serde(default)]
     pub happy_bonus: u32,
+    pub abundance: f32,
 }

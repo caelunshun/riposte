@@ -27,6 +27,7 @@ use self::{
 };
 
 mod land;
+mod resources;
 mod starting_locations;
 mod terrain;
 
@@ -71,8 +72,11 @@ impl MapGenerator {
             }
         };
 
-        let tiles = TerrainGenerator::new(land, &mut self.context).generate();
+        let mut tiles = TerrainGenerator::new(land, &mut self.context).generate();
+        resources::place_resources(&mut self.context, &mut tiles, &registry);
+
         let starting_locations = generate_starting_locations(&tiles, lobby.slots().count());
+        
         let tiles = tiles.map(RefCell::new);
 
         let mut game = Game::new(Arc::clone(registry), tiles);
