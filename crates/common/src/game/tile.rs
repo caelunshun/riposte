@@ -118,6 +118,10 @@ impl Tile {
             }
         }
 
+        for improvement in &self.improvements {
+            y = y + improvement.yield_bonus();
+        }
+
         y
     }
 

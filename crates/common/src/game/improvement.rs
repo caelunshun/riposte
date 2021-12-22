@@ -3,7 +3,7 @@ use std::{mem, str::FromStr};
 use crate::{
     assets::Handle,
     registry::{Registry, Tech},
-    Game, Player, Terrain, Tile,
+    Game, Player, Terrain, Tile, Yield,
 };
 
 #[derive(Debug, thiserror::Error)]
@@ -54,6 +54,28 @@ impl Improvement {
             Improvement::Road => 2,
             Improvement::Pasture => 5,
             Improvement::Cottage(_) => 4,
+        }
+    }
+
+    pub fn yield_bonus(&self) -> Yield {
+        match self {
+            Improvement::Farm => Yield {
+                food: 1,
+                hammers: 0,
+                commerce: 0,
+            },
+            Improvement::Mine => Yield {
+                food: 0,
+                hammers: 1,
+                commerce: 0,
+            },
+            Improvement::Road => Yield::default(),
+            Improvement::Pasture => Yield::default(),
+            Improvement::Cottage(c) => Yield {
+                food: 0,
+                hammers: 0,
+                commerce: c.level() as u32 + 1,
+            },
         }
     }
 
