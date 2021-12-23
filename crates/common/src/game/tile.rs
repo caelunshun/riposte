@@ -55,6 +55,7 @@ impl Tile {
     }
 
     pub fn update_owner(&mut self, game: &Game) {
+        let old_owner = self.owner;
         self.owner = self
             .culture
             .iter()
@@ -65,6 +66,15 @@ impl Tile {
                     .any(|c| game.city(*c).owner() == val.owner())
             })
             .map(|v| v.owner());
+        if self.owner != old_owner {
+            if let Some(new_owner) = self.owner {
+                game.defer(move |game| game.player_mut(new_owner).update_visibility(game));
+            }
+            if let Some(old_owner) = self.owner {
+                game.defer(move |game| game.player_mut(old_owner).update_visibility(game));
+
+            }
+        }
     }
 
     pub fn owner(&self, _game: &Game) -> Option<PlayerId> {

@@ -81,6 +81,13 @@ impl MapGenerator {
 
         let mut game = Game::new(Arc::clone(registry), tiles);
         self.add_players_and_starting_units(&mut game, registry, lobby, &starting_locations);
+
+        for player in game.players() {
+            let id = player.id();
+            drop(player);
+            game.player_mut(id).update_visibility(&game);
+        }
+
         game
     }
 

@@ -374,6 +374,10 @@ impl Unit {
             game.push_event(Event::UnitChanged(self.id));
         }
 
+        // Visibility changes
+        let owner = self.owner;
+        game.defer(move |game| game.player_mut(owner).update_visibility(game));
+
         true
     }
 

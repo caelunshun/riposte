@@ -1,5 +1,5 @@
 use ahash::{AHashMap, AHashSet};
-use glam::UVec2;
+use glam::{ivec2, uvec2, UVec2};
 use uuid::Uuid;
 
 use super::{CityId, PlayerId, UnitId};
@@ -359,7 +359,7 @@ impl Player {
         game.push_event(Event::PlayerChanged(self.id()));
     }
 
-   pub fn update_economy(&mut self, game: &Game) {
+    pub fn update_economy(&mut self, game: &Game) {
         let mut base = 0.;
         let mut gold = 0.;
         let mut beakers = 0.;
@@ -377,7 +377,12 @@ impl Player {
         self.economy.beaker_revenue = beakers.floor() as u32;
         self.economy.expenses = expenses.floor() as u32;
 
-        log::info!("Updated economy for {} - {} beakers from {} cities", self.username(), self.economy.beaker_revenue, self.cities.len());
+        log::info!(
+            "Updated economy for {} - {} beakers from {} cities",
+            self.username(),
+            self.economy.beaker_revenue,
+            self.cities.len()
+        );
     }
 
     fn update_research(&mut self, _game: &Game) {
@@ -396,6 +401,59 @@ impl Player {
                 self.research = None;
             }
         }
+    }
+
+    /// Recomputes the player's visibility grid.
+    pub fn update_visibility(&mut self, game: &Game) {
+        // Reset Visible => Fogged
+        for x in 0..self.visibility.width() {
+            for y in 0..self.visibility.height() {
+                let pos = uvec2(x, y);
+                if self.visibility_at(pos) == Visibility::Visible {
+                    self.visibility.set(pos, Visibility::Fogged).unwrap();
+                }
+            }
+        }
+
+        // Collect the points we can see from: cultural borders and units.
+        let mut visibility_points = Vec::new();
+
+        for x in 0..game.map().width() {
+            for y in 0..game.map().height() {
+                let pos = uvec2(x, y);
+                let tile = game.tile(pos).unwrap();
+                if tile.owner(game) == Some(self.id) {
+                    visibility_points.push(pos);
+                }
+            }
+        }
+
+        for unit in self.units() {
+            visibility_points.push(game.unit(*unit).pos());
+        }
+
+        // Distribute Visible from visibility points
+        for point in visibility_points {
+            let tile = game.tile(point).unwrap();
+            let distance = if tile.is_hilled() && !tile.is_forested() {
+                2
+            } else {
+                1
+            };
+
+            for dx in -distance..=distance {
+                for dy in -distance..=distance {
+                    let pos = point.as_i32() + ivec2(dx, dy);
+                    if self.visibility.is_in_bounds(pos) {
+                        self.visibility
+                            .set(pos.as_u32(), Visibility::Visible)
+                            .unwrap();
+                    }
+                }
+            }
+        }
+
+        game.push_event(Event::PlayerChanged(self.id));
     }
 }
 
@@ -456,7 +514,7 @@ impl EconomySettings {
         self.gold_percent = 100 - self.beaker_percent;
     }
 
-    pub fn set_beaker_percent(&mut self, percent: u32 ) {
+    pub fn set_beaker_percent(&mut self, percent: u32) {
         self.beaker_percent = percent.min(100);
         self.gold_percent = 100 - self.beaker_percent;
     }
