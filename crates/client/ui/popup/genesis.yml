@@ -1,0 +1,28 @@
+name: GenesisPopup
+child:
+  Container:
+    mode:
+      FillParentAndPad: 25
+    classes:
+      - window_container
+    child:
+      Column:
+        spacing: 20
+        children:
+          - Text:
+              text: The Dawn of Civilization
+              align_h: Center
+              classes:
+                - h2
+          - Divider: {}
+          - Text:
+              id: welcome_text
+              classes:
+                - h4
+          - Row:
+              align_h: Center
+              children:
+                - Button:
+                    child:
+                      Text: Continue
+                    id: close_button

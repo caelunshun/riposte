@@ -407,6 +407,10 @@ impl Context {
 
         frame.present();
     }
+
+    pub fn popup_windows(&self) -> &PopupWindows {
+        &self.popup_windows
+    }
 }
 
 /// A handle to a future running asynchronously

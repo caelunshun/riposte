@@ -192,6 +192,42 @@ impl ::duit::InstanceHandle for ErrorPopup {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct GenesisPopup {
+    pub welcome_text: WidgetHandle<Text>,
+    pub close_button: WidgetHandle<Button>,
+}
+impl ::duit::InstanceHandle for GenesisPopup {
+    fn name() -> &'static str {
+        "GenesisPopup"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut welcome_text = None;
+        let mut close_button = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "welcome_text" => welcome_text = Some(widget),
+                "close_button" => close_button = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            welcome_text: WidgetHandle::new(welcome_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "welcome_text"
+                )
+            })),
+            close_button: WidgetHandle::new(close_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "close_button"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct UserBar {
     pub user_text: WidgetHandle<Text>,
     pub log_out_button: WidgetHandle<Button>,

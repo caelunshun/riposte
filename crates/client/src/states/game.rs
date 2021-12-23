@@ -97,6 +97,11 @@ impl GameState {
 
         let page = Page::Main(MainUi::new(cx, &game));
 
+        if game.turn().get() == 0 {
+            cx.popup_windows()
+                .show_genesis_popup(&mut cx.ui_mut(), &game);
+        }
+
         Self {
             attachment,
             game,
