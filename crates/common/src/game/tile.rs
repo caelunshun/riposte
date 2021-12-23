@@ -35,6 +35,8 @@ pub struct Tile {
     resource: Option<Handle<Resource>>,
 
     improvements: Vec<Improvement>,
+
+    owner: Option<PlayerId>,
 }
 
 impl Tile {
@@ -48,11 +50,13 @@ impl Tile {
             worked_by_city: None,
             resource: None,
             improvements: Vec::new(),
+            owner: None,
         }
     }
 
-    pub fn owner(&self, game: &Game) -> Option<PlayerId> {
-        self.culture
+    pub fn update_owner(&mut self, game: &Game) {
+        self.owner = self
+            .culture
             .iter()
             .find(|val| {
                 // A tile can only be owned by a city that influences it.
@@ -60,7 +64,11 @@ impl Tile {
                     .iter()
                     .any(|c| game.city(*c).owner() == val.owner())
             })
-            .map(|v| v.owner())
+            .map(|v| v.owner());
+    }
+
+    pub fn owner(&self, _game: &Game) -> Option<PlayerId> {
+        self.owner
     }
 
     pub(crate) fn add_influencer(&mut self, influencer: CityId) {
@@ -190,6 +198,10 @@ impl Tile {
             bonus += 25;
         }
         bonus
+    }
+
+    pub fn worked_by_city(&self) -> Option<CityId> {
+        self.worked_by_city
     }
 
     pub fn set_forested(&mut self, f: bool) {

@@ -130,9 +130,18 @@ impl City {
 
         game.tile_mut(pos).unwrap().clear_improvements();
 
-        city.update_worked_tiles(game);
-        city.update_economy(game);
         city.update_culture_per_turn();
+
+        game.defer(move |game| {
+            for pos in game.map().adjacent(pos).into_iter().chain(once(pos)) {
+                let mut tile = game.tile_mut(pos).unwrap();
+                tile.update_owner(game);
+            }
+            let mut city = game.city_mut(id);
+            city.update_worked_tiles(game);
+            city.update_economy(game);
+        });
+
         city
     }
 
@@ -424,8 +433,12 @@ impl City {
 
         self.update_worked_tiles(game);
         game.push_event(Event::CityChanged(self.id));
-        game.player_mut(self.owner).update_economy(game);
-        game.push_event(Event::PlayerChanged(self.owner));
+
+        let owner = self.owner;
+        game.defer(move |game| {
+            game.player_mut(owner).update_economy(game);
+            game.push_event(Event::PlayerChanged(owner));
+        });
     }
 
     /// Should be called at the end of each turn.
@@ -520,7 +533,7 @@ impl City {
         }
 
         for tile in game.map().big_fat_cross(self.pos) {
-            if !entries.contains(&(tile, true)) {
+            if self.can_work_tile(game, tile) && !entries.contains(&(tile, true)) {
                 entries.push((tile, false));
             }
         }
@@ -562,6 +575,10 @@ impl City {
 
     pub fn can_work_tile(&self, game: &Game, pos: UVec2) -> bool {
         if !game.map().is_in_bounds(pos.as_i32()) {
+            return false;
+        }
+
+        if game.tile(pos).unwrap().owner(game) != Some(self.owner) {
             return false;
         }
 

@@ -5,7 +5,7 @@ use std::{
 };
 
 use ahash::AHashMap;
-use glam::UVec2;
+use glam::{uvec2, UVec2};
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
 use slotmap::{SecondaryMap, SlotMap};
@@ -36,9 +36,6 @@ pub struct Game {
     // Various indexes for fast lookups.
     cities_by_pos: AHashMap<UVec2, CityId>,
 
-    /// Stores which city is working each tile.
-    tile_workers: Grid<RefCell<Option<CityId>>>,
-
     worker_progress: RefCell<WorkerProgressGrid>,
 
     rng: RefCell<Pcg64Mcg>,
@@ -55,7 +52,6 @@ impl Game {
         Self {
             registry,
 
-            tile_workers: Grid::new(RefCell::new(None), map.width(), map.height()),
             worker_progress: RefCell::new(WorkerProgressGrid::new(map.width(), map.height())),
             map,
 
@@ -251,18 +247,15 @@ impl Game {
     }
 
     pub fn tile_worker(&self, pos: UVec2) -> Option<CityId> {
-        self.tile_workers
-            .get(pos)
-            .map(|r| *r.borrow())
-            .unwrap_or(None)
+        self.tile(pos).unwrap().worked_by_city()
     }
 
     pub fn set_tile_worker(&self, pos: UVec2, worker: CityId) {
-        *self.tile_workers.get(pos).unwrap().borrow_mut() = Some(worker);
+        self.tile_mut(pos).unwrap().set_worked_by_city(Some(worker));
     }
 
     pub fn clear_tile_worker(&self, pos: UVec2) {
-        *self.tile_workers.get(pos).unwrap().borrow_mut() = None;
+        self.tile_mut(pos).unwrap().set_worked_by_city(None);
     }
 
     /// Ends the turn, running all inter-turn simulation. (Server only.)
@@ -277,6 +270,14 @@ impl Game {
 
         for player in self.players.values() {
             player.borrow_mut().on_turn_end(self);
+        }
+
+        for x in 0..self.map.width() {
+            for y in 0..self.map.height() {
+                let pos = uvec2(x, y);
+                let mut tile = self.tile_mut(pos).unwrap();
+                tile.update_owner(self);
+            }
         }
 
         self.turn.increment();
@@ -297,10 +298,11 @@ impl Game {
     }
 
     pub fn run_deferred_functions(&mut self) {
-        let mut functions = mem::take(&mut self.deferred);
-        for f in functions.get_mut().drain(..) {
-            f(self);
+        while !self.deferred.get_mut().is_empty() {
+            let mut functions = mem::take(&mut self.deferred);
+            for f in functions.get_mut().drain(..) {
+                f(self);
+            }
         }
-        self.deferred = functions;
     }
 }
