@@ -426,7 +426,7 @@ impl City {
             self.manually_worked_tiles.remove(&pos);
         } else if self.can_work_tile(game, pos) {
             self.manually_worked_tiles.insert(pos);
-            if self.manually_worked_tiles.len() > self.num_workable_tiles() as usize {
+            if self.manually_worked_tiles.len() >= self.num_workable_tiles() as usize {
                 self.manually_worked_tiles.shift_remove_index(0);
             }
         }
@@ -536,6 +536,7 @@ impl City {
             if self.can_work_tile(game, tile) && !entries.contains(&(tile, true)) {
                 entries.push((tile, false));
             }
+            game.push_event(Event::TileChanged(tile));
         }
 
         #[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord)]
