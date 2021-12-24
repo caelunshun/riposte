@@ -1,0 +1,17 @@
+{
+  "id": "axeman",
+  "name": "Axeman",
+  "strength": 6,
+  "movement": 1,
+  "cost": 40,
+  "techs": ["Iron Working"],
+  "resources": ["iron"],
+  "category": "melee",
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "category": "melee",
+      "bonusPercent": 50
+    }
+  ]
+}

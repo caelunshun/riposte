@@ -12,5 +12,5 @@
     "carry_units"
   ],
   "carryUnitCapacity": 1,
-  "carryUnitType": nonCombat,
+  "carryUnitType": "nonCombat"
 }
