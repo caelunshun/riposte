@@ -425,6 +425,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/cuirassier.json",
+    "id": "unit/cuirassier",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -660,6 +665,11 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/cuirassier.png",
+    "id": "texture/unit/cuirassier",
+    "loader": "image"
+  },
+  {
     "path": "texture/river/straight_0.png",
     "id": "texture/river/straight_0",
     "loader": "image"
@@ -802,6 +812,11 @@
   {
     "path": "icon/unit_head/musketman.png",
     "id": "icon/unit_head/musketman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/cuirassier.png",
+    "id": "icon/unit_head/cuirassier",
     "loader": "image"
   },
   {
