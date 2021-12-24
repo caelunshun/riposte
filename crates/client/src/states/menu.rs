@@ -12,6 +12,7 @@ use crate::{
 };
 
 use duit::Vec2;
+use dume::Srgba;
 use dume_video::Video;
 
 use self::{
@@ -139,14 +140,17 @@ impl MenuState {
     }
 
     pub fn render_overlay(&mut self, cx: &mut Context) {
-        let time = 6. -  self.intro_video.current_time().as_secs_f32();
-        let alpha = if time < 1.5 {
-            time / 1.5 
-        } else {
-            1.
-        };
+        let time = 6. - self.intro_video.current_time().as_secs_f32();
+        let alpha = if time < 1.5 { time / 1.5 } else { 1. };
 
         let size = cx.canvas_mut().size();
+        if alpha > 0. {
+            cx.canvas_mut()
+                .begin_path()
+                .rect(Vec2::ZERO, size)
+                .solid_color(Srgba::new(0, 0, 0, u8::MAX))
+                .fill();
+        }
         self.intro_video
             .draw(&mut *cx.canvas_mut(), Vec2::ZERO, size.x, alpha)
             .ok();
