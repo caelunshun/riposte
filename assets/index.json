@@ -430,6 +430,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/landsknecht.json",
+    "id": "unit/landsknecht",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -670,6 +675,11 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/landsknecht.png",
+    "id": "texture/unit/landsknecht",
+    "loader": "image"
+  },
+  {
     "path": "texture/river/straight_0.png",
     "id": "texture/river/straight_0",
     "loader": "image"
@@ -827,6 +837,11 @@
   {
     "path": "icon/unit_head/cuirassier.png",
     "id": "icon/unit_head/cuirassier",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/landsknecht.png",
+    "id": "icon/unit_head/landsknecht",
     "loader": "image"
   },
   {
