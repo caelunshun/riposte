@@ -10,6 +10,7 @@
   "techs": ["Animal Husbandry"],
   "resources": ["horse"],
   "category": "mounted",
+  "firstStrikeImmunity": true,
   "combatBonuses": [
     {
       "type": "againstUnit",

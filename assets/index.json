@@ -925,6 +925,11 @@
     "loader": "tech"
   },
   {
+    "path": "tech/optics.json",
+    "id": "tech/optics",
+    "loader": "tech"
+  },
+  {
     "path": "resource/copper.json",
     "id": "resource/copper",
     "loader": "resource"

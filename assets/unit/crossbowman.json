@@ -1,0 +1,18 @@
+{
+  "id": "crossbowman",
+  "name": "Crossbowman",
+  "strength": 6,
+  "movement": 1,
+  "cost": 25,
+  "techs": ["Archery", "Machinery"],
+  "resources": ["iron"],
+  "category": "archery",
+  "firstStrikes": 1,
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "category": "melee",
+      "bonusPercent": 50
+    }
+  ]
+}
