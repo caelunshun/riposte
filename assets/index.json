@@ -335,10 +335,10 @@
     "loader": "unit"
   },
   {
-  "path": "unit/catapult.json",
-  "id": "unit/catapult",
-  "loader": "unit"
-},
+    "path": "unit/catapult.json",
+    "id": "unit/catapult",
+    "loader": "unit"
+  },
   {
     "path": "unit/war_chariot.json",
     "id": "unit/war_chariot",
@@ -900,6 +900,11 @@
     "loader": "resource"
   },
   {
+    "path": "resource/iron.json",
+    "id": "resource/iron",
+    "loader": "resource"
+  },
+  {
     "path": "texture/resource/rice.png",
     "id": "texture/resource/rice",
     "loader": "image"
@@ -917,6 +922,11 @@
   {
     "path": "texture/resource/gold.png",
     "id": "texture/resource/gold",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/iron.png",
+    "id": "texture/resource/iron",
     "loader": "image"
   },
   {
