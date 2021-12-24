@@ -6,7 +6,7 @@
   "cost": 100,
   "techs": ["Gunpowder", "Military Tradition", "Horseback Riding"],
   "resources": ["iron", "horse"],
-  "category": "archery",
+  "category": "mounted",
   "firstStrikeImmunity": true,
   "combatBonuses": [
     {
