@@ -40,5 +40,6 @@ pub enum BuildingEffectType {
     OceanFoodBonus,
     MinusMaintenancePercent,
     Happiness,
+    Health,
     GranaryFoodStore,
 }

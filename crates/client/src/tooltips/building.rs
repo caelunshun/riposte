@@ -87,6 +87,7 @@ fn building_effect_line(effect: &BuildingEffect) -> Text {
             text!("-{}% city maintenance", effect.amount)
         }
         BuildingEffectType::Happiness => bonus_line(effect.amount, "happy"),
+        BuildingEffectType::Health => bonus_line(effect.amount, "health"),
         BuildingEffectType::GranaryFoodStore => {
             text!("City keeps 50% of stored food after growth")
         }
