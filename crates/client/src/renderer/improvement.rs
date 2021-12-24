@@ -16,6 +16,7 @@ pub struct ImprovementRenderer {
     farm: TextureId,
     pasture: TextureId,
     mine: TextureId,
+    plantation: TextureId,
 }
 
 impl ImprovementRenderer {
@@ -26,6 +27,10 @@ impl ImprovementRenderer {
             farm: canvas.context().texture_for_name("icon/farm").unwrap(),
             pasture: canvas.context().texture_for_name("icon/pasture").unwrap(),
             mine: canvas.context().texture_for_name("icon/mine").unwrap(),
+            plantation: canvas
+                .context()
+                .texture_for_name("icon/plantation")
+                .unwrap(),
         }
     }
 
@@ -80,6 +85,7 @@ impl TileRenderLayer for ImprovementRenderer {
                 Improvement::Road => self.render_road(game, tile_pos, &mut canvas),
                 Improvement::Pasture => self.render_improvement_icon(&mut canvas, self.pasture),
                 Improvement::Cottage(_) => self.render_improvement_icon(&mut canvas, self.cottage),
+                Improvement::Plantation => self.render_improvement_icon(&mut canvas, self.plantation),
             }
         }
     }

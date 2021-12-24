@@ -21,6 +21,7 @@ pub enum Improvement {
     Mine,
     Road,
     Pasture,
+    Plantation,
     Cottage(Cottage),
 }
 
@@ -31,6 +32,7 @@ impl Improvement {
             Improvement::Mine => "Mine".to_owned(),
             Improvement::Road => "Road".to_owned(),
             Improvement::Pasture => "Pasture".to_owned(),
+            Improvement::Plantation => "Plantation".to_owned(),
             Improvement::Cottage(cottage) => format!("{:?}", cottage.level),
         }
     }
@@ -53,6 +55,7 @@ impl Improvement {
             Improvement::Mine => 4,
             Improvement::Road => 2,
             Improvement::Pasture => 5,
+            Improvement::Plantation => 6,
             Improvement::Cottage(_) => 4,
         }
     }
@@ -71,6 +74,7 @@ impl Improvement {
             },
             Improvement::Road => Yield::default(),
             Improvement::Pasture => Yield::default(),
+            Improvement::Plantation => Yield::default(),
             Improvement::Cottage(c) => Yield {
                 food: 0,
                 hammers: 0,
@@ -85,6 +89,7 @@ impl Improvement {
             Improvement::Mine => "Mining",
             Improvement::Road => "The Wheel",
             Improvement::Pasture => "Animal Husbandry",
+            Improvement::Plantation => "Agriculture",
             Improvement::Cottage(_) => "Pottery",
         };
         registry.tech(id).unwrap()
@@ -128,6 +133,17 @@ impl Improvement {
                 .unwrap_or(false)
             {
                 possible.push(Improvement::Pasture);
+            }
+
+            if tile
+                .resource()
+                .map(|r| {
+                    r.improvement == "Plantation"
+                        && builder.has_unlocked_tech(&game.registry().tech(&r.revealed_by).unwrap())
+                })
+                .unwrap_or(false)
+            {
+                possible.push(Improvement::Plantation);
             }
         }
 

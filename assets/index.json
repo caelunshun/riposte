@@ -70,6 +70,11 @@
     "loader": "image"
   },
   {
+    "path": "icon/plantation.png",
+    "id": "icon/plantation",
+    "loader": "image"
+  },
+  {
     "path": "icon/farm.png",
     "id": "icon/farm",
     "loader": "image"
@@ -955,6 +960,11 @@
     "loader": "resource"
   },
   {
+    "path": "resource/spices.json",
+    "id": "resource/spices",
+    "loader": "resource"
+  },
+  {
     "path": "texture/resource/rice.png",
     "id": "texture/resource/rice",
     "loader": "image"
@@ -982,6 +992,11 @@
   {
     "path": "texture/resource/silver.png",
     "id": "texture/resource/silver",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/spices.png",
+    "id": "texture/resource/spices",
     "loader": "image"
   },
   {

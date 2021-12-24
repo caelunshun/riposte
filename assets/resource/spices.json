@@ -1,13 +1,14 @@
 {
-    "id": "silver",
-    "name": "Silver",
-    "revealedBy": "Mining",
+    "id": "spices",
+    "name": "Spices",
+    "revealedBy": "Agriculture",
     "yieldBonus": {
       "commerce": 1
     },
-    "improvement": "Mine",
+    "improvement": "Plantation",
     "improvedBonus": {
-      "commerce": 4
+      "commerce": 2,
+      "food": 1
     },
     "happyBonus": 1,
     "abundance": 4,

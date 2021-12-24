@@ -13,6 +13,7 @@ pub fn build_improvement_tooltip(tile: &Tile, improvement: &Improvement) -> Stri
             "+1 @icon{coin}".to_owned(),
             "Grows for increased bonuses".to_owned(),
         ]),
+        Improvement::Plantation => {}
     }
 
     if let Some(resource) = tile.resource() {
