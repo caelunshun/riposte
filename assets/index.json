@@ -415,6 +415,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/trebuchet.json",
+    "id": "unit/trebuchet",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -640,6 +645,11 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/trebuchet.png",
+    "id": "texture/unit/trebuchet",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -767,6 +777,11 @@
   {
     "path": "icon/unit_head/crossbowman.png",
     "id": "icon/unit_head/crossbowman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/trebuchet.png",
+    "id": "icon/unit_head/trebuchet",
     "loader": "image"
   },
   {
