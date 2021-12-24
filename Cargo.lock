@@ -997,7 +997,7 @@ checksum = "9ea835d29036a4087793836fa931b08837ad5e957da9e23886b29586fb9b6650"
 [[package]]
 name = "duit"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#087a7a8aad4b551296cb92202b7d31da81d2b207"
+source = "git+https://github.com/caelunshun/duit#ee71d40692fabc8a961cd8b1f54dbaece6a505cb"
 dependencies = [
  "ahash",
  "duit-core",
@@ -1015,7 +1015,7 @@ dependencies = [
 [[package]]
 name = "duit-core"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#087a7a8aad4b551296cb92202b7d31da81d2b207"
+source = "git+https://github.com/caelunshun/duit#ee71d40692fabc8a961cd8b1f54dbaece6a505cb"
 dependencies = [
  "serde",
  "serde_yaml",
@@ -1025,7 +1025,7 @@ dependencies = [
 [[package]]
 name = "duit-platform"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/duit#087a7a8aad4b551296cb92202b7d31da81d2b207"
+source = "git+https://github.com/caelunshun/duit#ee71d40692fabc8a961cd8b1f54dbaece6a505cb"
 dependencies = [
  "duit",
  "dume",
@@ -1038,6 +1038,7 @@ dependencies = [
 [[package]]
 name = "dume"
 version = "0.1.0"
+source = "git+https://github.com/caelunshun/dume#8f9cb99385714d7c8fe0b7a1a8f91f2b98d05419"
 dependencies = [
  "ahash",
  "anyhow",
@@ -1067,6 +1068,7 @@ dependencies = [
 [[package]]
 name = "dume-markup"
 version = "0.1.0"
+source = "git+https://github.com/caelunshun/dume#8f9cb99385714d7c8fe0b7a1a8f91f2b98d05419"
 dependencies = [
  "anyhow",
  "logos",
@@ -1078,7 +1080,7 @@ dependencies = [
 [[package]]
 name = "dume-video"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/dume#733f7d0227a97acb33f3d77824e4e13ebcda45d1"
+source = "git+https://github.com/caelunshun/dume#8f9cb99385714d7c8fe0b7a1a8f91f2b98d05419"
 dependencies = [
  "anyhow",
  "dume",

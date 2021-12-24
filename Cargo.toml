@@ -17,6 +17,3 @@ opt-level = 3
 
 [patch.crates-io]
 slotmap = { git = "https://github.com/caelunshun/slotmap", branch = "feature/try_insert_with_key" }
-
-[patch.'https://github.com/caelunshun/dume']
-dume = { path = "../dume/crates/dume" }
