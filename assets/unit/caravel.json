@@ -1,0 +1,16 @@
+{
+  "id": "caravel",
+  "name": "Caravel",
+  "strength": 3,
+  "movement": 3,
+  "cost": 60,
+  "techs": ["Optics"],
+  "resources": [],
+  "category": "naval",
+  "ship": true,
+  "capabilities": [
+    "carry_units"
+  ],
+  "carryUnitCapacity": 1,
+  "carryUnitType": nonCombat,
+}

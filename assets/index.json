@@ -390,6 +390,16 @@
     "loader": "unit"
   },
   {
+    "path": "unit/pikeman.json",
+    "id": "unit/pikeman",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/caravel.json",
+    "id": "unit/caravel",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -585,6 +595,16 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/pikeman.png",
+    "id": "texture/unit/pikeman",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/caravel.png",
+    "id": "texture/unit/caravel",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -692,6 +712,16 @@
   {
     "path": "icon/unit_head/knight.png",
     "id": "icon/unit_head/knight",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/pikeman.png",
+    "id": "icon/unit_head/pikeman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/caravel.png",
+    "id": "icon/unit_head/caravel",
     "loader": "image"
   },
   {
