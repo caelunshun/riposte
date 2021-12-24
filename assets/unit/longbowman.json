@@ -6,6 +6,7 @@
   "cost": 50,
   "techs": ["Archery", "Feudalism"],
   "category": "archery",
+  "firstStrikes": 1,
   "combatBonuses": [
     {
       "type": "whenInCity",
