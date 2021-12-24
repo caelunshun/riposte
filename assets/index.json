@@ -500,6 +500,16 @@
     "loader": "building"
   },
   {
+    "path": "building/grocer.json",
+    "id": "building/grocer",
+    "loader": "building"
+  },
+  {
+    "path": "building/aqueduct.json",
+    "id": "building/aqueduct",
+    "loader": "building"
+  },
+  {
     "path": "texture/unit/warrior.png",
     "id": "texture/unit/warrior",
     "loader": "image"

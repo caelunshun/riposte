@@ -1,0 +1,11 @@
+{
+  "name": "Grocer",
+  "cost": 150,
+  "techs": ["Guilds", "Currency"],
+  "effects": [
+    {
+      "type": "bonusCommercePercent",
+      "amount": 25
+    }
+  ]
+}

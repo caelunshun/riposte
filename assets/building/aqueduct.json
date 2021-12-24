@@ -1,0 +1,11 @@
+{
+  "name": "Aqueduct",
+  "cost": 100,
+  "techs": ["Mathematics", "Masonry"],
+  "effects": [
+    {
+      "type": "health",
+      "amount": 2
+    }
+  ]
+}
