@@ -935,6 +935,11 @@
     "loader": "resource"
   },
   {
+    "path": "resource/silver.json",
+    "id": "resource/silver",
+    "loader": "resource"
+  },
+  {
     "path": "texture/resource/rice.png",
     "id": "texture/resource/rice",
     "loader": "image"
@@ -957,6 +962,11 @@
   {
     "path": "texture/resource/iron.png",
     "id": "texture/resource/iron",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/silver.png",
+    "id": "texture/resource/silver",
     "loader": "image"
   },
   {
