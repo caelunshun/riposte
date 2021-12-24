@@ -1,4 +1,4 @@
-use std::{collections::VecDeque, f32::consts::TAU};
+use std::{collections::VecDeque};
 
 use ahash::AHashSet;
 use float_ord::FloatOrd;
@@ -206,7 +206,22 @@ impl<'a> TerrainGenerator<'a> {
     }
 
     fn generate_rivers(&mut self) {
-        // Generate rivers by creating a bunch of source points, then following paths toward the ocean.
+        // Make elevation smoother toward the ocean
+        let mut river_elevation = self.elevation.clone();
+        for x in 0..self.elevation.width() {
+            for y in 0..self.elevation.height() {
+                let pos = uvec2(x, y);
+                let elevation = river_elevation.get_mut(pos).unwrap();
+                let distance = *self.distance_to_ocean.get(pos).unwrap();
+                *elevation += distance.powf(0.7);
+                *elevation += self.cx.rng.gen_range(2.0..=4.0);
+            }
+        }
+
+        // Generate rivers by creating a bunch of source points, then following
+        // elevation downward from those points.
+
+        // Random source points with Poisson distribution.
         let source_points: Vec<_> = sample_poisson_points(
             &mut self.cx.rng,
             4.,
@@ -214,71 +229,46 @@ impl<'a> TerrainGenerator<'a> {
         )
         .into_iter()
         .map(|v| v.as_u32())
-        .filter(|&pos| *self.land_map.get(pos).unwrap() == TileType::Land)
+        .filter(|pos| *self.land_map.get(*pos).unwrap() == TileType::Land)
         .collect();
 
         for point in source_points {
-            // Find the nearest ocean to determine the heading.
-            let nearest_water = self
-                .land_map
-                .rings(point)
-                .find(|&pos| *self.land_map.get(pos).unwrap() == TileType::Ocean)
-                .unwrap_or_else(|| {
-                    // use a random position in case the map has no ocean
-                    uvec2(
-                        self.cx.rng.gen_range(0..self.land_map.width()),
-                        self.cx.rng.gen_range(0..self.land_map.height()),
-                    )
-                });
-
             let mut river = River::new();
+            river.add_position(point);
+
             let mut visited = AHashSet::new();
             visited.insert(point);
 
-            // Follow the heading.
-            let heading_noise = Fbm::new().set_seed(self.cx.rng.gen()).set_frequency(0.1);
-
             let mut pos = point;
-            let mut last_pos = point;
-            let mut i = 0;
             loop {
-                i += 1;
-
-                if self.land_map.get(pos).unwrap() == &TileType::Ocean {
-                    if last_pos.x < pos.x || last_pos.y < pos.y {
-                        river.add_position(pos);
-                    }
-                    break;
-                }
-
-                river.add_position(pos);
-
-                if pos == nearest_water {
-                    break;
-                }
-
-                let ray = nearest_water.as_i32() - pos.as_i32();
-                let heading = (ray.y as f32).atan2(ray.x as f32);
-                let heading = heading + ((heading_noise.get([i as f64, 0.]) as f32) * TAU * 0.8);
-
-                let next_pos = self
+                // Look at adjacent tiles and follow the tile with least elevation
+                // (making sure not to repeat and get stuck in a cycle)
+                // NB if there is an ocean then we end, since oceans always have less elevation than land.
+                if let Some(next) = self
                     .land_map
                     .straight_adjacent(pos)
                     .into_iter()
-                    .filter(|p| !visited.contains(p))
-                    .min_by_key(|&other| {
-                        let ray = other.as_i32() - pos.as_i32();
-                        let theta = (ray.y as f32).atan2(ray.x as f32);
-                        FloatOrd((theta - heading).abs())
-                    });
-
-                match next_pos {
-                    Some(next_pos) => {
-                        last_pos = pos;
-                        pos = next_pos;
-                        visited.insert(next_pos);
+                    .find(|p| *self.land_map.get(*p).unwrap() == TileType::Ocean)
+                {
+                    if next.x > pos.x || next.y > pos.y {
+                        river.add_position(next);
                     }
-                    None => break, // hit a dead end
+                    break;
+                }
+
+                let next = self
+                    .land_map
+                    .straight_adjacent(pos)
+                    .into_iter()
+                    .filter(|pos| !visited.contains(pos))
+                    .min_by_key(|pos| FloatOrd(*river_elevation.get(*pos).unwrap()));
+                match next {
+                    Some(next_pos) => {
+                        visited.insert(next_pos);
+                        river.add_position(next_pos);
+                        pos = next_pos;
+                    }
+                    None => break, // river met a dead end
                 }
             }
 
