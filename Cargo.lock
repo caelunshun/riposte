@@ -3833,8 +3833,8 @@ checksum = "9def91fd1e018fe007022791f865d0ccc9b3a0d5001e01aabb8b40e46000afb5"
 
 [[package]]
 name = "slotmap"
-version = "1.0.5"
-source = "git+https://github.com/caelunshun/slotmap?branch=feature/try_insert_with_key#0743c24f404c2c7f973e97adf67084637f7db22b"
+version = "1.0.6"
+source = "git+https://github.com/orlp/slotmap#ce6e1e02bb2c2074d8d581e87ad9c2f72ce495c3"
 dependencies = [
  "version_check",
 ]
