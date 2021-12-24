@@ -675,6 +675,16 @@
     "loader": "image"
   },
   {
+    "path": "texture/river/straight_1.png",
+    "id": "texture/river/straight_1",
+    "loader": "image"
+  },
+  {
+    "path": "texture/river/straight_2.png",
+    "id": "texture/river/straight_2",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
