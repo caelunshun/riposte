@@ -420,6 +420,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/musketman.json",
+    "id": "unit/musketman",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -650,6 +655,11 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/musketman.png",
+    "id": "texture/unit/musketman",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -782,6 +792,11 @@
   {
     "path": "icon/unit_head/trebuchet.png",
     "id": "icon/unit_head/trebuchet",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/musketman.png",
+    "id": "icon/unit_head/musketman",
     "loader": "image"
   },
   {
