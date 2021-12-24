@@ -12,8 +12,8 @@ use slotmap::{SecondaryMap, SlotMap};
 
 use super::{CityId, PlayerId, UnitId};
 use crate::{
-    event::Event, registry::Registry, tile::OutOfBounds, worker::WorkerProgressGrid, City, Grid,
-    Player, Tile, Turn, Unit,
+    event::Event, registry::Registry, river::Rivers, tile::OutOfBounds, worker::WorkerProgressGrid,
+    City, Grid, Player, Tile, Turn, Unit,
 };
 
 /// Stores the entire game state.
@@ -21,6 +21,8 @@ pub struct Game {
     registry: Arc<Registry>,
 
     map: Grid<RefCell<Tile>>,
+
+    rivers: Rivers,
 
     // Allocators for IDs (only used on the server)
     player_ids: SlotMap<PlayerId, ()>,
@@ -48,12 +50,13 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(registry: Arc<Registry>, map: Grid<RefCell<Tile>>) -> Self {
+    pub fn new(registry: Arc<Registry>, map: Grid<RefCell<Tile>>, rivers: Rivers) -> Self {
         Self {
             registry,
 
             worker_progress: RefCell::new(WorkerProgressGrid::new(map.width(), map.height())),
             map,
+            rivers,
 
             player_ids: SlotMap::default(),
             city_ids: SlotMap::default(),
@@ -226,6 +229,10 @@ impl Game {
 
     pub fn worker_progress_grid_mut(&self) -> RefMut<WorkerProgressGrid> {
         self.worker_progress.borrow_mut()
+    }
+
+    pub fn rivers(&self) -> &Rivers {
+        &self.rivers
     }
 
     /// Gets the RNG used for all random game events, such as combat.

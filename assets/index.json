@@ -200,10 +200,10 @@
     "loader": "civ"
   },
   {
-  "path": "civ/america.json",
-  "id": "civ/america",
-  "loader": "civ"
-},
+    "path": "civ/america.json",
+    "id": "civ/america",
+    "loader": "civ"
+  },
   {
     "path": "civ/japan.json",
     "id": "civ/japan",
@@ -575,10 +575,10 @@
     "loader": "image"
   },
   {
-  "path": "texture/unit/catapult.png",
-  "id": "texture/unit/catapult",
-  "loader": "image"
-},
+    "path": "texture/unit/catapult.png",
+    "id": "texture/unit/catapult",
+    "loader": "image"
+  },
   {
     "path": "texture/unit/war_chariot.png",
     "id": "texture/unit/war_chariot",
@@ -595,10 +595,10 @@
     "loader": "image"
   },
   {
-  "path": "texture/unit/bowman.png",
-  "id": "texture/unit/bowman",
-  "loader": "image"
-},
+    "path": "texture/unit/bowman.png",
+    "id": "texture/unit/bowman",
+    "loader": "image"
+  },
   {
     "path": "texture/unit/hwacha.png",
     "id": "texture/unit/hwacha",
@@ -657,6 +657,11 @@
   {
     "path": "texture/unit/musketman.png",
     "id": "texture/unit/musketman",
+    "loader": "image"
+  },
+  {
+    "path": "texture/river/straight_0.png",
+    "id": "texture/river/straight_0",
     "loader": "image"
   },
   {
@@ -740,10 +745,10 @@
     "loader": "image"
   },
   {
-  "path": "icon/unit_head/hwacha.png",
-  "id": "icon/unit_head/hwacha",
-  "loader": "image"
-},
+    "path": "icon/unit_head/hwacha.png",
+    "id": "icon/unit_head/hwacha",
+    "loader": "image"
+  },
   {
     "path": "icon/unit_head/fast_worker.png",
     "id": "icon/unit_head/fast_worker",
@@ -880,15 +885,15 @@
     "loader": "tech"
   },
   {
-  "path": "tech/sailing.json",
-  "id": "tech/sailing",
-  "loader": "tech"
-},
+    "path": "tech/sailing.json",
+    "id": "tech/sailing",
+    "loader": "tech"
+  },
   {
-  "path": "tech/fishing.json",
-  "id": "tech/fishing",
-  "loader": "tech"
-},
+    "path": "tech/fishing.json",
+    "id": "tech/fishing",
+    "loader": "tech"
+  },
   {
     "path": "tech/currency.json",
     "id": "tech/currency",
@@ -995,9 +1000,9 @@
     "loader": "tech"
   },
   {
-    "path": "resource/divine_right.json",
-    "id": "resource/divine_right",
-    "loader": "resource"
+    "path": "tech/divine_right.json",
+    "id": "tech/divine_right",
+    "loader": "tech" 
   },
   {
     "path": "tech/music.json",

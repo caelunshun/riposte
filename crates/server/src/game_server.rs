@@ -73,6 +73,7 @@ impl GameServer {
             players: self.game.players().map(|p| p.clone()).collect(),
             units: self.game.units().map(|u| u.clone()).collect(),
             cities: self.game.cities().map(|c| c.clone()).collect(),
+            rivers: self.game.rivers().clone()
         }
     }
 

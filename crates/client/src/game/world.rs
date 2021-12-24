@@ -7,7 +7,7 @@ use std::{
 use arrayvec::ArrayVec;
 use duit::Event;
 use glam::UVec2;
-use riposte_common::Era;
+use riposte_common::{Era, river::Rivers};
 use riposte_common::{
     game::tile::OutOfBounds,
     protocol::server::InitialGameData,
@@ -68,11 +68,11 @@ pub struct Game {
 }
 
 impl Game {
-    pub fn new(registry: Arc<Registry>, map: Grid<RefCell<Tile>>) -> Self {
+    pub fn new(registry: Arc<Registry>, map: Grid<RefCell<Tile>>, rivers: Rivers) -> Self {
         let selected_units = SelectedUnits::new();
         let selection_units_version = selected_units.version();
         Self {
-            base: riposte_common::Game::new(registry, map),
+            base: riposte_common::Game::new(registry, map, rivers),
 
             view: RefCell::new(View::default()),
             stacks: StackGrid::default(),
@@ -110,7 +110,7 @@ impl Game {
         );
 
         let (width, height) = (data.map.width(), data.map.height());
-        let mut game = Self::new(registry, data.map);
+        let mut game = Self::new(registry, data.map, data.rivers);
 
         let stacks = StackGrid::new(width, height);
         game.stacks = stacks;

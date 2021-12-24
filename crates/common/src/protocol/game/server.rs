@@ -5,8 +5,8 @@ use std::cell::RefCell;
 use glam::UVec2;
 
 use crate::{
-    unit::MovementPoints, worker::WorkerProgressGrid, City, Grid, Player, PlayerId, Tile, Turn,
-    Unit, UnitId,
+    river::Rivers, unit::MovementPoints, worker::WorkerProgressGrid, City, Grid, Player, PlayerId,
+    Tile, Turn, Unit, UnitId,
 };
 
 #[derive(Debug, Clone)]
@@ -51,6 +51,8 @@ pub struct InitialGameData {
     pub units: Vec<Unit>,
     /// Every city in the game.
     pub cities: Vec<City>,
+    /// Every river in the game.
+    pub rivers: Rivers,
 }
 
 /// Updates the current turn number.

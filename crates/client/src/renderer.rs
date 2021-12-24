@@ -18,6 +18,8 @@ use crate::{
     },
 };
 
+use self::rivers::RiverRenderer;
+
 mod city;
 mod cultural_border;
 mod fog;
@@ -28,6 +30,7 @@ mod terrain;
 mod tile_yield;
 mod tree;
 mod unit;
+mod rivers;
 
 mod city_worked_tiles;
 mod staged_path;
@@ -55,6 +58,7 @@ impl GameRenderer {
         Self {
             tile_layers: vec![
                 Box::new(TerrainRenderer::new(cx)),
+                Box::new(RiverRenderer::new(cx)),
                 Box::new(GridOverlayRenderer::new(cx)),
                 Box::new(ResourceRenderer::new(cx)),
                 Box::new(TreeRenderer::new(cx)),

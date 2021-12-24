@@ -1,10 +1,15 @@
 use std::collections::VecDeque;
 
+use ahash::AHashSet;
 use float_ord::FloatOrd;
-use glam::{uvec2, DVec2};
+use glam::{uvec2, vec2, DVec2};
 use noise::{Fbm, MultiFractal, NoiseFn, Seedable};
 use rand::Rng;
-use riposte_common::{Grid, Terrain};
+use riposte_common::{
+    poisson::sample_poisson_points,
+    river::{River, Rivers},
+    Grid, Terrain,
+};
 
 use crate::game::Tile;
 
@@ -24,6 +29,9 @@ pub struct TerrainGenerator<'a> {
     /// Temperature in the region - determined in part by elevation
     temperature: Grid<f64>,
 
+    /// Generated rivers
+    rivers: Rivers,
+
     cx: &'a mut MapgenContext,
 }
 
@@ -37,15 +45,18 @@ impl<'a> TerrainGenerator<'a> {
             temperature: Grid::new(0., land_map.width(), land_map.height()),
             land_map,
 
+            rivers: Rivers::default(),
+
             cx,
         }
     }
 
-    pub fn generate(mut self) -> Grid<Tile> {
+    pub fn generate(mut self) -> (Grid<Tile>, Rivers) {
         self.generate_distance_to_ocean();
         self.generate_elevation();
         self.generate_temperature();
         self.generate_rainfall();
+        self.generate_rivers();
         self.finish()
     }
 
@@ -194,6 +205,63 @@ impl<'a> TerrainGenerator<'a> {
         normalize_grid(&mut self.rainfall);
     }
 
+    fn generate_rivers(&mut self) {
+        // Generate rivers by creating a bunch of source points, then following
+        // elevation downward from those points.
+
+        // Random source points with Poisson distribution.
+        let source_points: Vec<_> = sample_poisson_points(
+            &mut self.cx.rng,
+            4.,
+            vec2(self.land_map.width() as f32, self.land_map.height() as f32),
+        )
+        .into_iter()
+        .map(|v| v.as_u32())
+        .filter(|pos| *self.land_map.get(*pos).unwrap() == TileType::Land)
+        .collect();
+
+        for point in source_points {
+            let mut river = River::new();
+            river.add_position(point);
+
+            let mut visited = AHashSet::new();
+            visited.insert(point);
+
+            let mut pos = point;
+            loop {
+                // Look at adjacent tiles and follow the tile with least elevation
+                // (making sure not to repeat and get stuck in a cycle)
+                // NB if there is an ocean then we end, since oceans always have less elevation than land.
+                if let Some(pos) = self
+                    .land_map
+                    .straight_adjacent(pos)
+                    .into_iter()
+                    .find(|p| *self.land_map.get(*p).unwrap() == TileType::Ocean)
+                {
+                    river.add_position(pos);
+                    break;
+                }
+
+                let next = self
+                    .land_map
+                    .straight_adjacent(pos)
+                    .into_iter()
+                    .filter(|pos| !visited.contains(pos))
+                    .min_by_key(|pos| FloatOrd(*self.elevation.get(*pos).unwrap()));
+                match next {
+                    Some(next_pos) => {
+                        visited.insert(next_pos);
+                        river.add_position(next_pos);
+                        pos = next_pos;
+                    }
+                    None => break, // river met a dead end
+                }
+            }
+
+            self.rivers.add(river);
+        }
+    }
+
     fn sample_highest_elevation(&self, from: DVec2, vector: DVec2, max_distance: f64) -> f64 {
         let vector = vector.normalize();
         let steps = 10;
@@ -210,7 +278,7 @@ impl<'a> TerrainGenerator<'a> {
         highest
     }
 
-    fn finish(self) -> Grid<Tile> {
+    fn finish(self) -> (Grid<Tile>, Rivers) {
         let mut tiles = Grid::new(
             Tile::new(Terrain::Ocean),
             self.land_map.width(),
@@ -254,7 +322,7 @@ impl<'a> TerrainGenerator<'a> {
             }
         }
 
-        tiles
+        (tiles, self.rivers)
     }
 }
 
@@ -325,7 +393,7 @@ mod tests {
         save_grid(&gen.rainfall, "rainfall.png");
         save_grid(&gen.temperature, "temperature.png");
 
-        let tiles = gen.finish();
+        let (tiles, _) = gen.finish();
 
         let starting_locations =
             super::super::starting_locations::generate_starting_locations(&tiles, 7);
