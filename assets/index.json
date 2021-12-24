@@ -1145,6 +1145,11 @@
     "loader": "resource"
   },
   {
+    "path": "resource/banana.json",
+    "id": "resource/banana",
+    "loader": "resource"
+  },
+  {
     "path": "texture/resource/rice.png",
     "id": "texture/resource/rice",
     "loader": "image"
@@ -1177,6 +1182,11 @@
   {
     "path": "texture/resource/spices.png",
     "id": "texture/resource/spices",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/banana.png",
+    "id": "texture/resource/banana",
     "loader": "image"
   },
   {

@@ -1,0 +1,16 @@
+{
+    "id": "banana",
+    "name": "Banana",
+    "revealedBy": "Agriculture",
+    "yieldBonus": {
+      "food": 1
+    },
+    "improvement": "Plantation",
+    "improvedBonus": {
+      "food": 2
+    },
+    "abundance": 4,
+    "healthBonus": 1,
+    "allowDeserts": false
+  }
+  
