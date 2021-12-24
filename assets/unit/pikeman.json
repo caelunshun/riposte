@@ -5,7 +5,7 @@
   "movement": 1,
   "cost": 60,
   "techs": ["Engineering"],
-  "resources": ["copper"],
+  "resources": ["iron"],
   "category": "melee",
   "combatBonuses": [
     {

@@ -6,7 +6,7 @@
   "cost": 60,
   "techs": ["Civil Service"],
   "category": "melee",
-  "resources": ["copper"],
+  "resources": ["iron"],
   "combatBonuses": [
     {
       "type": "againstUnitCategory",
