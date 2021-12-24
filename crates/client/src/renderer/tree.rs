@@ -1,7 +1,10 @@
+use duit::Vec2;
 use dume::TextureId;
 use glam::{vec2, UVec2};
+use once_cell::sync::Lazy;
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
+use riposte_common::poisson::sample_poisson_points;
 
 use crate::{
     context::Context,
@@ -9,6 +12,20 @@ use crate::{
 };
 
 use super::TileRenderLayer;
+
+const TREE_SEED: u64 = 6104;
+static ARRANGEMENTS: Lazy<Vec<Vec<(Vec2, f32)>>> = Lazy::new(|| {
+    let mut rng = Pcg64Mcg::seed_from_u64(TREE_SEED);
+    (0..100)
+        .map(|_| {
+            let points = sample_poisson_points(&mut rng, 20., Vec2::splat(100.));
+            points
+                .into_iter()
+                .map(|point| (point, (rng.gen::<f32>() + 1.) * 25.))
+                .collect()
+        })
+        .collect()
+});
 
 /// Renders trees for forests.
 pub struct TreeRenderer {
@@ -40,12 +57,9 @@ impl TileRenderLayer for TreeRenderer {
         let seed = ((tile_pos.x as u64) << 32) | (tile_pos.y as u64);
         let mut rng = Pcg64Mcg::seed_from_u64(seed);
 
-        let num_trees = rng.gen_range(10..=20);
-        for _ in 0..num_trees {
-            let scale_x = (rng.gen::<f32>() + 1.) * 25.;
+        for &(pos, scale_x) in &ARRANGEMENTS[rng.gen_range(0..ARRANGEMENTS.len())] {
             let scale_y = scale_x * (self.tree_size.y as f32 / self.tree_size.x as f32);
-            let tree_pos = vec2(rng.gen_range(0.0..=100.0), rng.gen_range(0.0..=100.0))
-                - vec2(scale_x, scale_y) / 2.;
+            let tree_pos = pos - vec2(scale_x, scale_y) / 2.;
             cx.canvas_mut().draw_sprite(self.tree, tree_pos, scale_x);
         }
     }
