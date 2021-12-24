@@ -89,7 +89,7 @@ impl Improvement {
             Improvement::Mine => "Mining",
             Improvement::Road => "The Wheel",
             Improvement::Pasture => "Animal Husbandry",
-            Improvement::Plantation => "Agriculture",
+            Improvement::Plantation => "Calendar",
             Improvement::Cottage(_) => "Pottery",
         };
         registry.tech(id).unwrap()
