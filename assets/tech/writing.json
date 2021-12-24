@@ -2,5 +2,10 @@
   "name": "Writing",
   "cost": 140,
   "prerequisites": ["Pottery", "Animal Husbandry"],
-  "era": "ancient"
+  "era": "ancient",
+
+  "quote": {
+    "text": "The spoken word flies away, but the written word remains.",
+    "attribution": "Latin proverb"
+  }
 }

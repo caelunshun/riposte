@@ -2,5 +2,10 @@
   "name": "Mathematics",
   "cost": 250,
   "prerequisites": ["Writing"],
-  "era": "classical"
+  "era": "classical",
+
+  "quote": {
+    "text": "The mathematical sciences particularly exhibit order, symmetry, and limitation; and these are the greatest forms of the beautiful.",
+    "attribution": "Aristotle"
+  }
 }
