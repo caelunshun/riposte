@@ -400,6 +400,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/swordsman.json",
+    "id": "unit/swordsman",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -605,6 +610,11 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/swordsman.png",
+    "id": "texture/unit/swordsman",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -722,6 +732,11 @@
   {
     "path": "icon/unit_head/caravel.png",
     "id": "icon/unit_head/caravel",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/swordsman.png",
+    "id": "icon/unit_head/swordsman",
     "loader": "image"
   },
   {
