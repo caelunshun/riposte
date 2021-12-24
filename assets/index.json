@@ -1005,6 +1005,81 @@
     "loader": "tech"
   },
   {
+    "path": "tech/astronomy.json",
+    "id": "tech/astronomy",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/chemistry.json",
+    "id": "tech/chemistry",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/constitution.json",
+    "id": "tech/constitution",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/corporation.json",
+    "id": "tech/corporation",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/democracy.json",
+    "id": "tech/democracy",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/economics.json",
+    "id": "tech/economics",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/education.json",
+    "id": "tech/education",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/gunpowder.json",
+    "id": "tech/gunpowder",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/liberalism.json",
+    "id": "tech/liberalism",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/military_science.json",
+    "id": "tech/military_science",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/military_tradition.json",
+    "id": "tech/military_tradition",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/nationalism.json",
+    "id": "tech/nationalism",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/printing_press.json",
+    "id": "tech/printing_press",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/replaceable_parts.json",
+    "id": "tech/replaceable_parts",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/rifling.json",
+    "id": "tech/rifling",
+    "loader": "tech"
+  },
+  {
     "path": "resource/horse.json",
     "id": "resource/horse",
     "loader": "resource"

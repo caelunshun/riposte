@@ -1,0 +1,6 @@
+{
+  "name": "Military Science",
+  "cost": 2000,
+  "prerequisites": ["Chemistry"],
+  "era": "renaissance"
+}

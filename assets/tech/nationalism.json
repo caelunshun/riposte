@@ -1,0 +1,6 @@
+{
+  "name": "Nationalism",
+  "cost": 1800,
+  "prerequisites": ["Civil Service", "Divine Right"],
+  "era": "renaissance"
+}

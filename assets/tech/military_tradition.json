@@ -1,0 +1,6 @@
+{
+  "name": "Military Tradition",
+  "cost": 2000,
+  "prerequisites": ["Music", "Nationalism"],
+  "era": "renaissance"
+}

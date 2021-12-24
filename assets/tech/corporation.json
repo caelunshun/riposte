@@ -1,0 +1,6 @@
+{
+  "name": "Corporation",
+  "cost": 1600,
+  "prerequisites": ["Constitution", "Economics"],
+  "era": "renaissance"
+}

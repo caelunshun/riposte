@@ -1,0 +1,6 @@
+{
+  "name": "Economics",
+  "cost": 1400,
+  "prerequisites": ["Banking", "Education"],
+  "era": "renaissance"
+}

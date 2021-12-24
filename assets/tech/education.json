@@ -1,0 +1,6 @@
+{
+  "name": "Education",
+  "cost": 1800,
+  "prerequisites": ["Paper"],
+  "era": "renaissance"
+}
