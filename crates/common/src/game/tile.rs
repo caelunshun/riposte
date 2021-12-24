@@ -26,6 +26,8 @@ pub struct Tile {
     is_forested: bool,
     is_hilled: bool,
 
+    has_fresh_water: bool,
+
     culture: Culture,
     /// The set of cities for whom this tile is in the city's border radius.
     ///
@@ -47,6 +49,7 @@ impl Tile {
             terrain,
             is_forested: false,
             is_hilled: false,
+            has_fresh_water: false,
             culture: Culture::new(),
             influencers: Vec::new(),
             worked_by_city: None,
@@ -160,6 +163,10 @@ impl Tile {
         self.worked_by_city.is_some()
     }
 
+    pub fn has_fresh_water(&self) -> bool {
+        self.has_fresh_water
+    }
+
     pub fn resource(&self) -> Option<&Handle<Resource>> {
         self.resource.as_ref()
     }
@@ -225,6 +232,10 @@ impl Tile {
 
     pub fn set_terrain(&mut self, t: Terrain) {
         self.terrain = t;
+    }
+
+    pub fn set_has_fresh_water(&mut self, fresh_water: bool) {
+        self.has_fresh_water = fresh_water;
     }
 
     pub fn set_worked_by_city(&mut self, by_city: Option<CityId>) {

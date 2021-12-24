@@ -191,6 +191,9 @@ fn header(tile: &Tile) -> Text {
     if tile.is_forested() {
         header.extend(text!(", Forest"));
     }
+    if tile.has_fresh_water() {
+        header.extend(text!("\nFresh Water"));
+    }
     header
 }
 

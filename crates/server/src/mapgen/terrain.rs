@@ -336,6 +336,8 @@ impl<'a> TerrainGenerator<'a> {
             }
         }
 
+        self.rivers.distribute_fresh_water(&mut tiles);
+
         (tiles, self.rivers)
     }
 }

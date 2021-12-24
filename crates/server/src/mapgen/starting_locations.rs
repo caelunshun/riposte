@@ -119,6 +119,10 @@ fn score_tile(pos: UVec2, tiles: &Grid<Tile>, existing_starting_locations: &[UVe
         score -= 10.;
     }
 
+    if tile.has_fresh_water() {
+        score += 60.;
+    }
+
     // Prefer farther away from other starting locations
     for &other_pos in existing_starting_locations {
         score -= 100. / other_pos.as_f64().distance(pos.as_f64());

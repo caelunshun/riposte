@@ -2,6 +2,8 @@ use ahash::AHashMap;
 use glam::{uvec2, UVec2};
 use slotmap::SlotMap;
 
+use crate::{Grid, Tile};
+
 /// Stores rivers on the map.
 ///
 /// Rivers are represented as a list of tile positions. The river runs
@@ -33,6 +35,18 @@ impl Rivers {
     pub fn get(&self, id: RiverId) -> &River {
         &self.rivers[id]
     }
+
+    /// Distributes fresh water from rivers into tiles.
+    pub fn distribute_fresh_water(&self, tiles: &mut Grid<Tile>) {
+        for river in self.rivers.values() {
+            for segment in river.segments() {
+                tiles.get_mut(segment.pos).unwrap().set_has_fresh_water(true);
+                if let Ok(tile) = tiles.get_mut(segment.pos - segment.axis.cross().offset()) {
+                    tile.set_has_fresh_water(true);
+                }
+            }
+        }
+    }
 }
 
 slotmap::new_key_type! {
@@ -56,6 +70,13 @@ pub enum Axis {
 }
 
 impl Axis {
+    pub fn cross(self) -> Self {
+        match self {
+            Axis::Horizontal => Axis::Vertical,
+            Axis::Vertical => Axis::Horizontal,
+        }
+    }
+    
     pub fn offset(self) -> UVec2 {
         match self {
             Axis::Horizontal => uvec2(1, 0),

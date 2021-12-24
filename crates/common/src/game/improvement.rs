@@ -105,7 +105,9 @@ impl Improvement {
 
         if owner == Some(builder.id()) {
             if !tile.is_hilled() && tile.terrain() != Terrain::Desert {
-                possible.push(Improvement::Farm);
+                if tile.has_fresh_water() {
+                    possible.push(Improvement::Farm);
+                }
                 if tile.terrain() != Terrain::Tundra {
                     possible.push(Improvement::Cottage(Cottage::default()));
                 }
