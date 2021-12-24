@@ -129,18 +129,39 @@ fn score_tile(pos: UVec2, tiles: &Grid<Tile>, existing_starting_locations: &[UVe
     }
 
     // Score each tile in the big fat cross of this tile
+    let mut num_food_resources = 0;
     for bfc_pos in tiles.big_fat_cross(pos) {
         let bfc_tile = tiles.get(bfc_pos).unwrap();
         let dscore = match bfc_tile.terrain() {
             Terrain::Ocean => 0.75,
             Terrain::Desert => 0.,
             Terrain::Plains => 0.75,
-            Terrain::Grassland => 1.5,
+            Terrain::Grassland => 0.75,
             Terrain::Tundra => 0.25,
-            Terrain::Mountains => -0.5,
+            Terrain::Mountains => -0.25,
         };
         score += dscore;
+
+        if let Some(resource) = bfc_tile.resource() {
+            if resource.improvement == "Farm" {
+              num_food_resources += 1;
+            }
+        }
     }
+
+    // Coastal bonus
+    for pos in tiles.adjacent(pos) {
+        if tiles.get(pos).unwrap().terrain() == Terrain::Ocean {
+            score += 4.;
+            break;
+        }
+    }
+
+    if num_food_resources == 0 {
+        score -= 1000.;
+    }
+
+    score += num_food_resources as f64 * 6.;
 
     score
 }
