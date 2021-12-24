@@ -110,6 +110,7 @@ impl MapGenerator {
                 SlotPlayer::Ai { .. } => PlayerKind::Ai,
             };
             game.add_player(Player::new(
+                game,
                 player,
                 lobby_id,
                 player_kind,

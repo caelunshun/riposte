@@ -76,6 +76,7 @@ pub struct Player {
 
 impl Player {
     pub fn new(
+        game: &Game,
         id: PlayerId,
         lobby_id: SlotId,
         kind: PlayerKind,
@@ -84,6 +85,7 @@ impl Player {
         map_width: u32,
         map_height: u32,
     ) -> Self {
+        let unlocked_techs = civ.starting_techs.iter().map(|t| game.registry().tech(t).unwrap()).collect();
         Self {
             on_server: true,
             id,
@@ -103,7 +105,7 @@ impl Player {
             era: Era::Ancient,
             tech_progress: AHashMap::new(),
             research: None,
-            unlocked_techs: AHashSet::new(),
+            unlocked_techs,
             visibility: Grid::new(Visibility::Hidden, map_width, map_height),
         }
     }
