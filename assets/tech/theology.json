@@ -1,0 +1,6 @@
+{
+  "name": "Theology",
+  "cost": 500,
+  "prerequisites": ["Monotheism", "Writing"],
+  "era": "medieval"
+}

@@ -1,0 +1,6 @@
+{
+  "name": "Music",
+  "cost": 600,
+  "prerequisites": ["Mathematics", "Drama"],
+  "era": "medieval"
+}

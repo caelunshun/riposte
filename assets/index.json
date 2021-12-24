@@ -960,9 +960,34 @@
     "loader": "tech"
   },
   {
-    "path": "resource/copper.json",
-    "id": "resource/copper",
+    "path": "tech/optics.json",
+    "id": "tech/optics",
+    "loader": "tech"
+  },
+  {
+    "path": "resource/divine_right.json",
+    "id": "resource/divine_right",
     "loader": "resource"
+  },
+  {
+    "path": "tech/music.json",
+    "id": "tech/music",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/paper.json",
+    "id": "tech/paper",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/philosophy.json",
+    "id": "tech/philosophy",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/theology.json",
+    "id": "tech/theology",
+    "loader": "tech"
   },
   {
     "path": "resource/horse.json",
