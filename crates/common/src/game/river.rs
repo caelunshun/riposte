@@ -79,15 +79,32 @@ impl River {
     }
 
     pub fn segments(&self) -> impl Iterator<Item = RiverSegment> + '_ {
-        self.positions.windows(2).map(|window| {
-            let a = window[0];
-            let b = window[1];
-            let axis = if a.x == b.x {
-                Axis::Vertical
+        let mut segments = Vec::new();
+
+        let mut i = 0;
+        while i < self.positions.len() - 1 {
+            let a = self.positions[i];
+            let b = self.positions[i + 1];
+
+            if b.x > a.x || b.y > a.y {
+                let axis = if b.x > a.x {
+                    Axis::Horizontal
+                } else {
+                    Axis::Vertical
+                };
+                segments.push(RiverSegment { pos: a, axis });
             } else {
-                Axis::Horizontal
-            };
-            RiverSegment { axis, pos: a }
-        })
+                let axis = if b.x < a.x {
+                    Axis::Horizontal
+                } else {
+                    Axis::Vertical
+                };
+                segments.push(RiverSegment { pos: b, axis });
+            }
+
+            i += 1;
+        }
+
+        segments.into_iter()
     }
 }

@@ -1,3 +1,5 @@
+use std::collections::VecDeque;
+
 use ahash::AHashSet;
 use arrayvec::ArrayVec;
 use glam::{ivec2, uvec2, DVec2, IVec2, UVec2};
@@ -72,7 +74,6 @@ impl Tile {
             }
             if let Some(old_owner) = self.owner {
                 game.defer(move |game| game.player_mut(old_owner).update_visibility(game));
-
             }
         }
     }
@@ -413,6 +414,10 @@ impl<T> Grid<T> {
         x >= 0 && y >= 0 && x < self.width as i32 && y < self.height as i32
     }
 
+    pub fn rings(&self, pos: UVec2) -> Rings<T> {
+        Rings::new(self, pos)
+    }
+
     pub fn fill(&mut self, value: T)
     where
         T: Copy,
@@ -460,5 +465,41 @@ impl Grid<f64> {
         let ab = a * (1. - x_coeff) + b * x_coeff;
         let cd = c * (1. - x_coeff) + d * x_coeff;
         ab * (1. - y_coeff) + cd * y_coeff
+    }
+}
+
+/// An iterator over rings surrounding a tile in a [`Grid`].
+pub struct Rings<'a, T> {
+    grid: &'a Grid<T>,
+    queue: VecDeque<UVec2>,
+    visited: AHashSet<UVec2>,
+}
+
+impl<'a, T> Rings<'a, T> {
+    pub fn new(grid: &'a Grid<T>, pos: UVec2) -> Self {
+        let mut queue = VecDeque::new();
+        queue.push_back(pos);
+        let mut visited = AHashSet::new();
+        visited.insert(pos);
+        Self {
+            grid,
+            queue,
+            visited,
+        }
+    }
+}
+
+impl<'a, T> Iterator for Rings<'a, T> {
+    type Item = UVec2;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.queue.pop_front().map(|pos| {
+            for neighbor in self.grid.straight_adjacent(pos) {
+                if self.visited.insert(neighbor) {
+                    self.queue.push_back(neighbor);
+                }
+            }
+            pos
+        })
     }
 }
