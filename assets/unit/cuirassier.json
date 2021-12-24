@@ -1,0 +1,18 @@
+{
+  "id": "cuirassier",
+  "name": "Cuirassier",
+  "strength": 12,
+  "movement": 2,
+  "cost": 100,
+  "techs": ["Gunpowder", "Military Tradition", "Horseback Riding"],
+  "resources": ["iron", "horse"],
+  "category": "archery",
+  "firstStrikeImmunity": true,
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "category": "siege",
+      "bonusPercent": 20
+    }
+  ]
+}
