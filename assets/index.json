@@ -410,6 +410,11 @@
     "loader": "unit"
   },
   {
+    "path": "unit/crossbowman.json",
+    "id": "unit/crossbowman",
+    "loader": "unit"
+  },
+  {
     "path": "building/barracks.json",
     "id": "building/barracks",
     "loader": "building"
@@ -620,6 +625,11 @@
     "loader": "image"
   },
   {
+    "path": "texture/unit/crossbowman.png",
+    "id": "texture/unit/crossbowman",
+    "loader": "image"
+  },
+  {
     "path": "icon/unit_head/warrior.png",
     "id": "icon/unit_head/warrior",
     "loader": "image"
@@ -742,6 +752,11 @@
   {
     "path": "icon/unit_head/swordsman.png",
     "id": "icon/unit_head/swordsman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/crossbowman.png",
+    "id": "icon/unit_head/crossbowman",
     "loader": "image"
   },
   {
