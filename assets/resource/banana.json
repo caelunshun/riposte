@@ -11,6 +11,6 @@
     },
     "abundance": 4,
     "healthBonus": 1,
-    "allowDeserts": false
+    "allowDesert": false
   }
   

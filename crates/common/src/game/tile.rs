@@ -207,6 +207,10 @@ impl Tile {
         cost
     }
 
+    pub fn has_improveable_resource(&self, improvement: &str) -> bool {
+        self.resource().map(|r| r.improvement == improvement).unwrap_or(false)
+    }
+
     pub fn defense_bonus(&self) -> u32 {
         let mut bonus = 0;
         if self.is_forested() {

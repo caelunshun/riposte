@@ -12,5 +12,5 @@
     },
     "happyBonus": 1,
     "abundance": 4,
-    "allowDeserts": false
+    "allowDesert": false
 }

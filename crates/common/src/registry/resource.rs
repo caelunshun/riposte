@@ -14,4 +14,6 @@ pub struct Resource {
     #[serde(default)]
     pub happy_bonus: u32,
     pub abundance: f32,
+    #[serde(default)]
+    pub allow_desert: bool,
 }

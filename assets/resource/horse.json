@@ -11,5 +11,5 @@
     "commerce": 1
   },
   "abundance": 5,
-  "allowDeserts": false
+  "allowDesert": false
 }

@@ -10,5 +10,5 @@
     "hammers": 3
   },
   "abundance": 6,
-  "allowDeserts": true
+  "allowDesert": true
 }
