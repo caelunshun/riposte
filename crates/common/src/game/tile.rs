@@ -98,6 +98,19 @@ impl Tile {
         }
     }
 
+    pub fn has_improvement(&self, improvement: Improvement) -> bool {
+        self.improvements.contains(&improvement)
+    }
+
+    pub fn is_resource_improved(&self) -> bool {
+        match self.resource() {
+            Some(resource) => self
+                .improvements()
+                .any(|i| i.name() == resource.improvement),
+            None => false,
+        }
+    }
+
     pub fn tile_yield(&self) -> Yield {
         let mut y = Yield::default();
 
@@ -209,7 +222,9 @@ impl Tile {
     }
 
     pub fn has_improveable_resource(&self, improvement: &str) -> bool {
-        self.resource().map(|r| r.improvement == improvement).unwrap_or(false)
+        self.resource()
+            .map(|r| r.improvement == improvement)
+            .unwrap_or(false)
     }
 
     pub fn defense_bonus(&self) -> u32 {

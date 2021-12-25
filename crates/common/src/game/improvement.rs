@@ -99,7 +99,9 @@ impl Improvement {
         let mut possible = Vec::new();
 
         let owner = tile.owner(game);
-        if owner.is_none() || owner == Some(builder.id()) {
+        if (owner.is_none() || owner == Some(builder.id()))
+            && !tile.has_improvement(Improvement::Road)
+        {
             possible.push(Improvement::Road);
         }
 

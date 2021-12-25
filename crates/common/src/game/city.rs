@@ -10,7 +10,7 @@ use crate::{
     registry::{Building, Resource, UnitKind},
     utils::{MaybeInfinityU32, UVecExt},
     world::Game,
-    Player, Terrain, Unit,
+    Improvement, Player, Terrain, Unit,
 };
 
 use super::{
@@ -61,8 +61,10 @@ pub struct City {
     /// Bonus defense from culture
     culture_defense_bonus: u32,
 
-    /// Resources accessible to the city
+    /// Resources accessible to the city via trade networks.
     resources: AHashSet<Handle<Resource>>,
+    /// Cities connected to this city via trade networks.
+    connected_to_cities: AHashSet<CityId>,
 
     /// Buildings in this city
     buildings: Vec<Handle<Building>>,
@@ -112,6 +114,7 @@ impl City {
             build_task: None,
             culture_defense_bonus: 0,
             resources: AHashSet::new(),
+            connected_to_cities: AHashSet::new(),
             buildings: Vec::new(),
             economy: CityEconomy::default(),
             happiness_sources: Vec::new(),
@@ -246,6 +249,10 @@ impl City {
 
     pub fn is_tile_manually_worked(&self, tile: UVec2) -> bool {
         self.manual_worked_tiles().any(|t| t == tile)
+    }
+
+    pub fn is_connected_to_city(&self, peer: CityId) -> bool {
+        self.connected_to_cities.contains(&peer)
     }
 
     pub fn num_happiness(&self) -> u32 {
@@ -447,6 +454,7 @@ impl City {
         // worked tiles, and only then should we compute build task progress.
         self.do_growth(game);
         self.update_worked_tiles(game);
+        self.update_trade_networks(game);
         self.update_economy(game);
         self.check_build_task_prerequisites(game);
         self.make_build_task_progress(game);
@@ -682,6 +690,55 @@ impl City {
             .unwrap();
         } else {
             self.stored_food = new_stored_food as u32; // cast is safe because new_stored_food >= 0
+        }
+    }
+
+    /// Updates the trade network, pulling in all accessible resources
+    /// and peer cities.
+    fn update_trade_networks(&mut self, game: &Game) {
+        // We have to traverse the map using the following rules:
+        // * Roads, rivers, or ocean tiles can connect cities and resources.
+        // * In the case of ocean tiles, Astronomy must be unlocked, and only a _coastal_
+        // city can create access to the ocean.
+        // * We cannot travel through enemy roads.
+        // * We cannot acquire resources from land that does not belong to us.
+        self.resources.clear();
+        self.connected_to_cities.clear();
+
+        let mut stack = vec![self.pos()];
+        let mut visited = AHashSet::new();
+        visited.insert(self.pos());
+
+        while let Some(pos) = stack.pop() {
+            let tile = game.tile(pos).unwrap();
+
+            // Check for resource
+            if let Some(resource) = tile.resource() {
+                if tile.is_resource_improved() && tile.owner(game) == Some(self.owner) {
+                    self.resources.insert(resource.clone());
+                }
+            }
+
+            // Check for city
+            if let Some(peer_id) = game.city_id_at_pos(pos) {
+                if peer_id != self.id() {
+                    self.connected_to_cities.insert(peer_id);
+                }
+            }
+
+            for neighbor in game.map().adjacent(pos) {
+                let neighbor_tile = game.tile(neighbor).unwrap();
+                if neighbor_tile.has_improvement(Improvement::Road)
+                    && neighbor_tile
+                        .owner(game)
+                        .map(|owner| !game.player(owner).is_at_war_with(self.owner))
+                        .unwrap_or(true)
+                    && visited.insert(neighbor)
+                {
+                    // Traverse a road network
+                    stack.push(neighbor);
+                }
+            }
         }
     }
 }

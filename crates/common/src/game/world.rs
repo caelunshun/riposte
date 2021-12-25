@@ -160,9 +160,13 @@ impl Game {
         self.push_event(Event::CityChanged(id));
     }
 
+    pub fn city_id_at_pos(&self, pos: UVec2) -> Option<CityId> {
+        self.cities_by_pos.get(&pos).copied()
+    }
+
     /// Gets the city at the given tile.
     pub fn city_at_pos(&self, pos: UVec2) -> Option<Ref<City>> {
-        self.cities_by_pos.get(&pos).map(|&id| self.city(id))
+       self.city_id_at_pos(pos).map(|id| self.city(id))
     }
 
     /// Gets the unit with the given ID.
