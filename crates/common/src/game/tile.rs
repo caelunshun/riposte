@@ -142,7 +142,7 @@ impl Tile {
             y.food = y.food.saturating_sub(1);
         }
 
-        if self.has_fresh_water {
+        if self.has_fresh_water && !self.is_forested {
             y.commerce += 1;
         }
 
