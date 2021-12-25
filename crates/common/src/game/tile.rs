@@ -142,6 +142,10 @@ impl Tile {
             y.food = y.food.saturating_sub(1);
         }
 
+        if self.has_fresh_water {
+            y.commerce += 1;
+        }
+
         if let Some(resource) = &self.resource {
             y = y + resource.yield_bonus;
 
