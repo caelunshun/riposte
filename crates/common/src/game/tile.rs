@@ -1,4 +1,5 @@
 use std::collections::VecDeque;
+use std::mem;
 
 use ahash::AHashSet;
 use arrayvec::ArrayVec;
@@ -279,7 +280,7 @@ impl Tile {
     }
 
     pub fn add_improvement(&mut self, improvement: Improvement) {
-        if !self.improvements.contains(&improvement) {
+        if !self.improvements.iter().any(|i| mem::discriminant(i) == mem::discriminant(&improvement)) {
             if improvement != Improvement::Road {
                 self.is_forested = false;
             }

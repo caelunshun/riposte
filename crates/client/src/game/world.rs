@@ -453,7 +453,7 @@ impl Game {
                 unit,
                 old_pos,
                 new_pos,
-            });
+            });self.push_event(GameEvent::UnitUpdated { unit });
         }
     }
 
