@@ -2,7 +2,7 @@ use ahash::AHashMap;
 use glam::{uvec2, UVec2};
 use slotmap::SlotMap;
 
-use crate::{Grid, Tile};
+use crate::{types::Side, Grid, Tile};
 
 /// Stores rivers on the map.
 ///
@@ -36,11 +36,35 @@ impl Rivers {
         &self.rivers[id]
     }
 
+    /// Gets the direction to a river adjacent to `pos`.
+    pub fn river_side(&self, pos: UVec2) -> Option<Side> {
+        if self.river_id_at(pos, Axis::Horizontal).is_some() {
+            Some(Side::Up)
+        } else if self.river_id_at(pos, Axis::Vertical).is_some() {
+            Some(Side::Left)
+        } else if self
+            .river_id_at(pos + uvec2(0, 1), Axis::Horizontal)
+            .is_some()
+        {
+            Some(Side::Down)
+        } else if self
+            .river_id_at(pos + uvec2(1, 0), Axis::Vertical)
+            .is_some()
+        {
+            Some(Side::Right)
+        } else {
+            None
+        }
+    }
+
     /// Distributes fresh water from rivers into tiles.
     pub fn distribute_fresh_water(&self, tiles: &mut Grid<Tile>) {
         for river in self.rivers.values() {
             for segment in river.segments() {
-                tiles.get_mut(segment.pos).unwrap().set_has_fresh_water(true);
+                tiles
+                    .get_mut(segment.pos)
+                    .unwrap()
+                    .set_has_fresh_water(true);
                 if let Ok(tile) = tiles.get_mut(segment.pos - segment.axis.cross().offset()) {
                     tile.set_has_fresh_water(true);
                 }
@@ -76,7 +100,7 @@ impl Axis {
             Axis::Vertical => Axis::Horizontal,
         }
     }
-    
+
     pub fn offset(self) -> UVec2 {
         match self {
             Axis::Horizontal => uvec2(1, 0),

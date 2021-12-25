@@ -769,7 +769,7 @@ impl City {
         self.update_happiness();
         self.update_anger(game);
         self.update_health(game);
-        self.update_sickness();
+        self.update_sickness(game);
     }
 
     fn update_happiness(&mut self) {
@@ -864,7 +864,7 @@ impl City {
         }
     }
 
-    fn update_sickness(&mut self) {
+    fn update_sickness(&mut self, game: &Game) {
         self.sickness_sources.clear();
 
         for _ in 0..self.population.get() {
@@ -873,6 +873,17 @@ impl City {
 
         for _ in 0..self.building_effect(BuildingEffectType::Sickness) {
             self.sickness_sources.push(SicknessSource::Buildings);
+        }
+
+        let mut num_flood_plains = 0;
+        for pos in game.map().big_fat_cross(self.pos) {
+            let tile = game.tile(pos).unwrap();
+            if tile.owner(game) == Some(self.owner) && tile.is_flood_plains() {
+                num_flood_plains += 1;
+            }
+        }
+        for _ in 0..(num_flood_plains / 2) {
+            self.sickness_sources.push(SicknessSource::FloodPlains);
         }
     }
 }
@@ -960,4 +971,5 @@ pub enum HealthSource {
 pub enum SicknessSource {
     Population,
     Buildings,
+    FloodPlains,
 }

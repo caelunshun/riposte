@@ -117,6 +117,19 @@ pub enum Visibility {
     Visible,
 }
 
+/// A side of a tile.
+#[derive(Copy, Clone, Debug, PartialEq, Eq, PartialOrd, Ord, Serialize, Deserialize)]
+pub enum Side {
+    /// -Y
+    Up,
+    /// +Y
+    Down,
+    /// -X
+    Left,
+    /// +X
+    Right,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

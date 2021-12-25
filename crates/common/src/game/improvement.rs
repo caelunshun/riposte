@@ -42,7 +42,7 @@ impl Improvement {
             return false;
         }
 
-        if self == &Self::Road {
+        if self == &Self::Road || other == &Self::Road {
             return true;
         }
 
@@ -106,7 +106,7 @@ impl Improvement {
         }
 
         if owner == Some(builder.id()) {
-            if !tile.is_hilled() && tile.terrain() != Terrain::Desert {
+            if !tile.is_hilled() && (tile.terrain() != Terrain::Desert || tile.is_flood_plains()) {
                 if tile.has_fresh_water() || tile.has_improveable_resource("Farm") {
                     possible.push(Improvement::Farm);
                 }
@@ -151,8 +151,12 @@ impl Improvement {
             }
         }
 
-        possible.retain(|i| tile.improvements().all(|i2| i.is_compatible_with(i2)));
         possible.retain(|i| builder.has_unlocked_tech(&i.required_tech(game.registry())));
+        possible.retain(|i| {
+            !tile
+                .improvements()
+                .any(|i2| mem::discriminant(i) == mem::discriminant(i2))
+        });
 
         possible
     }

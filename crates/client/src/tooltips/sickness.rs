@@ -11,6 +11,8 @@ pub fn sickness_tooltip(city: &City) -> String {
         let reason = match source {
             SicknessSource::Population => "from overpopulation",
             SicknessSource::Buildings => "from buildings",
+            SicknessSource::FloodPlains => "from flood plains"
+            
         };
         lines.push(format!("+{}@icon{{sick}} {}", count, reason));
     }

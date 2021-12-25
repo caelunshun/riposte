@@ -30,6 +30,11 @@
     "loader": "image"
   },
   {
+    "path": "texture/tile/flood_plains.png",
+    "id": "texture/tile/flood_plains",
+    "loader": "image"
+  },
+  {
     "path": "texture/tile/grassland_basecolor_hill.png",
     "id": "texture/tile/grassland/hill",
     "loader": "image"

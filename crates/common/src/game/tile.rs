@@ -146,6 +146,10 @@ impl Tile {
             y.commerce += 1;
         }
 
+        if self.is_flood_plains() {
+            y.food += 3;
+        }
+
         if let Some(resource) = &self.resource {
             y = y + resource.yield_bonus;
 
@@ -179,6 +183,10 @@ impl Tile {
 
     pub fn is_worked(&self) -> bool {
         self.worked_by_city.is_some()
+    }
+
+    pub fn is_flood_plains(&self) -> bool {
+        self.has_fresh_water && self.terrain == Terrain::Desert && !self.is_hilled
     }
 
     pub fn has_fresh_water(&self) -> bool {
@@ -275,6 +283,8 @@ impl Tile {
             if improvement != Improvement::Road {
                 self.is_forested = false;
             }
+
+            self.improvements.retain(|i| i.is_compatible_with(&improvement));
 
             self.improvements.push(improvement);
         }

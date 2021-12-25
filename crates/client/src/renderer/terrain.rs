@@ -1,7 +1,8 @@
 use ahash::AHashMap;
+use dume::SpriteRotate;
 use dume::TextureId;
 use glam::{UVec2, Vec2};
-use riposte_common::Terrain;
+use riposte_common::{types::Side, Terrain};
 
 use crate::{
     context::Context,
@@ -27,6 +28,7 @@ impl TextureKey {
 
 pub struct TerrainRenderer {
     textures: AHashMap<TextureKey, TextureId>,
+    flood_plains: TextureId,
 }
 
 impl TerrainRenderer {
@@ -60,15 +62,43 @@ impl TerrainRenderer {
             }
         }
 
-        Self { textures }
+        let flood_plains = cx
+            .canvas()
+            .context()
+            .texture_for_name("texture/tile/flood_plains")
+            .unwrap();
+
+        Self {
+            textures,
+            flood_plains,
+        }
     }
 }
 
 impl TileRenderLayer for TerrainRenderer {
-    fn render(&mut self, _game: &Game, cx: &mut Context, _tile_pos: UVec2, tile: &Tile) {
-        let key = TextureKey::for_tile(tile);
-        let sprite = self.textures[&key];
-        cx.canvas_mut()
-            .draw_sprite(sprite, Vec2::ZERO, PIXELS_PER_TILE);
+    fn render(&mut self, game: &Game, cx: &mut Context, tile_pos: UVec2, tile: &Tile) {
+        let mut rotation = SpriteRotate::Zero;
+
+        let texture = if tile.is_flood_plains() {
+            let river_side = game
+                .base()
+                .rivers()
+                .river_side(tile_pos)
+                .unwrap_or(Side::Up);
+            rotation = match river_side {
+                Side::Up => SpriteRotate::Zero,
+                Side::Down => SpriteRotate::Two,
+                Side::Left => SpriteRotate::Three,
+                Side::Right => SpriteRotate::One,
+            };
+
+            self.flood_plains
+        } else {
+            let key = TextureKey::for_tile(tile);
+            self.textures[&key]
+        };
+
+        let mut canvas = cx.canvas_mut();
+        canvas.draw_sprite_with_rotation(texture, Vec2::ZERO, PIXELS_PER_TILE, rotation);
     }
 }
