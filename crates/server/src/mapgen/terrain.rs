@@ -190,13 +190,13 @@ impl<'a> TerrainGenerator<'a> {
                 let direction = *self.vector_to_ocean.get(pos).unwrap();
                 let factor = self.sample_highest_elevation(pos.as_f64(), -direction, 4.) - 0.6;
                 if factor >= 0. {
-                    rainfall += factor * 12.;
+                    rainfall += factor * 6.;
                 }
 
                 // Behind mountains (relative to ocean) = low rainfall.
                 let factor = self.sample_highest_elevation(pos.as_f64(), direction, 3.) - 0.6;
                 if factor >= 0. {
-                    rainfall -= factor * 10.;
+                    rainfall -= factor * 5.;
                 }
 
                 self.rainfall.set(pos, rainfall).unwrap();
@@ -299,6 +299,8 @@ impl<'a> TerrainGenerator<'a> {
             self.land_map.height(),
         );
 
+        let forest_noise = Fbm::new().set_seed(self.cx.rng.gen()).set_frequency(0.3);
+
         for x in 0..tiles.width() {
             for y in 0..tiles.height() {
                 let pos = uvec2(x, y);
@@ -316,7 +318,7 @@ impl<'a> TerrainGenerator<'a> {
                     Terrain::Desert
                 } else if temperature < 0.65 {
                     Terrain::Tundra
-                } else if temperature >= 0.4 && rainfall >= 0.4 {
+                } else if temperature >= 0.45 && rainfall >= 0.45 {
                     Terrain::Grassland
                 } else {
                     Terrain::Plains
@@ -327,7 +329,7 @@ impl<'a> TerrainGenerator<'a> {
                     terrain,
                     Terrain::Plains | Terrain::Grassland | Terrain::Desert | Terrain::Tundra
                 ) && rainfall > 0.3
-                    && self.cx.rng.gen_bool(0.9);
+                    && (self.cx.rng.gen_bool(0.4) || forest_noise.get([x as f64, y as f64]) > -0.4) && self.cx.rng.gen_bool(0.9);
 
                 let tile = tiles.get_mut(pos).unwrap();
                 tile.set_terrain(terrain);
