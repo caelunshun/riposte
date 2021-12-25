@@ -3,5 +3,10 @@
   "cost": 40,
   "era": "ancient",
 
-  "unlocksImprovements": ["Road"]
+  "unlocksImprovements": ["Road"],
+
+  "quote": {
+    "text": "A wise king scatthereth the wicked, and bringeth the wheel over them.",
+    "attribution": "Proverbs 20:26"
+  }
 }

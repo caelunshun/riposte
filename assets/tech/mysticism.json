@@ -1,5 +1,10 @@
 {
   "name": "Mysticism",
   "cost": 60,
-  "era": "ancient"
+  "era": "ancient",
+
+  "quote": {
+    "text": "There thy faithful oracles shall stand, and ever shall remain.",
+    "attribution": "Homer"
+  }
 }

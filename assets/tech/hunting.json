@@ -1,5 +1,10 @@
 {
   "name": "Hunting",
   "cost": 40,
-  "era": "ancient"
+  "era": "ancient",
+
+  "quote": {
+    "text": "Hunting their sport, and plundering was their trade.",
+    "attribution": "Virgil"
+  }
 }
