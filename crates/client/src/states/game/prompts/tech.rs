@@ -36,7 +36,7 @@ impl TechPrompt {
         }
     }
 
-    fn init(&mut self, cx: &Context, game: &Game) {
+    fn init(&mut self, _cx: &Context, game: &Game) {
         let (window, _) = self
             .attachment
             .create_window::<TechPopup, _>(Center::with_size(vec2(600., 600.)), Z_POPUP);
@@ -72,8 +72,8 @@ impl Prompt for TechPrompt {
     fn update(
         &mut self,
         cx: &mut Context,
-        game: &Game,
-        client: &mut Client<GameState>,
+        _game: &Game,
+        _client: &mut Client<GameState>,
     ) -> Option<Action> {
         if cx.ui_mut().pop_message::<Close>().is_some() {
             Some(Action::Close)

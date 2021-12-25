@@ -91,6 +91,7 @@ impl Tile {
         }
     }
 
+    #[allow(unused)]
     pub(crate) fn remove_influencer(&mut self, influencer: CityId) {
         if let Some(pos) = self.influencers.iter().position(|c| *c == influencer) {
             self.influencers.swap_remove(pos);

@@ -1,11 +1,9 @@
 use duit::{Ui, WindowId};
 use glam::vec2;
-use riposte_common::{assets::Handle, registry::Tech};
 
 use crate::{
     game::Game,
-    generated::{ErrorPopup, GenesisPopup, TechPopup},
-    tooltips::tech::tech_tooltip,
+    generated::{ErrorPopup, GenesisPopup},
     ui::{Center, Z_POPUP},
 };
 
