@@ -1038,7 +1038,7 @@ dependencies = [
 [[package]]
 name = "dume"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/dume#345d73e9ede725aceb4900be8e37023b307a368a"
+source = "git+https://github.com/caelunshun/dume#2dd7895914f34eba9a95bd9eb9feaea57c4135af"
 dependencies = [
  "ahash",
  "anyhow",
@@ -1068,7 +1068,7 @@ dependencies = [
 [[package]]
 name = "dume-markup"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/dume#345d73e9ede725aceb4900be8e37023b307a368a"
+source = "git+https://github.com/caelunshun/dume#2dd7895914f34eba9a95bd9eb9feaea57c4135af"
 dependencies = [
  "anyhow",
  "logos",
@@ -1080,7 +1080,7 @@ dependencies = [
 [[package]]
 name = "dume-video"
 version = "0.1.0"
-source = "git+https://github.com/caelunshun/dume#345d73e9ede725aceb4900be8e37023b307a368a"
+source = "git+https://github.com/caelunshun/dume#2dd7895914f34eba9a95bd9eb9feaea57c4135af"
 dependencies = [
  "anyhow",
  "dume",
