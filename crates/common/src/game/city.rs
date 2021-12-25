@@ -475,6 +475,7 @@ impl City {
         // worked tiles, and only then should we compute build task progress.
         self.do_growth(game);
         self.update_worked_tiles(game);
+        self.work_tiles(game);
         self.update_trade_networks(game);
         self.update_statuses(game);
         self.update_economy(game);
@@ -884,6 +885,12 @@ impl City {
         }
         for _ in 0..(num_flood_plains / 2) {
             self.sickness_sources.push(SicknessSource::FloodPlains);
+        }
+    }
+
+    fn work_tiles(&mut self, game: &Game) {
+        for &pos in &self.worked_tiles {
+            game.tile_mut(pos).unwrap().work();
         }
     }
 }

@@ -284,9 +284,19 @@ impl Tile {
                 self.is_forested = false;
             }
 
-            self.improvements.retain(|i| i.is_compatible_with(&improvement));
+            self.improvements
+                .retain(|i| i.is_compatible_with(&improvement));
 
             self.improvements.push(improvement);
+        }
+    }
+
+    /// Should be called at the end of a turn if a city is working this tile.
+    pub fn work(&mut self) {
+        for improvement in &mut self.improvements {
+            if let Improvement::Cottage(cottage) = improvement {
+                cottage.work();
+            }
         }
     }
 }

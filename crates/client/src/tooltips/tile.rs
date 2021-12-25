@@ -262,6 +262,14 @@ fn improvement_lines(tile: &Tile) -> Vec<Text> {
                         .last_mut()
                         .unwrap()
                         .extend(text!(" (City must work to grow)"));
+                } else {
+                    if let Some(next_level) = cottage.next_level() {
+                        lines.last_mut().unwrap().extend(text!(
+                            " ({} turns to {:?})",
+                            cottage.turns_to_next_level(),
+                            next_level
+                        ));
+                    }
                 }
             }
             _ => lines.push(text!("{}", improvement.name())),

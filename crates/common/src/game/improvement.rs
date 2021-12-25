@@ -33,7 +33,7 @@ impl Improvement {
             Improvement::Road => "Road".to_owned(),
             Improvement::Pasture => "Pasture".to_owned(),
             Improvement::Plantation => "Plantation".to_owned(),
-            Improvement::Cottage(cottage) => format!("{:?}", cottage.level),
+            Improvement::Cottage(cottage) => format!("{:?}", cottage.level()),
         }
     }
 
@@ -179,20 +179,49 @@ impl FromStr for Improvement {
 
 #[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Cottage {
-    level: CottageLevel,
+    worked_turns: u32,
 }
 
 impl Cottage {
     pub fn level(&self) -> CottageLevel {
-        self.level
+        match self.worked_turns {
+            0..=9 => CottageLevel::Cottage,
+            10..=29 => CottageLevel::Hamlet,
+            30..=69 => CottageLevel::Village,
+            70.. => CottageLevel::Town,
+        }
+    }
+
+    pub fn worked_turns(&self) -> u32 {
+        self.worked_turns
+    }
+
+    pub fn work(&mut self) {
+        self.worked_turns += 1;
+    }
+
+    pub fn turns_to_next_level(&self) -> u32 {
+        match self.level() {
+            CottageLevel::Cottage => 10 - self.worked_turns,
+            CottageLevel::Hamlet => 30 - self.worked_turns,
+            CottageLevel::Village => 70 - self.worked_turns,
+            CottageLevel::Town => 0,
+        }
+    }
+
+    pub fn next_level(&self) -> Option<CottageLevel> {
+        match self.level() {
+            CottageLevel::Cottage => Some(CottageLevel::Hamlet),
+            CottageLevel::Hamlet => Some(CottageLevel::Village),
+            CottageLevel::Village => Some(CottageLevel::Town),
+            CottageLevel::Town => None,
+        }
     }
 }
 
 impl Default for Cottage {
     fn default() -> Self {
-        Self {
-            level: CottageLevel::Cottage,
-        }
+        Self { worked_turns: 0 }
     }
 }
 
