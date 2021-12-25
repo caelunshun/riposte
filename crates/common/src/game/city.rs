@@ -150,7 +150,7 @@ impl City {
     }
 
     pub fn food_consumed_per_turn(&self) -> u32 {
-        self.population.get() + self.excess_sickness()
+        self.population.get() * 2 + self.excess_sickness()
     }
 
     pub fn excess_sickness(&self) -> u32 {
