@@ -134,7 +134,9 @@ impl City {
             game.push_event(Event::TileChanged(pos));
         }
 
-        game.tile_mut(pos).unwrap().clear_improvements();
+        let mut tile = game.tile_mut(pos).unwrap();
+        tile.clear_improvements();
+        tile.set_forested(false);
 
         city.update_culture_per_turn();
 
