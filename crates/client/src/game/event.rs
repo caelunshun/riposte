@@ -1,7 +1,7 @@
 use std::{cell::RefCell, collections::VecDeque};
 
 use glam::UVec2;
-use riposte_common::{CityId, PlayerId, UnitId};
+use riposte_common::{assets::Handle, registry::Tech, CityId, PlayerId, UnitId};
 
 /// An event indicates that some piece of game data was updated.
 ///
@@ -37,6 +37,9 @@ pub enum GameEvent {
     },
     BordersExpanded {
         city: CityId,
+    },
+    TechUnlocked {
+        tech: Handle<Tech>,
     },
 }
 

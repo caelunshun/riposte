@@ -8,20 +8,20 @@ use crate::{
 };
 
 pub struct GameSounds {
-    sounds: Vec<SoundHandle>,
+  pub  playing: Vec<SoundHandle>,
     previous_unit_move_time: Instant,
 }
 
 impl GameSounds {
     pub fn new() -> Self {
         Self {
-            sounds: Vec::new(),
+            playing: Vec::new(),
             previous_unit_move_time: Instant::now(),
         }
     }
 
     pub fn handle_game_event(&mut self, cx: &Context, game: &Game, event: &GameEvent) {
-        self.sounds.retain(|s| !s.empty());
+        self.playing.retain(|s| !s.empty());
         match event {
             GameEvent::UnitMoved { unit, new_pos, .. } => {
                 let unit = game.unit(*unit);
@@ -34,7 +34,7 @@ impl GameSounds {
                 }
                 self.previous_unit_move_time = Instant::now();
 
-                self.sounds.push(cx.audio().play(
+                self.playing.push(cx.audio().play(
                     "sound/event/move",
                     SoundCategory::Effects,
                     volumes::UNIT_MOVED,
@@ -42,7 +42,7 @@ impl GameSounds {
 
                 let target_tile = game.tile(*new_pos).unwrap();
                 if target_tile.is_forested() {
-                    self.sounds.push(cx.audio().play(
+                    self.playing.push(cx.audio().play(
                         "sound/event/move_through_trees",
                         SoundCategory::Effects,
                         volumes::UNIT_MOVED,
@@ -50,14 +50,14 @@ impl GameSounds {
                 }
             }
             GameEvent::WarDeclared { .. } => {
-                self.sounds.push(cx.audio().play(
+                self.playing.push(cx.audio().play(
                     "sound/event/war_declared",
                     SoundCategory::Effects,
                     volumes::WAR_AND_PEACE,
                 ));
             }
             GameEvent::PeaceDeclared { .. } => {
-                self.sounds.push(cx.audio().play(
+                self.playing.push(cx.audio().play(
                     "sound/event/peace_declared",
                     SoundCategory::Effects,
                     volumes::WAR_AND_PEACE,
@@ -73,14 +73,14 @@ impl GameSounds {
                 } else {
                     return;
                 };
-                self.sounds.push(
+                self.playing.push(
                     cx.audio()
                         .play(sound, SoundCategory::Effects, volumes::COMBAT),
                 );
             }
             GameEvent::BordersExpanded { city } => {
                 if game.city(*city).owner() == game.the_player().id() {
-                    self.sounds.push(cx.audio().play(
+                    self.playing.push(cx.audio().play(
                         "sound/event/borders_expand",
                         SoundCategory::Effects,
                         volumes::BORDERS_EXPAND,

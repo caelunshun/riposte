@@ -7,4 +7,12 @@ pub struct Tech {
     pub unlocks_improvements: Vec<String>,
     #[serde(default)]
     pub prerequisites: Vec<String>,
+    pub quote: Option<Quote>,
+}
+
+#[derive(Debug, serde::Deserialize)]
+#[serde(rename_all = "camelCase")]
+pub struct Quote {
+    pub text: String,
+    pub attribution: String,
 }

@@ -1,9 +1,11 @@
 use duit::{Ui, WindowId};
 use glam::vec2;
+use riposte_common::{assets::Handle, registry::Tech};
 
 use crate::{
     game::Game,
-    generated::{ErrorPopup, GenesisPopup},
+    generated::{ErrorPopup, GenesisPopup, TechPopup},
+    tooltips::tech::tech_tooltip,
     ui::{Center, Z_POPUP},
 };
 
@@ -18,7 +20,7 @@ impl PopupWindows {
         Self::default()
     }
 
-    pub fn show_error_popup(& self, ui: &mut Ui, error: &str) {
+    pub fn show_error_popup(&self, ui: &mut Ui, error: &str) {
         let (window, root) = ui.create_spec_instance::<ErrorPopup>();
 
         window
@@ -34,11 +36,11 @@ impl PopupWindows {
             .on_click(move || ClosePopup(window_id));
     }
 
-    pub fn show_genesis_popup(& self, ui: &mut Ui, game: &Game) {
+    pub fn show_genesis_popup(&self, ui: &mut Ui, game: &Game) {
         let (window, root) = ui.create_spec_instance::<GenesisPopup>();
 
         window.welcome_text.get_mut().set_text(text!(
-        "   The sun rises on 4000 BCE. For eons the {} people have lived a nomadic life. Now, at the culmination of those years, they are ready to settle their first city.
+        "   The sun rises on 4000 BCE. For eons the {} people have lived a nomadic life. Now they are ready to settle their first city.
         
     {}, lead your people to build a civilization that stands the test of time.", game.the_player().civ().adjective, game.the_player().username()));
 
@@ -49,7 +51,7 @@ impl PopupWindows {
             .get_mut()
             .on_click(move || ClosePopup(window_id));
     }
-
+    
     pub fn update(&mut self, ui: &mut Ui) {
         loop {
             match ui.pop_message::<ClosePopup>() {

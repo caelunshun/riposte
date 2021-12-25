@@ -115,6 +115,11 @@ styles:
     border_radius: 5
     border_width: 1
 
+  container & container_emphasized:
+    background_color: rgb(50, 105, 168)
+    border_radius: 5
+    border_wdth: 0
+
   tile_tooltip_container:
     border_width: 0
     border_radius: 0

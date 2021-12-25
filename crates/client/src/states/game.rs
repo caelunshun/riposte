@@ -1,14 +1,16 @@
 use duit::Event;
-use riposte_common::{CityId, PlayerId};
+use riposte_common::{assets::Handle, registry::Tech, CityId, PlayerId};
 use winit::event::VirtualKeyCode;
 
 use crate::{
+    audio::SoundCategory,
     client::{self, Client},
     context::Context,
     game::{event::GameEvent, Game},
     renderer::GameRenderer,
     state::StateAttachment,
-    states::game::prompts::city_build::CityBuildPrompt,
+    states::game::prompts::{city_build::CityBuildPrompt, tech::TechPrompt},
+    volumes,
 };
 
 use self::{
@@ -143,6 +145,7 @@ impl GameState {
             GameEvent::PlayerUpdated { player } => {
                 self.handle_player_updated(cx, *player);
             }
+            GameEvent::TechUnlocked { tech } => self.handle_tech_unlocked(cx, tech),
             _ => {}
         }
     }
@@ -161,6 +164,28 @@ impl GameState {
             if self.game.the_player().researching_tech().is_none() {
                 self.prompts.push(ResearchPrompt::new(cx, &mut self.client));
             }
+        }
+    }
+
+    fn handle_tech_unlocked(&mut self, cx: &Context, tech: &Handle<Tech>) {
+        use heck::ToSnakeCase;
+
+        self.prompts.push(TechPrompt::new(cx, tech.clone()));
+
+        self.sounds.playing.push(cx.audio().play(
+            "sound/event/tech_unlocked",
+            SoundCategory::Effects,
+            volumes::TECH,
+        ));
+
+        // Look for recording of tech quote
+        let quote_recording = format!("narration/tech/{}", tech.name.to_snake_case());
+        if cx.audio().contains_sound(&quote_recording) {
+            self.sounds.playing.push(cx.audio().play(
+                &quote_recording,
+                SoundCategory::Effects,
+                volumes::TECH,
+            ));
         }
     }
 

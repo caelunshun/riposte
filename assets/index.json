@@ -1360,8 +1360,33 @@
     "loader": "sound"
   },
   {
+    "path": "sound/event/tech_unlocked.ogg",
+    "id": "sound/event/tech_unlocked",
+    "loader": "sound"
+  },
+  {
     "path": "sound/ambient/city1.ogg",
     "id": "sound/ambient/city1",
+    "loader": "sound"
+  },
+  {
+    "path": "narration/tech/bronze_working.ogg",
+    "id": "narration/tech/bronze_working",
+    "loader": "sound"
+  },
+  {
+    "path": "narration/tech/construction.ogg",
+    "id": "narration/tech/construction",
+    "loader": "sound"
+  },
+  {
+    "path": "narration/tech/mathematics.ogg",
+    "id": "narration/tech/mathematics",
+    "loader": "sound"
+  },
+  {
+    "path": "narration/tech/monarchy.ogg",
+    "id": "narration/tech/monarchy",
     "loader": "sound"
   },
   {

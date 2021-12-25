@@ -75,6 +75,10 @@ impl Audio {
             .insert(id.to_owned(), Arc::<[u8]>::from(sound_encoded_bytes));
     }
 
+    pub fn contains_sound(&self, id: &str) -> bool {
+        self.loaded_sounds.contains_key(id)
+    }
+
     pub fn play(&self, id: &str, category: SoundCategory, volume: f32) -> SoundHandle {
         let sink = self.play_inner(id, category, volume, |sound_data| {
             Decoder::new(Cursor::new(sound_data))

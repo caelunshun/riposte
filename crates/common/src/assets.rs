@@ -148,6 +148,10 @@ impl Assets {
         Ok(())
     }
 
+    pub fn contains(&self, id: &str) -> bool {
+        self.assets.contains_key(id)
+    }
+
     /// Gets an asset handle from the asset's ID.
     ///
     /// Panics if `T` is not the type of the asset.

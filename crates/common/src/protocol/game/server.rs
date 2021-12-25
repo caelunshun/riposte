@@ -5,8 +5,8 @@ use std::cell::RefCell;
 use glam::UVec2;
 
 use crate::{
-    river::Rivers, unit::MovementPoints, worker::WorkerProgressGrid, City, Grid, Player, PlayerId,
-    Tile, Turn, Unit, UnitId,
+    assets::Handle, registry::Tech, river::Rivers, unit::MovementPoints,
+    worker::WorkerProgressGrid, City, Grid, Player, PlayerId, Tile, Turn, Unit, UnitId,
 };
 
 #[derive(Debug, Clone)]
@@ -32,6 +32,7 @@ pub enum ServerPacket {
     DeleteUnit(DeleteUnit),
     UpdateCity(UpdateCity),
     UpdateWorkerProgressGrid(UpdateWorkerProgressGrid),
+    TechUnlocked(TechUnlocked),
 }
 
 /// Sent in the `GameStarted` lobby packet.
@@ -115,4 +116,10 @@ pub struct UpdateCity {
 #[derive(Debug, Clone)]
 pub struct UpdateWorkerProgressGrid {
     pub grid: WorkerProgressGrid,
+}
+
+/// Informs the client that a tech was unlocked.
+#[derive(Debug, Clone)]
+pub struct TechUnlocked {
+    pub tech: Handle<Tech>,
 }

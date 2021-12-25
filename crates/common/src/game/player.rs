@@ -387,7 +387,7 @@ impl Player {
         );
     }
 
-    fn update_research(&mut self, _game: &Game) {
+    fn update_research(&mut self, game: &Game) {
         if let Some(tech) = &self.research {
             let progress = self.tech_progress.entry(tech.clone()).or_insert(0);
             *progress += self.economy.beaker_revenue;
@@ -399,6 +399,7 @@ impl Player {
 
             if *progress >= tech.cost {
                 self.economy.beaker_overflow = *progress - tech.cost;
+                game.push_event(Event::TechUnlocked(self.id, tech.clone()));
                 self.unlocked_techs.insert(tech.clone());
                 self.research = None;
             }

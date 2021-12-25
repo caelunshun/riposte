@@ -192,6 +192,60 @@ impl ::duit::InstanceHandle for ErrorPopup {
 }
 use duit::widgets::*;
 use duit::*;
+pub struct TechPopup {
+    pub tech_name: WidgetHandle<Text>,
+    pub quote_text: WidgetHandle<Text>,
+    pub tooltip_text: WidgetHandle<Text>,
+    pub close_button: WidgetHandle<Button>,
+}
+impl ::duit::InstanceHandle for TechPopup {
+    fn name() -> &'static str {
+        "TechPopup"
+    }
+    fn init(widget_handles: Vec<(String, WidgetPodHandle)>) -> Self {
+        let mut tech_name = None;
+        let mut quote_text = None;
+        let mut tooltip_text = None;
+        let mut close_button = None;
+        for (name, widget) in widget_handles {
+            match name.as_str() {
+                "tech_name" => tech_name = Some(widget),
+                "quote_text" => quote_text = Some(widget),
+                "tooltip_text" => tooltip_text = Some(widget),
+                "close_button" => close_button = Some(widget),
+                _ => {}
+            }
+        }
+        Self {
+            tech_name: WidgetHandle::new(tech_name.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "tech_name"
+                )
+            })),
+            quote_text: WidgetHandle::new(quote_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "quote_text"
+                )
+            })),
+            tooltip_text: WidgetHandle::new(tooltip_text.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "tooltip_text"
+                )
+            })),
+            close_button: WidgetHandle::new(close_button.unwrap_or_else(|| {
+                panic!(
+                    "missing widget with ID '{}' (generated code not up to date)",
+                    "close_button"
+                )
+            })),
+        }
+    }
+}
+use duit::widgets::*;
+use duit::*;
 pub struct GenesisPopup {
     pub welcome_text: WidgetHandle<Text>,
     pub close_button: WidgetHandle<Button>,

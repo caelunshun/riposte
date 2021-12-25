@@ -29,7 +29,10 @@ use riposte_common::{
     CityId, PlayerId, UnitId,
 };
 
-use crate::{context::Context, game::Game};
+use crate::{
+    context::Context,
+    game::{event::GameEvent, Game},
+};
 
 #[derive(Debug, thiserror::Error)]
 pub enum ClientError {
@@ -298,6 +301,9 @@ impl Client<GameState> {
                     ServerPacket::UpdateCity(p) => game.add_or_update_city(p.city)?,
                     ServerPacket::UpdateWorkerProgressGrid(p) => {
                         *game.base().worker_progress_grid_mut() = p.grid
+                    }
+                    ServerPacket::TechUnlocked(p) => {
+                        game.push_event(GameEvent::TechUnlocked { tech: p.tech })
                     }
                 }
             }

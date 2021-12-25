@@ -8,8 +8,8 @@ use riposte_common::{
         },
         game::server::{InitialGameData, ServerGamePacket, ServerPacket},
         server::{
-            ConfirmMoveUnits, DeleteUnit, UnitsMoved, UpdateCity, UpdatePlayer, UpdateTile,
-            UpdateTurn, UpdateUnit, UpdateWorkerProgressGrid,
+            ConfirmMoveUnits, DeleteUnit, TechUnlocked, UnitsMoved, UpdateCity, UpdatePlayer,
+            UpdateTile, UpdateTurn, UpdateUnit, UpdateWorkerProgressGrid,
         },
         GenericServerPacket,
     },
@@ -73,7 +73,7 @@ impl GameServer {
             players: self.game.players().map(|p| p.clone()).collect(),
             units: self.game.units().map(|u| u.clone()).collect(),
             cities: self.game.cities().map(|c| c.clone()).collect(),
-            rivers: self.game.rivers().clone()
+            rivers: self.game.rivers().clone(),
         }
     }
 
@@ -260,6 +260,11 @@ impl GameServer {
             ),
             Event::UnitDeleted(unit) => {
                 self.broadcast(conns, ServerPacket::DeleteUnit(DeleteUnit { unit }))
+            }
+            Event::TechUnlocked(player, tech) => {
+                conns
+                    .get(self.conn_for_player(player))
+                    .send_game_packet(ServerPacket::TechUnlocked(TechUnlocked { tech }), None);
             }
         });
     }
