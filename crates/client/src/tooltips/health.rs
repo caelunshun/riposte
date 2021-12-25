@@ -13,6 +13,8 @@ pub fn health_tooltip(city: &City) -> String {
             HealthSource::Resources => "from resources",
             HealthSource::Buildings => "from buildings",
             HealthSource::Forests => "from local forests",
+            HealthSource::FreshWater => "from fresh water"
+            
         };
         lines.push(format!("+{}@icon{{health}} {}", count, reason));
     }

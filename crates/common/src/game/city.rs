@@ -7,7 +7,7 @@ use indexmap::IndexSet;
 use crate::{
     assets::Handle,
     event::Event,
-    registry::{Building, Resource, UnitKind},
+    registry::{Building, BuildingEffectType, Resource, UnitKind},
     utils::{MaybeInfinityU32, UVecExt},
     world::Game,
     Improvement, Player, Terrain, Unit,
@@ -68,6 +68,8 @@ pub struct City {
 
     /// Buildings in this city
     buildings: Vec<Handle<Building>>,
+    /// Building effects (computed from buildings)
+    building_effects: AHashMap<BuildingEffectType, u32>,
 
     /// Cached economy data for the city.
     economy: CityEconomy,
@@ -116,6 +118,7 @@ impl City {
             resources: AHashSet::new(),
             connected_to_cities: AHashSet::new(),
             buildings: Vec::new(),
+            building_effects: AHashMap::new(),
             economy: CityEconomy::default(),
             happiness_sources: Vec::new(),
             anger_sources: Vec::new(),
@@ -141,8 +144,10 @@ impl City {
                 tile.update_owner(game);
             }
             let mut city = game.city_mut(id);
+            city.update_statuses(game);
             city.update_worked_tiles(game);
             city.update_economy(game);
+            city.update_trade_networks(game);
         });
 
         city
@@ -162,6 +167,10 @@ impl City {
         } else {
             0
         }
+    }
+
+    fn excess_anger(&self) -> u32 {
+        self.num_anger().saturating_sub(self.num_happiness())
     }
 
     pub fn culture(&self) -> u32 {
@@ -255,6 +264,10 @@ impl City {
         self.connected_to_cities.contains(&peer)
     }
 
+    pub fn building_effect(&self, effect: BuildingEffectType) -> u32 {
+        self.building_effects.get(&effect).copied().unwrap_or(0)
+    }
+
     pub fn num_happiness(&self) -> u32 {
         self.happiness_sources.len() as u32
     }
@@ -337,6 +350,13 @@ impl City {
 
     pub fn downgrade_to_client(&mut self) {
         self.on_server = false;
+    }
+
+    pub fn add_building(&mut self, building: Handle<Building>) {
+        for effect in &building.effects {
+            *self.building_effects.entry(effect.typ).or_insert(0) += effect.amount;
+        }
+        self.buildings.push(building);
     }
 
     /// Returns all the possible build tasks for this city.
@@ -439,6 +459,7 @@ impl City {
         }
 
         self.update_worked_tiles(game);
+        self.update_economy(game);
         game.push_event(Event::CityChanged(self.id));
 
         let owner = self.owner;
@@ -455,6 +476,7 @@ impl City {
         self.do_growth(game);
         self.update_worked_tiles(game);
         self.update_trade_networks(game);
+        self.update_statuses(game);
         self.update_economy(game);
         self.check_build_task_prerequisites(game);
         self.make_build_task_progress(game);
@@ -571,7 +593,7 @@ impl City {
         for (pos, _) in entries
             .into_iter()
             .rev()
-            .take(self.num_workable_tiles() as usize - 1)
+            .take(self.num_workable_tiles().saturating_sub(1) as usize)
         {
             self.worked_tiles.insert(pos);
             game.set_tile_worker(pos, self.id);
@@ -579,7 +601,7 @@ impl City {
     }
 
     pub fn num_workable_tiles(&self) -> u32 {
-        self.population.get() + 1
+        (self.population.get() + 1).saturating_sub(self.excess_anger())
     }
 
     pub fn can_work_tile(&self, game: &Game, pos: UVec2) -> bool {
@@ -728,7 +750,8 @@ impl City {
 
             for neighbor in game.map().adjacent(pos) {
                 let neighbor_tile = game.tile(neighbor).unwrap();
-                if neighbor_tile.has_improvement(Improvement::Road)
+                if (neighbor_tile.has_improvement(Improvement::Road)
+                    || game.city_id_at_pos(neighbor).is_some())
                     && neighbor_tile
                         .owner(game)
                         .map(|owner| !game.player(owner).is_at_war_with(self.owner))
@@ -739,6 +762,117 @@ impl City {
                     stack.push(neighbor);
                 }
             }
+        }
+    }
+
+    fn update_statuses(&mut self, game: &Game) {
+        self.update_happiness();
+        self.update_anger(game);
+        self.update_health(game);
+        self.update_sickness();
+    }
+
+    fn update_happiness(&mut self) {
+        self.happiness_sources.clear();
+
+        for _ in 0..4 {
+            self.happiness_sources
+                .push(HappinessSource::DifficultyBonus);
+        }
+
+        for resource in &self.resources {
+            for _ in 0..resource.happy_bonus {
+                self.happiness_sources.push(HappinessSource::Resources);
+            }
+        }
+
+        for _ in 0..self.building_effect(BuildingEffectType::Happiness) {
+            self.happiness_sources.push(HappinessSource::Buildings);
+        }
+
+        if self.is_capital() {
+            self.happiness_sources.push(HappinessSource::Buildings); // palace
+        }
+    }
+
+    fn update_anger(&mut self, game: &Game) {
+        self.anger_sources.clear();
+
+        for _ in 0..self.population.get() {
+            self.anger_sources.push(AngerSource::Population);
+        }
+
+        let mut num_our_units = 0;
+        let mut num_enemy_units = 0;
+        for unit in game.units() {
+            if unit.kind().strength == 0. {
+                continue;
+            }
+            if unit.pos() == self.pos() {
+                if unit.owner() == self.owner {
+                    num_our_units += 1;
+                } else {
+                    num_enemy_units += 1;
+                }
+            }
+        }
+
+        if num_our_units == 0 {
+            self.anger_sources.push(AngerSource::Undefended);
+            if num_enemy_units > 0 {
+                self.anger_sources.push(AngerSource::Undefended);
+            }
+        }
+    }
+
+    fn update_health(&mut self, game: &Game) {
+        self.health_sources.clear();
+
+        for _ in 0..2 {
+            self.health_sources.push(HealthSource::DifficultyBonus);
+        }
+
+        let mut num_forest_tiles = 0;
+        for pos in game.map().big_fat_cross(self.pos) {
+            let tile = game.tile(pos).unwrap();
+            if tile.owner(game) != Some(self.owner) {
+                continue;
+            }
+            if tile.is_forested() {
+                num_forest_tiles += 1;
+            }
+        }
+
+        for _ in 0..num_forest_tiles / 2 {
+            self.health_sources.push(HealthSource::Forests);
+        }
+
+        if game.tile(self.pos).unwrap().has_fresh_water() {
+            for _ in 0..2 {
+                self.health_sources.push(HealthSource::FreshWater);
+            }
+        }
+
+        for resource in &self.resources {
+            for _ in 0..resource.health_bonus {
+                self.health_sources.push(HealthSource::Resources);
+            }
+        }
+
+        for _ in 0..self.building_effect(BuildingEffectType::Health) {
+            self.health_sources.push(HealthSource::Buildings);
+        }
+    }
+
+    fn update_sickness(&mut self) {
+        self.sickness_sources.clear();
+
+        for _ in 0..self.population.get() {
+            self.sickness_sources.push(SicknessSource::Population);
+        }
+
+        for _ in 0..self.building_effect(BuildingEffectType::Sickness) {
+            self.sickness_sources.push(SicknessSource::Buildings);
         }
     }
 }
@@ -815,6 +949,7 @@ pub enum AngerSource {
 #[derive(Copy, Clone, Debug, PartialEq, Eq)]
 pub enum HealthSource {
     DifficultyBonus,
+    FreshWater,
     Resources,
     Buildings,
     Forests,

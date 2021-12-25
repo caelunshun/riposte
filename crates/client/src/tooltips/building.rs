@@ -32,7 +32,7 @@ pub fn building_tooltip(registry: &Registry, building: &Building) -> Text {
     merge_text_lines(lines)
 }
 
-fn bonus_line(amount: i32, icon: &str) -> Text {
+fn bonus_line(amount: u32, icon: &str) -> Text {
     let mut text = text!("+{} ", amount);
     text.extend(Text::from_sections([TextSection::Icon {
         name: icon.into(),
@@ -41,7 +41,7 @@ fn bonus_line(amount: i32, icon: &str) -> Text {
     text
 }
 
-fn bonus_percent_line(amount: i32, icon: &str) -> Text {
+fn bonus_percent_line(amount: u32, icon: &str) -> Text {
     let mut text = text!("+{}% ", amount);
     text.extend(Text::from_sections([TextSection::Icon {
         name: icon.into(),
@@ -91,5 +91,7 @@ fn building_effect_line(effect: &BuildingEffect) -> Text {
         BuildingEffectType::GranaryFoodStore => {
             text!("City keeps 50% of stored food after growth")
         }
+        BuildingEffectType::Anger => text!("+{}@icon[anger]", effect.amount),
+        BuildingEffectType::Sickness => text!("+{}@icon[sick]", effect.amount),
     }
 }

@@ -20,10 +20,10 @@ pub struct BuildingEffect {
     #[serde(rename = "type")]
     pub typ: BuildingEffectType,
     #[serde(default)]
-    pub amount: i32,
+    pub amount: u32,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, serde::Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub enum BuildingEffectType {
     BonusHammers,
@@ -41,5 +41,7 @@ pub enum BuildingEffectType {
     MinusMaintenancePercent,
     Happiness,
     Health,
+    Anger,
+    Sickness,
     GranaryFoodStore,
 }
