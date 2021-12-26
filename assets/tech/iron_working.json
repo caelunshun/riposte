@@ -2,5 +2,10 @@
   "name": "Iron Working",
   "cost": 450,
   "prerequisites": ["Bronze Working"],
-  "era": "classical"
+  "era": "classical",
+
+  "quote": {
+    "text": "There is no greater fame for a man than that which he wins with his footwork or the skill of his hands.",
+    "attribution": "Homer"
+  }
 }
