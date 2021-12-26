@@ -11,11 +11,11 @@ duit = { git = "https://github.com/caelunshun/duit" }
 duit-platform = { git = "https://github.com/caelunshun/duit" }
 dume = { git = "https://github.com/caelunshun/dume" }
 flume = "0.10"
-octocrab = { version = "0.13", default-features = false, features = [ "rustls"] }
+octocrab = { version = "0.13", default-features = false, features = [ "rustls" ] }
 reqwest = { version = "0.11", default-features = false }
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"
 tar = "0.4"
 tokio = { version = "1", features = [ "full" ] }
-winit = { version = "0.25", default-features = false, features = [ "x11" ] }
+winit = { version = "0.26", default-features = false, features = [ "x11" ] }
 zstd = "0.9"

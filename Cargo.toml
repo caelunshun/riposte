@@ -18,6 +18,11 @@ opt-level = 3
 [patch.crates-io]
 slotmap = { git = "https://github.com/orlp/slotmap" }
 
-#[patch."https://github.com/caelunshun/dume"]
-#dume = { path = "../dume/crates/dume" }
-#dume-video = { path = "../dume/crates/dume-video" }
+# [patch."https://github.com/caelunshun/dume"]
+# dume = { path = "../dume/crates/dume" }
+# dume-video = { path = "../dume/crates/dume-video" }
+
+# [patch."https://github.com/caelunshun/duit"]
+# duit = { path = "../duit/crates/duit" }
+# duit-core = { path = "../duit/crates/duit-core" }
+# duit-platform = { path = "../duit/crates/duit-platform" }
