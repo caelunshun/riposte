@@ -6,8 +6,12 @@ edition = "2021"
 [dependencies]
 anyhow = "1"
 bytes = "1"
+flume = "0.10"
+futures = "0.3"
+log = "0.4"
 prost = "0.9"
 quinn = "0.8"
+tokio = { version = "1", features = [ "full" ] }
 tokio-util = { version = "0.6", features = [ "codec" ] }
 tonic = { version = "0.6", features = [ "tls", "tls-roots" ] }
 uuid = "0.8"

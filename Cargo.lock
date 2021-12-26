@@ -3299,8 +3299,12 @@ version = "0.1.0"
 dependencies = [
  "anyhow",
  "bytes",
+ "flume",
+ "futures",
+ "log",
  "prost",
  "quinn",
+ "tokio",
  "tokio-util",
  "tonic",
  "tonic-build",

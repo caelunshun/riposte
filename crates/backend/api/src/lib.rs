@@ -3,6 +3,9 @@ pub extern crate quinn;
 pub extern crate tonic;
 pub extern crate uuid;
 
+pub mod server;
+pub mod client;
+
 use std::str::FromStr;
 
 use tokio_util::codec::length_delimited;
@@ -42,3 +45,4 @@ pub fn codec() -> length_delimited::Builder {
     b.little_endian();
     b
 }
+
