@@ -33,27 +33,22 @@ mimalloc = { version = "0.1", default-features = false }
 once_cell = "1"
 palette = "0.6"
 pollster = "0.2"
-prost = "0.8"
-prost-types = "0.8"
-quinn = "0.7"
 rand = "0.8"
 rand_pcg = "0.3"
 riposte-backend-api = { path = "../backend/api" }
 riposte-common = { path = "../common" }
 riposte-server = { path = "../server" }
 rodio = { version = "0.14", default-features = false, features = [ "vorbis", "wav" ] }
-rustls = { version = "0.19", features = [ "dangerous_configuration", "quic" ] }
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"
 simple_logger = { version = "1", default-features = false, features = [ "colors" ] }
 slotmap = "1"
 smallvec = "1"
 splines = { version = "4", features = [ "glam" ] }
-strum = "0.22"
+strum = "0.23"
 thiserror = "1"
 tokio = { version = "1", features = [ "full" ] }
 uuid = { version = "0.8", features = [ "serde", "v4" ] }
 walkdir = "2"
-webpki = "0.21"
 wgpu = "0.12"
 winit = "0.26"

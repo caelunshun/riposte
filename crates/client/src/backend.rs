@@ -1,73 +1,43 @@
 use anyhow::Context as _;
 use riposte_backend_api::{
+    grpc_server_addr,
     riposte_backend_client::RiposteBackendClient,
-    tonic::{transport::Channel, Response, Status},
-    Authenticated, GameList, GameListRequest, LogInRequest, RegisterRequest, UserInfo, BACKEND_URL,
+    tonic::{
+        transport::{Channel, ClientTlsConfig},
+        Response, Status,
+    },
+    Authenticated, GameList, GameListRequest, LogInRequest, RegisterRequest, UserInfo,
 };
 use tokio::runtime;
 use uuid::Uuid;
 
-use std::sync::Arc;
-
 use crate::context::FutureHandle;
 
 pub type BackendResponse<T> = FutureHandle<Result<Response<T>, Status>>;
-
-// Implementation of `ServerCertVerifier` that verifies everything as trustworthy.
-struct SkipCertificationVerification;
-impl rustls::ServerCertVerifier for SkipCertificationVerification {
-    fn verify_server_cert(
-        &self,
-        _: &rustls::RootCertStore,
-        _: &[rustls::Certificate],
-        _: webpki::DNSNameRef,
-        _: &[u8],
-    ) -> Result<rustls::ServerCertVerified, rustls::TLSError> {
-        Ok(rustls::ServerCertVerified::assertion())
-    }
-}
 
 /// Maintains a connection to the gRPC backend service,
 /// which handles user authentication and multiplayer server lists.
 pub struct BackendService {
     client: RiposteBackendClient<Channel>,
     runtime: runtime::Handle,
-    endpoint: quinn::Endpoint,
 }
 
 impl BackendService {
     pub async fn new(runtime: runtime::Handle) -> anyhow::Result<Self> {
-        let client = RiposteBackendClient::connect(BACKEND_URL)
+        let channel = Channel::from_shared(format!("http://{}", grpc_server_addr()))?
+            .tls_config(ClientTlsConfig::new().domain_name("riposte.tk"))?
+            .connect()
             .await
             .context("failed to connect to Riposte backend service. Check your Internet.")?;
+        let client = RiposteBackendClient::new(channel);
 
         log::info!("Connected to Riposte backend service.");
 
-        let mut endpoint_config = quinn::ClientConfigBuilder::default().build();
-        let tls_cfg: &mut rustls::ClientConfig = Arc::get_mut(&mut endpoint_config.crypto).unwrap();
-        tls_cfg
-            .dangerous()
-            .set_certificate_verifier(Arc::new(SkipCertificationVerification));
-
-        let mut endpoint = quinn::Endpoint::builder();
-        endpoint.default_client_config(endpoint_config);
-        let (endpoint, _) = endpoint
-            .bind(&"0.0.0.0:0".parse().unwrap())
-            .context("failed to bind to QUIC socket")?;
-
-        Ok(Self {
-            client,
-            runtime,
-            endpoint,
-        })
+        Ok(Self { client, runtime })
     }
 
     pub fn client(&self) -> &RiposteBackendClient<Channel> {
         &self.client
-    }
-
-    pub fn quic_endpoint(&self) -> &quinn::Endpoint {
-        &self.endpoint
     }
 
     pub fn log_in(&self, request: LogInRequest) -> BackendResponse<Authenticated> {

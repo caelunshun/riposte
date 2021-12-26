@@ -33,7 +33,6 @@ mod utils;
 mod popups;
 mod renderer;
 mod saveload;
-mod server_bridge;
 mod state;
 mod states;
 mod tooltips;

@@ -1,25 +1,27 @@
-tonic::include_proto!("rip.backend");
-
-pub const PORT: u16 = 19836;
-pub const QUIC_PORT: u16 = 19837;
-
-pub const BACKEND_URL: &str = "http://35.217.91.71:80";
-
-pub fn quic_addr() -> SocketAddr {
-    format!("35.217.91.71:{}", QUIC_PORT).parse().unwrap()
-}
-
-pub type SessionId = [u8; 16];
-
 pub extern crate prost;
 pub extern crate quinn;
 pub extern crate tonic;
 pub extern crate uuid;
 
-use std::{net::SocketAddr, str::FromStr};
+use std::str::FromStr;
 
 use tokio_util::codec::length_delimited;
 pub use tokio_util::codec::{Framed, FramedRead, FramedWrite, LengthDelimitedCodec};
+
+tonic::include_proto!("rip.backend");
+
+pub const GAME_PORT: u16 = 16836;
+pub const GRPC_PORT: u16 = 16837;
+
+pub fn game_server_addr() -> String {
+    format!("riposte.tk:{}", GAME_PORT)
+}
+
+pub fn grpc_server_addr() -> String {
+    format!("riposte.tk:{}", GRPC_PORT)
+}
+
+pub type SessionId = [u8; 16];
 
 impl From<uuid::Uuid> for Uuid {
     fn from(u: uuid::Uuid) -> Self {

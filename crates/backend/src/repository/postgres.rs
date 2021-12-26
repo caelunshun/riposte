@@ -1,4 +1,4 @@
-use deadpool::managed::Object;
+use deadpool::{managed::Object, Runtime};
 use deadpool_postgres::{Config, Pool};
 use tokio_postgres::{NoTls, Row};
 use uuid::Uuid;
@@ -25,7 +25,7 @@ impl PostgresRepository {
             host: Some(url.to_owned()),
             ..Default::default()
         };
-        let pool = config.create_pool(NoTls)?;
+        let pool = config.create_pool(Some(Runtime::Tokio1), NoTls)?;
         Ok(Self { pool })
     }
 

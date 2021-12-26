@@ -13,6 +13,8 @@ pub struct CombatEvent {
     attacker_won: bool,
 
     rounds: Vec<CombatRound>,
+
+    collateral_units: Vec<UnitId>,
 }
 
 impl CombatEvent {
@@ -34,6 +36,11 @@ impl CombatEvent {
 
     pub fn rounds(&self) -> &[CombatRound] {
         &self.rounds
+    }
+
+    /// Returns units affected by collateral damage.
+    pub fn collateral_units(&self) -> &[UnitId] {
+        &self.collateral_units
     }
 
     pub fn pop_round(&mut self) -> CombatRound {

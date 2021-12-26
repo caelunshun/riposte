@@ -1,12 +1,12 @@
 //! The game hub. Keeps track of all active games
 //! and proxies connections over QUIC.
 
-use std::{collections::HashMap, sync::Arc, time::Duration};
+use std::{collections::HashMap, fs, sync::Arc, time::Duration};
 
 use anyhow::Context;
 use futures::StreamExt;
-use quinn::{CertificateChain, Incoming, ServerConfigBuilder};
-use riposte_backend_api::{GameInfo, SessionId, QUIC_PORT};
+use quinn::{Incoming, VarInt};
+use riposte_backend_api::{GameInfo, SessionId, GAME_PORT};
 use tokio::{sync::RwLock, task};
 use uuid::Uuid;
 
@@ -165,34 +165,45 @@ impl Hub {
 }
 
 fn build_endpoint() -> anyhow::Result<(quinn::Endpoint, Incoming)> {
-    let (cert, key) = generate_self_signed_cert()?;
+    let (certs, key) = load_certs_and_key()?;
 
-    let mut server_config_builder = ServerConfigBuilder::default();
-    server_config_builder.certificate(CertificateChain::from_certs(vec![cert]), key)?;
-
-    let mut server_config = server_config_builder.build();
+    let mut server_config = quinn::ServerConfig::with_single_cert(certs, key)?;
 
     let transport_config = Arc::get_mut(&mut server_config.transport).unwrap();
 
     transport_config
         .keep_alive_interval(Some(Duration::from_secs(1)))
-        .max_concurrent_bidi_streams(0)?; // we don't use bidirectional streams
+        .max_concurrent_bidi_streams(VarInt::from_u32(0)); // we don't use bidirectional streams
 
-    let mut endpoint_builder = quinn::Endpoint::builder();
-    endpoint_builder.listen(server_config);
-    let (endpoint, incoming) =
-        endpoint_builder.bind(&format!("0.0.0.0:{}", QUIC_PORT).parse().unwrap())?;
+    let (endpoint, incoming) = quinn::Endpoint::server(
+        server_config,
+        format!("0.0.0.0:{}", GAME_PORT).parse().unwrap(),
+    )?;
 
     Ok((endpoint, incoming))
 }
 
-fn generate_self_signed_cert() -> anyhow::Result<(quinn::Certificate, quinn::PrivateKey)> {
-    // Generate dummy certificate.
-    let certificate = rcgen::generate_simple_self_signed(vec!["localhost".into()]).unwrap();
-    let serialized_key = certificate.serialize_private_key_der();
-    let serialized_certificate = certificate.serialize_der().unwrap();
+fn load_certs_and_key() -> anyhow::Result<(Vec<rustls::Certificate>, rustls::PrivateKey)> {
+    let(key_path, cert_path) = super::key_and_cert_paths()?;
 
-    let cert = quinn::Certificate::from_der(&serialized_certificate)?;
-    let key = quinn::PrivateKey::from_der(&serialized_key)?;
-    Ok((cert, key))
+    let key = fs::read(&key_path)?;
+    let key = match rustls_pemfile::pkcs8_private_keys(&mut &*key)?
+        .into_iter()
+        .next()
+    {
+        Some(k) => k,
+        None => rustls_pemfile::rsa_private_keys(&mut &*key)?
+            .into_iter()
+            .next()
+            .context("missing key in PEM file")?,
+    };
+    let key = rustls::PrivateKey(key);
+
+    let cert = fs::read(&cert_path)?;
+    let certs = rustls_pemfile::certs(&mut &*cert)?
+        .into_iter()
+        .map(rustls::Certificate)
+        .collect();
+
+    Ok((certs, key))
 }

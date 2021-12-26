@@ -7,16 +7,15 @@ use riposte_backend_api::{GameList, Uuid};
 
 use crate::{
     backend::BackendResponse,
-    context::{Context, FutureHandle},
+    context::{Context},
     generated::ServerListWindow,
-    server_bridge::ServerBridge,
     state::StateAttachment,
     ui::{FillScreen, Z_FOREGROUND},
 };
 
 pub enum Action {
     Close,
-    JoinGame(ServerBridge),
+    JoinGame,
 }
 
 struct Close;
@@ -30,8 +29,6 @@ pub struct ServerListState {
 
     games: BackendResponse<GameList>,
     loaded_games: bool,
-
-    pending_join_game: Option<FutureHandle<anyhow::Result<ServerBridge>>>,
 }
 
 impl ServerListState {
@@ -49,7 +46,6 @@ impl ServerListState {
             window,
             games,
             loaded_games: false,
-            pending_join_game: None,
         }
     }
 
@@ -90,7 +86,7 @@ impl ServerListState {
             return Some(Action::Close);
         }
 
-        if let Some(JoinGame(game_id)) = cx.ui_mut().pop_message::<JoinGame>() {
+       /* if let Some(JoinGame(game_id)) = cx.ui_mut().pop_message::<JoinGame>() {
             self.pending_join_game = Some(ServerBridge::new_multiplayer(cx, game_id));
         }
 
@@ -102,7 +98,7 @@ impl ServerListState {
                 }
                 self.pending_join_game = None;
             }
-        }
+        }*/
 
         None
     }

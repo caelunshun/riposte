@@ -1,14 +1,15 @@
 use std::fmt::Display;
+use std::fs;
 use std::sync::Arc;
 
 use riposte_backend_api::riposte_backend_server::RiposteBackendServer;
 use riposte_backend_api::{
     join_game_response, Authenticated, CreateGameRequest, CreateGameResponse, DeleteGameRequest,
     GameList, GameListRequest, JoinGameRequest, JoinGameResponse, LogInRequest,
-    UpdateGameSettingsRequest, UserInfo, Uuid,
+    UpdateGameSettingsRequest, UserInfo, Uuid, GRPC_PORT,
 };
 use riposte_backend_api::{riposte_backend_server::RiposteBackend, RegisterRequest};
-use tonic::transport::Server;
+use tonic::transport::{Identity, Server, ServerTlsConfig};
 use tonic::{Request, Response, Status};
 use tower_http::trace::TraceLayer;
 use tracing::{Instrument, Level};
@@ -22,10 +23,14 @@ pub async fn run_grpc_server(repo: Arc<dyn Repository>, hub: Arc<Hub>) -> anyhow
         .layer(TraceLayer::new_for_grpc())
         .into_inner();
 
+    let (key_path, cert_path) = super::key_and_cert_paths()?;
+    let identity = Identity::from_pem(fs::read(&cert_path)?, fs::read(&key_path)?);
+
     Server::builder()
         .layer(layer)
+        .tls_config(ServerTlsConfig::new().identity(identity))?
         .add_service(RiposteBackendServer::new(RiposteBackendImpl { repo, hub }))
-        .serve("0.0.0.0:80".parse()?)
+        .serve(format!("0.0.0.0:{}", GRPC_PORT).parse()?)
         .instrument(tracing::span!(Level::INFO, "gRPC Service"))
         .await?;
 

@@ -36,3 +36,9 @@ async fn main() -> anyhow::Result<()> {
 
     Ok(())
 }
+
+fn key_and_cert_paths() -> anyhow::Result<(String, String)> {
+    let key_path = std::env::var("RIPOSTE_PRIVKEY").context("RIPOSTE_PRIVKEY not set")?;
+    let cert_path = std::env::var("RIPOSTE_CERT").context("RIPOSTE_CERT not set")?;
+    Ok((key_path, cert_path))
+}

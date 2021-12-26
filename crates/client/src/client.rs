@@ -38,8 +38,6 @@ use crate::{
 pub enum ClientError {
     #[error("disconnected from the server. Either it crashed or the connection failed.")]
     Disconnected,
-    #[error(transparent)]
-    Decode(#[from] prost::DecodeError),
     #[error("packet is null")]
     MissingPacket,
     #[error("lobby error: {0}")]

@@ -6,11 +6,11 @@ edition = "2021"
 [dependencies]
 anyhow = "1"
 bytes = "1"
-prost = "0.8"
-quinn = "0.7"
+prost = "0.9"
+quinn = "0.8"
 tokio-util = { version = "0.6", features = [ "codec" ] }
-tonic = "0.5"
+tonic = { version = "0.6", features = [ "tls", "tls-roots" ] }
 uuid = "0.8"
 
 [build-dependencies]
-tonic-build = "0.5"
+tonic-build = "0.6"
