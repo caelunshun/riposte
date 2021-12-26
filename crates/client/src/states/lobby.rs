@@ -20,7 +20,7 @@ use duit::{
     widgets::{Button, PickList, Text},
 };
 use palette::Srgba;
-use riposte_backend_api::UserInfo;
+use riposte_backend_api::{CreateGameRequest, SessionId, UserInfo};
 use riposte_common::protocol::game::server::InitialGameData;
 use riposte_common::{
     assets::Handle,
@@ -70,26 +70,44 @@ pub struct GameLobbyState {
 }
 
 impl GameLobbyState {
-    pub fn new_singleplayer(cx: &Context, save: Option<Vec<u8>>) -> anyhow::Result<Self> {
-        let _rt_guard = cx.runtime().enter();
-        let (server_bridge, client_bridge) = bridge::local_bridge_pair();
+    pub fn new_hosted(
+        cx: &Context,
+        _save: Option<Vec<u8>>,
+        multiplayer: bool,
+    ) -> anyhow::Result<Self> {
+        cx.runtime().block_on(async move {
+            let (server_bridge, client_bridge) = bridge::local_bridge_pair();
 
-        let mut server = Server::new(ServerConfig {
-            registry: Arc::clone(cx.registry()),
-            tokio_runtime: cx.runtime().handle().clone(),
-        });
-        server.add_connection(server_bridge, cx.options().account().uuid(), true);
-        cx.runtime().spawn(async move {
-            server.run().await;
-        });
+            let multiplayer_session_id: Option<SessionId> = if multiplayer {
+                let res = cx
+                    .backend()
+                    .client()
+                    .clone()
+                    .create_game(CreateGameRequest {
+                        auth_token: cx.options().account().auth_token().into(),
+                    })
+                    .await?;
+                Some(res.get_ref().session_id.as_slice().try_into()?)
+            } else {
+                None
+            };
 
-        let mut client = Client::new(client_bridge);
+            let mut server = Server::new(ServerConfig {
+                registry: Arc::clone(cx.registry()),
+                tokio_runtime: cx.runtime().handle().clone(),
+                multiplayer_session_id,
+            })
+            .await?;
 
-        if let Some(save) = save {
-            client.set_save_file(save);
-        }
+            server.add_connection(server_bridge, cx.options().account().uuid(), true);
+            cx.runtime().spawn(async move {
+                server.run().await;
+            });
 
-        Ok(Self::new(cx, client))
+            let client = Client::new(client_bridge);
+
+            Ok(Self::new(cx, client))
+        })
     }
 
     pub fn new(cx: &Context, client: Client<client::LobbyState>) -> Self {

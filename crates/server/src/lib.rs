@@ -10,6 +10,7 @@ use game::Game;
 use game_server::GameServer;
 use lobby_server::LobbyServer;
 use mapgen::MapGenerator;
+use riposte_backend_api::{server::GameServerToHub, SessionId};
 use riposte_common::{
     bridge::{Bridge, ServerSide},
     lobby::GameLobby,
@@ -32,21 +33,30 @@ mod mapgen;
 pub struct ServerConfig {
     pub tokio_runtime: runtime::Handle,
     pub registry: Arc<Registry>,
+    pub multiplayer_session_id: Option<SessionId>,
 }
 
 pub struct Server {
     config: ServerConfig,
     connections: Connections,
     state: State,
+
+    hub: Option<GameServerToHub>, // only if multiplayer == true
 }
 
 impl Server {
-    pub fn new(config: ServerConfig) -> Self {
-        Self {
+    pub async fn new(config: ServerConfig) -> anyhow::Result<Self> {
+        let hub = match config.multiplayer_session_id {
+            Some(id) => Some(GameServerToHub::connect(id).await?),
+            None => None,
+        };
+
+        Ok(Self {
             state: State::Lobby(LobbyServer::new(Arc::clone(&config.registry))),
             config,
             connections: Connections::default(),
-        }
+            hub,
+        })
     }
 
     /// Runs the server, handling packets in a loop until shutdown is requested.

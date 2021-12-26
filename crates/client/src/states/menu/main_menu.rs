@@ -9,6 +9,7 @@ pub enum Action {
     PushOptions,
     LogOut,
     EnterSingleplayerLobby,
+    CreateMultiplayerLobby,
     EnterServerList,
     EnterSavesList,
 }
@@ -17,6 +18,7 @@ pub enum Action {
 enum Page {
     Main,
     Singleplayer,
+    Multiplayer,
 }
 
 #[derive(Debug, Copy, Clone)]
@@ -28,8 +30,12 @@ enum Message {
     BackClicked,
     LogOutClicked,
 
-    LoadGameClicked,
-    NewGameClicked,
+    SingleplayerLoadGameClicked,
+    SingleplayerNewGameClicked,
+
+    MultiplayerJoinGameClicked,
+    MultiplayerNewGameClicked,
+    MultiplayerLoadGameClicked,
 }
 
 pub struct MainMenuState {
@@ -77,9 +83,14 @@ impl MainMenuState {
                 Message::BackClicked => self.current_page = Page::Main,
                 Message::OptionsClicked => action = Some(Action::PushOptions),
                 Message::LogOutClicked => action = Some(Action::LogOut),
-                Message::NewGameClicked => action = Some(Action::EnterSingleplayerLobby),
-                Message::MultiplayerClicked => action = Some(Action::EnterServerList),
-                Message::LoadGameClicked => action = Some(Action::EnterSavesList),
+                Message::SingleplayerNewGameClicked => {
+                    action = Some(Action::EnterSingleplayerLobby)
+                }
+                Message::SingleplayerLoadGameClicked => action = Some(Action::EnterSavesList),
+                Message::MultiplayerClicked => self.current_page = Page::Multiplayer,
+                Message::MultiplayerJoinGameClicked => action = Some(Action::EnterServerList),
+                Message::MultiplayerNewGameClicked => action = Some(Action::CreateMultiplayerLobby),
+                Message::MultiplayerLoadGameClicked => {}
             }
         });
 
@@ -100,9 +111,14 @@ impl MainMenuState {
                     .add_entry(cx, "OPTIONS", Some(Message::OptionsClicked));
             }
             Page::Singleplayer => {
-                self.add_entry(cx, "NEW GAME", Some(Message::NewGameClicked))
-                    .add_entry(cx, "LOAD GAME", Some(Message::LoadGameClicked))
+                self.add_entry(cx, "NEW GAME", Some(Message::SingleplayerNewGameClicked))
+                    .add_entry(cx, "LOAD GAME", Some(Message::SingleplayerLoadGameClicked))
                     .add_entry(cx, "BACK", Some(Message::BackClicked));
+            }
+            Page::Multiplayer => {
+                self.add_entry(cx, "JOIN GAME", Some(Message::MultiplayerJoinGameClicked))
+                    .add_entry(cx, "CREATE GAME", Some(Message::MultiplayerNewGameClicked))
+                    .add_entry(cx, "LOAD GAME", Some(Message::MultiplayerLoadGameClicked));
             }
         }
     }

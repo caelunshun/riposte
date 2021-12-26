@@ -29,7 +29,6 @@ mod game;
 mod generated;
 mod options;
 mod paths;
-mod utils;
 mod popups;
 mod renderer;
 mod saveload;
@@ -37,6 +36,7 @@ mod state;
 mod states;
 mod tooltips;
 mod ui;
+mod utils;
 mod volumes;
 
 use states::{game::GameState, lobby::GameLobbyState, menu::MenuState};
@@ -45,6 +45,7 @@ extern crate fs_err as fs;
 
 pub enum Action {
     EnterSingleplayerLobby(Option<Vec<u8>>),
+    EnterMultiplayerLobby,
     EnterLobby(Bridge<ClientSide>),
 }
 
@@ -61,10 +62,19 @@ impl RootState {
                 if let Some(action) = menu.update(cx) {
                     match action {
                         Action::EnterSingleplayerLobby(save) => {
-                            match GameLobbyState::new_singleplayer(cx, save) {
+                            match GameLobbyState::new_hosted(cx, save, false) {
                                 Ok(l) => *self = RootState::Lobby(l),
                                 Err(e) => cx.show_error_popup(&format!(
                                     "failed to create singleplayer game: {}",
+                                    e
+                                )),
+                            }
+                        }
+                        Action::EnterMultiplayerLobby => {
+                            match GameLobbyState::new_hosted(cx, None, true) {
+                                Ok(l) => *self = RootState::Lobby(l),
+                                Err(e) => cx.show_error_popup(&format!(
+                                    "failed to create multiplayer game: {}",
                                     e
                                 )),
                             }

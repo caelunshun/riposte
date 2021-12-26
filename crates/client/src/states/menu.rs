@@ -99,6 +99,8 @@ impl MenuState {
                     main_menu::Action::EnterSavesList => {
                         self.state = State::SavesList(SavesListState::new(cx));
                     }
+                    main_menu::Action::CreateMultiplayerLobby => action = Some(crate::Action::EnterMultiplayerLobby),
+                    
                 },
                 None => {}
             },

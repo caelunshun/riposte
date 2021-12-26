@@ -1,3 +1,5 @@
+use std::net::ToSocketAddrs;
+
 use bytes::Bytes;
 use flume::{Receiver, Sender};
 use futures::{SinkExt, StreamExt};
@@ -29,7 +31,11 @@ impl GameClientToHub {
         } = endpoint
             .connect_with(
                 client_config,
-                game_server_addr().parse().unwrap(),
+                game_server_addr()
+                    .to_socket_addrs()
+                    .unwrap()
+                    .next()
+                    .unwrap(),
                 "riposte.tk",
             )?
             .await?;

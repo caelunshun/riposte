@@ -117,10 +117,6 @@ impl Client<LobbyState> {
         self.send_message(ClientLobbyPacket::StartGame(StartGame));
     }
 
-    pub fn set_save_file(&mut self, _file: Vec<u8>) {
-        todo!()
-    }
-
     pub fn to_game_state(&self) -> Client<GameState> {
         Client {
             bridge: self.bridge.clone(),

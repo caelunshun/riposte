@@ -1,4 +1,4 @@
-use std::{collections::HashMap, sync::Arc};
+use std::{collections::HashMap, net::ToSocketAddrs, sync::Arc};
 
 use anyhow::Context;
 use bytes::Bytes;
@@ -29,7 +29,11 @@ impl GameServerToHub {
         } = endpoint
             .connect_with(
                 client_config,
-                game_server_addr().parse().unwrap(),
+                game_server_addr()
+                    .to_socket_addrs()
+                    .unwrap()
+                    .next()
+                    .unwrap(),
                 "riposte.tk",
             )?
             .await?;
