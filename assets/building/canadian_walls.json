@@ -1,0 +1,21 @@
+{
+  "name": "Walls",
+  "cost": 60,
+  "techs": ["Masonry"],
+  "replaces": ["Walls"],
+  "onlyForCivs": ["canada"],
+  "effects": [
+    {
+      "type": "bonusCulture",
+      "amount": 1
+    },
+    {
+      "type": "happiness",
+      "amount": 2
+    },
+    {
+      "type": "bonusCommercePercent",
+      "amount": 10
+    }
+  ]
+}
