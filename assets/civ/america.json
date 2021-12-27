@@ -61,5 +61,5 @@
     "Dallas",
     "Memphis"
   ],
-  "introText": " \"   The sun rises on 4000 BCE. For eons the American people have lived a nomadic life. Now they are ready to settle their first city.\n        \n    {}, lead your people to build a civilization that stands the test of time.\" \n \n You start with The Wheel and Agriculture technologies. Your special unit is the Pioneer due to the Pioneers in early America. The Pioneer is a special version of the settler in the game. It costs 10 less hammers and has 1 more movement point than a normal settler. This means that America is good at a settle early and quickly strategy on a more crowded map. Good Luck!, game.the_player().username()));\n"
+  "introText": " \"   The sun rises on 4000 BCE. For eons the American people have lived a nomadic life. Now they are ready to settle their first city.\n        \n    {}, lead your people to build a civilization that stands the test of time.\" \n \n You start with The Wheel and Agriculture technologies. Your special unit is the Pioneer due to the Pioneers in early America. The Pioneer is a special version of the settler in the game. It costs 10 less hammers and has 1 more movement point than a normal settler. This means that America is good at a settle early and quickly strategy on a more crowded map. Good Luck! \n"
 }
