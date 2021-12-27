@@ -6,7 +6,7 @@ use crate::{
     Game, Player, Terrain, Tile, Yield,
 };
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 #[derive(Debug, thiserror::Error)]
 #[error("unknown cottage level '{0}'")]
@@ -108,7 +108,9 @@ impl Improvement {
         }
 
         if owner == Some(builder.id()) {
-            if !tile.is_hilled() && (tile.terrain() != Terrain::Desert || tile.is_flood_plains()) {
+            if (!tile.is_hilled() || tile.has_improveable_resource("Farm"))
+                && (tile.terrain() != Terrain::Desert || tile.is_flood_plains())
+            {
                 if tile.has_fresh_water() || tile.has_improveable_resource("Farm") {
                     possible.push(Improvement::Farm);
                 }
