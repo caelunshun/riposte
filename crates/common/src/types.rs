@@ -40,10 +40,35 @@ impl Turn {
 
     /// Gets the year corresponding to the current turn number.
     pub fn year(self) -> Year {
-        // Exponentional decay is the year function, starting at 4000 BCE at turn
-        // 0 and growing to 2035 CE at turn 500.
-        let year = -8000.0 * 10.0f64.powf(-(self.0 as f64) / 820.) + 4000.;
-        Year::new(year.round() as i32)
+        // Piecewise year function from (0, 4000 BCE) to (500, 2050 CE).
+        let increments = [
+            (480, 75),
+            (300, 60),
+            (240, 25),
+            (120, 50),
+            (60, 60),
+            (24, 50),
+            (12, 120),
+        ];
+
+        let mut months = 0;
+        let mut current_turn = 0;
+        for (incr, turns) in increments {
+            let mut i = 0;
+            while current_turn < self.0 && i < turns {
+                months += incr;
+                current_turn += 1;
+                i += 1;
+            }
+        }
+
+        // End behavior
+        while current_turn < self.0 {
+            months += 6;
+            current_turn += 1;
+        }
+
+        Year::new(months / 12 - 4000)
     }
 
     pub fn increment(&mut self) {
@@ -137,6 +162,6 @@ mod tests {
     #[test]
     fn turn_to_year() {
         assert_eq!(Turn::new(0).year().get(), -4000);
-        assert_eq!(Turn::new(500).year().get(), 2035);
+        assert_eq!(Turn::new(500).year().get(), 2050);
     }
 }
