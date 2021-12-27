@@ -82,10 +82,6 @@ where
 
 impl Client<LobbyState> {
     fn poll_for_message(&self) -> Result<Option<ServerLobbyPacket>> {
-        if self.bridge.is_disconnected() {
-            return Err(ClientError::Disconnected);
-        }
-
         match self.bridge.try_recv() {
             Some(GenericServerPacket::Lobby(packet)) => Ok(Some(packet)),
             _ => Ok(None),

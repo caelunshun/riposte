@@ -2,6 +2,7 @@ use std::{
     cell::{Ref, RefCell},
     ptr,
     sync::Arc,
+    thread,
 };
 
 use crate::{
@@ -99,9 +100,11 @@ impl GameLobbyState {
             })
             .await?;
 
+            let rt = cx.runtime().handle().clone();
             server.add_connection(server_bridge, cx.options().account().uuid(), true);
-            cx.runtime().spawn(async move {
-                server.run().await;
+            thread::spawn(move || {
+                let _guard = rt.enter();
+                server.run();
             });
 
             let client = Client::new(client_bridge);

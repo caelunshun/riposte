@@ -1,13 +1,17 @@
+use anyhow::{bail, Context as _};
 use duit::{
     widget,
     widgets::{Button, Text},
     WidgetHandle,
 };
-use riposte_backend_api::{GameList, Uuid};
+use riposte_backend_api::{
+    client::GameClientToHub, join_game_response, GameList, JoinGameRequest, Uuid,
+};
+use riposte_common::bridge::{Bridge, ClientSide};
 
 use crate::{
     backend::BackendResponse,
-    context::{Context},
+    context::Context,
     generated::ServerListWindow,
     state::StateAttachment,
     ui::{FillScreen, Z_FOREGROUND},
@@ -15,7 +19,7 @@ use crate::{
 
 pub enum Action {
     Close,
-    JoinGame,
+    JoinGame(Bridge<ClientSide>),
 }
 
 struct Close;
@@ -86,19 +90,33 @@ impl ServerListState {
             return Some(Action::Close);
         }
 
-       /* if let Some(JoinGame(game_id)) = cx.ui_mut().pop_message::<JoinGame>() {
-            self.pending_join_game = Some(ServerBridge::new_multiplayer(cx, game_id));
-        }
-
-        if let Some(pending) = &mut self.pending_join_game {
-            if let Some(bridge) = pending.take() {
-                match bridge {
-                    Ok(bridge) => return Some(Action::JoinGame(bridge)),
-                    Err(e) => cx.show_error_popup(&format!("Failed to join game: {}", e)),
+        if let Some(JoinGame(game_id)) = cx.ui_mut().pop_message::<JoinGame>() {
+            let res: anyhow::Result<Bridge<ClientSide>> = cx.runtime().block_on(async {
+                let res = cx
+                    .backend()
+                    .client()
+                    .clone()
+                    .join_game(JoinGameRequest {
+                        game_id: Some(game_id.into()),
+                        auth_token: cx.options().account().auth_token().into(),
+                    })
+                    .await?;
+                match res.into_inner().result.context("missing JoinGame result")? {
+                    join_game_response::Result::ErrorMessage(e) => bail!("{}", e),
+                    join_game_response::Result::SessionId(session_id) => {
+                        let session_id =
+                            session_id.try_into().ok().context("malformed session ID")?;
+                        let conn = GameClientToHub::connect(session_id).await?;
+                        Ok(Bridge::client(conn))
+                    }
                 }
-                self.pending_join_game = None;
+            });
+
+            match res {
+                Ok(bridge) => return Some(Action::JoinGame(bridge)),
+                Err(e) => log::error!("Failed to join game: {:?}", e),
             }
-        }*/
+        }
 
         None
     }

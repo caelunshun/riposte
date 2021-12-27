@@ -49,6 +49,7 @@ impl GameServerToHub {
             messages,
             messages_tx,
             uuid_to_connection_id: Mutex::new(HashMap::new()),
+            uuid_to_received_data: Mutex::new(HashMap::new()),
         });
 
         let inner2 = Arc::clone(&inner);
@@ -61,8 +62,8 @@ impl GameServerToHub {
         Ok(Self(inner))
     }
 
-    pub async fn poll(&self) -> Option<Message> {
-        self.0.messages.recv_async().await.ok()
+    pub  fn poll(&self) -> Option<Message> {
+        self.0.messages.try_recv().ok()
     }
 
     pub async fn open_stream_to_client(&self, player_uuid: Uuid) -> anyhow::Result<StreamToClient> {
@@ -73,12 +74,14 @@ impl GameServerToHub {
 /// A network event.
 pub enum Message {
     /// A new client connected through the hub.
-    NewClient { player_uuid: Uuid },
-    /// A client sent a piece of data.
-    DataReceived { player_uuid: Uuid, data: Bytes },
+    NewClient {
+        player_uuid: Uuid,
+        streams: StreamsFromClient,
+    },
 }
 
 /// A stream to send data to a client.
+#[derive(Clone)]
 pub struct StreamToClient {
     sender: flume::Sender<Bytes>,
 }
@@ -122,6 +125,21 @@ impl StreamToClient {
     }
 }
 
+/// Receiving data from a client.
+#[derive(Clone)]
+pub struct StreamsFromClient {
+    receiver: Receiver<Bytes>,
+}
+
+impl StreamsFromClient {
+    pub async fn poll(&self) -> anyhow::Result<Bytes> {
+        self.receiver
+            .recv_async()
+            .await
+            .map_err(anyhow::Error::from)
+    }
+}
+
 async fn handle_outgoing_stream(
     mut writer: FramedWrite<quinn::SendStream, LengthDelimitedCodec>,
     receiver: Receiver<Bytes>,
@@ -139,6 +157,7 @@ struct Inner {
     messages: Receiver<Message>,
     messages_tx: Sender<Message>,
     uuid_to_connection_id: Mutex<HashMap<Uuid, Uuid>>,
+    uuid_to_received_data: Mutex<HashMap<Uuid, Sender<Bytes>>>,
 }
 
 async fn handle_incoming(
@@ -169,10 +188,21 @@ async fn handle_incoming(
                     .lock()
                     .await
                     .insert(player_uuid, connection_id);
+
+                let (sender, receiver) = flume::unbounded();
                 inner
                     .messages_tx
-                    .send_async(Message::NewClient { player_uuid })
-                    .await?
+                    .send_async(Message::NewClient {
+                        player_uuid,
+                        streams: StreamsFromClient { receiver },
+                    })
+                    .await?;
+
+                inner
+                    .uuid_to_received_data
+                    .lock()
+                    .await
+                    .insert(player_uuid, sender);
             }
             OpenStreamType::ProxiedStream(proxied_stream) => {
                 let player_uuid = connection_id_to_uuid
@@ -187,7 +217,12 @@ async fn handle_incoming(
 
                 let inner2 = Arc::clone(&inner);
                 task::spawn(async move {
-                    if let Err(e) = handle_incoming_stream(&inner2, reader, player_uuid).await {
+                    if let Err(e) = handle_incoming_stream(
+                        reader,
+                        inner2.uuid_to_received_data.lock().await[&player_uuid].clone(),
+                    )
+                    .await
+                    {
                         log::error!("Failed to handle incoming stream: {:?}", e);
                     }
                 });
@@ -201,19 +236,13 @@ async fn handle_incoming(
 }
 
 async fn handle_incoming_stream(
-    inner: &Arc<Inner>,
     mut reader: FramedRead<quinn::RecvStream, LengthDelimitedCodec>,
-    player_uuid: Uuid,
+
+    sender: Sender<Bytes>,
 ) -> anyhow::Result<()> {
     while let Some(data) = reader.next().await {
         let data = data?;
-        inner
-            .messages_tx
-            .send_async(Message::DataReceived {
-                player_uuid,
-                data: data.freeze(),
-            })
-            .await?;
+        sender.send_async(data.freeze()).await?;
     }
     Ok(())
 }

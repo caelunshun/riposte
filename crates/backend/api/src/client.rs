@@ -9,6 +9,7 @@ use tokio_util::codec::{FramedRead, FramedWrite, LengthDelimitedCodec};
 use crate::{codec, game_server_addr, SessionId};
 
 /// A connection from a Riposte client to a game server, proxied through the hub.
+#[derive(Clone)]
 pub struct GameClientToHub {
     #[allow(unused)]
     endpoint: quinn::Endpoint,

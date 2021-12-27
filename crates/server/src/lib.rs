@@ -2,7 +2,7 @@
 
 #![allow(dead_code)]
 
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 
 use anyhow::bail;
 use connection::{Connection, ConnectionId, Connections};
@@ -10,7 +10,10 @@ use game::Game;
 use game_server::GameServer;
 use lobby_server::LobbyServer;
 use mapgen::MapGenerator;
-use riposte_backend_api::{server::GameServerToHub, SessionId};
+use riposte_backend_api::{
+    server::{GameServerToHub, Message},
+    SessionId,
+};
 use riposte_common::{
     bridge::{Bridge, ServerSide},
     lobby::GameLobby,
@@ -18,7 +21,7 @@ use riposte_common::{
     protocol::GenericClientPacket,
     registry::Registry,
 };
-use tokio::runtime;
+use tokio::{runtime, time::timeout};
 use uuid::Uuid;
 
 extern crate fs_err as fs;
@@ -60,12 +63,26 @@ impl Server {
     }
 
     /// Runs the server, handling packets in a loop until shutdown is requested.
-    pub async fn run(&mut self) {
+    pub fn run(&mut self) {
         log::info!("Server running");
         self.update();
 
         loop {
-            let (packet, sender) = self.connections.recv_packet().await;
+            self.update();
+            if let State::Lobby(_) = &self.state {
+                self.config
+                    .tokio_runtime
+                    .clone()
+                    .block_on(self.handle_new_connections());
+            }
+
+            let (packet, sender) = match self.config.tokio_runtime.block_on(timeout(
+                Duration::from_millis(1000),
+                self.connections.recv_packet(),
+            )) {
+                Ok(r) => r,
+                Err(_) => continue,
+            };
 
             log::trace!("Server got packet: {:?}", packet);
 
@@ -80,8 +97,6 @@ impl Server {
                     self.remove_connection(sender);
                 }
             }
-
-            self.update();
         }
     }
 
@@ -115,6 +130,31 @@ impl Server {
                 } else {
                     bail!("expected a game packet")
                 }
+            }
+        }
+    }
+
+    async fn handle_new_connections(&mut self) {
+        if self.hub.is_none() {
+            return;
+        }
+        while let Some(Message::NewClient {
+            player_uuid,
+            streams: receiver,
+        }) = self.hub.as_ref().unwrap().poll()
+        {
+            let sender = self
+                .hub
+                .as_ref()
+                .unwrap()
+                .open_stream_to_client(player_uuid)
+                .await;
+            match sender {
+                Ok(sender) => {
+                    let bridge = Bridge::server(sender, receiver);
+                    self.add_connection(bridge, player_uuid, false);
+                }
+                Err(e) => log::error!("Failed to open stream to client: {:?}", e),
             }
         }
     }

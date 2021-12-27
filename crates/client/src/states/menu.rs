@@ -99,8 +99,9 @@ impl MenuState {
                     main_menu::Action::EnterSavesList => {
                         self.state = State::SavesList(SavesListState::new(cx));
                     }
-                    main_menu::Action::CreateMultiplayerLobby => action = Some(crate::Action::EnterMultiplayerLobby),
-                    
+                    main_menu::Action::CreateMultiplayerLobby => {
+                        action = Some(crate::Action::EnterMultiplayerLobby)
+                    }
                 },
                 None => {}
             },
@@ -122,9 +123,8 @@ impl MenuState {
                 Some(server_list::Action::Close) => {
                     self.state = State::MainMenu(MainMenuState::new(cx));
                 }
-                Some(server_list::Action::JoinGame) => {
-                    todo!()
-                    // action = Some(crate::Action::EnterLobby(bridge));
+                Some(server_list::Action::JoinGame(bridge)) => {
+                    action = Some(crate::Action::EnterLobby(bridge));
                 }
                 _ => {}
             },

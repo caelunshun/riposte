@@ -17,6 +17,7 @@ log = "0.4"
 once_cell = "1"
 rand = "0.8"
 rand_pcg = "0.3"
+riposte-backend-api = { path = "../backend/api" }
 serde = { version = "1", features = [ "derive" ] }
 serde_json = "1"
 slotmap = { version = "1", features = [ "serde" ] }
