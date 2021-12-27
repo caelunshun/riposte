@@ -1,5 +1,6 @@
 use slotmap::SlotMap;
 use uuid::Uuid;
+use serde::{Serialize, Deserialize};
 
 use crate::{
     assets::Handle,
@@ -12,7 +13,7 @@ slotmap::new_key_type! {
 }
 
 /// The game lobby.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct GameLobby {
     slots: SlotMap<SlotId, LobbySlot>,
 }
@@ -53,7 +54,7 @@ impl GameLobby {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct LobbySlot {
     pub player: SlotPlayer,
 }
@@ -73,7 +74,7 @@ impl LobbySlot {
 }
 
 /// A slot in the game lobby.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SlotPlayer {
     /// Slot is empty and open for human players.
     Empty,

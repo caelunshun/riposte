@@ -106,7 +106,7 @@ impl Add<Yield> for Yield {
 }
 
 /// Determines how a tile is visibile to a player.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Visibility {
     /// The tile cannot be seen at all.
     Hidden,

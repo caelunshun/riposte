@@ -16,20 +16,22 @@ use self::{
     lobby::{ClientLobbyPacket, ServerLobbyPacket},
 };
 
+use serde::{Serialize, Deserialize};
+
 pub mod game;
 pub mod lobby;
 
 pub use game::*;
 
 /// Any packet sent by the server.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum GenericServerPacket {
     Lobby(ServerLobbyPacket),
     Game(ServerGamePacket),
 }
 
 /// Any packet sent by the client.
-#[derive(Debug)]
+#[derive(Debug, Serialize, Deserialize)]
 pub enum GenericClientPacket {
     Lobby(ClientLobbyPacket),
     Game(ClientGamePacket),

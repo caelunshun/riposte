@@ -1,9 +1,11 @@
 use std::{cmp, fmt::Display};
 
+use serde::{Serialize, Deserialize};
+
 use super::PlayerId;
 
 /// Tracks the amount of culture for each player on a given tile or city.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Culture {
     values: Vec<CultureValue>,
 }
@@ -50,7 +52,7 @@ impl Culture {
 }
 
 /// A pair of (player, amount of culture)
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct CultureValue {
     owner: PlayerId,
     amount: u32,

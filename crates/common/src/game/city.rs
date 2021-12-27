@@ -3,6 +3,7 @@ use std::{iter::once, num::NonZeroU32};
 use ahash::{AHashMap, AHashSet};
 use glam::UVec2;
 use indexmap::IndexSet;
+use serde::{Serialize, Deserialize};
 
 use crate::{
     assets::Handle,
@@ -24,7 +25,7 @@ pub const BFC_RADIUS_SQUARED: u32 = 5;
 ///
 /// All fields are private and encapsulated. Modifying city
 /// data has to happen through high-level methods like [`set_build_task`].
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct City {
     on_server: bool,
 
@@ -898,7 +899,7 @@ impl City {
 }
 
 /// The most recent build task completed in a city.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PreviousBuildTask {
     /// Whether the task completed succesfully, which is not the case if
     /// e.g. we lost the resource needed to build a unit.
@@ -909,7 +910,7 @@ pub struct PreviousBuildTask {
 /// Something a city is building.
 ///
 /// Build task progress is stored in [`CityData::build_task_progress`].
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum BuildTask {
     /// The city is training a unit
     Unit(Handle<UnitKind>),
@@ -933,7 +934,7 @@ impl BuildTask {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct CityEconomy {
     // gold + beakers = commerce
     pub gold: f64,
@@ -951,7 +952,7 @@ pub struct CityEconomy {
 }
 
 /// A source of happiness in a city.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum HappinessSource {
     DifficultyBonus,
     Buildings,
@@ -959,14 +960,14 @@ pub enum HappinessSource {
 }
 
 /// A source of anger in a city.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum AngerSource {
     Population,
     Undefended,
 }
 
 /// A source of health in a city.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum HealthSource {
     DifficultyBonus,
     FreshWater,
@@ -976,7 +977,7 @@ pub enum HealthSource {
 }
 
 /// A source of sickness in a city.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum SicknessSource {
     Population,
     Buildings,

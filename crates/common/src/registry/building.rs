@@ -14,7 +14,7 @@ pub struct Building {
     pub replaces: Option<String>,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct BuildingEffect {
     #[serde(rename = "type")]
@@ -23,7 +23,7 @@ pub struct BuildingEffect {
     pub amount: u32,
 }
 
-#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, serde::Deserialize)]
+#[derive(Copy, Clone, PartialEq, Eq, Hash, Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum BuildingEffectType {
     BonusHammers,

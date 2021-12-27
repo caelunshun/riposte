@@ -1,5 +1,6 @@
 use ahash::AHashMap;
 use glam::{uvec2, UVec2};
+use serde::{Deserialize, Serialize};
 use slotmap::SlotMap;
 
 use crate::{types::Side, Grid, Tile};
@@ -8,7 +9,7 @@ use crate::{types::Side, Grid, Tile};
 ///
 /// Rivers are represented as a list of tile positions. The river runs
 /// along the left and top sides of each tile in the list.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Rivers {
     rivers: SlotMap<RiverId, River>,
     by_pos: AHashMap<RiverSegment, RiverId>,
@@ -81,13 +82,13 @@ slotmap::new_key_type! {
 ///
 /// The segment runs along either the left or top side
 /// of the tile at `pos` depending on `axis`.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct RiverSegment {
     pub pos: UVec2,
     pub axis: Axis,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Axis {
     Horizontal,
     Vertical,
@@ -109,7 +110,7 @@ impl Axis {
     }
 }
 
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct River {
     positions: Vec<UVec2>,
 }

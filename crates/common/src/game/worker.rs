@@ -12,11 +12,12 @@
 
 use ahash::AHashMap;
 use glam::UVec2;
+use serde::{Serialize, Deserialize};
 
 use crate::{event::Event, Game, Grid, Improvement, Player, Tile};
 
 /// Stores worker turn progress for each pair of (tile, worker task).
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerProgressGrid {
     progress: Grid<AHashMap<WorkerTask, u32>>,
 }
@@ -65,7 +66,7 @@ impl WorkerProgressGrid {
 }
 
 /// A task performed by a Worker.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum WorkerTask {
     BuildImprovement(Improvement),
 }

@@ -1,6 +1,7 @@
 use ahash::{AHashMap, AHashSet};
 use glam::{ivec2, uvec2, UVec2};
 use uuid::Uuid;
+use serde::{Serialize, Deserialize};
 
 use super::{CityId, PlayerId, UnitId};
 use crate::event::Event;
@@ -18,7 +19,7 @@ use crate::{
 ///
 /// All fields are private and encapsulated. Modifying player
 /// data has to happen through high-level methods like [`declare_war_on`].
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Player {
     on_server: bool,
 
@@ -461,7 +462,7 @@ impl Player {
 }
 
 /// Cached economy data for a player.
-#[derive(Debug, Clone, Default)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct PlayerEconomy {
     /// Total gold revenue before conversion to gold / beakers based on slider percents.
     pub base_revenue: u32,
@@ -476,7 +477,7 @@ pub struct PlayerEconomy {
     pub beaker_overflow: u32,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum PlayerKind {
     Human { account_uuid: Uuid },
     Ai,
@@ -487,7 +488,7 @@ pub enum PlayerKind {
 /// and espionage.
 ///
 /// All terms must sum to 100.
-#[derive(Copy, Clone, Debug, PartialEq, Eq)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub struct EconomySettings {
     beaker_percent: u32,
     gold_percent: u32,

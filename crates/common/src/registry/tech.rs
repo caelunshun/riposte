@@ -10,7 +10,7 @@ pub struct Tech {
     pub quote: Option<Quote>,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Quote {
     pub text: String,

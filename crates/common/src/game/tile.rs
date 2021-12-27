@@ -4,6 +4,7 @@ use std::mem;
 use ahash::AHashSet;
 use arrayvec::ArrayVec;
 use glam::{ivec2, uvec2, DVec2, IVec2, UVec2};
+use serde::{Deserialize, Serialize};
 
 use crate::assets::Handle;
 use crate::player::Player;
@@ -21,7 +22,7 @@ use super::{CityId, PlayerId};
 ///
 /// All fields are private and encapsulated. Modifying tile
 /// data has to happen through high-level methods.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Tile {
     terrain: Terrain,
     is_forested: bool,
@@ -280,7 +281,11 @@ impl Tile {
     }
 
     pub fn add_improvement(&mut self, improvement: Improvement) {
-        if !self.improvements.iter().any(|i| mem::discriminant(i) == mem::discriminant(&improvement)) {
+        if !self
+            .improvements
+            .iter()
+            .any(|i| mem::discriminant(i) == mem::discriminant(&improvement))
+        {
             if improvement != Improvement::Road {
                 self.is_forested = false;
             }
@@ -303,7 +308,7 @@ impl Tile {
 }
 
 /// A terrain type.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Terrain {
     Ocean,
     Desert,
@@ -327,7 +332,7 @@ pub struct OutOfBounds {
 }
 
 /// A 2D array that can be used to store tiles.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Grid<T> {
     tiles: Box<[T]>,
     width: u32,

@@ -59,8 +59,6 @@ pub struct Context {
     /// Popup window manager
     popup_windows: PopupWindows,
 
-    /// Loaded assets
-    assets: Assets,
     /// The game window
     window: Window,
     /// Audio player
@@ -149,6 +147,10 @@ impl Context {
 
         let saves = RefCell::new(SaveFiles::new(&paths));
 
+        assets.load_from_dir("assets")?;
+
+        riposte_common::assets::set_global_assets(assets);
+
         Ok((
             Self {
                 canvas,
@@ -158,7 +160,6 @@ impl Context {
                 sample_texture,
                 ui,
                 popup_windows,
-                assets,
                 window,
                 audio,
                 registry,
@@ -180,10 +181,9 @@ impl Context {
     }
 
     pub fn load_assets(&mut self) -> anyhow::Result<()> {
-        self.assets.load_from_dir("assets")?;
         Arc::get_mut(&mut self.registry)
             .unwrap()
-            .load_from_assets(&self.assets);
+            .load_from_assets(riposte_common::assets::global_assets());
 
         let texture_set = self
             .texture_set_builder
@@ -246,7 +246,7 @@ impl Context {
     }
 
     pub fn assets(&self) -> &Assets {
-        &self.assets
+        riposte_common::assets::global_assets()
     }
 
     pub fn audio(&self) -> Ref<Audio> {

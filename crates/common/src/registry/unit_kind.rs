@@ -1,4 +1,4 @@
-#[derive(Debug, serde::Deserialize, PartialEq, Eq, Hash)]
+#[derive(Debug, serde::Deserialize, serde::Serialize, PartialEq, Eq, Hash)]
 #[serde(rename_all = "snake_case")]
 pub enum CapabilityType {
     FoundCity,
@@ -7,7 +7,7 @@ pub enum CapabilityType {
     BombardCityDefenses,
 }
 
-#[derive(Debug, serde::Deserialize, PartialEq, Eq, Copy, Clone)]
+#[derive(Debug, serde::Deserialize, PartialEq, Eq, Copy, Clone, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum UnitCategory {
     Auxilary,
@@ -50,7 +50,7 @@ pub struct UnitKind {
     pub replaces: Option<String>,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct CombatBonus {
     #[serde(default)]
@@ -66,7 +66,7 @@ pub struct CombatBonus {
     pub unit_category: Option<UnitCategory>,
 }
 
-#[derive(Debug, serde::Deserialize)]
+#[derive(Debug, serde::Deserialize, serde::Serialize)]
 #[serde(rename_all = "camelCase")]
 pub enum CombatBonusType {
     WhenInCity,

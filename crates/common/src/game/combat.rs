@@ -1,11 +1,13 @@
 use crate::UnitId;
 
+use serde::{Serialize, Deserialize};
+
 /// A combat event that occurred between two units.
 ///
 /// Combat is simulated in _rounds_, where in each round
 /// one of the units takes damage. We store combat rounds
 /// so the client can use them to animate health bars.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CombatEvent {
     attacker_id: UnitId,
     defender_id: UnitId,
@@ -49,7 +51,7 @@ impl CombatEvent {
 }
 
 /// A round of combat.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CombatRound {
     attacker_health: f64,
     defender_health: f64,

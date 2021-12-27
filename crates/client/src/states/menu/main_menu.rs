@@ -118,7 +118,8 @@ impl MainMenuState {
             Page::Multiplayer => {
                 self.add_entry(cx, "JOIN GAME", Some(Message::MultiplayerJoinGameClicked))
                     .add_entry(cx, "CREATE GAME", Some(Message::MultiplayerNewGameClicked))
-                    .add_entry(cx, "LOAD GAME", Some(Message::MultiplayerLoadGameClicked));
+                    .add_entry(cx, "LOAD GAME", Some(Message::MultiplayerLoadGameClicked))
+                    .add_entry(cx, "BACK", Some(Message::BackClicked));
             }
         }
     }

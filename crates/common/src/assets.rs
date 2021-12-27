@@ -11,6 +11,8 @@ use std::{
 
 use ahash::AHashMap;
 use anyhow::Context;
+use once_cell::sync::OnceCell;
+use serde::{Deserialize, Serialize};
 
 /// A loader for an asset.
 ///
@@ -38,9 +40,29 @@ pub trait Loader: 'static {
 #[error("missing asset with ID '{0}'")]
 pub struct MissingAsset(String);
 
+static GLOBAL_ASSETS: OnceCell<Assets> = OnceCell::new();
+
+pub fn set_global_assets(assets: Assets) {
+    GLOBAL_ASSETS
+        .set(assets)
+        .ok()
+        .expect("global assets cannot be set twice")
+}
+
+pub fn global_assets() -> &'static Assets {
+    GLOBAL_ASSETS.get().expect("global assets not set")
+}
+
 /// Handle to an asset.
+///
+/// # Serialization
+/// When a `Handle` is serialized, we write the ID of the asset as a string.
+/// Any process with an asset having the same ID will be able to deserialize the handle.
+///
+/// Set `GLOBAL_ASSETS` to configure the asset store deserialized handles will be loaded from.
 pub struct Handle<T> {
     arc: Arc<T>,
+    id: Arc<str>,
 }
 
 impl<T> Deref for Handle<T> {
@@ -67,6 +89,7 @@ impl<T> Clone for Handle<T> {
     fn clone(&self) -> Self {
         Self {
             arc: Arc::clone(&self.arc),
+            id: Arc::clone(&self.id),
         }
     }
 }
@@ -94,6 +117,31 @@ where
     }
 }
 
+impl<T> Serialize for Handle<T> {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        (&*self.id).serialize(serializer)
+    }
+}
+
+impl<'de, T> Deserialize<'de> for Handle<T>
+where
+    T: Send + Sync + 'static,
+{
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        let id = String::deserialize(deserializer)?;
+        let asset = global_assets()
+            .get(&id)
+            .map_err(|_| serde::de::Error::custom(&format!("missing asset with ID '{}'", id)))?;
+        Ok(asset)
+    }
+}
+
 #[derive(Debug, serde::Deserialize)]
 struct IndexEntry {
     id: String,
@@ -108,8 +156,12 @@ struct IndexEntry {
 #[derive(Default)]
 pub struct Assets {
     loaders: AHashMap<String, Box<dyn Loader>>,
-    assets: AHashMap<String, Arc<dyn Any + Send + Sync>>,
+    assets: AHashMap<Arc<str>, Arc<dyn Any + Send + Sync>>,
+    ids: AHashMap<Arc<str>, Arc<str>>,
 }
+
+unsafe impl Send for Assets {}
+unsafe impl Sync for Assets {}
 
 impl Assets {
     pub fn new() -> Self {
@@ -139,7 +191,9 @@ impl Assets {
                 .with_context(|| format!("failed to load asset '{}'", entry.id))?;
 
             if let Some(asset) = asset {
-                self.assets.insert(entry.id.clone(), asset);
+                let id = Arc::from(entry.id.clone());
+                self.assets.insert(Arc::clone(&id), asset);
+                self.ids.insert(Arc::clone(&id), Arc::clone(&id));
             }
 
             log::info!("Loaded asset '{}' with loader '{}'", entry.id, entry.loader);
@@ -156,27 +210,30 @@ impl Assets {
     ///
     /// Panics if `T` is not the type of the asset.
     pub fn get<T: Send + Sync + 'static>(&self, id: &str) -> Result<Handle<T>, MissingAsset> {
-        let dyn_asset = self
+        let asset = self
             .assets
             .get(id)
             .ok_or_else(|| MissingAsset(id.to_owned()))?;
-        let asset = Arc::downcast(Arc::clone(dyn_asset))
-            .ok()
-            .unwrap_or_else(|| {
-                panic!(
-                    "asset has invalid type: expected {}",
-                    std::any::type_name::<T>(),
-                )
-            });
-        Ok(Handle { arc: asset })
+        let asset = Arc::downcast(Arc::clone(asset)).ok().unwrap_or_else(|| {
+            panic!(
+                "asset has invalid type: expected {}",
+                std::any::type_name::<T>(),
+            )
+        });
+        let id = Arc::clone(&self.ids[id]);
+        Ok(Handle { arc: asset, id })
     }
 
     /// Iterates over all assets with the given type.
     pub fn iter_by_type<T: Send + Sync + 'static>(&self) -> impl Iterator<Item = Handle<T>> + '_ {
         self.assets
-            .values()
-            .filter_map(|value| Arc::downcast(Arc::clone(value)).ok())
-            .map(|arc| Handle { arc })
+            .iter()
+            .filter_map(|(id, value)| {
+                Arc::downcast(Arc::clone(value))
+                    .ok()
+                    .map(|v| (Arc::clone(id), v))
+            })
+            .map(|(id, arc)| Handle { arc, id })
     }
 
     /// Iterates over all assets with the given type.
@@ -185,11 +242,15 @@ impl Assets {
     ) -> impl Iterator<Item = (&str, Handle<T>)> + '_ {
         self.assets
             .iter()
-            .filter_map(|(id, value)| {
-                Arc::downcast(Arc::clone(value))
-                    .ok()
-                    .map(|v| (id.as_str(), v))
+            .filter_map(|(id, value)| Arc::downcast(Arc::clone(value)).ok().map(|v| (id, v)))
+            .map(|(id, arc)| {
+                (
+                    &**id,
+                    Handle {
+                        arc,
+                        id: Arc::clone(id),
+                    },
+                )
             })
-            .map(|(id, arc)| (id, Handle { arc }))
     }
 }

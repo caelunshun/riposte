@@ -1308,6 +1308,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "e01732b97afd8508eee3333a541b9f7610f454bb818669e66e90f5f57c93a776"
 dependencies = [
  "bytemuck",
+ "serde",
 ]
 
 [[package]]
@@ -3337,6 +3338,7 @@ dependencies = [
  "indexmap",
  "lexical",
  "log",
+ "once_cell",
  "rand 0.8.4",
  "rand_pcg",
  "serde",
@@ -3709,6 +3711,7 @@ name = "slotmap"
 version = "1.0.6"
 source = "git+https://github.com/orlp/slotmap#ce6e1e02bb2c2074d8d581e87ad9c2f72ce495c3"
 dependencies = [
+ "serde",
  "version_check",
 ]
 

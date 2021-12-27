@@ -6,6 +6,8 @@ use crate::{
     Game, Player, Terrain, Tile, Yield,
 };
 
+use serde::{Serialize, Deserialize};
+
 #[derive(Debug, thiserror::Error)]
 #[error("unknown cottage level '{0}'")]
 pub struct InvalidCottageLevel(String);
@@ -15,7 +17,7 @@ pub struct InvalidCottageLevel(String);
 pub struct InvalidImprovementType(String);
 
 /// A tile improvement.
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub enum Improvement {
     Farm,
     Mine,
@@ -177,7 +179,7 @@ impl FromStr for Improvement {
     }
 }
 
-#[derive(Debug, Clone, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct Cottage {
     worked_turns: u32,
 }
@@ -225,7 +227,7 @@ impl Default for Cottage {
     }
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Serialize, Deserialize)]
 pub enum CottageLevel {
     Cottage,
     Hamlet,

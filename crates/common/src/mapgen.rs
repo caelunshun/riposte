@@ -1,10 +1,11 @@
 use std::fmt::Display;
 
 use glam::{uvec2, UVec2};
+use serde::{Serialize, Deserialize};
 use strum::EnumIter;
 
 /// Settings provided to the map generator.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct MapgenSettings {
     /// How the map generator will compute land and ocean tiles.
     pub land: LandGeneratorSettings,
@@ -24,7 +25,7 @@ impl Default for MapgenSettings {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum LandGeneratorSettings {
     /// A map consisting of land dotted with optional lakes.
     Flat(FlatSettings),
@@ -47,19 +48,19 @@ impl Display for LandGeneratorSettings {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct FlatSettings {
     /// Whether to generate small lakes.
     pub lakes: bool,
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ContinentsSettings {
     /// Number of continents to generate.
     pub num_continents: NumContinents,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, EnumIter)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, EnumIter, Serialize, Deserialize)]
 pub enum NumContinents {
     One = 1,
     Two = 2,
@@ -70,7 +71,7 @@ pub enum NumContinents {
     Seven = 7,
 }
 
-#[derive(Copy, Clone, Debug, PartialEq, Eq, EnumIter)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, EnumIter, Serialize, Deserialize)]
 pub enum MapSize {
     Tiny,
     Small,

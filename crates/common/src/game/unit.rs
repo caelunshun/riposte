@@ -7,6 +7,7 @@ use std::{
 
 use glam::UVec2;
 use lexical::WriteFloatOptions;
+use serde::{Serialize, Deserialize};
 
 use crate::{
     assets::Handle,
@@ -24,7 +25,7 @@ pub use crate::worker::WorkerTask;
 ///
 /// All fields are private and encapsulated. Modifying unit
 /// data has to happen through high-level methods like [`move_to`].
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Unit {
     on_server: bool,
 
@@ -504,7 +505,7 @@ fn float_options() -> WriteFloatOptions {
 ///
 /// Internally, uses a fixed-point integer representation
 /// in 1/30s of a movement point.
-#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash)]
+#[derive(Copy, Clone, Debug, PartialEq, Eq, Hash, Serialize, Deserialize)]
 pub struct MovementPoints(u32);
 
 pub const ONE_MOVEMENT_POINT: u32 = 30;
@@ -575,14 +576,14 @@ impl Display for MovementPoints {
 
 /// A special capability for a unit - founding cities,
 /// carrying units across oceans, et al.
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Capability {
     FoundCity,
     BombardCity { max_per_turn: u32 },
     Worker(WorkerCapability),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct WorkerCapability {
     pub current_task: Option<WorkerTask>,
 }
