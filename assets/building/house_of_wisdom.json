@@ -1,5 +1,5 @@
 {
-  "name": "Great Library of Baghdad",
+  "name": "House of Wisdom",
   "cost": 110,
   "techs": ["Writing"],
   "onlyForCivs": ["arabia"],

@@ -38,5 +38,7 @@
     "Balkh",
     "Mosul",
     "Aydab"
-  ]
+  ],
+  "introText": " \"   The sun rises on 4000 BCE. For eons the Arabian people have lived a nomadic life. Now they are ready to settle their first city.\n        \n    {}, lead your people to build a civilization that stands the test of time.\" \n \n You are the only civilization to start with 3 technologies: Mysticism, The Wheel, and Hunting. While these are arguably the worst of the starting techs, this puts you ahead for the tech race in the long term. Your special building is the House of Wisdom due to the famous Library of Baghdad or House of Wisdom during the Golden Age of Islam in the late 8th century. The House of Wisdom is a special version of the Library in the game. It costs 20 more hammers, gives 2 bonus culture, and a 50 beaker bonus. This means that Arabia is good at creating a strong science economy in the middle game. Good Luck!, game.the_player().username()));\n"
+
 }

@@ -510,8 +510,8 @@
     "loader": "building"
   },
   {
-    "path": "building/great_library_of_baghdad.json",
-    "id": "building/great_library_of_baghdad",
+    "path": "building/house_of_wisdom.json",
+    "id": "building/house_of_wisdom",
     "loader": "building"
   },
   {
