@@ -210,6 +210,7 @@ impl GameServer {
     }
 
     fn end_turn(&mut self, conns: &Connections) {
+        self.ended_turns.values_mut().for_each(|b| *b = false);
         self.game.end_turn();
 
         self.broadcast(
