@@ -35,7 +35,7 @@ impl EconomyScreen {
             .set_text(text!("+{} @icon[gold] / turn", city.gold_per_turn()));
         self.window.maintenance_text.get_mut().set_text(text!(
             "Maintenance: -{} @icon[coin] / turn",
-            city.maintenance_cost()
+            city.economy().maintenance_cost
         ));
     }
 }

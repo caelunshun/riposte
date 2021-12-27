@@ -3,7 +3,7 @@ use std::{iter::once, num::NonZeroU32};
 use ahash::{AHashMap, AHashSet};
 use glam::UVec2;
 use indexmap::IndexSet;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{
     assets::Handle,
@@ -73,7 +73,7 @@ pub struct City {
     building_effects: AHashMap<BuildingEffectType, u32>,
 
     /// Cached economy data for the city.
-    economy: CityEconomy,
+   pub(crate) economy: CityEconomy,
 
     /// The previous build task we completed.
     previous_build_task: Option<PreviousBuildTask>,
@@ -151,6 +151,9 @@ impl City {
             city.update_worked_tiles(game);
             city.update_economy(game);
             city.update_trade_networks(game);
+            let owner = city.owner();
+            drop(city);
+            game.player_mut(owner).update_economy(game);
         });
 
         city
@@ -337,10 +340,6 @@ impl City {
             - self.food_consumed_per_turn()
             - 1)
             / (self.economy().food_yield - self.food_consumed_per_turn())
-    }
-
-    pub fn maintenance_cost(&self) -> u32 {
-        self.economy().maintenance_cost as u32
     }
 
     pub fn name(&self) -> &str {
@@ -649,10 +648,31 @@ impl City {
             self.economy.commerce_yield += 8.;
         }
 
-        let owner = game.player(self.owner);
-        let beaker_percent = owner.beaker_percent() as f64 / 100.;
-        self.economy.beakers = self.economy.commerce_yield as f64 * beaker_percent;
-        self.economy.gold = self.economy.commerce_yield as f64 * (1. - beaker_percent);
+        self.economy.maintenance_cost = self.maintenance_cost(game);
+    }
+
+    fn maintenance_cost(&self, game: &Game) -> f64 {
+        let capital = game.player(self.owner).capital().expect("no capital?");
+        let distance_to_palace_cost = if self.is_capital() {
+            0.
+        } else {
+            let capital = game
+                .city(capital)
+                .pos();
+            let dist = self.pos.as_f64().distance(capital.as_f64());
+            (0.125 / 2. * dist) * (7. + self.population().get() as f64)
+        };
+        let number_of_cities_cost = 0.6
+            + 0.1 * self.population().get() as f64 * game.player(self.owner).cities().len() as f64
+                / 2.;
+            
+        let mut cost = distance_to_palace_cost + number_of_cities_cost;
+
+        if self.is_connected_to_city(capital) {
+            cost *= 0.9;
+        }
+
+        cost 
     }
 
     fn update_culture_per_turn(&mut self) {

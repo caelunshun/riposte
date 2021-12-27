@@ -1,7 +1,7 @@
 use ahash::{AHashMap, AHashSet};
 use glam::{ivec2, uvec2, UVec2};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-use serde::{Serialize, Deserialize};
 
 use super::{CityId, PlayerId, UnitId};
 use crate::event::Event;
@@ -86,7 +86,11 @@ impl Player {
         map_width: u32,
         map_height: u32,
     ) -> Self {
-        let unlocked_techs = civ.starting_techs.iter().map(|t| game.registry().tech(t).unwrap()).collect();
+        let unlocked_techs = civ
+            .starting_techs
+            .iter()
+            .map(|t| game.registry().tech(t).unwrap())
+            .collect();
         Self {
             on_server: true,
             id,
@@ -358,6 +362,7 @@ impl Player {
     /// Should be called on the end of each turn.
     pub fn on_turn_end(&mut self, game: &Game) {
         self.update_economy(game);
+        self.do_economy_turn(game);
         self.update_research(game);
         game.push_event(Event::PlayerChanged(self.id()));
     }
@@ -367,9 +372,14 @@ impl Player {
         let mut gold = 0.;
         let mut beakers = 0.;
         let mut expenses = 0.;
+
         for &city_id in &self.cities {
-            let city = game.city(city_id);
+            let mut city = game.city_mut(city_id);
             base += city.economy().commerce_yield;
+
+            city.economy.gold = self.economy_settings.gold_percent() as f64 / 100. * city.economy.commerce_yield;
+            city.economy.beakers = self.economy_settings.beaker_percent() as f64 / 100. * city.economy.commerce_yield;
+
             gold += city.economy().gold;
             beakers += city.economy().beakers;
             expenses += city.economy().maintenance_cost;
@@ -386,6 +396,17 @@ impl Player {
             self.economy.beaker_revenue,
             self.cities.len()
         );
+    }
+
+    fn do_economy_turn(&mut self, game: &Game) {
+        while self.gold as i32 + self.net_gold_per_turn() < 0
+            && self.economy_settings.beaker_percent() > 0
+        {
+            self.economy_settings.decrement_beaker_percent();
+            self.update_economy(game);
+        }
+
+        self.gold = (self.gold as i32 + self.net_gold_per_turn()).max(0) as u32;
     }
 
     fn update_research(&mut self, game: &Game) {
