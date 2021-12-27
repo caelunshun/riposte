@@ -7,7 +7,7 @@
   "onlyForCivs": ["holy_rome"],
   "techs": ["Engineering"],
   "resources": ["iron"],
-  "replaces": ["pikeman"],
+  "replaces": "pikeman",
   "category": "melee",
   "combatBonuses": [
     {
