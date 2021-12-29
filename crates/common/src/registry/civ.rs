@@ -10,6 +10,8 @@ pub struct Civilization {
     pub leaders: Vec<Leader>,
     pub cities: Vec<String>,
     pub starting_techs: Vec<String>,
+    #[serde(default)]
+    pub intro_text: String
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]
