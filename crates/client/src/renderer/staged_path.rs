@@ -2,7 +2,7 @@ use ahash::AHashMap;
 use duit::Vec2;
 use dume::{
     font::{Query, Weight},
-    Align, Baseline, Canvas, Text, TextBlob, TextOptions, TextSection, TextStyle,
+    Align, Baseline, Canvas, StrokeCap, Text, TextBlob, TextOptions, TextSection, TextStyle,
 };
 use glam::UVec2;
 use palette::Srgba;
@@ -86,9 +86,10 @@ impl StagedPathOverlay {
                 canvas.draw_text(text, next_pos - offset, 1.);
 
                 canvas.begin_path();
-                super::dashed_circle(&mut canvas, next_pos, 30., 16, 0.1, cx.time());
+                super::dashed_circle(&mut canvas, next_pos, 30., 16, 0.5, cx.time());
                 canvas
                     .stroke_width(3.)
+                    .stroke_cap(StrokeCap::Round)
                     .solid_color(Srgba::new(u8::MAX, u8::MAX, u8::MAX, 200))
                     .stroke();
             }

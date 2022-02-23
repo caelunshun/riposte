@@ -13,7 +13,7 @@ use anyhow::Context as _;
 use duit::{Spec, Ui, Vec2};
 use dume::{Canvas, TextureSetBuilder};
 use flume::Receiver;
-use glam::vec2;
+use glam::{uvec2, vec2};
 use once_cell::sync::OnceCell;
 use riposte_common::{
     assets::Assets,
@@ -52,7 +52,6 @@ pub struct Context {
     device: Arc<wgpu::Device>,
     queue: Arc<wgpu::Queue>,
     surface: wgpu::Surface,
-    sample_texture: wgpu::Texture,
 
     /// The UI state (duit)
     ui: Rc<RefCell<Ui>>,
@@ -98,7 +97,7 @@ pub struct Context {
 
 impl Context {
     pub fn new() -> anyhow::Result<(Self, EventLoop<()>)> {
-        let (event_loop, window, dume_context, canvas, surface, sample_texture, device, queue) =
+        let (event_loop, window, dume_context, canvas, surface, device, queue) =
             init::init_graphics_state()?;
 
         let canvas = Rc::new(RefCell::new(canvas));
@@ -157,7 +156,6 @@ impl Context {
                 queue,
                 device,
                 surface,
-                sample_texture,
                 ui,
                 popup_windows,
                 window,
@@ -331,7 +329,6 @@ impl Context {
     }
 
     pub fn resize(&mut self, new_size: PhysicalSize<u32>) {
-        self.sample_texture = init::create_sample_texture(&self.device, new_size);
         self.surface.configure(
             &self.device,
             &wgpu::SurfaceConfiguration {
@@ -343,7 +340,7 @@ impl Context {
             },
         );
         self.canvas_mut().resize(
-            init::logical_size(new_size, self.window.scale_factor()),
+            uvec2(new_size.width, new_size.height),
             self.window.scale_factor() as f32,
         );
     }
@@ -400,10 +397,8 @@ impl Context {
                     .expect("failed to get next swapchain frame")
             }
         };
-        self.canvas_mut().render(
-            &frame.texture.create_view(&Default::default()),
-            &self.sample_texture.create_view(&Default::default()),
-        );
+        self.canvas_mut()
+            .render(&frame.texture.create_view(&Default::default()));
 
         frame.present();
     }

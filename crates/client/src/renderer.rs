@@ -26,11 +26,11 @@ mod fog;
 mod grid_overlay;
 mod improvement;
 mod resource;
+mod rivers;
 mod terrain;
 mod tile_yield;
 mod tree;
 mod unit;
-mod rivers;
 
 mod city_worked_tiles;
 mod staged_path;
@@ -99,7 +99,9 @@ impl GameRenderer {
                 for y in first_tile.y..=last_tile.y {
                     let pos = uvec2(x, y);
                     if let Ok(tile) = game.tile(pos) {
-                        if game.the_player().visibility_at(pos) == Visibility::Hidden && !game.cheat_mode {
+                        if game.the_player().visibility_at(pos) == Visibility::Hidden
+                            && !game.cheat_mode
+                        {
                             continue;
                         }
 
@@ -136,11 +138,19 @@ pub fn dashed_circle(
         let arc_start = angle_offset + i as f32 * arc_length;
         let arc_end = angle_offset + (i + 1) as f32 * arc_length - dash_separation;
 
-        canvas.move_to(vec2(
-            center.x + radius * arc_start.cos(),
-            center.y + radius * arc_start.sin(),
-        ));
-        canvas.arc(center, radius, arc_start, arc_end);
+        let control1 = arc_start + (arc_start - arc_end) / 3.;
+        let control2 = arc_start + (arc_start - arc_end) / 3. * 2.;
+
+        canvas
+            .move_to(vec2(
+                center.x + radius * arc_start.cos(),
+                center.y + radius * arc_start.sin(),
+            ))
+            .cubic_to(
+                center + radius * vec2(control1.cos(), control1.sin()),
+                center + radius * vec2(control2.cos(), control2.sin()),
+                center + radius * vec2(arc_end.cos(), arc_end.sin()),
+            );
     }
 }
 

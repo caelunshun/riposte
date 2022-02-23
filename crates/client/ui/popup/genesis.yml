@@ -15,10 +15,16 @@ child:
               classes:
                 - h2
           - Divider: {}
-          - Text:
-              id: welcome_text
+          - Container:
               classes:
-                - h4
+                - container_emphasized
+              mode:
+                Pad: 20
+              child:
+                Text:
+                  id: welcome_text
+                  classes:
+                    - h4
           - Row:
               align_h: Center
               children:

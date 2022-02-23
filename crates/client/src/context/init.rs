@@ -20,7 +20,6 @@ pub fn init_graphics_state() -> anyhow::Result<(
     dume::Context,
     Canvas,
     wgpu::Surface,
-    wgpu::Texture,
     Arc<wgpu::Device>,
     Arc<wgpu::Queue>,
 )> {
@@ -44,7 +43,7 @@ pub fn init_graphics_state() -> anyhow::Result<(
     let (device, queue) = block_on(adapter.request_device(
         &wgpu::DeviceDescriptor {
             label: Some("the_device"),
-            features: wgpu::Features::default(),
+            features: wgpu::Features::TEXTURE_ADAPTER_SPECIFIC_FORMAT_FEATURES,
             limits: wgpu::Limits {
                 max_texture_dimension_2d: 16384,
                 ..Default::default()
@@ -75,41 +74,11 @@ pub fn init_graphics_state() -> anyhow::Result<(
     context.set_default_font_family("Merriweather");
 
     let canvas = context.create_canvas(
-        logical_size(window.inner_size(), window.scale_factor()),
+        uvec2(window.inner_size().width, window.inner_size().height),
         window.scale_factor() as f32,
     );
 
-    let sample_texture = create_sample_texture(&device, window.inner_size());
-
-    Ok((
-        event_loop,
-        window,
-        context,
-        canvas,
-        surface,
-        sample_texture,
-        device,
-        queue,
-    ))
-}
-
-pub fn create_sample_texture(
-    device: &wgpu::Device,
-    window_size: PhysicalSize<u32>,
-) -> wgpu::Texture {
-    device.create_texture(&wgpu::TextureDescriptor {
-        label: Some("sample_texture"),
-        size: wgpu::Extent3d {
-            width: window_size.width,
-            height: window_size.height,
-            depth_or_array_layers: 1,
-        },
-        mip_level_count: 1,
-        sample_count: dume::SAMPLE_COUNT,
-        dimension: wgpu::TextureDimension::D2,
-        format: dume::TARGET_FORMAT,
-        usage: wgpu::TextureUsages::RENDER_ATTACHMENT,
-    })
+    Ok((event_loop, window, context, canvas, surface, device, queue))
 }
 
 pub fn logical_size(physical: PhysicalSize<u32>, scale: f64) -> Vec2 {

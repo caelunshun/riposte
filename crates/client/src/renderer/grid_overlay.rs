@@ -23,8 +23,8 @@ impl TileRenderLayer for GridOverlayRenderer {
         cx.canvas_mut()
             .begin_path()
             .rect(Vec2::ZERO, Vec2::splat(PIXELS_PER_TILE))
-            .solid_color(Srgba::new(80, 80, 80, 200))
-            .stroke_width(0.5)
+            .solid_color(Srgba::new(80, 80, 80, 150))
+            .stroke_width(1.0)
             .stroke();
     }
 }

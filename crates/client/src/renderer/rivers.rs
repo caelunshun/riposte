@@ -1,6 +1,4 @@
-use std::f32::consts::TAU;
-
-use dume::TextureId;
+use dume::{SpriteRotate, TextureId};
 use glam::{vec2, UVec2};
 use rand::{Rng, SeedableRng};
 use rand_pcg::Pcg64Mcg;
@@ -42,18 +40,23 @@ impl TileRenderLayer for RiverRenderer {
         for axis in [Axis::Vertical, Axis::Horizontal] {
             if game.base().rivers().river_id_at(tile_pos, axis).is_some() {
                 let mut canvas = cx.canvas_mut();
-                if axis == Axis::Vertical {
-                    canvas.rotate(TAU / 4.);
-                }
 
                 let mut rng =
                     Pcg64Mcg::seed_from_u64(((tile_pos.x as u64) << 32) | tile_pos.y as u64);
                 let segment = &self.straights[rng.gen_range(0..self.straights.len())];
 
-                canvas.draw_sprite(segment.texture, vec2(0., -segment.offset), 100.);
-                if axis == Axis::Vertical {
-                    canvas.rotate(-TAU / 4.);
-                }
+                let rotation = if axis == Axis::Vertical {
+                    SpriteRotate::One
+                } else {
+                    SpriteRotate::Zero
+                };
+                let offset = if axis == Axis::Vertical {
+                    vec2(-segment.offset, 0.)
+                } else {
+                    vec2(0., -segment.offset)
+                };
+
+                canvas.draw_sprite_with_rotation(segment.texture, offset, 100., rotation);
             }
         }
     }

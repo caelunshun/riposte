@@ -2,7 +2,7 @@ use ahash::AHashMap;
 use duit::Vec2;
 use dume::{
     font::{Query, Weight},
-    Align, Baseline, Text, TextBlob, TextOptions, TextSection, TextStyle, TextureId,
+    Align, Baseline, StrokeCap, Text, TextBlob, TextOptions, TextSection, TextStyle, TextureId,
 };
 use glam::{vec2, UVec2};
 use palette::Srgba;
@@ -79,7 +79,7 @@ impl UnitRenderer {
         canvas.begin_path();
 
         let num_dashes = 16;
-        super::dashed_circle(&mut canvas, center, radius, num_dashes, 0.1, cx.time());
+        super::dashed_circle(&mut canvas, center, radius, num_dashes, 0.2, cx.time());
 
         let color = if unit.has_movement_left() {
             Srgba::new(255, 255, 255, 200)
@@ -87,7 +87,11 @@ impl UnitRenderer {
             Srgba::new(235, 51, 0, 200)
         };
 
-        canvas.solid_color(color).stroke_width(4.).stroke();
+        canvas
+            .solid_color(color)
+            .stroke_width(4.)
+            .stroke_cap(StrokeCap::Round)
+            .stroke();
     }
 
     fn render_health_bar(&mut self, cx: &Context, unit: &Unit) {

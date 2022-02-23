@@ -88,8 +88,8 @@ impl TileRenderLayer for TerrainRenderer {
             rotation = match river_side {
                 Side::Up => SpriteRotate::Zero,
                 Side::Down => SpriteRotate::Two,
-                Side::Left => SpriteRotate::Three,
-                Side::Right => SpriteRotate::One,
+                Side::Left => SpriteRotate::One,
+                Side::Right => SpriteRotate::Three,
             };
 
             self.flood_plains
