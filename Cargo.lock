@@ -909,6 +909,7 @@ dependencies = [
 [[package]]
 name = "dume"
 version = "0.1.0"
+source = "git+https://github.com/caelunshun/dume#de5bed0d70e5c4d6696622b753ee466dc5ad5198"
 dependencies = [
  "ahash",
  "anyhow",
@@ -938,6 +939,7 @@ dependencies = [
 [[package]]
 name = "dume-markup"
 version = "0.1.0"
+source = "git+https://github.com/caelunshun/dume#de5bed0d70e5c4d6696622b753ee466dc5ad5198"
 dependencies = [
  "anyhow",
  "logos",
