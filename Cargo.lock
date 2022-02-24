@@ -3221,6 +3221,7 @@ dependencies = [
  "anyhow",
  "arrayvec",
  "float-ord",
+ "flume",
  "fs-err",
  "futures-util",
  "glam",

@@ -1,4 +1,6 @@
 use anyhow::Context;
+use flume::{Receiver, Sender};
+use glam::UVec2;
 use riposte_common::{
     event::Event,
     protocol::{
@@ -15,7 +17,7 @@ use riposte_common::{
         },
         GenericServerPacket,
     },
-    PlayerId,
+    PlayerId, UnitId,
 };
 use slotmap::SecondaryMap;
 
@@ -26,14 +28,20 @@ pub struct GameServer {
     game: Game,
     player_connections: Vec<(PlayerId, ConnectionId)>,
     ended_turns: SecondaryMap<PlayerId, bool>,
+
+    combat_outcomes: Receiver<(UnitId, bool, UVec2, u32, PlayerId)>,
+    combat_outcomes_tx: Sender<(UnitId, bool, UVec2, u32, PlayerId)>,
 }
 
 impl GameServer {
     pub fn new(game: Game) -> Self {
+        let (combat_outcomes_tx, combat_outcomes) = flume::unbounded();
         Self {
             game,
             player_connections: Vec::new(),
             ended_turns: SecondaryMap::default(),
+            combat_outcomes,
+            combat_outcomes_tx,
         }
     }
 
@@ -122,13 +130,35 @@ impl GameServer {
     ) {
         let mut success = true;
         for &unit in &packet.unit_ids {
-            if !self
-                .game
-                .unit(unit)
-                .can_move_to(&self.game, packet.target_pos)
-            {
+            let mut unit = self.game.unit_mut(unit);
+            if !unit.can_move_to(&self.game, packet.target_pos) {
                 success = false;
                 break;
+            }
+
+            if unit.attack_target(&self.game, packet.target_pos).is_some() {
+                // Combat.
+                unit.move_to(&self.game, packet.target_pos);
+                let id = unit.id();
+
+                let tx = self.combat_outcomes_tx.clone();
+                // TODO fix nested defer. (Needed so this code runs after the combat simulation)
+                self.game.defer(move |game| {
+                    game.defer(move |game| {
+                        let mut success = false;
+                        if game.is_unit_valid(id) {
+                            // The unit won.
+                            let unit = game.unit(id);
+                            if unit.pos() == packet.target_pos {
+                                success = true;
+                            }
+                        }
+
+                        tx.send((id, success, packet.target_pos, request_id, player))
+                            .unwrap();
+                    });
+                });
+                return;
             }
         }
 
@@ -298,7 +328,23 @@ impl GameServer {
             Event::PeaceMade(maker, made) => {
                 self.broadcast(conns, ServerPacket::PeaceMade(PeaceMade { made, maker }))
             }
+            Event::CombatEvent(event) => self.broadcast(conns, ServerPacket::CombatEvent(event)),
+            Event::UnitMoved(_, _, _) => {}
         });
+
+        for (unit, success, target_pos, request_id, player) in self.combat_outcomes.try_iter() {
+            if success {
+                conns.broadcast_game_packet(ServerPacket::UnitsMoved(UnitsMoved {
+                    units: vec![unit],
+                    new_movement_left: vec![self.game.unit(unit).movement_left()],
+                    new_pos: target_pos,
+                }));
+            }
+            conns.get(self.conn_for_player(player)).send_game_packet(
+                ServerPacket::ConfirmMoveUnits(ConfirmMoveUnits { success }),
+                Some(request_id),
+            );
+        }
     }
 
     pub fn game(&self) -> &Game {

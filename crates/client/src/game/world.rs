@@ -420,7 +420,9 @@ impl Game {
             *unit = data;
             let new_pos = unit.pos();
             if old_pos != new_pos {
-                self.on_units_moved(cx, &[unit.id()], old_pos, new_pos);
+                let id = unit.id();
+                drop(unit);
+                self.on_units_moved(cx, &[id], old_pos, new_pos);
             }
         } else {
             self.base.add_unit(data);

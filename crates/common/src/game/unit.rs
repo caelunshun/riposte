@@ -11,6 +11,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{
     assets::Handle,
+    combat::CombatSimulator,
     event::Event,
     registry::{CapabilityType, CombatBonusType, UnitKind},
     world::Game,
@@ -20,6 +21,13 @@ use crate::{
 use super::{PlayerId, UnitId};
 
 pub use crate::worker::WorkerTask;
+
+#[derive(Debug, PartialEq, Eq)]
+pub enum UnitMoveOutcome {
+    Success,
+    Fail,
+    Combat,
+}
 
 /// Represents a unit in the game.
 ///
@@ -137,6 +145,14 @@ impl Unit {
         }
     }
 
+    pub fn can_attack(&self) -> bool {
+        self.strength() > 0.
+    }
+
+    pub fn will_attack(&self, game: &Game, unit: &Unit) -> bool {
+        game.player(self.owner).is_at_war_with(unit.owner()) && self.can_attack()
+    }
+
     pub fn id(&self) -> UnitId {
         self.id
     }
@@ -159,15 +175,14 @@ impl Unit {
 
     /// Computes this unit's modified defense strength against
     /// an attacker.
-    ///
-    /// NB: this method is duplicated from the C++ server code, Unit::getModifiedDefendingStrength.
-    /// It should be kept in sync.
-    ///
-    /// This method ignores tile defense and city defense bonuses,
-    /// as its only use on the Rust client is to sort unit stacks - and all units in the same
-    /// stack have the same tile defense bonuses.
     pub fn modified_defending_strength(&self, game: &Game, attacker: &Unit) -> f64 {
         let mut percent_bonus = 0i32;
+
+        // Tile defense bonus
+        let tile = game.tile(self.pos).unwrap();
+        percent_bonus += tile.defense_bonus() as i32;
+
+        // City + building defense bonus - TODO
 
         // Subtract opponent bonuses
         for bonus in &attacker.kind.combat_bonuses {
@@ -352,15 +367,34 @@ impl Unit {
             return false;
         }
 
+        if !self.can_attack() && self.attack_target(game, target).is_some() {
+            return false;
+        }
+
         true
     }
 
     /// Moves the unit to the given position.
-    pub fn move_to(&mut self, game: &Game, target: UVec2) -> bool {
+    pub fn move_to(&mut self, game: &Game, target: UVec2) -> UnitMoveOutcome {
         if !self.can_move_to(game, target) {
-            return false;
+            return UnitMoveOutcome::Fail;
         }
 
+        // Simulate combat if we're attacking a tile.
+        let defender = self.attack_target(game, target);
+        if let Some(defender) = defender {
+            let self_id = self.id;
+            game.defer(move |game| {
+                let simulator = CombatSimulator::new(game, self_id, defender);
+                let event = simulator.run();
+                game.push_event(Event::CombatEvent(event));
+            });
+            // The combat simulator will invoke move_to() again
+            // if we won.
+            return UnitMoveOutcome::Combat;
+        }
+
+        let old_pos = self.pos;
         self.pos = target;
 
         // Spend the movement points
@@ -379,7 +413,31 @@ impl Unit {
         let owner = self.owner;
         game.defer(move |game| game.player_mut(owner).update_visibility(game));
 
-        true
+        // If we moved into an enemy city, then the city is captured
+        game.push_event(Event::UnitMoved(self.id, old_pos, target));
+
+        UnitMoveOutcome::Success
+    }
+
+    /// Returns the unit we'd attack if we moved to the given tile.
+    pub fn attack_target(&self, game: &Game, target_pos: UVec2) -> Option<UnitId> {
+        // Choose the unit with the best defending strength against this unit.
+        let mut best_unit = None;
+        for unit in game.units_by_pos(target_pos) {
+            if !self.will_attack(game, &unit) {
+                continue;
+            }
+            let strength = unit.modified_defending_strength(game, self);
+            match best_unit {
+                Some((_, s)) => {
+                    if strength > s {
+                        best_unit = Some((unit.id(), strength));
+                    }
+                }
+                None => best_unit = Some((unit.id(), strength)),
+            }
+        }
+        best_unit.map(|(u, _strength)| u)
     }
 
     /// Should be called at the end of each turn.

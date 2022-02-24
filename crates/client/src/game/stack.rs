@@ -78,6 +78,12 @@ impl UnitStack {
                 score += 1000.;
             }
 
+            if let Some(combat) = game.current_combat_event() {
+                if combat.attacker_id() == u || combat.defender_id() == u {
+                    score += 1500.;
+                }
+            }
+
             cmp::Reverse((FloatOrd(score), u))
         });
 
@@ -160,20 +166,6 @@ impl StackGrid {
         }
 
         log::info!("Unit moved from {:?} to {:?}", old_pos, new_pos);
-
-        if cfg!(debug_assertions) {
-            let mut touched_units = ahash::AHashSet::new();
-            for x in 0..self.width {
-                for y in 0..self.height {
-                    let pos = glam::uvec2(x, y);
-                    let stack = self.get(pos).unwrap();
-                    for unit in stack.units() {
-                        assert!(touched_units.insert(*unit), "failed at {:?}", pos);
-                        assert_eq!(game.unit(*unit).pos(), pos);
-                    }
-                }
-            }
-        }
     }
 
     pub fn on_unit_deleted(&self, game: &Game, unit: UnitId) {

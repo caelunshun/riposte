@@ -24,6 +24,9 @@ impl GameSounds {
         self.playing.retain(|s| !s.empty());
         match event {
             GameEvent::UnitMoved { unit, new_pos, .. } => {
+                if !game.is_unit_valid(*unit) {
+                    return;
+                }
                 let unit = game.unit(*unit);
                 if unit.owner() != game.the_player().id() {
                     return;

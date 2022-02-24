@@ -6,7 +6,7 @@ use glam::UVec2;
 use serde::{Deserialize, Serialize};
 
 use crate::{
-    assets::Handle, registry::Tech, river::Rivers, unit::MovementPoints,
+    assets::Handle, combat::CombatEvent, registry::Tech, river::Rivers, unit::MovementPoints,
     worker::WorkerProgressGrid, City, Grid, Player, PlayerId, Tile, Turn, Unit, UnitId,
 };
 
@@ -37,6 +37,7 @@ pub enum ServerPacket {
     GameSaved(GameSaved),
     WarDeclared(WarDeclared),
     PeaceMade(PeaceMade),
+    CombatEvent(CombatEvent),
 }
 
 /// Sent in the `GameStarted` lobby packet.

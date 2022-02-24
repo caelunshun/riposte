@@ -37,6 +37,7 @@ pub struct Game {
 
     // Various indexes for fast lookups.
     cities_by_pos: AHashMap<UVec2, CityId>,
+    units_by_pos: AHashMap<UVec2, Vec<UnitId>>,
 
     worker_progress: RefCell<WorkerProgressGrid>,
 
@@ -74,6 +75,7 @@ impl Game {
             units: SecondaryMap::default(),
 
             cities_by_pos: AHashMap::new(),
+            units_by_pos: AHashMap::new(),
 
             rng: RefCell::new(Pcg64Mcg::from_entropy()),
 
@@ -99,6 +101,7 @@ impl Game {
             cities: SecondaryMap::new(),
             units: SecondaryMap::new(),
             cities_by_pos: AHashMap::new(),
+            units_by_pos: AHashMap::new(),
             worker_progress: RefCell::new(file.worker_progress),
             rng: RefCell::new(Pcg64Mcg::from_entropy()), // TODO: should RNG state persist?
             turn: file.turn,
@@ -270,16 +273,33 @@ impl Game {
     pub fn remove_unit(&mut self, id: UnitId) {
         self.unit_ids.remove(id);
         if let Some(u) = self.units.remove(id) {
-            self.player_mut(u.into_inner().owner()).deregister_unit(id);
+            let u = u.into_inner();
+            self.player_mut(u.owner()).deregister_unit(id);
+            if let Some(v) = self.units_by_pos.get_mut(&u.pos()) {
+                v.retain(|id| *id != u.id());
+            }
         }
         self.push_event(Event::UnitDeleted(id));
+    }
+
+    /// Gets the units at the given position.
+    pub fn units_by_pos(&self, pos: UVec2) -> impl Iterator<Item = Ref<Unit>> + '_ {
+        self.units_by_pos
+            .get(&pos)
+            .map(|v| v.as_slice())
+            .unwrap_or_default()
+            .iter()
+            .copied()
+            .map(|id| self.unit(id))
     }
 
     /// Adds a new unit with an existing ID.
     pub fn add_unit(&mut self, unit: Unit) {
         let id = unit.id();
         let owner = unit.owner();
+        self.units_by_pos.entry(unit.pos()).or_default().push(id);
         self.units.insert(id, RefCell::new(unit));
+
         self.player_mut(owner).register_unit(id);
         self.push_event(Event::UnitChanged(id));
     }
@@ -367,6 +387,19 @@ impl Game {
     }
 
     pub fn push_event(&self, event: Event) {
+        if let Event::UnitMoved(unit, old_pos, new_pos) = &event {
+            let unit = *unit;
+            let old_pos = *old_pos;
+            let new_pos = *new_pos;
+            self.defer(move |game| {
+                game.units_by_pos
+                    .get_mut(&old_pos)
+                    .unwrap()
+                    .retain(|id| *id != unit);
+                game.units_by_pos.entry(new_pos).or_default().push(unit);
+            });
+        }
+
         self.events.borrow_mut().push(event);
     }
 

@@ -1,6 +1,6 @@
 use glam::UVec2;
 
-use crate::{assets::Handle, registry::Tech, CityId, PlayerId, UnitId};
+use crate::{assets::Handle, combat::CombatEvent, registry::Tech, CityId, PlayerId, UnitId};
 
 /// Used to track changes to game state so the server
 /// can send updates to clients.
@@ -14,4 +14,6 @@ pub enum Event {
     TechUnlocked(PlayerId, Handle<Tech>),
     WarDeclared(PlayerId, PlayerId),
     PeaceMade(PlayerId, PlayerId),
+    CombatEvent(CombatEvent),
+    UnitMoved(UnitId, UVec2, UVec2),
 }

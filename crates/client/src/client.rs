@@ -31,7 +31,7 @@ use riposte_common::{
 
 use crate::{
     context::Context,
-    game::{event::GameEvent, Game},
+    game::{combat::CombatEvent, event::GameEvent, Game},
 };
 
 #[derive(Debug, thiserror::Error)]
@@ -310,6 +310,7 @@ impl Client<GameState> {
                         declarer: p.maker,
                         declared: p.made,
                     }),
+                    ServerPacket::CombatEvent(p) => self.handle_combat_event(cx, game, p)?,
                 }
             }
 
@@ -336,55 +337,16 @@ impl Client<GameState> {
         game.on_units_moved(cx, &packet.units, old_pos, packet.new_pos);
     }
 
-    /*
     fn handle_combat_event(
         &mut self,
         cx: &Context,
         game: &mut Game,
-        packet: riposte_common::CombatEvent,
+        packet: riposte_common::combat::CombatEvent,
     ) -> anyhow::Result<()> {
+        dbg!(&packet);
         game.set_current_combat_event(cx, CombatEvent::from_data(packet, game)?);
         Ok(())
     }
-
-    fn handle_game_saved(&mut self, cx: &Context, game: &Game, packet: GameSaved, request_id: u32) {
-        if self.server_response_senders.contains_key(&request_id) {
-            log::info!(
-                "Received game save - {:.1} MiB",
-                packet.game_save_data.len() as f64 / 1024. / 1024.
-            );
-            cx.saves_mut()
-                .add_save(cx, &packet.game_save_data, game.turn());
-            self.handle_server_response(request_id, packet);
-        }
-    }
-
-    fn handle_war_declared(&mut self, game: &Game, packet: WarDeclared) -> anyhow::Result<()> {
-        game.push_event(GameEvent::WarDeclared {
-            declarer: game.resolve_player_id(packet.declarer_id as u32)?,
-            declared: game.resolve_player_id(packet.declared_id as u32)?,
-        });
-        Ok(())
-    }
-
-    fn handle_peace_declared(&mut self, game: &Game, packet: PeaceDeclared) -> anyhow::Result<()> {
-        game.push_event(GameEvent::PeaceDeclared {
-            declarer: game.resolve_player_id(packet.declarer_id as u32)?,
-            declared: game.resolve_player_id(packet.declared_id as u32)?,
-        });
-        Ok(())
-    }
-
-    fn handle_borders_expanded(
-        &mut self,
-        game: &Game,
-        packet: BordersExpanded,
-    ) -> anyhow::Result<()> {
-        game.push_event(GameEvent::BordersExpanded {
-            city: game.resolve_city_id(packet.city_id)?,
-        });
-        Ok(())
-    }*/
 
     fn handle_server_response<T: 'static>(&mut self, request_id: u32, value: T) {
         if let Some(sender) = self.server_response_senders.remove(&request_id) {
