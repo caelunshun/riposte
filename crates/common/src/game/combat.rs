@@ -145,7 +145,7 @@ impl<'a> CombatSimulator<'a> {
             let attacker_id = self.attacker.id();
             let loser_pos = loser.pos();
             self.game.defer(move |game| {
-               dbg!( game.unit_mut(attacker_id).move_to(game, loser_pos));
+                game.unit_mut(attacker_id).move_to(game, loser_pos);
             });
         }
 

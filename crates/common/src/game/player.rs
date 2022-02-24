@@ -279,17 +279,19 @@ impl Player {
 
     /// Should be called when this player loses a city.
     pub fn deregister_city(&mut self, game: &Game, id: CityId) {
+        if let Some(p) = self.cities().iter().position(|p| *p == id) {
+            self.cities.swap_remove(p);
+        }
+
         // If this city was our capital, we need a new one.
         if self.on_server && self.capital == Some(id) {
             self.capital = self.find_new_capital(game);
             if self.capital.is_none() {
                 // We've run out of cities - we're dead.
                 self.die(game);
+            } else {
+                game.city_mut(self.capital.unwrap()).set_capital(true);
             }
-        }
-
-        if let Some(p) = self.cities().iter().position(|p| *p == id) {
-            self.cities.swap_remove(p);
         }
     }
 

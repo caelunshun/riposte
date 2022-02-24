@@ -146,7 +146,7 @@ impl Unit {
     }
 
     pub fn can_attack(&self) -> bool {
-        self.strength() > 0.
+        self.strength() > 0. && !self.has_used_attack
     }
 
     pub fn will_attack(&self, game: &Game, unit: &Unit) -> bool {
@@ -389,8 +389,9 @@ impl Unit {
                 let event = simulator.run();
                 game.push_event(Event::CombatEvent(event));
             });
+            self.has_used_attack = true;
             // The combat simulator will invoke move_to() again
-            // if we won.
+            // if we won and can move into the target.
             return UnitMoveOutcome::Combat;
         }
 
@@ -414,6 +415,13 @@ impl Unit {
         game.defer(move |game| game.player_mut(owner).update_visibility(game));
 
         // If we moved into an enemy city, then the city is captured
+        if let Some(city) = game.city_id_at_pos(target) {
+            let mut city = game.city_mut(city);
+            if game.player(self.owner).is_at_war_with(city.owner()) {
+                city.transfer_control(game, self.owner);
+            }
+        }
+
         game.push_event(Event::UnitMoved(self.id, old_pos, target));
 
         UnitMoveOutcome::Success
@@ -478,6 +486,7 @@ impl Unit {
 
     fn reset_movement(&mut self) {
         self.movement_left = MovementPoints::from_u32(self.kind.movement);
+        self.has_used_attack = false;
     }
 
     fn heal(&mut self, game: &Game) {

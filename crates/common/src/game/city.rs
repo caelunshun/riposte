@@ -254,6 +254,10 @@ impl City {
         self.is_capital
     }
 
+    pub fn set_capital(&mut self, c: bool) {
+        self.is_capital = c;
+    }
+
     pub fn worked_tiles(&self) -> impl DoubleEndedIterator<Item = UVec2> + '_ {
         self.worked_tiles.iter().map(|p| p.clone().into())
     }
@@ -630,6 +634,25 @@ impl City {
         true
     }
 
+    pub fn transfer_control(&mut self, game: &Game, to_player: PlayerId) {
+        self.owner = to_player;
+        self.is_capital = false;
+        self.build_task = None;
+        self.build_task_progress.clear();
+        self.population =
+            NonZeroU32::new(self.population.get() - 1).unwrap_or(NonZeroU32::new(1).unwrap());
+
+        let owner = self.owner;
+        let id = self.id;
+        game.defer(move |game| {
+            game.player_mut(owner).deregister_city(game, id);
+
+            game.player_mut(to_player).register_city(id);
+
+            game.push_event(Event::CityChanged(id));
+        });
+    }
+
     /// Updates the CityEconomy based on current worked tiles.
     pub fn update_economy(&mut self, game: &Game) {
         // Base values of 1 for free.
@@ -653,7 +676,7 @@ impl City {
 
     fn maintenance_cost(&self, game: &Game) -> f64 {
         let capital = game.player(self.owner).capital().expect("no capital?");
-        let distance_to_palace_cost = if self.is_capital() {
+        let distance_to_palace_cost = if capital == self.id {
             0.
         } else {
             let capital = game.city(capital).pos();
