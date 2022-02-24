@@ -1,0 +1,9 @@
+{
+  "id": "musketman",
+  "name": "Musketman",
+  "strength": 9,
+  "movement": 1,
+  "cost": 80,
+  "techs": ["Gunpowder"],
+  "category": "gunpowder"
+}

@@ -1,0 +1,24 @@
+{
+  "id": "landsknecht",
+  "name": "Landsknecht",
+  "strength": 6,
+  "movement": 1,
+  "cost": 60,
+  "onlyForCivs": ["holy_rome"],
+  "techs": ["Engineering"],
+  "resources": ["iron"],
+  "replaces": "pikeman",
+  "category": "melee",
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "category": "mounted",
+      "bonusPercent": 100
+    },
+    {
+      "type": "againstUnitCategory",
+      "category": "melee",
+      "bonusPercent": 100
+    }
+  ]
+}

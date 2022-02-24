@@ -1,0 +1,6 @@
+{
+  "name": "Chemistry",
+  "cost": 1800,
+  "prerequisites": ["Gunpowder", "Engineering"],
+  "era": "renaissance"
+}

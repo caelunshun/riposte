@@ -1,5 +1,10 @@
 {
   "name": "Fishing",
   "cost": 70,
-  "era": "ancient"
+  "era": "ancient",
+
+  "quote": {
+    "text": "Give a man a fish, and you feed him for a day. Teach a man to fish, and you feed him for a lifetime.",
+    "attribution": "Proverb, Unknown"
+  }
 }

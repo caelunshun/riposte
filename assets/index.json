@@ -20,6 +20,21 @@
     "loader": "image"
   },
   {
+    "path": "texture/tile/tundra_basecolor.png",
+    "id": "texture/tile/tundra",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/mountain.png",
+    "id": "texture/tile/mountain",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/flood_plains.png",
+    "id": "texture/tile/flood_plains",
+    "loader": "image"
+  },
+  {
     "path": "texture/tile/grassland_basecolor_hill.png",
     "id": "texture/tile/grassland/hill",
     "loader": "image"
@@ -32,6 +47,11 @@
   {
     "path": "texture/tile/desert_basecolor_hill.png",
     "id": "texture/tile/desert/hill",
+    "loader": "image"
+  },
+  {
+    "path": "texture/tile/tundra_basecolor_hill.png",
+    "id": "texture/tile/tundra/hill",
     "loader": "image"
   },
   {
@@ -52,6 +72,11 @@
   {
     "path": "icon/cottage.png",
     "id": "icon/cottage",
+    "loader": "image"
+  },
+  {
+    "path": "icon/plantation.png",
+    "id": "icon/plantation",
     "loader": "image"
   },
   {
@@ -180,10 +205,10 @@
     "loader": "civ"
   },
   {
-  "path": "civ/america.json",
-  "id": "civ/america",
-  "loader": "civ"
-},
+    "path": "civ/america.json",
+    "id": "civ/america",
+    "loader": "civ"
+  },
   {
     "path": "civ/japan.json",
     "id": "civ/japan",
@@ -320,10 +345,10 @@
     "loader": "unit"
   },
   {
-  "path": "unit/catapult.json",
-  "id": "unit/catapult",
-  "loader": "unit"
-},
+    "path": "unit/catapult.json",
+    "id": "unit/catapult",
+    "loader": "unit"
+  },
   {
     "path": "unit/war_chariot.json",
     "id": "unit/war_chariot",
@@ -372,6 +397,46 @@
   {
     "path": "unit/knight.json",
     "id": "unit/knight",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/pikeman.json",
+    "id": "unit/pikeman",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/caravel.json",
+    "id": "unit/caravel",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/swordsman.json",
+    "id": "unit/swordsman",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/crossbowman.json",
+    "id": "unit/crossbowman",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/trebuchet.json",
+    "id": "unit/trebuchet",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/musketman.json",
+    "id": "unit/musketman",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/cuirassier.json",
+    "id": "unit/cuirassier",
+    "loader": "unit"
+  },
+  {
+    "path": "unit/landsknecht.json",
+    "id": "unit/landsknecht",
     "loader": "unit"
   },
   {
@@ -445,8 +510,8 @@
     "loader": "building"
   },
   {
-    "path": "building/great_library_of_baghdad.json",
-    "id": "building/great_library_of_baghdad",
+    "path": "building/house_of_wisdom.json",
+    "id": "building/house_of_wisdom",
     "loader": "building"
   },
   {
@@ -457,6 +522,16 @@
   {
     "path": "building/stock_market.json",
     "id": "building/stock_market",
+    "loader": "building"
+  },
+  {
+    "path": "building/grocer.json",
+    "id": "building/grocer",
+    "loader": "building"
+  },
+  {
+    "path": "building/aqueduct.json",
+    "id": "building/aqueduct",
     "loader": "building"
   },
   {
@@ -515,10 +590,10 @@
     "loader": "image"
   },
   {
-  "path": "texture/unit/catapult.png",
-  "id": "texture/unit/catapult",
-  "loader": "image"
-},
+    "path": "texture/unit/catapult.png",
+    "id": "texture/unit/catapult",
+    "loader": "image"
+  },
   {
     "path": "texture/unit/war_chariot.png",
     "id": "texture/unit/war_chariot",
@@ -535,10 +610,10 @@
     "loader": "image"
   },
   {
-  "path": "texture/unit/bowman.png",
-  "id": "texture/unit/bowman",
-  "loader": "image"
-},
+    "path": "texture/unit/bowman.png",
+    "id": "texture/unit/bowman",
+    "loader": "image"
+  },
   {
     "path": "texture/unit/hwacha.png",
     "id": "texture/unit/hwacha",
@@ -567,6 +642,61 @@
   {
     "path": "texture/unit/knight.png",
     "id": "texture/unit/knight",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/pikeman.png",
+    "id": "texture/unit/pikeman",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/caravel.png",
+    "id": "texture/unit/caravel",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/swordsman.png",
+    "id": "texture/unit/swordsman",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/crossbowman.png",
+    "id": "texture/unit/crossbowman",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/trebuchet.png",
+    "id": "texture/unit/trebuchet",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/musketman.png",
+    "id": "texture/unit/musketman",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/cuirassier.png",
+    "id": "texture/unit/cuirassier",
+    "loader": "image"
+  },
+  {
+    "path": "texture/unit/landsknecht.png",
+    "id": "texture/unit/landsknecht",
+    "loader": "image"
+  },
+  {
+    "path": "texture/river/straight_0.png",
+    "id": "texture/river/straight_0",
+    "loader": "image"
+  },
+  {
+    "path": "texture/river/straight_1.png",
+    "id": "texture/river/straight_1",
+    "loader": "image"
+  },
+  {
+    "path": "texture/river/straight_2.png",
+    "id": "texture/river/straight_2",
     "loader": "image"
   },
   {
@@ -650,10 +780,10 @@
     "loader": "image"
   },
   {
-  "path": "icon/unit_head/hwacha.png",
-  "id": "icon/unit_head/hwacha",
-  "loader": "image"
-},
+    "path": "icon/unit_head/hwacha.png",
+    "id": "icon/unit_head/hwacha",
+    "loader": "image"
+  },
   {
     "path": "icon/unit_head/fast_worker.png",
     "id": "icon/unit_head/fast_worker",
@@ -677,6 +807,46 @@
   {
     "path": "icon/unit_head/knight.png",
     "id": "icon/unit_head/knight",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/pikeman.png",
+    "id": "icon/unit_head/pikeman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/caravel.png",
+    "id": "icon/unit_head/caravel",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/swordsman.png",
+    "id": "icon/unit_head/swordsman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/crossbowman.png",
+    "id": "icon/unit_head/crossbowman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/trebuchet.png",
+    "id": "icon/unit_head/trebuchet",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/musketman.png",
+    "id": "icon/unit_head/musketman",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/cuirassier.png",
+    "id": "icon/unit_head/cuirassier",
+    "loader": "image"
+  },
+  {
+    "path": "icon/unit_head/landsknecht.png",
+    "id": "icon/unit_head/landsknecht",
     "loader": "image"
   },
   {
@@ -760,15 +930,15 @@
     "loader": "tech"
   },
   {
-  "path": "tech/sailing.json",
-  "id": "tech/sailing",
-  "loader": "tech"
-},
+    "path": "tech/sailing.json",
+    "id": "tech/sailing",
+    "loader": "tech"
+  },
   {
-  "path": "tech/fishing.json",
-  "id": "tech/fishing",
-  "loader": "tech"
-},
+    "path": "tech/fishing.json",
+    "id": "tech/fishing",
+    "loader": "tech"
+  },
   {
     "path": "tech/currency.json",
     "id": "tech/currency",
@@ -865,9 +1035,114 @@
     "loader": "tech"
   },
   {
-    "path": "resource/copper.json",
-    "id": "resource/copper",
-    "loader": "resource"
+    "path": "tech/optics.json",
+    "id": "tech/optics",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/optics.json",
+    "id": "tech/optics",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/divine_right.json",
+    "id": "tech/divine_right",
+    "loader": "tech" 
+  },
+  {
+    "path": "tech/music.json",
+    "id": "tech/music",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/paper.json",
+    "id": "tech/paper",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/philosophy.json",
+    "id": "tech/philosophy",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/theology.json",
+    "id": "tech/theology",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/astronomy.json",
+    "id": "tech/astronomy",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/chemistry.json",
+    "id": "tech/chemistry",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/constitution.json",
+    "id": "tech/constitution",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/corporation.json",
+    "id": "tech/corporation",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/democracy.json",
+    "id": "tech/democracy",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/economics.json",
+    "id": "tech/economics",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/education.json",
+    "id": "tech/education",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/gunpowder.json",
+    "id": "tech/gunpowder",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/liberalism.json",
+    "id": "tech/liberalism",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/military_science.json",
+    "id": "tech/military_science",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/military_tradition.json",
+    "id": "tech/military_tradition",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/nationalism.json",
+    "id": "tech/nationalism",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/printing_press.json",
+    "id": "tech/printing_press",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/replaceable_parts.json",
+    "id": "tech/replaceable_parts",
+    "loader": "tech"
+  },
+  {
+    "path": "tech/rifling.json",
+    "id": "tech/rifling",
+    "loader": "tech"
   },
   {
     "path": "resource/horse.json",
@@ -882,6 +1157,26 @@
   {
     "path": "resource/gold.json",
     "id": "resource/gold",
+    "loader": "resource"
+  },
+  {
+    "path": "resource/iron.json",
+    "id": "resource/iron",
+    "loader": "resource"
+  },
+  {
+    "path": "resource/silver.json",
+    "id": "resource/silver",
+    "loader": "resource"
+  },
+  {
+    "path": "resource/spices.json",
+    "id": "resource/spices",
+    "loader": "resource"
+  },
+  {
+    "path": "resource/banana.json",
+    "id": "resource/banana",
     "loader": "resource"
   },
   {
@@ -902,6 +1197,26 @@
   {
     "path": "texture/resource/gold.png",
     "id": "texture/resource/gold",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/iron.png",
+    "id": "texture/resource/iron",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/silver.png",
+    "id": "texture/resource/silver",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/spices.png",
+    "id": "texture/resource/spices",
+    "loader": "image"
+  },
+  {
+    "path": "texture/resource/banana.png",
+    "id": "texture/resource/banana",
     "loader": "image"
   },
   {
@@ -1050,8 +1365,33 @@
     "loader": "sound"
   },
   {
+    "path": "sound/event/tech_unlocked.ogg",
+    "id": "sound/event/tech_unlocked",
+    "loader": "sound"
+  },
+  {
     "path": "sound/ambient/city1.ogg",
     "id": "sound/ambient/city1",
+    "loader": "sound"
+  },
+  {
+    "path": "narration/tech/bronze_working.ogg",
+    "id": "narration/tech/bronze_working",
+    "loader": "sound"
+  },
+  {
+    "path": "narration/tech/construction.ogg",
+    "id": "narration/tech/construction",
+    "loader": "sound"
+  },
+  {
+    "path": "narration/tech/mathematics.ogg",
+    "id": "narration/tech/mathematics",
+    "loader": "sound"
+  },
+  {
+    "path": "narration/tech/monarchy.ogg",
+    "id": "narration/tech/monarchy",
     "loader": "sound"
   },
   {
@@ -1128,5 +1468,10 @@
     "path": "icon/flag/babylonia.png",
     "id": "icon/flag/babylonia",
     "loader": "image"
+  },
+  {
+    "path": "film/logo.ivf",
+    "id": "film/logo",
+    "loader": "video"
   }
 ]

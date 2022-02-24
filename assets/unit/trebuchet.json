@@ -1,0 +1,15 @@
+{
+  "id": "trebuchet",
+  "name": "Trebuchet",
+  "strength": 4,
+  "movement": 1,
+  "cost": 80,
+  "techs": ["Engineering"],
+  "category": "siege",
+  "capabilities": [
+    "bombard_city_defenses"
+  ],
+  "maxBombardPerTurn": 16,
+  "doesCollateralDamage": true,
+  "maxCollateralTargets": 5
+}

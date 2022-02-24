@@ -4,5 +4,10 @@
   "prerequisites": ["The Wheel"],
   "era": "ancient",
 
-  "unlocksImprovements": ["Cottage"]
+  "unlocksImprovements": ["Cottage"],
+
+  "quote": {
+    "text": "Hath not the potter power over the clay, of the same lump to make one vessel unto honour, and another unto dishonour?",
+    "attribution": "Romans 9:21"
+  }
 }

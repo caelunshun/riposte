@@ -3,5 +3,10 @@
   "cost": 70,
   "era": "ancient",
 
-  "unlocksImprovements": ["Mine"]
+  "unlocksImprovements": ["Mine"],
+
+  "quote": {
+    "text": "All creation is a mine, and every man, a miner.",
+    "attribution": "Abraham Lincoln"
+  }
 }

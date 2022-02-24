@@ -2,5 +2,10 @@
   "name": "Sailing",
   "cost": 110,
   "prerequisites": ["Pottery", "Fishing"],
-  "era": "ancient"
+  "era": "ancient",
+
+  "quote": {
+    "text": "The Yankee clipper is under her sky-sails, she cuts the sparkle and scud.",
+    "attribution": "Walt Whitman"
+  }
 }

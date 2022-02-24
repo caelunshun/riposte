@@ -1,0 +1,6 @@
+{
+  "name": "Liberalism",
+  "cost": 1400,
+  "prerequisites": ["Philosophy", "Education"],
+  "era": "renaissance"
+}

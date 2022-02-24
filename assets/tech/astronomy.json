@@ -1,0 +1,6 @@
+{
+  "name": "Astronomy",
+  "cost": 2000,
+  "prerequisites": ["Calendar", "Optics"],
+  "era": "renaissance"
+}

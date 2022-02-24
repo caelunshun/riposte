@@ -1,0 +1,6 @@
+{
+  "name": "Optics",
+  "cost": 600,
+  "prerequisites": ["Compass", "Machinery"],
+  "era": "medieval"
+}

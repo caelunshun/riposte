@@ -1,0 +1,6 @@
+{
+  "name": "Constitution",
+  "cost": 2000,
+  "prerequisites": ["Code of Laws", "Nationalism"],
+  "era": "renaissance"
+}

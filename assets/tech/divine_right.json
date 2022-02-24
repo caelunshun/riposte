@@ -1,0 +1,6 @@
+{
+  "name": "Divine Right",
+  "cost": 1200,
+  "prerequisites": ["Theology", "Monarchy"],
+  "era": "medieval"
+}

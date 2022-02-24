@@ -2,5 +2,10 @@
   "name": "Archery",
   "cost": 80,
   "prerequisites": ["Hunting"],
-  "era": "ancient"
+  "era": "ancient",
+
+  "quote": {
+    "text": "When you shoot a bow and arrow, you aim at the clouds, not because you expect to hit them, but so that you may reach the distant target on the ground.",
+    "attribution": "Sun Tzu"
+  }
 }

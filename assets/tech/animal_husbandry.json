@@ -4,5 +4,10 @@
   "prerequisites": ["Agriculture"],
   "era": "ancient",
 
-  "unlocksImprovements": ["Pasture"]
+  "unlocksImprovements": ["Pasture"],
+
+  "quote": {
+    "text": "Know well the state of your flocks, and give attention to your herds, for riches do not last forever.",
+    "attribution": "Proverbs 27:23"
+  }
 }

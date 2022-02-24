@@ -1,13 +1,12 @@
 [workspace]
 members = [
-    "client",
-    "client/protocol",
-    "launcher",
-    "lobby",
-    "bundler",
-    "backend",
-    "backend/api",
-    "c-bindings",
+    "crates/backend",
+    "crates/backend/api",
+    "crates/bundler",
+    "crates/client",
+    "crates/common",
+    "crates/launcher",
+    "crates/server",
 ]
 
 resolver = "2"
@@ -17,4 +16,15 @@ resolver = "2"
 opt-level = 3
 
 [patch.crates-io]
-slotmap = { git = "https://github.com/caelunshun/slotmap", branch = "feature/try_insert_with_key" }
+slotmap = { git = "https://github.com/orlp/slotmap" }
+# Required for Dume (bug in Naga breaks atomic array access on Metal)
+naga = { git = "https://github.com/caelunshun/naga", branch = "macos-fix" }
+
+#[patch."https://github.com/caelunshun/dume"]
+#dume = { path = "../dume/crates/dume" }
+# dume-video = { path = "../dume/crates/dume-video" }
+
+# [patch."https://github.com/caelunshun/duit"]
+# duit = { path = "../duit/crates/duit" }
+# duit-core = { path = "../duit/crates/duit-core" }
+# duit-platform = { path = "../duit/crates/duit-platform" }

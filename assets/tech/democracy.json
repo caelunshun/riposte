@@ -1,0 +1,6 @@
+{
+  "name": "Democracy",
+  "cost": 2800,
+  "prerequisites": ["Printing Press", "Constitution"],
+  "era": "renaissance"
+}

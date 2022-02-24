@@ -10,6 +10,6 @@
     "hammers": 1,
     "commerce": 1
   },
-  "abundance": 3,
-  "allowDeserts": false
+  "abundance": 5,
+  "allowDesert": false
 }

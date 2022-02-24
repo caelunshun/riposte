@@ -1,0 +1,6 @@
+{
+  "name": "Printing Press",
+  "cost": 1600,
+  "prerequisites": ["Machinery", "Paper"],
+  "era": "renaissance"
+}

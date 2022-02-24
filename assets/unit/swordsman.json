@@ -1,0 +1,10 @@
+{
+  "id": "swordsman",
+  "name": "Swordsman",
+  "strength": 6,
+  "movement": 1,
+  "cost": 40,
+  "techs": ["Iron Working"],
+  "resources": ["iron"],
+  "category": "melee"
+}

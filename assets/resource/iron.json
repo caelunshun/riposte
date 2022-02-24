@@ -1,0 +1,14 @@
+{
+    "id": "iron",
+    "name": "Iron",
+    "revealedBy": "Iron Working",
+    "yieldBonus": {
+      "hammers": 1
+    },
+    "improvement": "Mine",
+    "improvedBonus": {
+      "hammers": 1
+    },
+    "abundance": 5,
+    "allowDesert": true
+  }

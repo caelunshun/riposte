@@ -1,0 +1,6 @@
+{
+  "name": "Philosophy",
+  "cost": 800,
+  "prerequisites": ["Meditation", "Code of Laws"],
+  "era": "medieval"
+}

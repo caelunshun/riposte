@@ -1,0 +1,28 @@
+[package]
+name = "riposte-server"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+ahash = "0.7"
+anyhow = "1"
+arrayvec = "0.7"
+float-ord = "0.3"
+fs-err = "2"
+flume = "0.10"
+futures-util = "0.3"
+glam = "0.17"
+log = "0.4"
+noise = { version = "0.7", default-features = false }
+quinn = "0.8"
+rand = "0.8"
+rand_pcg =   "0.3"
+riposte-backend-api = { path = "../backend/api" }
+riposte-common = { path = "../common" }
+slotmap = "1"
+thiserror = "1"
+tokio = { version = "1", features = [ "full" ] }
+uuid = "0.8"
+
+[dev-dependencies]
+image = { version = "0.23", default-features = false, features = [ "png" ] }

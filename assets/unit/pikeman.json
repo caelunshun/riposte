@@ -1,0 +1,17 @@
+{
+  "id": "pikeman",
+  "name": "Pikeman",
+  "strength": 6,
+  "movement": 1,
+  "cost": 60,
+  "techs": ["Engineering"],
+  "resources": ["iron"],
+  "category": "melee",
+  "combatBonuses": [
+    {
+      "type": "againstUnitCategory",
+      "category": "mounted",
+      "bonusPercent": 100
+    }
+  ]
+}

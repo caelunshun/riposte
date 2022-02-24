@@ -9,6 +9,6 @@
   "improvedBonus": {
     "hammers": 3
   },
-  "abundance": 4,
-  "allowDeserts": true
+  "abundance": 6,
+  "allowDesert": true
 }

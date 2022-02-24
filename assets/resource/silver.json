@@ -1,0 +1,15 @@
+{
+    "id": "silver",
+    "name": "Silver",
+    "revealedBy": "Mining",
+    "yieldBonus": {
+      "commerce": 1
+    },
+    "improvement": "Mine",
+    "improvedBonus": {
+      "commerce": 4
+    },
+    "happyBonus": 1,
+    "abundance": 4,
+    "allowDesert": false
+}

@@ -2,5 +2,10 @@
   "name": "Bronze Working",
   "cost": 150,
   "prerequisites": ["Mining"],
-  "era": "ancient"
+  "era": "ancient",
+
+  "quote": {
+    "text": "Without a sign, his sword the brave man draws, and asks no omen, but his country's cause.",
+    "attribution": "Homer, The Iliad"
+  }
 }

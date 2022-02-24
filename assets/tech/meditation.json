@@ -2,5 +2,10 @@
   "name": "Meditation",
   "cost": 70,
   "prerequisites": ["Mysticism"],
-  "era": "ancient"
+  "era": "ancient",
+
+  "quote": {
+    "text": "Meditation brings wisdom; lack of meditation leaves ignorance. Know well what leads you forward and what holds you back.",
+    "attribution": "Buddha"
+  }
 }

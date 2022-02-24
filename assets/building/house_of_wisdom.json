@@ -1,0 +1,17 @@
+{
+  "name": "House of Wisdom",
+  "cost": 110,
+  "techs": ["Writing"],
+  "onlyForCivs": ["arabia"],
+  "replaces": "Library",
+  "effects": [
+    {
+      "type": "bonusCulture",
+      "amount": 2
+    },
+    {
+      "type": "bonusBeakerPercent",
+      "amount": 50
+    }
+  ]
+}

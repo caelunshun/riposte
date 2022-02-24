@@ -10,6 +10,6 @@
     "commerce": 5
   },
   "happyBonus": 1,
-  "abundance": 4,
-  "allowDeserts": true
+  "abundance": 2,
+  "allowDesert": true
 }

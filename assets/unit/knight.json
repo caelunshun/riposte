@@ -6,5 +6,6 @@
   "cost": 90,
   "techs": ["Guilds", "Horseback Riding"],
   "category": "mounted",
-  "resources": ["copper", "horse"]
+  "firstStrikeImmunity": true,
+  "resources": ["iron", "horse"]
 }

@@ -1,0 +1,6 @@
+{
+  "name": "Replaceable Parts",
+  "cost": 2000,
+  "prerequisites": ["Banking", "Printing Press"],
+  "era": "renaissance"
+}

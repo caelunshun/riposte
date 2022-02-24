@@ -1,0 +1,6 @@
+{
+  "name": "Rifling",
+  "cost": 2400,
+  "prerequisites": ["Gunpowder", "Replaceable Parts"],
+  "era": "renaissance"
+}

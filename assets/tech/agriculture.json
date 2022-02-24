@@ -3,5 +3,10 @@
   "cost": 40,
   "era": "ancient",
 
-  "unlocksImprovements": ["Farm"]
+  "unlocksImprovements": ["Farm"],
+
+  "quote": {
+    "text": "No race can prosper till it learns that there is as much dignity in digging a field as there is in writing a poem.",
+    "attribution": "Booker T. Washington"
+  }
 }

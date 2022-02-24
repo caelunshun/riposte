@@ -1,0 +1,6 @@
+{
+  "name": "Paper",
+  "cost": 600,
+  "prerequisites": ["Civil Service"],
+  "era": "medieval"
+}
