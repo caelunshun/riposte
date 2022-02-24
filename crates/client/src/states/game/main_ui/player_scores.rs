@@ -50,7 +50,7 @@ impl PlayerScores {
         while let Some(msg) = cx.ui_mut().pop_message::<Message>() {
             match msg {
                 Message::DeclareWar(player) => client.declare_war_on(game, player),
-                Message::MakePeace(_) => todo!(),
+                Message::MakePeace(player) => client.make_peace_with(game, player),
                 Message::None => {}
             }
         }

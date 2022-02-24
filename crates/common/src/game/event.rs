@@ -12,4 +12,6 @@ pub enum Event {
     TileChanged(UVec2),
     UnitDeleted(UnitId),
     TechUnlocked(PlayerId, Handle<Tech>),
+    WarDeclared(PlayerId, PlayerId),
+    PeaceMade(PlayerId, PlayerId),
 }

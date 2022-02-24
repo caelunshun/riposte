@@ -3,13 +3,15 @@ use riposte_common::{
     event::Event,
     protocol::{
         client::{
-            ClientGamePacket, ClientPacket, ConfigureWorkedTiles, DoUnitAction, MoveUnits,
-            SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask, UnitAction,
+            ClientGamePacket, ClientPacket, ConfigureWorkedTiles, DeclareWar, DoUnitAction,
+            MakePeace, MoveUnits, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask,
+            UnitAction,
         },
         game::server::{InitialGameData, ServerGamePacket, ServerPacket},
         server::{
-            ConfirmMoveUnits, DeleteUnit, GameSaved, TechUnlocked, UnitsMoved, UpdateCity,
-            UpdatePlayer, UpdateTile, UpdateTurn, UpdateUnit, UpdateWorkerProgressGrid,
+            ConfirmMoveUnits, DeleteUnit, GameSaved, PeaceMade, TechUnlocked, UnitsMoved,
+            UpdateCity, UpdatePlayer, UpdateTile, UpdateTurn, UpdateUnit, UpdateWorkerProgressGrid,
+            WarDeclared,
         },
         GenericServerPacket,
     },
@@ -100,7 +102,8 @@ impl GameServer {
             ClientPacket::SetEconomySettings(p) => self.handle_set_economy_settings(player, p),
             ClientPacket::SetResearch(p) => self.handle_set_research(player, p),
             ClientPacket::DoUnitAction(p) => self.handle_do_unit_action(p),
-            ClientPacket::DeclareWar(_) => todo!(),
+            ClientPacket::DeclareWar(p) => self.handle_declare_war(player, p),
+            ClientPacket::MakePeace(p) => self.handle_make_peace(player, p),
             ClientPacket::ConfigureWorkedTiles(p) => self.handle_configure_worked_tiles(p),
             ClientPacket::BombardCity(_) => todo!(),
             ClientPacket::SaveGame(_) => self.handle_save_game(player, conns),
@@ -218,6 +221,18 @@ impl GameServer {
             .send_game_packet(ServerPacket::GameSaved(GameSaved { encoded }), None);
     }
 
+    fn handle_declare_war(&mut self, player: PlayerId, packet: DeclareWar) {
+        self.game
+            .player_mut(player)
+            .declare_war_on(&self.game, packet.on_player);
+    }
+
+    fn handle_make_peace(&mut self, player: PlayerId, packet: MakePeace) {
+        self.game
+            .player_mut(player)
+            .make_peace_with(&self.game, packet.with_player);
+    }
+
     fn end_turn(&mut self, conns: &Connections) {
         self.ended_turns.values_mut().for_each(|b| *b = false);
         self.game.end_turn();
@@ -275,6 +290,13 @@ impl GameServer {
                 conns
                     .get(self.conn_for_player(player))
                     .send_game_packet(ServerPacket::TechUnlocked(TechUnlocked { tech }), None);
+            }
+            Event::WarDeclared(declarer, declared) => self.broadcast(
+                conns,
+                ServerPacket::WarDeclared(WarDeclared { declared, declarer }),
+            ),
+            Event::PeaceMade(maker, made) => {
+                self.broadcast(conns, ServerPacket::PeaceMade(PeaceMade { made, maker }))
             }
         });
     }

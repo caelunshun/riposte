@@ -35,6 +35,8 @@ pub enum ServerPacket {
     UpdateWorkerProgressGrid(UpdateWorkerProgressGrid),
     TechUnlocked(TechUnlocked),
     GameSaved(GameSaved),
+    WarDeclared(WarDeclared),
+    PeaceMade(PeaceMade),
 }
 
 /// Sent in the `GameStarted` lobby packet.
@@ -136,4 +138,18 @@ pub struct TechUnlocked {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct GameSaved {
     pub encoded: Vec<u8>,
+}
+
+/// Someone declared war on another player.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct WarDeclared {
+    pub declarer: PlayerId,
+    pub declared: PlayerId,
+}
+
+/// Someone made peace with another player.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct PeaceMade {
+    pub maker: PlayerId,
+    pub made: PlayerId,
 }

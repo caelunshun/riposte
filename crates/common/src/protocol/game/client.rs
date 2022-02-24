@@ -25,6 +25,7 @@ pub enum ClientPacket {
     SetResearch(SetResearch),
     DoUnitAction(DoUnitAction),
     DeclareWar(DeclareWar),
+    MakePeace(MakePeace),
     ConfigureWorkedTiles(ConfigureWorkedTiles),
     BombardCity(BombardCity),
     SaveGame(SaveGame),
@@ -95,6 +96,12 @@ pub struct DoUnitAction {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DeclareWar {
     pub on_player: PlayerId,
+}
+
+/// Ends the war with a player/
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct MakePeace {
+    pub with_player: PlayerId,
 }
 
 /// Updates a city's manually worked tiles.

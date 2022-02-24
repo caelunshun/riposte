@@ -13,8 +13,8 @@ use riposte_common::{
     player::EconomySettings,
     protocol::{
         client::{
-            ClientGamePacket, ConfigureWorkedTiles, DeclareWar, DoUnitAction, EndTurn, MoveUnits,
-            SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask,
+            ClientGamePacket, ConfigureWorkedTiles, DeclareWar, DoUnitAction, EndTurn, MakePeace,
+            MoveUnits, SaveGame, SetCityBuildTask, SetEconomySettings, SetResearch, SetWorkerTask,
         },
         game::client::{ClientPacket, UnitAction},
         lobby::{
@@ -260,6 +260,10 @@ impl Client<GameState> {
         self.send_message(ClientPacket::DeclareWar(DeclareWar { on_player }));
     }
 
+    pub fn make_peace_with(&mut self, _game: &Game, with_player: PlayerId) {
+        self.send_message(ClientPacket::MakePeace(MakePeace { with_player }));
+    }
+
     pub fn save_game(&mut self) {
         self.send_message(ClientPacket::SaveGame(SaveGame));
     }
@@ -298,6 +302,14 @@ impl Client<GameState> {
                     ServerPacket::GameSaved(p) => {
                         cx.saves_mut().add_save(cx, &p.encoded, game.turn().get());
                     }
+                    ServerPacket::WarDeclared(p) => game.push_event(GameEvent::WarDeclared {
+                        declared: p.declared,
+                        declarer: p.declarer,
+                    }),
+                    ServerPacket::PeaceMade(p) => game.push_event(GameEvent::PeaceDeclared {
+                        declarer: p.maker,
+                        declared: p.made,
+                    }),
                 }
             }
 

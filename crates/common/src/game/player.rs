@@ -359,6 +359,28 @@ impl Player {
         self.economy_settings = settings;
     }
 
+    pub fn declare_war_on(&mut self, game: &Game, on_player_id: PlayerId) {
+        if self.at_war_with.insert(on_player_id) {
+            let mut on_player = game.player_mut(on_player_id);
+            on_player.at_war_with.insert(self.id);
+
+            game.push_event(Event::PlayerChanged(self.id));
+            game.push_event(Event::PlayerChanged(on_player_id));
+            game.push_event(Event::WarDeclared(self.id, on_player_id));
+        }
+    }
+
+    pub fn make_peace_with(&mut self, game: &Game, with_player_id: PlayerId) {
+        if self.at_war_with.remove(&with_player_id) {
+            let mut with_player = game.player_mut(with_player_id);
+            with_player.at_war_with.remove(&self.id);
+
+            game.push_event(Event::PlayerChanged(self.id));
+            game.push_event(Event::PlayerChanged(with_player_id));
+            game.push_event(Event::PeaceMade(self.id, with_player_id));
+        }
+    }
+
     /// Should be called on the end of each turn.
     pub fn on_turn_end(&mut self, game: &Game) {
         self.update_economy(game);
