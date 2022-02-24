@@ -104,8 +104,13 @@ impl MapGenerator {
             let player = game.new_player_id();
             let player_kind = match &player_desc.player {
                 SlotPlayer::Empty { .. } => panic!("empty player added to game"),
-                SlotPlayer::Human { player_uuid, .. } => PlayerKind::Human {
+                SlotPlayer::Human {
+                    player_uuid,
+                    username,
+                    ..
+                } => PlayerKind::Human {
                     account_uuid: *player_uuid,
+                    username: username.clone(),
                 },
                 SlotPlayer::Ai { .. } => PlayerKind::Ai,
             };

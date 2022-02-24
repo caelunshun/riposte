@@ -159,6 +159,7 @@ impl LobbyServer {
         &mut self,
         id: ConnectionId,
         player_uuid: Uuid,
+        username: String,
         is_admin: bool,
     ) -> Result<(), NoOpenSlots> {
         let (slot_id, _) = self
@@ -179,6 +180,7 @@ impl LobbyServer {
             civ,
             leader,
             is_admin,
+            username,
         };
 
         self.slot_connections.insert(slot_id, id);

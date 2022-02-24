@@ -11,7 +11,9 @@ use game_server::GameServer;
 use lobby_server::LobbyServer;
 use mapgen::MapGenerator;
 use riposte_backend_api::{
+    riposte_backend_client::RiposteBackendClient,
     server::{GameServerToHub, Message},
+    tonic::transport::Channel,
     SessionId,
 };
 use riposte_common::{
@@ -39,6 +41,7 @@ pub struct ServerConfig {
     pub registry: Arc<Registry>,
     pub multiplayer_session_id: Option<SessionId>,
     pub save: Option<Vec<u8>>,
+    pub backend: RiposteBackendClient<Channel>,
 }
 
 pub struct Server {
@@ -175,14 +178,14 @@ impl Server {
             match sender {
                 Ok(sender) => {
                     let bridge = Bridge::server(sender, receiver);
-                    self.add_connection(bridge, player_uuid, false);
+                    self.add_connection(bridge, player_uuid, false).await;
                 }
                 Err(e) => log::error!("Failed to open stream to client: {:?}", e),
             }
         }
     }
 
-    pub fn add_connection(
+    pub async fn add_connection(
         &mut self,
         bridge: Bridge<ServerSide>,
         player_uuid: Uuid,
@@ -197,9 +200,19 @@ impl Server {
             is_admin
         );
 
+        // Fetch player account
+        let user_info = self
+            .config
+            .backend
+            .fetch_user_info(riposte_backend_api::Uuid::from(player_uuid))
+            .await;
+        let username = user_info
+            .map(|info| info.into_inner().username)
+            .unwrap_or_else(|_| "<ERROR>".to_string());
+
         match &mut self.state {
             State::Lobby(l) => {
-                if let Err(e) = l.add_connection(id, player_uuid, is_admin) {
+                if let Err(e) = l.add_connection(id, player_uuid, username, is_admin) {
                     log::warn!("Player rejected from joining the lobby");
                     self.kick(id, e.to_string());
                 }

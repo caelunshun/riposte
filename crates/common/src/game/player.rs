@@ -152,7 +152,10 @@ impl Player {
     }
 
     pub fn username(&self) -> &str {
-        &self.leader().name
+        match &self.kind {
+            PlayerKind::Human { username, .. } => username,
+            PlayerKind::Ai => &self.leader().name,
+        }
     }
 
     pub fn base_revenue(&self) -> u32 {
@@ -526,7 +529,10 @@ pub struct PlayerEconomy {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum PlayerKind {
-    Human { account_uuid: Uuid },
+    Human {
+        account_uuid: Uuid,
+        username: String,
+    },
     Ai,
 }
 

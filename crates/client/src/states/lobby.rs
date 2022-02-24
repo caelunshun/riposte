@@ -98,11 +98,14 @@ impl GameLobbyState {
                 tokio_runtime: cx.runtime().handle().clone(),
                 multiplayer_session_id,
                 save,
+                backend: cx.backend().client().clone(),
             })
             .await?;
 
             let rt = cx.runtime().handle().clone();
-            server.add_connection(server_bridge, cx.options().account().uuid(), true);
+            server
+                .add_connection(server_bridge, cx.options().account().uuid(), true)
+                .await;
             thread::spawn(move || {
                 let _guard = rt.enter();
                 server.run();

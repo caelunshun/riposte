@@ -85,6 +85,7 @@ pub enum SlotPlayer {
     /// Slot contains a human player.
     Human {
         player_uuid: Uuid,
+        username: String,
         civ: Handle<Civilization>,
         leader: Leader,
         is_admin: bool,
