@@ -16,10 +16,11 @@ use riposte_backend_api::{
 };
 use riposte_common::{
     bridge::{Bridge, ServerSide},
-    lobby::GameLobby,
+    lobby::{GameLobby, LobbySlot, SlotPlayer},
     mapgen::MapgenSettings,
     protocol::GenericClientPacket,
     registry::Registry,
+    saveload::SaveFile,
 };
 use tokio::{runtime, time::timeout};
 use uuid::Uuid;
@@ -37,12 +38,15 @@ pub struct ServerConfig {
     pub tokio_runtime: runtime::Handle,
     pub registry: Arc<Registry>,
     pub multiplayer_session_id: Option<SessionId>,
+    pub save: Option<Vec<u8>>,
 }
 
 pub struct Server {
     config: ServerConfig,
     connections: Connections,
     state: State,
+
+    save: Option<SaveFile>,
 
     hub: Option<GameServerToHub>, // only if multiplayer == true
 }
@@ -54,11 +58,30 @@ impl Server {
             None => None,
         };
 
+        let save = config
+            .save
+            .as_ref()
+            .map(|bytes| SaveFile::decode(bytes))
+            .transpose()?;
+
+        let lobby = match &save {
+            Some(save) => save.lobby.clone(),
+            None => {
+                let mut lobby = GameLobby::new();
+                // For the host
+                lobby.add_slot(LobbySlot {
+                    player: SlotPlayer::Empty { player_uuid: None },
+                });
+                lobby
+            }
+        };
+
         Ok(Self {
-            state: State::Lobby(LobbyServer::new(Arc::clone(&config.registry))),
+            state: State::Lobby(LobbyServer::new(Arc::clone(&config.registry), lobby)),
             config,
             connections: Connections::default(),
             hub,
+            save,
         })
     }
 
@@ -232,8 +255,13 @@ impl Server {
     }
 
     fn initialize_game(&self, lobby: &GameLobby, settings: &MapgenSettings) -> Game {
-        let gen = MapGenerator::new(settings.clone());
-        gen.generate(lobby, &self.config.registry)
+        match &self.save {
+            Some(save) => Game::from_save_file(Arc::clone(&self.config.registry), save.clone()),
+            None => {
+                let gen = MapGenerator::new(settings.clone());
+                gen.generate(lobby, &self.config.registry)
+            }
+        }
     }
 }
 

@@ -17,6 +17,7 @@ pub mod mapgen;
 pub mod poisson;
 pub mod protocol;
 pub mod registry;
+pub mod saveload;
 pub mod types;
 pub mod utils;
 

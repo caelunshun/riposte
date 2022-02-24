@@ -3,14 +3,14 @@
 pub mod city;
 pub mod combat;
 pub mod culture;
+pub mod event;
 pub mod improvement;
 pub mod player;
-pub mod tile;
-pub mod world;
-pub mod unit;
 pub mod river;
+pub mod tile;
+pub mod unit;
 pub mod worker;
-pub mod event;
+pub mod world;
 
 pub use city::City;
 pub use player::Player;
@@ -28,4 +28,3 @@ slotmap::new_key_type! {
 slotmap::new_key_type! {
     pub struct UnitId;
 }
-

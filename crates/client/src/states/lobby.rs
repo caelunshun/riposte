@@ -73,7 +73,7 @@ pub struct GameLobbyState {
 impl GameLobbyState {
     pub fn new_hosted(
         cx: &Context,
-        _save: Option<Vec<u8>>,
+        save: Option<Vec<u8>>,
         multiplayer: bool,
     ) -> anyhow::Result<Self> {
         cx.runtime().block_on(async move {
@@ -97,6 +97,7 @@ impl GameLobbyState {
                 registry: Arc::clone(cx.registry()),
                 tokio_runtime: cx.runtime().handle().clone(),
                 multiplayer_session_id,
+                save,
             })
             .await?;
 
@@ -357,7 +358,7 @@ impl GameLobbyState {
 
         for (id, slot) in self.lobby.slots() {
             let name = match &slot.player {
-                SlotPlayer::Empty => text!("@color[180, 180, 180][<empty>]"),
+                SlotPlayer::Empty { .. } => text!("@color[180, 180, 180][<empty>]"),
                 SlotPlayer::Human { player_uuid, .. } => {
                     match self.user_info(cx, player_uuid.clone()) {
                         Some(info) => text!("{}", info.username),
@@ -372,7 +373,7 @@ impl GameLobbyState {
                 SlotPlayer::Ai { .. } => text!("<AI>"),
             };
             let status = match &slot.player {
-                SlotPlayer::Empty => text!("@color[30,200,50][Open]"),
+                SlotPlayer::Empty { .. } => text!("@color[30,200,50][Open]"),
                 SlotPlayer::Human { is_admin: true, .. } => text!("@color[230,20,10][Admin]"),
                 SlotPlayer::Human {
                     is_admin: false, ..

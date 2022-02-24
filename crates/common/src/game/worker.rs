@@ -12,7 +12,7 @@
 
 use ahash::AHashMap;
 use glam::UVec2;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{event::Event, Game, Grid, Improvement, Player, Tile};
 

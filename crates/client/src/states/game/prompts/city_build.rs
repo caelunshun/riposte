@@ -131,10 +131,7 @@ impl CityBuildPrompt {
             }
 
             let tooltip_text = tooltips::build_task_tooltip(cx.registry(), &task);
-            handle
-                .tooltip_text
-                .get_mut()
-                .set_text(tooltip_text);
+            handle.tooltip_text.get_mut().set_text(tooltip_text);
 
             self.window
                 .as_mut()

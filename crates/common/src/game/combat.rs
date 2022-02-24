@@ -1,6 +1,6 @@
 use crate::UnitId;
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 /// A combat event that occurred between two units.
 ///

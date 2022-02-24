@@ -65,11 +65,14 @@ impl SaveFiles {
             log::error!("Failed to write save to disk: {}", e);
         }
 
-        self.index.entries.push(SaveFileEntry {
-            turn,
-            created_at: SystemTime::now(),
-            path: name,
-        });
+        self.index.entries.insert(
+            0,
+            SaveFileEntry {
+                turn,
+                created_at: SystemTime::now(),
+                path: name,
+            },
+        );
         self.rewrite_index(cx);
 
         log::info!("Successfully saved game to {}", path.display());

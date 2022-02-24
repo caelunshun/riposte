@@ -295,6 +295,9 @@ impl Client<GameState> {
                     ServerPacket::TechUnlocked(p) => {
                         game.push_event(GameEvent::TechUnlocked { tech: p.tech })
                     }
+                    ServerPacket::GameSaved(p) => {
+                        cx.saves_mut().add_save(cx, &p.encoded, game.turn().get());
+                    }
                 }
             }
 

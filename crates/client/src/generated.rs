@@ -1,4 +1,6 @@
-use crate::ui::flashing_button::FlashingButton; use crate::ui::turn_indicator::TurnIndicatorCircle; use crate::ui::unit_indicator::UnitIndicator;
+use crate::ui::flashing_button::FlashingButton;
+use crate::ui::turn_indicator::TurnIndicatorCircle;
+use crate::ui::unit_indicator::UnitIndicator;
 use duit::widgets::*;
 use duit::*;
 pub struct GameLobbyWindow {

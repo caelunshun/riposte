@@ -25,7 +25,12 @@ impl UnitMoveSplines {
         }
         let spline = &mut self.splines[unit];
 
-        if spline.keys().last().map(|k| k.value.as_u32() == new_pos).unwrap_or(false) {
+        if spline
+            .keys()
+            .last()
+            .map(|k| k.value.as_u32() == new_pos)
+            .unwrap_or(false)
+        {
             return;
         }
 

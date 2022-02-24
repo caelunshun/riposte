@@ -184,7 +184,7 @@ fn build_endpoint() -> anyhow::Result<(quinn::Endpoint, Incoming)> {
 }
 
 fn load_certs_and_key() -> anyhow::Result<(Vec<rustls::Certificate>, rustls::PrivateKey)> {
-    let(key_path, cert_path) = super::key_and_cert_paths()?;
+    let (key_path, cert_path) = super::key_and_cert_paths()?;
 
     let key = fs::read(&key_path)?;
     let key = match rustls_pemfile::pkcs8_private_keys(&mut &*key)?

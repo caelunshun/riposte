@@ -7,7 +7,7 @@ use std::{
 
 use glam::UVec2;
 use lexical::WriteFloatOptions;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{
     assets::Handle,

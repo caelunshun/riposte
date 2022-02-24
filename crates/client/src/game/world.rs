@@ -7,7 +7,6 @@ use std::{
 use arrayvec::ArrayVec;
 use duit::Event;
 use glam::UVec2;
-use riposte_common::{Era, river::Rivers};
 use riposte_common::{
     game::tile::OutOfBounds,
     protocol::server::InitialGameData,
@@ -15,6 +14,7 @@ use riposte_common::{
     utils::VersionSnapshot,
     CityId, Grid, PlayerId, Turn, UnitId,
 };
+use riposte_common::{lobby::GameLobby, river::Rivers, Era};
 
 use crate::{
     client::{Client, GameState},
@@ -72,7 +72,7 @@ impl Game {
         let selected_units = SelectedUnits::new();
         let selection_units_version = selected_units.version();
         Self {
-            base: riposte_common::Game::new(registry, map, rivers),
+            base: riposte_common::Game::new(registry, map, rivers, GameLobby::new()),
 
             view: RefCell::new(View::default()),
             stacks: StackGrid::default(),
@@ -130,6 +130,9 @@ impl Game {
         }
 
         game.set_initial_view_center();
+
+        game.base.set_turn(data.turn);
+        *game.base.worker_progress_grid_mut() = data.worker_progress;
 
         Ok(game)
     }
@@ -433,11 +436,13 @@ impl Game {
         self.base.remove_unit(unit);
     }
 
-    fn on_unit_added(&mut self,cx: &Context, unit: UnitId) {
+    fn on_unit_added(&mut self, cx: &Context, unit: UnitId) {
         self.stacks.on_unit_added(self, unit);
         self.selection_driver_mut().on_unit_added(self, unit);
         let pos = self.unit(unit).pos();
-        self.unit_splines.borrow_mut().on_unit_moved(cx, unit, pos, pos);
+        self.unit_splines
+            .borrow_mut()
+            .on_unit_moved(cx, unit, pos, pos);
     }
 
     pub fn on_units_moved(&self, cx: &Context, units: &[UnitId], old_pos: UVec2, new_pos: UVec2) {
@@ -447,13 +452,16 @@ impl Game {
         self.selection_driver_mut()
             .on_units_moved(self, units, old_pos, new_pos);
         for &unit in units {
-            self.unit_splines.borrow_mut().on_unit_moved(cx, unit, old_pos, new_pos);
+            self.unit_splines
+                .borrow_mut()
+                .on_unit_moved(cx, unit, old_pos, new_pos);
 
             self.push_event(GameEvent::UnitMoved {
                 unit,
                 old_pos,
                 new_pos,
-            });self.push_event(GameEvent::UnitUpdated { unit });
+            });
+            self.push_event(GameEvent::UnitUpdated { unit });
         }
     }
 

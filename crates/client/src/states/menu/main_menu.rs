@@ -11,7 +11,7 @@ pub enum Action {
     EnterSingleplayerLobby,
     CreateMultiplayerLobby,
     EnterServerList,
-    EnterSavesList,
+    EnterSavesList { multiplayer: bool },
 }
 
 #[derive(Copy, Clone, Debug)]
@@ -86,11 +86,15 @@ impl MainMenuState {
                 Message::SingleplayerNewGameClicked => {
                     action = Some(Action::EnterSingleplayerLobby)
                 }
-                Message::SingleplayerLoadGameClicked => action = Some(Action::EnterSavesList),
+                Message::SingleplayerLoadGameClicked => {
+                    action = Some(Action::EnterSavesList { multiplayer: false })
+                }
                 Message::MultiplayerClicked => self.current_page = Page::Multiplayer,
                 Message::MultiplayerJoinGameClicked => action = Some(Action::EnterServerList),
                 Message::MultiplayerNewGameClicked => action = Some(Action::CreateMultiplayerLobby),
-                Message::MultiplayerLoadGameClicked => {}
+                Message::MultiplayerLoadGameClicked => {
+                    action = Some(Action::EnterSavesList { multiplayer: true })
+                }
             }
         });
 

@@ -8,8 +8,8 @@ use riposte_common::{
         },
         game::server::{InitialGameData, ServerGamePacket, ServerPacket},
         server::{
-            ConfirmMoveUnits, DeleteUnit, TechUnlocked, UnitsMoved, UpdateCity, UpdatePlayer,
-            UpdateTile, UpdateTurn, UpdateUnit, UpdateWorkerProgressGrid,
+            ConfirmMoveUnits, DeleteUnit, GameSaved, TechUnlocked, UnitsMoved, UpdateCity,
+            UpdatePlayer, UpdateTile, UpdateTurn, UpdateUnit, UpdateWorkerProgressGrid,
         },
         GenericServerPacket,
     },
@@ -74,6 +74,7 @@ impl GameServer {
             units: self.game.units().map(|u| u.clone()).collect(),
             cities: self.game.cities().map(|c| c.clone()).collect(),
             rivers: self.game.rivers().clone(),
+            worker_progress: self.game.worker_progress_grid().clone(),
         }
     }
 
@@ -102,7 +103,7 @@ impl GameServer {
             ClientPacket::DeclareWar(_) => todo!(),
             ClientPacket::ConfigureWorkedTiles(p) => self.handle_configure_worked_tiles(p),
             ClientPacket::BombardCity(_) => todo!(),
-            ClientPacket::SaveGame(_) => todo!(),
+            ClientPacket::SaveGame(_) => self.handle_save_game(player, conns),
             ClientPacket::EndTurn(_) => self.handle_end_turn(player, conns),
         }
 
@@ -207,6 +208,14 @@ impl GameServer {
         if self.ended_turns.values().all(|&b| b) {
             self.end_turn(conns);
         }
+    }
+
+    fn handle_save_game(&mut self, player: PlayerId, conns: &Connections) {
+        let save_file = self.game.to_save_file();
+        let encoded = save_file.encode();
+        conns
+            .get(self.conn_for_player(player))
+            .send_game_packet(ServerPacket::GameSaved(GameSaved { encoded }), None);
     }
 
     fn end_turn(&mut self, conns: &Connections) {

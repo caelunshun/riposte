@@ -73,7 +73,7 @@ pub struct City {
     building_effects: AHashMap<BuildingEffectType, u32>,
 
     /// Cached economy data for the city.
-   pub(crate) economy: CityEconomy,
+    pub(crate) economy: CityEconomy,
 
     /// The previous build task we completed.
     previous_build_task: Option<PreviousBuildTask>,
@@ -656,23 +656,21 @@ impl City {
         let distance_to_palace_cost = if self.is_capital() {
             0.
         } else {
-            let capital = game
-                .city(capital)
-                .pos();
+            let capital = game.city(capital).pos();
             let dist = self.pos.as_f64().distance(capital.as_f64());
             (0.125 / 2. * dist) * (7. + self.population().get() as f64)
         };
         let number_of_cities_cost = 0.6
             + 0.1 * self.population().get() as f64 * game.player(self.owner).cities().len() as f64
                 / 2.;
-            
+
         let mut cost = distance_to_palace_cost + number_of_cities_cost;
 
         if self.is_connected_to_city(capital) {
             cost *= 0.9;
         }
 
-        cost 
+        cost
     }
 
     fn update_culture_per_turn(&mut self) {

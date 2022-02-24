@@ -16,7 +16,7 @@ use self::{
     lobby::{ClientLobbyPacket, ServerLobbyPacket},
 };
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 pub mod game;
 pub mod lobby;

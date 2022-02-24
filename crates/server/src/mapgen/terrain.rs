@@ -1,4 +1,4 @@
-use std::{collections::VecDeque};
+use std::collections::VecDeque;
 
 use ahash::AHashSet;
 use float_ord::FloatOrd;
@@ -329,7 +329,8 @@ impl<'a> TerrainGenerator<'a> {
                     terrain,
                     Terrain::Plains | Terrain::Grassland | Terrain::Desert | Terrain::Tundra
                 ) && rainfall > 0.3
-                    && (self.cx.rng.gen_bool(0.4) || forest_noise.get([x as f64, y as f64]) > -0.4) && self.cx.rng.gen_bool(0.9);
+                    && (self.cx.rng.gen_bool(0.4) || forest_noise.get([x as f64, y as f64]) > -0.4)
+                    && self.cx.rng.gen_bool(0.9);
 
                 let tile = tiles.get_mut(pos).unwrap();
                 tile.set_terrain(terrain);

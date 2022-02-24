@@ -97,7 +97,9 @@ fn get_possible_unit_actions(game: &Game, unit: &Unit) -> Vec<PossibleUnitAction
         .next()
     {
         let tile = game.tile(unit.pos()).unwrap();
-        for task in WorkerTask::possible_for_tile(game.base(), &*tile, unit.pos(), &*game.the_player()) {
+        for task in
+            WorkerTask::possible_for_tile(game.base(), &*tile, unit.pos(), &*game.the_player())
+        {
             match &task {
                 WorkerTask::BuildImprovement(improvement) => {
                     let is_recommended = tile

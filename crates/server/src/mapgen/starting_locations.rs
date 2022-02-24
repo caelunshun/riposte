@@ -148,7 +148,7 @@ fn score_tile(pos: UVec2, tiles: &Grid<Tile>, existing_starting_locations: &[UVe
 
         if let Some(resource) = bfc_tile.resource() {
             if resource.improvement == "Farm" {
-              num_food_resources += 1;
+                num_food_resources += 1;
             }
         }
     }

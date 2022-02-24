@@ -1,6 +1,6 @@
 use std::{cmp, fmt::Display};
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use super::PlayerId;
 

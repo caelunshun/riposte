@@ -49,7 +49,7 @@ impl PopupWindows {
             .get_mut()
             .on_click(move || ClosePopup(window_id));
     }
-    
+
     pub fn update(&mut self, ui: &mut Ui) {
         loop {
             match ui.pop_message::<ClosePopup>() {

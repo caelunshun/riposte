@@ -85,7 +85,9 @@ impl TileRenderLayer for ImprovementRenderer {
                 Improvement::Road => self.render_road(game, tile_pos, &mut canvas),
                 Improvement::Pasture => self.render_improvement_icon(&mut canvas, self.pasture),
                 Improvement::Cottage(_) => self.render_improvement_icon(&mut canvas, self.cottage),
-                Improvement::Plantation => self.render_improvement_icon(&mut canvas, self.plantation),
+                Improvement::Plantation => {
+                    self.render_improvement_icon(&mut canvas, self.plantation)
+                }
             }
         }
     }

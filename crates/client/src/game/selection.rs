@@ -6,8 +6,9 @@ use duit::{Event, Vec2};
 use float_ord::FloatOrd;
 use glam::UVec2;
 use riposte_common::{
+    protocol::server::ConfirmMoveUnits,
     utils::{Version, VersionSnapshot},
-    UnitId, protocol::server::ConfirmMoveUnits,
+    UnitId,
 };
 use slotmap::{SecondaryMap, SlotMap};
 use smallvec::SmallVec;
@@ -595,5 +596,5 @@ struct WaitingMovement {
     target_pos: UVec2,
     start_pos: UVec2,
     callback: Box<dyn Fn(&Game, bool)>,
-    future: ServerResponseFuture<ConfirmMoveUnits>
+    future: ServerResponseFuture<ConfirmMoveUnits>,
 }

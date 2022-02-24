@@ -8,7 +8,7 @@ use crate::{
 };
 
 pub struct GameSounds {
-  pub  playing: Vec<SoundHandle>,
+    pub playing: Vec<SoundHandle>,
     previous_unit_move_time: Instant,
 }
 

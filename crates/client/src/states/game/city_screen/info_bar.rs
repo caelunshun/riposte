@@ -74,14 +74,11 @@ impl InfoBarScreen {
         let growth_text = if city.is_growing() {
             text!("Growing ({} turns)", city.turns_needed_for_growth())
         } else if city.is_stagnant() {
-           text!("Stagnant")
+            text!("Stagnant")
         } else {
             text!("@color[180, 20, 30][STARVATION!]")
         };
-        self.window
-            .growth_text
-            .get_mut()
-            .set_text(growth_text);
+        self.window.growth_text.get_mut().set_text(growth_text);
 
         let production_text = match city.build_task() {
             Some(task) => format!(

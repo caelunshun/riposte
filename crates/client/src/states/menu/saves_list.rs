@@ -13,7 +13,7 @@ use crate::{
 
 pub enum Action {
     Close,
-    LoadGame(Vec<u8>),
+    LoadGame(Vec<u8>, bool),
 }
 
 struct Close;
@@ -24,10 +24,12 @@ pub struct SavesListState {
     state: StateAttachment,
 
     window: SavesWindow,
+
+    multiplayer: bool,
 }
 
 impl SavesListState {
-    pub fn new(cx: &Context) -> Self {
+    pub fn new(cx: &Context, multiplayer: bool) -> Self {
         let state = cx.state_manager().create_state();
 
         let (window, _) = state.create_window::<SavesWindow, _>(FillScreen, Z_FOREGROUND);
@@ -64,7 +66,11 @@ impl SavesListState {
         }
         drop(table);
 
-        Self { state, window }
+        Self {
+            state,
+            window,
+            multiplayer,
+        }
     }
 
     pub fn update(&mut self, cx: &mut Context) -> Option<Action> {
@@ -76,7 +82,7 @@ impl SavesListState {
             let saves = cx.saves();
             let save = saves.list_saves().skip(index).next().unwrap();
             let data = saves.load_save(cx, save);
-            return Some(Action::LoadGame(data));
+            return Some(Action::LoadGame(data, self.multiplayer));
         }
 
         None

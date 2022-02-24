@@ -3,7 +3,7 @@
 use std::cell::RefCell;
 
 use glam::UVec2;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{
     assets::Handle, registry::Tech, river::Rivers, unit::MovementPoints,
@@ -34,6 +34,7 @@ pub enum ServerPacket {
     UpdateCity(UpdateCity),
     UpdateWorkerProgressGrid(UpdateWorkerProgressGrid),
     TechUnlocked(TechUnlocked),
+    GameSaved(GameSaved),
 }
 
 /// Sent in the `GameStarted` lobby packet.
@@ -55,6 +56,8 @@ pub struct InitialGameData {
     pub cities: Vec<City>,
     /// Every river in the game.
     pub rivers: Rivers,
+    /// The worker progress grid.
+    pub worker_progress: WorkerProgressGrid,
 }
 
 /// Updates the current turn number.
@@ -123,4 +126,14 @@ pub struct UpdateWorkerProgressGrid {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct TechUnlocked {
     pub tech: Handle<Tech>,
+}
+
+/// Response to a `SaveGame` request.
+///
+/// The packet contains the serialized game data,
+/// which the client should save to disk so the game can be loaded
+/// in the UI at a later point.
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct GameSaved {
+    pub encoded: Vec<u8>,
 }

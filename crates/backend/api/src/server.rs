@@ -62,7 +62,7 @@ impl GameServerToHub {
         Ok(Self(inner))
     }
 
-    pub  fn poll(&self) -> Option<Message> {
+    pub fn poll(&self) -> Option<Message> {
         self.0.messages.try_recv().ok()
     }
 

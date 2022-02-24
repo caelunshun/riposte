@@ -79,7 +79,7 @@ impl MapGenerator {
 
         let tiles = tiles.map(RefCell::new);
 
-        let mut game = Game::new(Arc::clone(registry), tiles, rivers);
+        let mut game = Game::new(Arc::clone(registry), tiles, rivers, lobby.clone());
         self.add_players_and_starting_units(&mut game, registry, lobby, &starting_locations);
 
         for player in game.players() {
@@ -103,7 +103,7 @@ impl MapGenerator {
         for ((lobby_id, player_desc), &starting_location) in lobby.slots().zip(starting_locations) {
             let player = game.new_player_id();
             let player_kind = match &player_desc.player {
-                SlotPlayer::Empty => panic!("empty player added to game"),
+                SlotPlayer::Empty { .. } => panic!("empty player added to game"),
                 SlotPlayer::Human { player_uuid, .. } => PlayerKind::Human {
                     account_uuid: *player_uuid,
                 },

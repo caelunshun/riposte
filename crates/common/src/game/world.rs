@@ -12,8 +12,8 @@ use slotmap::{SecondaryMap, SlotMap};
 
 use super::{CityId, PlayerId, UnitId};
 use crate::{
-    event::Event, registry::Registry, river::Rivers, tile::OutOfBounds, worker::WorkerProgressGrid,
-    City, Grid, Player, Tile, Turn, Unit,
+    event::Event, lobby::GameLobby, registry::Registry, river::Rivers, saveload::SaveFile,
+    tile::OutOfBounds, worker::WorkerProgressGrid, City, Grid, Player, Tile, Turn, Unit,
 };
 
 /// Stores the entire game state.
@@ -47,10 +47,17 @@ pub struct Game {
     events: RefCell<Vec<Event>>,
 
     deferred: RefCell<Vec<Box<dyn FnOnce(&mut Game) + Send>>>,
+
+    lobby: GameLobby,
 }
 
 impl Game {
-    pub fn new(registry: Arc<Registry>, map: Grid<RefCell<Tile>>, rivers: Rivers) -> Self {
+    pub fn new(
+        registry: Arc<Registry>,
+        map: Grid<RefCell<Tile>>,
+        rivers: Rivers,
+        lobby: GameLobby,
+    ) -> Self {
         Self {
             registry,
 
@@ -75,6 +82,71 @@ impl Game {
             events: RefCell::new(Vec::new()),
 
             deferred: RefCell::new(Vec::new()),
+
+            lobby,
+        }
+    }
+
+    pub fn from_save_file(registry: Arc<Registry>, file: SaveFile) -> Self {
+        let mut game = Self {
+            registry,
+            map: file.map.map(|t| RefCell::new(t)),
+            rivers: file.rivers,
+            player_ids: file.player_ids,
+            city_ids: file.city_ids,
+            unit_ids: file.unit_ids,
+            players: SecondaryMap::new(),
+            cities: SecondaryMap::new(),
+            units: SecondaryMap::new(),
+            cities_by_pos: AHashMap::new(),
+            worker_progress: RefCell::new(file.worker_progress),
+            rng: RefCell::new(Pcg64Mcg::from_entropy()), // TODO: should RNG state persist?
+            turn: file.turn,
+            events: RefCell::new(Vec::new()),
+            deferred: RefCell::new(Vec::new()),
+            lobby: file.lobby,
+        };
+
+        for (_, player) in file.players {
+            game.add_player(player);
+        }
+
+        for (_, city) in file.cities {
+            game.add_city(city);
+        }
+
+        for (_, unit) in file.units {
+            game.add_unit(unit);
+        }
+
+        game
+    }
+
+    pub fn to_save_file(&self) -> SaveFile {
+        SaveFile {
+            map: self.map.clone().map(|cell| cell.into_inner()),
+            rivers: self.rivers.clone(),
+            player_ids: self.player_ids.clone(),
+            city_ids: self.city_ids.clone(),
+            unit_ids: self.unit_ids.clone(),
+            players: self
+                .players
+                .iter()
+                .map(|(id, v)| (id, v.borrow().clone()))
+                .collect(),
+            cities: self
+                .cities
+                .iter()
+                .map(|(id, v)| (id, v.borrow().clone()))
+                .collect(),
+            units: self
+                .units
+                .iter()
+                .map(|(id, v)| (id, v.borrow().clone()))
+                .collect(),
+            worker_progress: self.worker_progress.borrow().clone(),
+            turn: self.turn,
+            lobby: self.lobby.clone(),
         }
     }
 
@@ -166,7 +238,7 @@ impl Game {
 
     /// Gets the city at the given tile.
     pub fn city_at_pos(&self, pos: UVec2) -> Option<Ref<City>> {
-       self.city_id_at_pos(pos).map(|id| self.city(id))
+        self.city_id_at_pos(pos).map(|id| self.city(id))
     }
 
     /// Gets the unit with the given ID.

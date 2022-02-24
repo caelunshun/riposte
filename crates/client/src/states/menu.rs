@@ -75,11 +75,11 @@ impl MenuState {
                     main_menu::Action::EnterServerList => {
                         self.state = State::ServerList(ServerListState::new(cx))
                     }
-                    main_menu::Action::EnterSavesList => {
-                        self.state = State::SavesList(SavesListState::new(cx));
+                    main_menu::Action::EnterSavesList { multiplayer } => {
+                        self.state = State::SavesList(SavesListState::new(cx, multiplayer));
                     }
                     main_menu::Action::CreateMultiplayerLobby => {
-                        action = Some(crate::Action::EnterMultiplayerLobby)
+                        action = Some(crate::Action::EnterMultiplayerLobby(None))
                     }
                 },
                 None => {}
@@ -111,8 +111,12 @@ impl MenuState {
                 Some(saves_list::Action::Close) => {
                     self.state = State::MainMenu(MainMenuState::new(cx));
                 }
-                Some(saves_list::Action::LoadGame(save)) => {
-                    action = Some(crate::Action::EnterSingleplayerLobby(Some(save)));
+                Some(saves_list::Action::LoadGame(save, multiplayer)) => {
+                    if multiplayer {
+                        action = Some(crate::Action::EnterMultiplayerLobby(Some(save)));
+                    } else {
+                        action = Some(crate::Action::EnterSingleplayerLobby(Some(save)));
+                    }
                 }
                 _ => {}
             },

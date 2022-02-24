@@ -1,6 +1,6 @@
+use serde::{Deserialize, Serialize};
 use slotmap::SlotMap;
 use uuid::Uuid;
-use serde::{Serialize, Deserialize};
 
 use crate::{
     assets::Handle,
@@ -62,14 +62,14 @@ pub struct LobbySlot {
 impl LobbySlot {
     pub fn is_admin(&self) -> bool {
         match &self.player {
-            SlotPlayer::Empty => false,
+            SlotPlayer::Empty { .. } => false,
             SlotPlayer::Human { is_admin, .. } => *is_admin,
             SlotPlayer::Ai { .. } => false,
         }
     }
 
     pub fn is_occupied(&self) -> bool {
-        !matches!(&self.player, SlotPlayer::Empty)
+        !matches!(&self.player, SlotPlayer::Empty { .. })
     }
 }
 
@@ -77,7 +77,11 @@ impl LobbySlot {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum SlotPlayer {
     /// Slot is empty and open for human players.
-    Empty,
+    Empty {
+        /// UUID of the player owning the slot (if the game was loaded from a save.)
+        /// If set to `Some`, then only that player is allowed to occupy the slot.
+        player_uuid: Option<Uuid>,
+    },
     /// Slot contains a human player.
     Human {
         player_uuid: Uuid,
@@ -97,7 +101,7 @@ impl SlotPlayer {
         match self {
             SlotPlayer::Human { civ, .. } => Some(civ),
             SlotPlayer::Ai { civ, .. } => Some(civ),
-            SlotPlayer::Empty => None,
+            SlotPlayer::Empty { .. } => None,
         }
     }
 
@@ -105,7 +109,7 @@ impl SlotPlayer {
         match self {
             SlotPlayer::Human { leader, .. } => Some(leader),
             SlotPlayer::Ai { leader, .. } => Some(leader),
-            SlotPlayer::Empty => None,
+            SlotPlayer::Empty { .. } => None,
         }
     }
 }

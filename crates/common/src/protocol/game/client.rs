@@ -1,7 +1,7 @@
 //! Messages sent from client to server.
 
 use glam::UVec2;
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use crate::{
     assets::Handle, city::BuildTask, player::EconomySettings, registry::Tech, worker::WorkerTask,

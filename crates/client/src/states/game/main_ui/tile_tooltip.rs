@@ -46,7 +46,9 @@ impl TileTooltip {
             if self.hovered_tile != Some(tile_pos) {
                 let mut displayed = false;
                 if let Ok(tile) = game.tile(tile_pos) {
-                    if game.the_player().visibility_at(tile_pos) != Visibility::Hidden || game.cheat_mode {
+                    if game.the_player().visibility_at(tile_pos) != Visibility::Hidden
+                        || game.cheat_mode
+                    {
                         self.update_for_tile(game, &tile, tile_pos);
                         displayed = true;
                     }

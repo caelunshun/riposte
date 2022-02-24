@@ -5,7 +5,7 @@ use crate::{
     registry::{Civilization, Leader},
 };
 
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 
 use super::game::server::InitialGameData;
 

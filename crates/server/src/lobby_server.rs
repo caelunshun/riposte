@@ -37,11 +37,16 @@ pub struct LobbyServer {
 }
 
 impl LobbyServer {
-    pub fn new(registry: Arc<Registry>) -> Self {
-        let mut lobby = GameLobby::new();
-        lobby.add_slot(LobbySlot {
-            player: SlotPlayer::Empty,
-        }); // for the host
+    pub fn new(registry: Arc<Registry>, mut lobby: GameLobby) -> Self {
+        // Set slots to empty since we loaded from a save file
+        for (_, slot) in lobby.slots_mut() {
+            if let SlotPlayer::Human { player_uuid, .. } = &slot.player {
+                slot.player = SlotPlayer::Empty {
+                    player_uuid: Some(*player_uuid),
+                };
+            }
+        }
+
         Self {
             lobby,
             slot_connections: SecondaryMap::new(),
@@ -81,7 +86,7 @@ impl LobbyServer {
                 let player = if create_slot.is_ai {
                     SlotPlayer::Ai { civ, leader }
                 } else {
-                    SlotPlayer::Empty
+                    SlotPlayer::Empty { player_uuid: None }
                 };
 
                 self.lobby.add_slot(LobbySlot { player });
@@ -159,7 +164,12 @@ impl LobbyServer {
         let (slot_id, _) = self
             .lobby
             .slots_mut()
-            .find(|(_, slot)| matches!(slot.player, SlotPlayer::Empty))
+            .find(|(_, slot)| match &slot.player {
+                SlotPlayer::Empty { player_uuid: uuid } => {
+                    uuid.is_none() || uuid == &Some(player_uuid)
+                }
+                _ => false,
+            })
             .ok_or(NoOpenSlots)?;
 
         let civ = self.random_available_civ().map_err(|_| NoOpenSlots)?;
@@ -181,7 +191,7 @@ impl LobbyServer {
 
     pub fn remove_connection(&mut self, id: ConnectionId) {
         if let Some(slot_id) = self.slot_for_connection(id) {
-            self.lobby.slot_mut(slot_id).player = SlotPlayer::Empty;
+            self.lobby.slot_mut(slot_id).player = SlotPlayer::Empty { player_uuid: None };
             self.slot_connections.remove(slot_id);
             self.connection_slots.remove(id);
 

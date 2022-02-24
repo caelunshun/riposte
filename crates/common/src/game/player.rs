@@ -377,8 +377,10 @@ impl Player {
             let mut city = game.city_mut(city_id);
             base += city.economy().commerce_yield;
 
-            city.economy.gold = self.economy_settings.gold_percent() as f64 / 100. * city.economy.commerce_yield;
-            city.economy.beakers = self.economy_settings.beaker_percent() as f64 / 100. * city.economy.commerce_yield;
+            city.economy.gold =
+                self.economy_settings.gold_percent() as f64 / 100. * city.economy.commerce_yield;
+            city.economy.beakers =
+                self.economy_settings.beaker_percent() as f64 / 100. * city.economy.commerce_yield;
 
             gold += city.economy().gold;
             beakers += city.economy().beakers;

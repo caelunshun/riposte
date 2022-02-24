@@ -1,6 +1,6 @@
 use glam::UVec2;
 
-use crate::{CityId, PlayerId, UnitId, assets::Handle, registry::Tech};
+use crate::{assets::Handle, registry::Tech, CityId, PlayerId, UnitId};
 
 /// Used to track changes to game state so the server
 /// can send updates to clients.
@@ -11,5 +11,5 @@ pub enum Event {
     PlayerChanged(PlayerId),
     TileChanged(UVec2),
     UnitDeleted(UnitId),
-    TechUnlocked(PlayerId, Handle<Tech>)
+    TechUnlocked(PlayerId, Handle<Tech>),
 }

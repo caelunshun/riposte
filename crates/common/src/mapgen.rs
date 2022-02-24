@@ -1,7 +1,7 @@
 use std::fmt::Display;
 
 use glam::{uvec2, UVec2};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use strum::EnumIter;
 
 /// Settings provided to the map generator.

@@ -3,8 +3,8 @@ pub extern crate quinn;
 pub extern crate tonic;
 pub extern crate uuid;
 
-pub mod server;
 pub mod client;
+pub mod server;
 
 use std::str::FromStr;
 
@@ -45,4 +45,3 @@ pub fn codec() -> length_delimited::Builder {
     b.little_endian();
     b
 }
-

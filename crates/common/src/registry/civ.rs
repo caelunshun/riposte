@@ -11,7 +11,7 @@ pub struct Civilization {
     pub cities: Vec<String>,
     pub starting_techs: Vec<String>,
     #[serde(default)]
-    pub intro_text: String
+    pub intro_text: String,
 }
 
 #[derive(Debug, Clone, serde::Deserialize, serde::Serialize)]

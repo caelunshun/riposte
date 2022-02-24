@@ -5,7 +5,7 @@ pub fn merge_text_lines(lines: impl IntoIterator<Item = Text>) -> Text {
     delimit_text(lines, text!("\n"))
 }
 
-pub fn delimit_text(text: impl IntoIterator<Item = Text>, delimiter: Text)-> Text  {
+pub fn delimit_text(text: impl IntoIterator<Item = Text>, delimiter: Text) -> Text {
     let mut res = Text::from_sections(None);
 
     for (i, line) in text.into_iter().enumerate() {

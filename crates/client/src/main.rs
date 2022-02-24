@@ -45,7 +45,7 @@ extern crate fs_err as fs;
 
 pub enum Action {
     EnterSingleplayerLobby(Option<Vec<u8>>),
-    EnterMultiplayerLobby,
+    EnterMultiplayerLobby(Option<Vec<u8>>),
     EnterLobby(Bridge<ClientSide>),
 }
 
@@ -70,8 +70,8 @@ impl RootState {
                                 )),
                             }
                         }
-                        Action::EnterMultiplayerLobby => {
-                            match GameLobbyState::new_hosted(cx, None, true) {
+                        Action::EnterMultiplayerLobby(save) => {
+                            match GameLobbyState::new_hosted(cx, save, true) {
                                 Ok(l) => *self = RootState::Lobby(l),
                                 Err(e) => cx.show_error_popup(&format!(
                                     "failed to create multiplayer game: {}",
