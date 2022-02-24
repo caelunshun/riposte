@@ -28,7 +28,7 @@ use super::{
     path::Pathfinder,
     player::Player,
     selection::{SelectedUnits, SelectionDriver},
-    stack::{StackGrid, UnitStack},
+    stack::UnitStack,
     unit::{Unit, UnitMoveSplines},
     Tile, View,
 };

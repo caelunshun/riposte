@@ -66,6 +66,10 @@ namespace rip {
 
         score = packet.score();
 
+        if (packet.has_useruuid()) {
+            userUUID = packet.useruuid();
+        }
+
         for (int x = 0; x < mapWidth; x++) {
             for (int y = 0; y < mapHeight; y++) {
                 visibilityMap[glm::uvec2(x, y)] =

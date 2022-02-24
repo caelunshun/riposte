@@ -12,6 +12,7 @@
 #include "registry.h"
 #include "ids.h"
 #include "tech.h"
+#include <riposte.pb.h>
 
 namespace rip {
     namespace proto {
@@ -123,6 +124,8 @@ namespace rip {
          int getTotalPopulation(const Game &game);
 
      public:
+        std::optional<proto::UUID> userUUID;
+
          Player(std::string username, std::shared_ptr<CivKind> civ, Leader leader, uint32_t mapWidth, uint32_t mapHeight, const std::shared_ptr<TechTree> &techTree);
 
          Player(const proto::UpdatePlayer &packet, const Registry &registry, const std::shared_ptr<TechTree> &techTree,

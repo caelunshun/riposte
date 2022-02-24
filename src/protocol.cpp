@@ -311,6 +311,10 @@ namespace rip {
         packet.set_civid(player.getCiv().id);
         packet.set_leadername(player.getLeader().name);
 
+        if (player.userUUID.has_value()) {
+            packet.mutable_useruuid()->CopyFrom(*player.userUUID);
+        }
+
         return packet;
     }
 
