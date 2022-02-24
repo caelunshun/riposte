@@ -27,22 +27,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           submodules: recursive
-
-      - name: Install Conan (Linux)
-        if: matrix.os == 'ubuntu-18.04'
-        run: |
-           pwd
-           pip3 install wheel setuptools
-           pip3 install conan
-           export PATH=$PATH:/home/runner/.local/bin
-           echo $PATH
-           sudo ln -s ~/.local/bin/conan /usr/local/bin/conan
-           conan --version
-           ls
-           
-      - name: Install Conan (macOS)
-        if: matrix.os-name == 'macOS'
-        run: brew install conan
            
         # Caching
 
@@ -74,40 +58,10 @@ jobs:
         with:
           path: cmake-build-release
           key: ${{ runner.os }}-cmake-build-v4
-           
-      - name: Cache protobuf library
-        id: cache-protobuf
-        uses: actions/cache@v2
-        if: matrix.os == 'ubuntu-18.04'
-        with:
-          path: protobuf
-          key: ${{ runner.os }}-protobuf
-          
-      - name: Build protobuf library (Linux)
-        if: steps.cache-protobuf.outputs.cache-hit != 'true' && matrix.os == 'ubuntu-18.04'
-        run: |
-           git clone https://github.com/protocolbuffers/protobuf.git
-           cd protobuf
-           git submodule update --init --recursive
-           ./autogen.sh
-           ./autogen.sh
-           ./configure
-           make -j2
-           
-      - name: Install protobuf library (Linux)
-        if: matrix.os == 'ubuntu-18.04'
-        run: |
-           cd protobuf
-           sudo make install
-           sudo ldconfig
-           
-      - name: Install protobuf library (macOS)
-        if: matrix.os-name == 'macOS'
-        run: brew install protobuf
         
       - name: Install dependencies (Linux)
         if: matrix.os == 'ubuntu-18.04'
-        run: sudo apt install libgl-dev libglu1-mesa-dev libasound2-dev -y
+        run: sudo apt install libasound2-dev -y
         
       - name: Install makers
         run: cargo install cargo-make --debug
