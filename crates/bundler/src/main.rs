@@ -15,7 +15,6 @@ use std::{
 use tar::Header;
 
 const BUILD_DIR: &str = "target/release";
-const LIBS_DIR: &str = "cmake-build-release";
 
 const UI_DIR: &str = "client/ui";
 const STYLE_PATH: &str = "client/style.yml";
@@ -23,12 +22,6 @@ const STYLE_PATH: &str = "client/style.yml";
 #[derive(Debug)]
 struct Asset {
     path: String,
-    contents: Vec<u8>,
-}
-
-#[derive(Debug)]
-struct DynLib {
-    name: String,
     contents: Vec<u8>,
 }
 
@@ -41,7 +34,6 @@ struct Executable {
 #[derive(Debug, Default)]
 struct Bundle {
     assets: Vec<Asset>,
-    dynlibs: Vec<DynLib>,
     executables: Vec<Executable>,
 }
 
@@ -51,7 +43,6 @@ impl Bundle {
             .iter()
             .map(|e| e.contents.len())
             .chain(self.assets.iter().map(|m| m.contents.len()))
-            .chain(self.dynlibs.iter().map(|d| d.contents.len()))
             .sum::<usize>()
     }
 }
@@ -60,10 +51,9 @@ fn main() -> anyhow::Result<()> {
     let bundle = find_bundle()?;
 
     println!(
-        "Bundle contains {} assets, {} executables, and {} dynamic libraries.",
+        "Bundle contains {} assets and {} executables.",
         bundle.assets.len(),
         bundle.executables.len(),
-        bundle.dynlibs.len()
     );
     println!(
         "Total uncompressed size: {} MiB",
@@ -85,7 +75,6 @@ fn main() -> anyhow::Result<()> {
 fn find_bundle() -> anyhow::Result<Bundle> {
     let mut bundle = Bundle::default();
     find_assets(&mut bundle)?;
-    find_dynlibs(&mut bundle)?;
     find_executables(&mut bundle)?;
     Ok(bundle)
 }
@@ -118,30 +107,8 @@ fn find_assets(bundle: &mut Bundle) -> anyhow::Result<()> {
     Ok(())
 }
 
-fn find_dynlibs(bundle: &mut Bundle) -> anyhow::Result<()> {
-    let libs_dir = Path::new(LIBS_DIR).to_owned();
-    for entry in fs::read_dir(&libs_dir)? {
-        let entry = entry?;
-        let path = entry.path();
-
-        let extension = path.extension().map(|s| s.to_str().unwrap());
-        if !matches!(extension, Some("so" | "dylib" | "dll")) {
-            continue;
-        }
-
-        bundle.dynlibs.push(DynLib {
-            name: entry.file_name().to_string_lossy().to_string(),
-            contents: fs::read(&path)?,
-        });
-
-        println!("Found dynamic library '{}'", path.display());
-    }
-
-    Ok(())
-}
-
 fn find_executables(bundle: &mut Bundle) -> anyhow::Result<()> {
-    for (file, name) in [("riposte", "Riposte"), ("riposte-server", "riposte-server")] {
+    for (file, name) in [("riposte", "Riposte")] {
         bundle.executables.push(Executable {
             name: name.to_owned(),
             contents: fs::read(Path::new(BUILD_DIR).join(file))?,
@@ -164,15 +131,6 @@ fn build_tarball(bundle: &Bundle) -> anyhow::Result<Vec<u8>> {
         header.set_mode(0o644);
         header.set_cksum();
         archive.append(&header, Cursor::new(&asset.contents))?;
-    }
-
-    for dynlib in &bundle.dynlibs {
-        let mut header = Header::new_gnu();
-        header.set_path(&dynlib.name)?;
-        header.set_size(dynlib.contents.len() as u64);
-        header.set_mode(0o644);
-        header.set_cksum();
-        archive.append(&header, Cursor::new(&dynlib.contents))?;
     }
 
     // UI YAML specs and stylesheets
