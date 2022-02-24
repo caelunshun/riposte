@@ -17,9 +17,11 @@ opt-level = 3
 
 [patch.crates-io]
 slotmap = { git = "https://github.com/orlp/slotmap" }
+# Required for Dume (bug in Naga breaks atomic array access on Metal)
+naga = { git = "https://github.com/caelunshun/naga", branch = "macos-fix" }
 
-[patch."https://github.com/caelunshun/dume"]
-dume = { path = "../dume/crates/dume" }
+#[patch."https://github.com/caelunshun/dume"]
+#dume = { path = "../dume/crates/dume" }
 # dume-video = { path = "../dume/crates/dume-video" }
 
 # [patch."https://github.com/caelunshun/duit"]
