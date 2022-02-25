@@ -16,8 +16,8 @@ use tar::Header;
 
 const BUILD_DIR: &str = "target/release";
 
-const UI_DIR: &str = "client/ui";
-const STYLE_PATH: &str = "client/style.yml";
+const UI_DIR: &str = "crates/client/ui";
+const STYLE_PATH: &str = "crates/client/style.yml";
 
 #[derive(Debug)]
 struct Asset {
@@ -134,8 +134,8 @@ fn build_tarball(bundle: &Bundle) -> anyhow::Result<Vec<u8>> {
     }
 
     // UI YAML specs and stylesheets
-    archive.append_dir_all("crates/client/ui", UI_DIR)?;
-    archive.append_file("crates/client/style.yml", &mut File::open(STYLE_PATH)?)?;
+    archive.append_dir_all("ui", UI_DIR)?;
+    archive.append_file("style.yml", &mut File::open(STYLE_PATH)?)?;
 
     // Executables
     for executable in &bundle.executables {
