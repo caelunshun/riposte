@@ -204,7 +204,7 @@ impl Context {
         let base_dir = if let Ok(dir) = std::env::var("RIPOSTE_UI_BASE_DIR") {
             PathBuf::from(dir)
         } else {
-            PathBuf::from("crates/client/")
+            PathBuf::new()
         };
 
         for entry in WalkDir::new(base_dir.join("ui")) {
