@@ -51,7 +51,7 @@ args = [
 ]
 
 [tasks.bundle]
-dependencies = ["build-debug"]
+dependencies = ["build"]
 command = "cargo"
 args = [
     "run",

@@ -6,6 +6,7 @@
 //! * Locate all assets
 //! and bundle everything into a tarball.
 
+use anyhow::Context;
 use serde::Deserialize;
 use std::{
     fs::{self, File},
@@ -134,8 +135,8 @@ fn build_tarball(bundle: &Bundle) -> anyhow::Result<Vec<u8>> {
     }
 
     // UI YAML specs and stylesheets
-    archive.append_dir_all("ui", UI_DIR)?;
-    archive.append_file("style.yml", &mut File::open(STYLE_PATH)?)?;
+    archive.append_dir_all("ui", UI_DIR).context("ui dir")?;
+    archive.append_file("style.yml", &mut File::open(STYLE_PATH)?).context("style")?;
 
     // Executables
     for executable in &bundle.executables {
