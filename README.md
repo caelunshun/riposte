@@ -5,7 +5,7 @@ The graphics rendering uses [`dume`](https://github.com/caelunshun/dume), a 2D r
 
 ## Features
 
-* Multiplayer support via networking, proxied through the server in the [`backend`](backend) application
+* Multiplayer support via networking, proxied through the server in the [`backend`](crates/backend) application
 * Procedural map generation using Simplex noise, Poisson sampling, and some other clever tricks
 * Basic AI players
 * Economy simulation
