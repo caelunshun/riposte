@@ -1,5 +1,5 @@
 # riposte
-A clone of Civilization IV (2005). It is written from scratch (no game engine) and has, at various points in time, consisted of C++ or Lua code. Now, the whole implementation is in Rust. (Those rewrites were tedious but satisfying).
+A clone of Civilization IV (2005). It is written from scratch (no game engine) and has, at various points in time, consisted of C++ or Lua code. Now, the whole implementation is in Rust. The legacy C++ code is still available in the [`src`](./src) directory.
 
 The graphics rendering uses [`dume`](https://github.com/caelunshun/dume), a 2D renderer I wrote on top of WebGPU, and the UI is based on [`duit`](https://github.com/caelunshun/duit), another one of my libraries.
 
